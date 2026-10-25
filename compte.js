@@ -3,8 +3,8 @@
    Mise en place : voir docs/COMPTES.md. La clé « anon » est publique par conception :
    la sécurité vient des règles RLS de la table progression. */
 const DECLIC_CONFIG = {
-  supabaseUrl: '',      // ex. https://abcdefgh.supabase.co
-  supabaseAnonKey: '',  // clé « anon public » du projet
+  supabaseUrl: 'https://rvomqlelambizurddqyt.supabase.co',
+  supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ2b21xbGVsYW1iaXp1cmRkcXl0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI5Mzc3NzIsImV4cCI6MjEwODUxMzc3Mn0.hNVsmDUGfwJH_jLvTPUZ4PEDy5htmGDgDceLrelpV5E',
 };
 
 window.Compte = (()=>{
