@@ -14,6 +14,8 @@ const cells=(P,x,y,vals,c='var(--code)',cw=0.8)=>{ P.rect(x,y-0.4,cw*vals.length
   vals.forEach((v,i)=>{ if(i) P.seg(x+i*cw,y-0.4,x+i*cw,y+0.4,{c,w:1.5}); if(v!==null) P.text(x+(i+.5)*cw,y,String(v),{a:'middle',dy:5,s:13}); });
   return vals.map((_,i)=>[x+(i+.5)*cw,y]); };
 const ref=(P,x1,y1,x2,y2,c='var(--ink)')=>P.arrow(x1,y1,x2,y2,{c,w:2,hs:9});
+// petit tableau HTML (traces de variables)
+const tab=(h,rows)=>`<table style="margin:6px auto;border-collapse:collapse;text-align:center"><tr>${h.map(x=>`<th style="padding:2px 10px;border-bottom:1px solid var(--line)">${x}</th>`).join('')}</tr>${rows.map(r=>`<tr>${r.map(x=>`<td style="padding:2px 10px">${x}</td>`).join('')}</tr>`).join('')}</table>`;
 
 COURS.push(
 
@@ -52,6 +54,18 @@ print(2 * 3 % 4)     # (2 * 3) % 4 = 2`),
  {h:'Dans quel ordre&nbsp;?',p:'Qu’affiche ce code&nbsp;?',fig:py(`print(2 + 3 * 4 ** 2 // 5)`),
   opts:[cd('16'),cd('80'),cd('10'),cd('11')],ans:3,
   why:`D’abord 4 ** 2 = 16. Puis de gauche à droite : 3 * 16 = 48 et 48 // 5 = 9. Enfin 2 + 9 = 11.`},
+ {kind:'Méthode',h:'Découper un nombre avec // et %',
+  p:`<p>Dès qu’il faut répartir une quantité en paquets (des secondes en minutes, des francs en billets, un nombre en chiffres), pense au couple ${cd('//')} et ${cd('%')}. ${cd('n // k')} compte les paquets complets de taille <i>k</i>, et ${cd('n % k')} donne ce qui reste.</p><p>Pour les chiffres d’un entier positif : ${cd('n % 10')} est le chiffre des unités, et ${cd('n // 10')} efface ce chiffre. Le chiffre des dizaines est donc ${cd('n // 10 % 10')}, celui des centaines ${cd('n // 100 % 10')}.</p>`,
+  demo:{enonce:'Convertir 200 minutes en heures et minutes, puis trouver le chiffre des centaines de 4725.',
+   etapes:[
+    {f:`${cd('200 // 60')} = 3`,w:'Une heure est un paquet de 60 minutes : on compte les paquets complets.'},
+    {f:`${cd('200 % 60')} = 20, car 200 = 60 · 3 + 20`,w:'Le reste est ce qui ne remplit pas une heure de plus. Contrôle toujours avec a = b·q + r.'},
+    {f:`${cd('4725 // 100')} = 47`,w:'Diviser par 100 efface les deux derniers chiffres, 2 et 5.'},
+    {f:`${cd('47 % 10')} = 7`,w:'Le chiffre des unités de 47 est le chiffre des centaines de 4725. Comme // et % ont la même priorité, on écrit d’un coup 4725 // 100 % 10, lu de gauche à droite.'}],
+   conclusion:'200 minutes font 3 h 20 min, et le chiffre des centaines de 4725 est 7.'},
+  note:'Pour revenir en arrière, on recolle les morceaux : 3 h 20 min = 3 · 60 + 20 = 200 min.'},
+ {h:'Le chiffre des centaines',p:`Que vaut ${cd('58372 // 100 % 10')}&nbsp;?`,lab:'résultat =',ans:3,
+  why:'58372 // 100 = 583 (on efface 7 et 2), puis 583 % 10 = 3 : c’est le chiffre des centaines.'},
  {h:'Conversions et affectation',p:`${cd('int()')}, ${cd('float()')}, ${cd('str()')} et ${cd('bool()')} convertissent une valeur. ${cd('int(3.9)')} <b>tronque</b> vers 0. L’affectation ${cd('x = expr')} évalue d’abord la droite, puis attache le nom <i>x</i> au résultat : ${cd('x = x + 1')} a donc un sens.`,
   fig:py(`int('42') + 1     # 43
 str(7) + '7'      # '77' : + colle deux chaînes
@@ -63,6 +77,44 @@ x += 2            # raccourci de x = x + 2, x vaut 7
 a, b = 1, 2
 a, b = b, a       # échange : a vaut 2, b vaut 1`),
   note:`${cd('input()')} renvoie toujours une <b>chaîne</b>. Pour lire un nombre, écris ${cd('int(input())')}.`},
+ {kind:'Méthode',h:'Lire un message d’erreur',
+  p:`<p>Quand Python ne peut pas exécuter une ligne, il s’arrête et affiche un message (une <i>traceback</i>). Lis-le <b>par le bas</b> : la dernière ligne donne le <b>type</b> d’erreur et une explication, la ligne au-dessus montre l’instruction fautive et son numéro.</p><ul><li>${cd('SyntaxError')} ou ${cd('IndentationError')} : le code est mal écrit (parenthèse ou deux-points oubliés, mauvais décalage).</li><li>${cd('NameError')} : nom inconnu (faute de frappe, variable pas encore créée).</li><li>${cd('TypeError')} : opération impossible entre ces types, comme une chaîne + un entier.</li><li>${cd('ValueError')} : bon type mais valeur impossible, comme ${cd("int('abc')")}.</li><li>${cd('ZeroDivisionError')} : division par zéro.</li></ul>`,
+  demo:{enonce:'Ce programme plante. Trouver pourquoi et le corriger.'+py(`age = 17
+print('Tu as ' + age + ' ans')`)+py(`Traceback (most recent call last):
+  File "prog.py", line 2, in <module>
+    print('Tu as ' + age + ' ans')
+TypeError: can only concatenate str (not "int") to str`),
+   etapes:[
+    {f:`Dernière ligne : ${cd('TypeError')}`,w:'Le type d’erreur dit déjà la famille du problème : deux valeurs de types incompatibles.'},
+    {f:'Message : on ne peut coller (<i>concatenate</i>) à une str qu’une autre str, pas un int.',w:'L’explication dit quelle opération a échoué et avec quels types.'},
+    {f:`Ligne 2 : ${cd("'Tu as ' + age")}, où <i>age</i> vaut l’entier 17.`,w:'On repère dans la ligne indiquée l’opération qui mélange les types.'},
+    {f:`Correction : ${cd("print('Tu as ' + str(age) + ' ans')")}`,w:'On convertit l’entier en chaîne avant de coller. On aurait aussi pu écrire print(\'Tu as\', age, \'ans\').'}],
+   conclusion:'Le programme corrigé affiche « Tu as 17 ans ». Retiens le réflexe : type d’erreur, message, puis ligne.'},
+  note:'Le numéro de ligne indique où Python s’est arrêté. La vraie cause est parfois juste avant, par exemple une parenthèse non fermée à la ligne précédente.'},
+ {h:'Quelle erreur&nbsp;?',p:'Que se passe-t-il quand on exécute cette ligne&nbsp;?',fig:py(`n = int('3.5')`),
+  opts:[`Une erreur ${cd('TypeError')}`,`Aucune erreur : <i>n</i> vaut 3`,`Une erreur ${cd('SyntaxError')}`,`Une erreur ${cd('ValueError')}`],ans:3,
+  why:`'3.5' est bien une chaîne, le type accepté par int(). Mais int() ne sait lire que l’écriture d’un entier : la valeur est impossible, d’où ValueError: invalid literal for int(). Il faudrait int(float('3.5')).`},
+ {kind:'Méthode',h:'Tracer un programme avec un tableau',
+  p:`<p>Pour prévoir ce qu’affiche un programme, ne le lis pas d’un bloc : exécute-le comme la machine, <b>une ligne à la fois</b>. Fais un tableau avec une colonne par variable. À chaque affectation, calcule la partie droite avec les valeurs <b>actuelles</b>, puis écris la nouvelle valeur dans la colonne. Une variable garde sa valeur tant qu’on ne la réaffecte pas.</p><p>${cd('print(a, b)')} affiche les valeurs dans l’ordre, séparées par une espace.</p>`,
+  demo:{enonce:'Qu’affiche ce programme&nbsp;?'+py(`a = 7
+b = a // 2
+a = a + b
+b = a % b
+print(a, b)`),
+   etapes:[
+    {f:'Ligne 1 : a = 7.',w:'On ouvre une colonne a et une colonne b. b n’existe pas encore.'},
+    {f:'Ligne 2 : b = 7 // 2 = 3.',w:'On remplace a par sa valeur actuelle, 7.'},
+    {f:'Ligne 3 : a = 7 + 3 = 10.',w:'La droite est calculée avec l’ancien a, puis a reçoit le résultat.'},
+    {f:'Ligne 4 : b = 10 % 3 = 1.',w:'a vaut maintenant 10, pas 7. Oublier une mise à jour est l’erreur la plus fréquente.'},
+    {f:'Ligne 5 : print affiche 10 1.',w:'On lit la dernière ligne du tableau.'}],
+   conclusion:'Le tableau complet :'+tab(['ligne','a','b'],[[1,7,'–'],[2,7,3],[3,10,3],[4,10,1]])+'Le programme affiche 10 1.'},
+  note:'Une ligne du tableau par instruction : c’est plus long à écrire, mais tu ne mélanges jamais l’ancienne et la nouvelle valeur.'},
+ {h:'Trace à toi',p:'Qu’affiche ce programme&nbsp;?',fig:py(`x = 4
+y = x * 3
+x = y - x
+y = y // x + x
+print(x + y)`),lab:'affichage :',ans:17,
+  why:'y = 12, puis x = 12 − 4 = 8. Ensuite y = 12 // 8 + 8 = 1 + 8 = 9. On affiche 8 + 9 = 17.'},
  {h:'Paquets de 4',p:`Règle <i>x</i> pour que ${cd('x // 4')} vaille 3 et ${cd('x % 4')} vaille 2. Chaque rangée complète contient 4 points.`,
   params:[{id:'x',l:'x',min:0,max:30,v:9}],
   draw:v=>{ const P=plane({x:[0,10],y:[0,4.4],grid:false,axes:false});
@@ -119,6 +171,23 @@ print(-t // 3600, -t % 3600)`),
   fig:memFig(2.6,P=>{ nameAt(P,1.4,1.9,'x'); cells(P,4.5,1.9,[1,2]); ref(P,1.75,1.9,4.45,1.9);
     nameAt(P,1.4,0.6,'n'); box(P,4.5,0.6,0.9,'5','var(--math)'); ref(P,1.75,0.6,4.45,0.6); P.text(6.6,1.9,'objet list',{s:12,c:'var(--muted)'}); P.text(6.6,0.6,'objet int',{s:12,c:'var(--muted)'}); }),
   note:'Une flèche représente une référence. Plusieurs noms peuvent pointer vers le même objet.'},
+ {kind:'Méthode',h:'Fabriquer et lire une liste',
+  p:`<p>Une liste s’écrit entre crochets : ${cd('[3, 1, 4]')}. Les cases sont numérotées <b>à partir de 0</b> : ${cd('L[0]')} est la première, et ${cd('L[i] = x')} remplace la case <i>i</i>. ${cd('len(L)')} donne le nombre d’éléments et ${cd('sum(L)')} leur somme.</p><p>${cd('L + M')} crée une <b>nouvelle</b> liste qui met L et M bout à bout. ${cd('L * k')} crée une nouvelle liste qui répète k fois le contenu de L. ${cd('L.append(x)')} ajoute x à la fin de L elle-même.</p>`,
+  demo:{enonce:'Qu’affiche ce programme&nbsp;?'+py(`a = [1, 2]
+b = a * 2 + [5]
+b[0] = 7
+print(b, len(b), sum(b))`),
+   etapes:[
+    {f:`${cd('a * 2')} = [1, 2, 1, 2]`,w:'* répète le contenu de la liste : deux copies de 1, 2 à la suite.'},
+    {f:`${cd('[1, 2, 1, 2] + [5]')} = [1, 2, 1, 2, 5]`,w:'* passe avant +, comme pour les nombres. + colle les deux listes.'},
+    {f:`${cd('b[0] = 7')} : b = [7, 2, 1, 2, 5]`,w:'La case d’indice 0 est la première. On la remplace, les autres ne bougent pas.'},
+    {f:'len(b) = 5 et sum(b) = 7 + 2 + 1 + 2 + 5 = 17',w:'On compte les cases, puis on additionne leur contenu.'}],
+   conclusion:'Le programme affiche [7, 2, 1, 2, 5] 5 17. La liste a n’a pas changé : * et + fabriquent de nouvelles listes.'},
+  note:`Le dernier élément d’une liste de longueur n a l’indice n − 1. ${cd('L[len(L)]')} n’existe pas.`},
+ {h:'Somme d’une liste',p:'Qu’affiche ce programme&nbsp;?',fig:py(`L = [3, 1] * 3 + [4]
+L[1] = 0
+print(sum(L))`),lab:'affichage :',ans:15,
+  why:'L = [3, 1, 3, 1, 3, 1, 4], puis la case d’indice 1 devient 0 : [3, 0, 3, 1, 3, 1, 4]. Somme : 15.'},
  {h:'Deux noms, une seule liste',p:`Avance ligne par ligne. ${cd('b = a')} ne copie rien : <i>b</i> devient un deuxième nom pour la <b>même</b> liste. C’est l’<b>aliasing</b>.`,
   params:[{id:'e',l:'Étape',min:1,max:4,v:1}],
   draw:v=>{ const L=['a = [1, 2, 3]','b = a','b.append(4)','a = [7]'];
@@ -175,6 +244,29 @@ print(a is b, a is c, a == c)`),
     return py(`m = [[0, 0], [0, 0]]\n${opt}\nb[0][0] = 9`)+fig; },
   info:v=>`${cd('print(m)')} affiche <b>${v.k===3?'[[0, 0], [0, 0]]':'[[9, 0], [0, 0]]'}</b>`,
   ok:v=>v.k===3,why:'Seule la copie profonde crée de nouvelles sous-listes. Avec m[:] ou m.copy(), b[0] et m[0] restent la même sous-liste, donc le 9 apparaît aussi dans m.'},
+ {kind:'Méthode',h:'Suivre la mémoire : modifier ou réaffecter',
+  p:`<p>Pour chaque ligne, pose-toi une seule question : <b>modifie-t-elle un objet, ou déplace-t-elle une flèche&nbsp;?</b></p><ul><li><b>Réaffecter</b> : ${cd('nom = expression')}. On calcule l’expression, puis on attache le nom au résultat. Aucun objet n’est modifié. Si l’expression est un autre nom (${cd('b = a')}), la flèche pointe vers le même objet. Si c’est ${cd('a + [3]')}, ${cd('a * 2')}, ${cd('a[:]')} ou une liste écrite entre crochets, c’est un nouvel objet.</li><li><b>Modifier sur place</b> : ${cd('append')}, ${cd('remove')}, ${cd('L[i] = x')}, ${cd('L += [x]')}… L’objet change, et <b>tous</b> les noms qui pointent vers lui voient le changement.</li></ul><p>Piège : ${cd('[L] * 3')} répète trois fois la même flèche vers L, sans copier L.</p>`,
+  demo:{enonce:'Qu’affiche ce programme&nbsp;?'+py(`p = [1]
+q = p
+q.append(2)
+p = p + [3]
+q[0] = 9
+print(p, q)`),
+   etapes:[
+    {f:'Ligne 1 : un objet L₁ = [1], et p → L₁.',w:'Une liste écrite entre crochets crée un objet.'},
+    {f:'Ligne 2 : q → L₁ aussi.',w:'Réaffectation par un nom : pas de copie, juste une deuxième flèche.'},
+    {f:'Ligne 3 : L₁ devient [1, 2].',w:'append modifie l’objet sur place : p et q le voient tous les deux.'},
+    {f:'Ligne 4 : p + [3] crée L₂ = [1, 2, 3], et p → L₂.',w:'+ fabrique un nouvel objet. Seule la flèche de p bouge, q pointe toujours vers L₁.'},
+    {f:'Ligne 5 : L₁ devient [9, 2].',w:'On modifie l’objet de q, qui n’est plus celui de p.'}],
+   conclusion:'Le programme affiche [1, 2, 3] [9, 2] : deux noms, deux objets à la fin.'},
+  note:'Dessine les flèches dès qu’un programme a deux noms pour des listes. Une ligne mal classée suffit à tout fausser.'},
+ {h:'Une liste de références',p:'Qu’affiche ce programme&nbsp;?',fig:py(`a = [0, 0]
+b = [a] * 2
+a = [5, 5]
+b[0][1] = 7
+print(b)`),
+  opts:[cd('[[0, 7], [0, 0]]'),cd('[[5, 7], [5, 5]]'),cd('[[0, 7], [0, 7]]'),cd('[[5, 5], [5, 5]]')],ans:2,
+  why:'[a] * 2 contient deux flèches vers la même liste L = [0, 0]. a = [5, 5] déplace seulement le nom a. b[0][1] = 7 modifie L, que b voit deux fois : [[0, 7], [0, 7]].'},
  {kind:'Défi',h:'+= ou + ?',p:'Qu’affiche ce code&nbsp;?',fig:py(`a = [1, 2]
 b = a
 b += [3]
@@ -276,6 +368,36 @@ ajoute(a)
 print(a)`),
   opts:[cd('[1]'),cd('[9]'),cd('[1, 0, 9]'),cd('[1, 0]')],ans:3,
   why:'Au début, L et a référencent la même liste : append(0) la modifie, a vaut [1, 0]. Ensuite L = [9] attache seulement le nom local L à une nouvelle liste. a n’est pas touchée.'},
+ {kind:'Méthode',h:'Tracer des appels de fonction',
+  p:`<p>Chaque appel crée un <b>cadre</b> neuf : un petit tableau à part pour ses paramètres et ses variables locales. Pour tracer un appel :</p><ol><li>Calcule les arguments avec les valeurs de l’endroit qui appelle.</li><li>Ouvre un tableau pour cet appel et range chaque argument dans son paramètre.</li><li>Exécute le corps dans ce tableau. Un appel à l’intérieur ouvre un nouveau tableau, posé au-dessus.</li><li>Au ${cd('return')}, ferme le tableau et remplace l’appel par la valeur renvoyée.</li></ol><p>Les noms d’un cadre ne touchent pas ceux des autres cadres, sauf avec ${cd('global')}.</p>`,
+  demo:{enonce:'Qu’affiche ce programme&nbsp;?'+py(`def f(a):
+    b = a + 1
+    return b * 2
+
+def g(b):
+    return f(b) - b
+
+b = 10
+print(g(3), b)`),
+   etapes:[
+    {f:'Global : b = 10. On appelle g(3).',w:'Les deux def ne font que définir les fonctions. Le programme commence vraiment à b = 10.'},
+    {f:'Cadre de g : b = 3. Il faut f(b), donc f(3).',w:'Dans g, le nom b désigne le paramètre local, qui vaut 3, pas le b global.'},
+    {f:'Cadre de f : a = 3, puis b = 4. f renvoie 4 · 2 = 8.',w:'Ce b est local à f. Il n’a rien à voir avec celui de g ni avec le global.'},
+    {f:'Retour dans g : 8 − 3 = 5. g renvoie 5.',w:'L’appel f(b) est remplacé par 8, et le b de g vaut toujours 3.'},
+    {f:'print affiche 5 10.',w:'Aucun cadre n’a réaffecté le b global, qui vaut encore 10.'}],
+   conclusion:'Le programme affiche 5 10. Trois b différents ont existé, un par cadre.'},
+  note:'Écris les cadres les uns au-dessus des autres, comme une pile : le dernier ouvert est le premier fermé.'},
+ {h:'Deux cadres',p:'Qu’affiche ce programme&nbsp;?',fig:py(`def h(x, y):
+    x = x + y
+    return x * y
+
+def k(n):
+    m = h(n, 2)
+    return h(m, n)
+
+x = 1
+print(k(x + 2))`),lab:'affichage :',ans:39,
+  why:'k(3) : h(3, 2) met x = 5 dans son cadre et renvoie 10, donc m = 10. Puis h(10, 3) : x = 13, et on renvoie 13 · 3 = 39. Le x global vaut toujours 1.'},
  {h:'Importer une bibliothèque',p:`${cd('import math')} donne accès à ${cd('math.sqrt')}, ${cd('math.pi')}, ${cd('math.floor')}, ${cd('math.ceil')}… On peut aussi écrire ${cd('from math import sqrt')}. Le module ${cd('random')} tire des nombres au hasard.`,
   fig:py(`import math
 import random
@@ -289,6 +411,23 @@ random.choice(['a', 'b', 'c'])`),
   note:`Piège : ${cd('random.randint(1, 6)')} inclut 6, alors que ${cd('range(1, 6)')} s’arrête à 5.`},
  {h:'Avec math',p:`Que vaut ${cd('math.floor(math.sqrt(50)) + math.ceil(2.1)')}&nbsp;?`,lab:'résultat =',ans:10,
   why:'√50 ≈ 7,07, donc math.floor donne 7. math.ceil(2.1) = 3. Total : 7 + 3 = 10.'},
+ {kind:'Méthode',h:'Découper un problème en fonctions',
+  p:`<p>Quand un calcul revient plusieurs fois, ou qu’un problème a plusieurs étapes, écris <b>une petite fonction par tâche</b>. Chacune porte un nom clair, reçoit ce dont elle a besoin en paramètres et <b>renvoie</b> son résultat avec ${cd('return')} (pas ${cd('print')}). La fonction principale appelle les autres.</p><p>Tu écris ainsi chaque calcul une seule fois, et tu peux tester chaque morceau à part.</p>`,
+  demo:{enonce:'Calculer le périmètre du triangle de sommets A(0 ; 0), B(3 ; 0) et C(3 ; 4).',
+   etapes:[
+    {f:'Sous-problème qui se répète : la distance entre deux points, trois fois (AB, BC, CA).',w:'On cherche le calcul qu’on écrirait sinon trois fois.'},
+    {f:py(`import math
+
+def distance(xa, ya, xb, yb):
+    return math.sqrt((xb - xa) ** 2 + (yb - ya) ** 2)`),w:'Une fonction pour ce calcul, qui renvoie la distance (théorème de Pythagore).'},
+    {f:py(`def perimetre(xa, ya, xb, yb, xc, yc):
+    return (distance(xa, ya, xb, yb) + distance(xb, yb, xc, yc)
+            + distance(xc, yc, xa, ya))`),w:'La fonction principale ne fait qu’assembler. Parce que distance renvoie un nombre, on peut additionner ses résultats.'},
+    {f:'perimetre(0, 0, 3, 0, 3, 4) = 3.0 + 4.0 + 5.0 = 12.0',w:'On teste : AB = 3, BC = 4 et CA = √(9 + 16) = 5. math.sqrt renvoie un float, d’où 12.0.'}],
+   conclusion:'Le périmètre vaut 12. distance resservira dans tout autre calcul de géométrie.'},
+  note:'Si une fonction affiche au lieu de renvoyer, on ne peut rien faire de son résultat : distance(…) + distance(…) donnerait une erreur, car None + None est impossible.'},
+ {h:'Réutiliser une fonction',p:`Avec les fonctions ${cd('distance')} et ${cd('perimetre')} de la méthode, que vaut ${cd('perimetre(0, 0, 6, 0, 6, 8)')}&nbsp;?`,lab:'périmètre =',ans:24,
+  why:'AB = 6, BC = 8 et CA = √(36 + 64) = 10. Le périmètre vaut 6 + 8 + 10 = 24 (Python affiche 24.0).'},
  {kind:'Défi',h:'Deux appels',p:'Qu’affiche ce code&nbsp;?',fig:py(`def f(a, b=2, c=3):
     return a * 100 + b * 10 + c
 
@@ -371,6 +510,21 @@ while n != 1:
   info:v=>{ const t=[v.n0]; while(t[t.length-1]!==1){ const n=t[t.length-1]; t.push(n%2===0?n/2:3*n+1); }
     const m=Math.min(v.k,t.length-1); return `Après ${m} tour(s) : n = ${t[m]}, pas = ${m}. `+(t[m]===1?`La condition ${cd('n != 1')} est fausse : la boucle s’arrête après <b>${t.length-1}</b> tours.`:`${cd('n != 1')} est vraie : on refait un tour.`); },
   note:'Personne ne sait démontrer que cette boucle s’arrête pour tout n0. C’est la conjecture de Syracuse.'},
+ {kind:'Méthode',h:'Tracer une boucle avec un tableau des tours',
+  p:`<p>Pour une boucle, fais un tableau avec une colonne pour le <b>test</b> et une colonne par variable. À chaque tour : évalue la condition avec les valeurs actuelles, puis, si elle est vraie, exécute le corps et écris une nouvelle ligne. Dès que le test est faux, on sort et on passe à la suite.</p><p>Pour compter : la boucle fait autant de <b>tours</b> que de tests vrais, et la condition est évaluée <b>une fois de plus</b>, la fois où elle est fausse.</p>`,
+  demo:{enonce:'Qu’affiche ce programme, combien de tours fait la boucle et combien de fois la condition est-elle évaluée&nbsp;?'+py(`s = 0
+i = 1
+while s < 20:
+    s = s + i
+    i = i + 2
+print(i, s)`),
+   etapes:[
+    {f:'Départ : s = 0, i = 1.',w:'Première ligne du tableau, avant tout test.'},
+    {f:tab(['test','s','i'],[['0 &lt; 20 vrai',1,3],['1 &lt; 20 vrai',4,5],['4 &lt; 20 vrai',9,7],['9 &lt; 20 vrai',16,9],['16 &lt; 20 vrai',25,11]]),w:'Chaque ligne est un tour : on teste avec les anciennes valeurs, puis on écrit les nouvelles.'},
+    {f:'Test suivant : 25 &lt; 20 est faux, on sort.',w:'La condition est vérifiée au début de chaque tour, pas au milieu du corps.'},
+    {f:'5 tests vrais, donc 5 tours. Avec le test faux, la condition est évaluée 6 fois.',w:'On compte les lignes du tableau, plus le dernier test.'}],
+   conclusion:'Le programme affiche 11 25, après 5 tours et 6 évaluations de la condition.'},
+  note:`${cd("print(x, end=' ')")} écrit x suivi d’une espace au lieu d’aller à la ligne : les affichages successifs d’une boucle restent alors sur une seule ligne.`},
  {h:'Compte les tours',p:'Qu’affiche ce code&nbsp;?',fig:py(`n = 100
 k = 0
 while n > 1:
@@ -385,6 +539,28 @@ range(10, 0, -3)  # 10, 7, 4, 1
 for lettre in 'abc':
     print(lettre)  # a, puis b, puis c`),
   note:`${cd('range(n)')} fait exactement <i>n</i> tours, de 0 à <i>n</i> − 1.`},
+ {kind:'Méthode',h:'Accumulateur et compteur',
+  p:`<p>Pour une <b>somme</b> (ou un produit, ou une chaîne construite morceau par morceau), utilise un <b>accumulateur</b> : une variable créée <b>avant</b> la boucle avec la valeur neutre (0 pour une somme, 1 pour un produit, ${cd("''")} pour une chaîne), puis mise à jour à chaque tour.</p><p>Pour <b>compter</b> les éléments qui vérifient une condition, utilise un <b>compteur</b> : il part de 0 et on lui ajoute 1 seulement quand la condition est vraie.</p>`,
+  demo:{enonce:'Combien y a-t-il d’entiers de 1 à 15 multiples de 3 ou de 5, et quelle est leur somme&nbsp;?'+py(`s = 0
+c = 0
+for k in range(1, 16):
+    if k % 3 == 0 or k % 5 == 0:
+        s = s + k
+        c = c + 1
+print(c, s)`),
+   etapes:[
+    {f:'s = 0 et c = 0 avant la boucle.',w:'0 est neutre pour l’addition : la somme vide vaut 0, et on n’a encore rien compté.'},
+    {f:'range(1, 16) donne k = 1, 2, …, 15.',w:'La fin 16 est exclue, donc 15 est bien inclus.'},
+    {f:'Passent le test : 3, 5, 6, 9, 10, 12, 15.',w:'k % 3 == 0 teste « multiple de 3 ». Avec or, une seule des deux conditions suffit, et 15 n’est compté qu’une fois.'},
+    {f:'c = 7 et s = 3 + 5 + 6 + 9 + 10 + 12 + 15 = 60.',w:'Le compteur gagne 1 par élément retenu, l’accumulateur gagne l’élément lui-même.'}],
+   conclusion:'Le programme affiche 7 60.'},
+  note:'Erreur classique : écrire s = 0 à l’intérieur de la boucle. La somme repart alors de 0 à chaque tour.'},
+ {h:'Un produit',p:'Qu’affiche ce programme&nbsp;?',fig:py(`p = 1
+for k in range(1, 6):
+    if k % 2 == 1:
+        p = p * k
+print(p)`),lab:'p =',ans:15,
+  why:'k vaut 1, 2, 3, 4, 5, et seuls les impairs 1, 3, 5 sont multipliés. Le produit part de 1, valeur neutre : 1 · 1 · 3 · 5 = 15.'},
  {h:'Fabrique la séquence',p:`Règle ${cd('range(a, b, c)')} pour obtenir exactement 3, 7, 11, 15.`,
   params:[{id:'a',l:'a (début)',min:0,max:10,v:0},{id:'b',l:'b (fin)',min:0,max:20,v:10},{id:'c',l:'c (pas)',min:1,max:5,v:1}],
   draw:v=>{ const P=plane({x:[-1,21],y:[-2,1.8],grid:false,axes:false}); P.seg(-0.5,0,20.5,0,{c:'var(--muted)',w:1.5});
@@ -395,6 +571,57 @@ for lettre in 'abc':
   info:v=>{ const r=[]; for(let x=v.a;x<v.b;x+=v.c) r.push(x); return `${cd(`list(range(${v.a}, ${v.b}, ${v.c}))`)} = ${esc(pyv(r))}`; },
   ok:v=>{ const r=[]; for(let x=v.a;x<v.b;x+=v.c) r.push(x); return r.join()==='3,7,11,15'; },
   why:'Début 3, pas 4. La fin est exclue : toute valeur de 16 à 19 convient, par exemple range(3, 16, 4). Avec 20, on obtiendrait aussi 19.'},
+ {kind:'Méthode',h:'Chercher le maximum',
+  p:`<p>Pour le plus grand élément d’une liste, garde <b>le meilleur vu jusqu’ici</b>. Initialise-le avec le <b>premier élément</b> ${cd('L[0]')}, puis compare chaque élément au meilleur : s’il est plus grand, il le remplace. Le minimum se cherche de la même façon avec ${cd('<')}.</p><p>N’initialise pas avec 0 : si tous les nombres sont négatifs, 0 resterait le « maximum » alors qu’il n’est pas dans la liste.</p>`,
+  demo:{enonce:'Que vaut <i>m</i> à la fin&nbsp;?'+py(`L = [-4, -9, -2, -7]
+m = L[0]
+for x in L:
+    if x > m:
+        m = x`),
+   etapes:[
+    {f:'m = −4.',w:'Le premier élément est un candidat honnête : il est dans la liste.'},
+    {f:'x = −4 : −4 &gt; −4 est faux. x = −9 : faux.',w:'On ne remplace que par un élément strictement plus grand.'},
+    {f:'x = −2 : −2 &gt; −4 est vrai, m = −2.',w:'Nouveau meilleur.'},
+    {f:'x = −7 : −7 &gt; −2 est faux.',w:'Le meilleur ne change plus.'}],
+   conclusion:'m = −2. Avec m = 0 au départ, on aurait obtenu 0, faux.'},
+  note:`Avec ${cd('x > m')}, en cas d’égalité, le <b>premier</b> ex æquo reste le meilleur. Avec ${cd('x >= m')}, c’est le <b>dernier</b> qui gagne.`},
+ {h:'Maximum et égalité',p:'Qu’affiche ce programme&nbsp;?',fig:py(`L = [3, 8, -1, 8, 5]
+m = L[0]
+k = 0
+for x in L:
+    if x > m:
+        m = x
+        k = k + 1
+print(m + k)`),lab:'affichage :',ans:9,
+  why:'m change une seule fois, quand x = 8 (k = 1). Le second 8 ne passe pas le test 8 &gt; 8. On affiche 8 + 1 = 9.'},
+ {kind:'Méthode',h:'Drapeau et sortie anticipée',
+  p:`<p>Pour savoir si <b>au moins un</b> élément vérifie une condition, utilise un <b>drapeau</b> : une variable booléenne mise à ${cd('False')} avant la boucle et passée à ${cd('True')} dès qu’on trouve. ${cd('break')} arrête alors la boucle, car la réponse est connue.</p><p>Dans une fonction, ${cd('return')} placé dans la boucle fait les deux d’un coup : il sort de la boucle <b>et</b> de la fonction. Le ${cd('return')} placé après la boucle n’est atteint que si aucun tour n’a trouvé. Pour « <b>tous</b> les éléments vérifient… », on cherche un contre-exemple de la même façon.</p>`,
+  demo:{enonce:'La liste [4, 7, −2, 5] contient-elle un nombre négatif&nbsp;? Combien de tests x &lt; 0 sont faits&nbsp;?'+py(`def a_un_negatif(L):
+    for x in L:
+        if x < 0:
+            return True
+    return False
+
+trouve = False             # même idée avec un drapeau
+for x in [4, 7, -2, 5]:
+    if x < 0:
+        trouve = True
+        break`),
+   etapes:[
+    {f:'x = 4 puis x = 7 : test faux, on continue.',w:'Un élément qui ne convient pas ne permet pas encore de conclure.'},
+    {f:'x = −2 : test vrai. La fonction renvoie True, et le drapeau passe à True avant le break.',w:'Un seul exemple suffit pour « au moins un » : inutile de regarder la suite.'},
+    {f:'x = 5 n’est jamais testé.',w:'return et break ont arrêté la boucle.'}],
+   conclusion:'La réponse est True, après 3 tests seulement. Pour une liste sans négatif, les 4 tests seraient faits, puis return False.'},
+  note:`Piège : écrire ${cd('else: return False')} dans la boucle. La fonction décide alors dès le premier élément, sans regarder les autres.`},
+ {h:'Tous pairs&nbsp;?',p:'Qu’affiche ce programme&nbsp;?',fig:py(`def tous_pairs(L):
+    for x in L:
+        if x % 2 == 1:
+            return False
+    return True
+
+print(tous_pairs([2, 4, 7, 8]), tous_pairs([]))`),
+  opts:[cd('False False'),cd('True True'),cd('False True'),cd('True False')],ans:2,
+  why:'Dans [2, 4, 7, 8], 7 est un contre-exemple : False. Pour la liste vide, la boucle ne tourne pas et on atteint return True : aucun élément ne contredit « tous pairs ».'},
  {h:'break et continue',p:'Qu’affiche ce code&nbsp;?',fig:py(`for i in range(10):
     if i % 3 == 0:
         continue
@@ -411,12 +638,67 @@ for lettre in 'abc':
     for(let i=0;i<3;i++) for(let j=0;j<3;j++) P.dot(j,2-i,{r:8,c:j>=i?'var(--code)':'var(--line)'});
     [0,1,2].forEach(k=>{ P.text(k,3,'j='+k,{a:'middle',s:11,c:'var(--muted)'}); P.text(-0.4,2-k,'i='+k,{a:'end',dy:4,s:11,c:'var(--muted)'}); }); return P.svg(); })(),
   note:'Deux boucles de n tours chacune, sans dépendance, font n·n tours au total.'},
+ {kind:'Méthode',h:'Dérouler deux boucles imbriquées',
+  p:'Écris <b>une ligne par valeur de la boucle extérieure</b>, et sur cette ligne toutes les valeurs que prend la boucle intérieure. Le nombre total de tours est la somme des longueurs des lignes. Pour une somme, additionne d’abord chaque ligne, puis les lignes entre elles.',
+  demo:{enonce:'Que valent <i>c</i> et le nombre de tours de la boucle intérieure&nbsp;?'+py(`c = 0
+for i in range(4):
+    for j in range(i + 1, 4):
+        c = c + i + j`),
+   etapes:[
+    {f:'i = 0 : j = 1, 2, 3. On ajoute 1 + 2 + 3 = 6.',w:'range(i + 1, 4) dépend de i : on le recalcule pour chaque ligne.'},
+    {f:'i = 1 : j = 2, 3. On ajoute 3 + 4 = 7.',w:'Chaque terme vaut i + j.'},
+    {f:'i = 2 : j = 3. On ajoute 5.',w:'La ligne raccourcit d’un élément à chaque fois.'},
+    {f:'i = 3 : range(4, 4) est vide, rien.',w:'Une ligne vide compte pour 0 tour.'},
+    {f:'Tours : 3 + 2 + 1 + 0 = 6. c = 6 + 7 + 5 = 18.',w:'On additionne les lignes.'}],
+   conclusion:'La boucle intérieure fait 6 tours et c vaut 18.'}},
  {kind:'Défi',h:'Somme imbriquée',p:'Qu’affiche ce code&nbsp;?',fig:py(`s = 0
 for i in range(1, 4):
     for j in range(i):
         s += i * j
 print(s)`),lab:'s =',ans:11,
   why:'i = 1 : j = 0, on ajoute 0. i = 2 : j = 0, 1, on ajoute 0 + 2. i = 3 : j = 0, 1, 2, on ajoute 0 + 3 + 6. Total : 2 + 9 = 11.'},
+ {kind:'Méthode',h:'Déboguer une boucle',
+  p:`<p>Quand un programme donne un mauvais résultat, ne devine pas : <b>regarde</b>. Ajoute un ${cd('print')} dans la boucle pour afficher les variables à chaque tour, et compare avec ce que tu attendais.</p><p>Vérifie surtout le <b>premier</b> et le <b>dernier</b> tour. La plupart des erreurs de boucle sont des <b>erreurs d’une unité</b> : un range qui s’arrête un cran trop tôt, ${cd('<')} au lieu de ${cd('<=')}, un départ à 0 au lieu de 1.</p>`,
+  demo:{enonce:'Ce programme doit calculer 1 + 2 + 3 + 4 + 5 = 15, mais il affiche 10. Trouver l’erreur.'+py(`s = 0
+for k in range(5):
+    s = s + k
+    print('k =', k, 's =', s)   # ligne ajoutée pour voir
+print(s)`),
+   etapes:[
+    {f:'Affichage : k = 0 s = 0, k = 1 s = 1, …, k = 4 s = 10.',w:'Le print montre ce que fait vraiment la boucle, tour par tour.'},
+    {f:'Premier tour : k = 0 au lieu de 1. Dernier tour : k = 4, donc 5 n’est jamais ajouté.',w:'On compare les deux bouts avec ce qu’on voulait : de 1 à 5.'},
+    {f:`Correction : ${cd('for k in range(1, 6):')}`,w:'range(a, b) va de a inclus à b exclu : pour finir à 5, il faut b = 6.'},
+    {f:'Nouvel affichage : s vaut 1, 3, 6, 10, 15.',w:'On relance pour vérifier, puis on retire le print de débogage.'}],
+   conclusion:'L’erreur était sur les deux bornes du range. Le programme corrigé affiche 15.'}},
+ {h:'Les bonnes bornes',p:`On veut compter les entiers de 10 à 20 <b>inclus</b> qui sont multiples de 4 (il y en a 3 : 12, 16, 20). Le corps de la boucle est ${cd('if k % 4 == 0: c = c + 1')}. Quelle boucle convient&nbsp;?`,
+  opts:[cd('for k in range(10, 20):'),cd('for k in range(10, 21):'),cd('for k in range(0, 20, 4):'),cd('for k in range(12, 20, 4):')],ans:1,
+  why:'Il faut que k prenne toutes les valeurs de 10 à 20, donc range(10, 21). range(10, 20) et range(12, 20, 4) s’arrêtent avant 20 et comptent 2. range(0, 20, 4) compte 0, 4, 8, 12, 16 : 5.'},
+ {kind:'Méthode',h:'Tester sur des cas limites',
+  p:`<p>Une fonction peut marcher sur ton exemple et échouer ailleurs. Avant de la déclarer juste, essaie les <b>cas limites</b> : liste vide ou à un seul élément, nombres négatifs ou nuls, égalité exacte dans une condition, réponse tout au début ou tout à la fin.</p><p>${cd('assert condition')} ne fait rien si la condition est vraie, et arrête le programme avec ${cd('AssertionError')} sinon. C’est un test automatique qu’on relance après chaque modification.</p>`,
+  demo:{enonce:'Cette fonction doit renvoyer le plus grand élément d’une liste non vide. La tester.'+py(`def maxi(L):
+    m = 0
+    for x in L:
+        if x > m:
+            m = x
+    return m
+
+assert maxi([3, 8, 2]) == 8
+assert maxi([5]) == 5
+assert maxi([-3, -1]) == -1`),
+   etapes:[
+    {f:'maxi([3, 8, 2]) renvoie 8 : le test passe.',w:'Le cas « normal » ne suffit jamais à conclure.'},
+    {f:'maxi([5]) renvoie 5 : le test passe.',w:'Liste à un seul élément : le plus petit cas permis.'},
+    {f:'maxi([-3, -1]) renvoie 0 : AssertionError.',w:'Tous négatifs : aucun x ne dépasse 0, et m garde une valeur absente de la liste.'},
+    {f:`Correction : ${cd('m = L[0]')}, puis on relance les trois tests.`,w:'On part d’un vrai élément de la liste, comme dans la méthode du maximum. Les trois tests passent.'}],
+   conclusion:'Le troisième test a révélé l’erreur. La liste vide reste interdite : L[0] lèverait IndexError, c’est pourquoi l’énoncé dit « non vide ».'}},
+ {h:'Quel test révèle l’erreur&nbsp;?',p:`Cette fonction doit compter les éléments de <i>L</i> compris entre <i>a</i> et <i>b</i>, <b>bornes incluses</b>. Quel test échoue&nbsp;?`+py(`def compte_entre(L, a, b):
+    c = 0
+    for x in L:
+        if a < x < b:
+            c = c + 1
+    return c`),
+  opts:[cd('assert compte_entre([2, 5, 7], 1, 9) == 3'),cd('assert compte_entre([], 0, 10) == 0'),cd('assert compte_entre([4, 6], 4, 6) == 2'),cd('assert compte_entre([1, 20], 5, 10) == 0')],ans:2,
+  why:'Le cas limite est l’égalité avec une borne : 4 &lt; 4 et 6 &lt; 6 sont faux, donc la fonction renvoie 0 au lieu de 2. Il faut écrire a &lt;= x &lt;= b. Les trois autres tests passent et ne voient rien.'},
  {kind:'Problème',h:'Quand la somme dépasse 100',p:`On additionne les carrés 1², 2², 3²… tant que la somme ne dépasse pas 100. Il faut trouver la valeur qui fait sortir de la boucle, puis voir ce que change une petite modification de la condition.`+py(`n = 0
 s = 0
 while s <= 100:
@@ -468,6 +750,15 @@ print(compte)`),
     P.text(0.5+v.a,0.6,'a',{a:'middle',dy:14,s:12,c:'var(--ok)'}); P.text(0.5+v.b,0.6,'b',{a:'middle',dy:14,s:12,c:'var(--bad)'}); return P.svg(); },
   info:v=>{ let r=''; for(let i=v.a;i<v.b;i+=v.c) r+='PROGRAMME'[i]; return `${cd(`s[${v.a}:${v.b}:${v.c}]`)} = ${cd(`'${r}'`)}`+(r?'':' (tranche vide)'); },
   note:'Une tranche ne lève jamais d’erreur : si a ≥ b, elle est simplement vide. Et len(s[a:b]) = b − a quand 0 ≤ a ≤ b ≤ len(s).'},
+ {kind:'Méthode',h:'Calculer une tranche',
+  p:`<p>Pour lire ${cd('s[a:b:c]')} sans te tromper, écris les indices sous chaque caractère. Un indice négatif −<i>k</i> se remplace par len(s) − <i>k</i>. Puis pars de <i>a</i>, avance de <i>c</i> en <i>c</i>, et arrête-toi <b>avant</b> <i>b</i>.</p><p>Bornes omises : ${cd('s[:b]')} part du début, ${cd('s[a:]')} va jusqu’au bout. Avec un pas négatif, on avance vers la gauche : ${cd('s[::-1]')} renverse.</p>`,
+  demo:{enonce:`Avec ${cd("s = 'ordinateur'")}, calculer ${cd('s[2:5]')}, ${cd('s[-4:]')} et ${cd('s[::2]')}.`,
+   etapes:[
+    {f:tab(['o','r','d','i','n','a','t','e','u','r'],[[0,1,2,3,4,5,6,7,8,9]]),w:'On numérote de 0 à len(s) − 1 = 9.'},
+    {f:`${cd('s[2:5]')} : indices 2, 3, 4, soit 'din'.`,w:'5 est exclu : on prend 5 − 2 = 3 caractères.'},
+    {f:`${cd('s[-4:]')} = ${cd('s[6:]')} : indices 6 à 9, soit 'teur'.`,w:'−4 vaut 10 − 4 = 6. Sans fin, on va jusqu’au dernier caractère.'},
+    {f:`${cd('s[::2]')} : indices 0, 2, 4, 6, 8, soit 'odntu'.`,w:'Sans début ni fin, on parcourt tout, de 2 en 2.'}],
+   conclusion:'On obtient \'din\', \'teur\' et \'odntu\'. Et s[::-1] vaut \'ruetanidro\'.'}},
  {h:'La fin du mot',p:`Avec ${cd("s = 'ingenieur'")}, que vaut ${cd('s[-3:]')}&nbsp;?`,
   opts:[cd("'ieur'"),cd("'r'"),cd("'eur'"),cd("'nie'")],ans:2,
   why:`${cd('s[-3:]')} part de l’indice −3 (le e de « eur ») et va jusqu’à la fin : 'eur'. Les trois derniers caractères.`},
@@ -479,7 +770,10 @@ s.split()                # ['Bonjour', 'le', 'monde']
 'banane'.replace('a', 'o')   # 'bonone'
 'banane'.find('n')       # 2 : premier indice trouvé
 'nan' in 'banane'        # True
-'Abc'.upper()            # 'ABC'`),
+'Abc'.upper()            # 'ABC'
+'Abc'.lower()            # 'abc'
+'A'.isupper()            # True : est-ce une majuscule ?
+'banane'.count('an')     # 2 : nombre d'apparitions`),
   note:`${cd('s.upper()')} seul ne sert à rien : il faut récupérer le résultat, par exemple ${cd('s = s.upper()')}.`},
  {h:'Enchaîner les méthodes',p:'Qu’affiche ce code&nbsp;?',fig:py(`print('-'.join('a b c'.split()).upper())`),
   opts:[cd('a-b-c'),cd('A-B-C'),cd('A B C'),cd("['A', 'B', 'C']")],ans:1,
@@ -492,7 +786,7 @@ x = L.pop()       # x = 1, L = [7, 5, 3, 8]
 L.remove(3)       # [7, 5, 8]
 for i, v in enumerate(L):
     print(i, v)   # 0 7, puis 1 5, puis 2 8`),
-  note:`${cd('L.sort()')} trie sur place et renvoie None. ${cd('sorted(L)')} renvoie une nouvelle liste triée. Donc ${cd('L = L.sort()')} perd la liste.`},
+  note:`${cd('L.sort()')} trie sur place et renvoie None. ${cd('sorted(L)')} renvoie une nouvelle liste triée. Donc ${cd('L = L.sort()')} perd la liste. ${cd('L.pop(i)')} retire et renvoie l’élément d’indice <i>i</i>.`},
  {h:'Insère au bon endroit',p:`${cd('L = [1, 3, 8, 9]')}. Choisis <i>k</i> pour que ${cd('L.insert(k, 6)')} laisse la liste triée. Plusieurs <i>k</i> conviennent, y compris un négatif.`,
   params:[{id:'k',l:'k',min:-5,max:5,v:0}],
   draw:v=>{ const L=[1,3,8,9]; let i=v.k<0?v.k+L.length:v.k; i=Math.max(0,Math.min(i,L.length)); L.splice(i,0,6);
@@ -509,6 +803,42 @@ x = L.pop()
 L[0] = x
 print(sum(L))`),lab:'somme =',ans:19,
   why:'append : [3, 1, 4, 1, 5, 9]. remove(1) retire le premier 1 : [3, 4, 1, 5, 9]. pop renvoie 9 : [3, 4, 1, 5]. L[0] = 9 : [9, 4, 1, 5]. Somme : 19.'},
+ {kind:'Méthode',h:'Parcourir par valeur, par indice ou avec enumerate',
+  p:`<p>Trois façons de parcourir une liste, selon ce dont tu as besoin :</p><ul><li>${cd('for x in L:')} quand seule la <b>valeur</b> compte (somme, test).</li><li>${cd('for i in range(len(L)):')} quand il faut l’<b>indice</b>, par exemple pour modifier ${cd('L[i]')} ou regarder un voisin.</li><li>${cd('for i, x in enumerate(L):')} pour avoir <b>les deux</b> : à chaque tour, i est l’indice et x vaut L[i].</li></ul>`,
+  demo:{enonce:'À quel indice se trouve le premier maximum de [4, 9, 2, 9]&nbsp;?'+py(`L = [4, 9, 2, 9]
+im = 0
+for i, x in enumerate(L):
+    if x > L[im]:
+        im = i
+print(im)`),
+   etapes:[
+    {f:'On a besoin de la position, pas seulement de la valeur : enumerate.',w:'Avec for x in L, on saurait que le maximum vaut 9, mais pas où il est.'},
+    {f:'im = 0 : le meilleur provisoire est L[0] = 4.',w:'On garde l’indice du meilleur, et sa valeur se lit dans L[im].'},
+    {f:'i = 0, x = 4 : non. i = 1, x = 9 &gt; 4 : im = 1. i = 2, x = 2 : non.',w:'C’est la méthode du maximum, appliquée aux indices.'},
+    {f:'i = 3, x = 9 : 9 &gt; 9 est faux, im reste 1.',w:'Avec &gt;, le premier ex æquo est conservé.'}],
+   conclusion:'Le programme affiche 1.'},
+  note:`Piège : ${cd('for x in L: x = 2 * x')} ne change pas L, car x est un nom qui reçoit une copie de la valeur. Pour doubler chaque case, écris ${cd('for i in range(len(L)): L[i] = 2 * L[i]')}.`},
+ {h:'Indice fois valeur',p:'Qu’affiche ce programme&nbsp;?',fig:py(`L = [5, 3, 4]
+s = 0
+for i, x in enumerate(L):
+    s = s + i * x
+print(s)`),lab:'s =',ans:11,
+  why:'Les couples (i, x) sont (0, 5), (1, 3) et (2, 4). s = 0 · 5 + 1 · 3 + 2 · 4 = 11.'},
+ {kind:'Méthode',h:'Construire une nouvelle liste',
+  p:`Pour <b>filtrer</b> (garder certains éléments) ou <b>transformer</b> (changer chaque élément), ne modifie pas la liste que tu parcours. Pars d’une liste vide ${cd('res = []')} et ajoute avec ${cd('append')} ce que tu gardes, transformé si besoin. Pour une chaîne, même idée : pars de ${cd("''")} et colle avec ${cd('+')}.`,
+  demo:{enonce:'Garder en majuscules les mots de plus de 3 lettres, et former le mot des initiales.'+py(`mots = ['un', 'arbre', 'est', 'vert']
+res = []
+ini = ''
+for m in mots:
+    if len(m) > 3:
+        res.append(m.upper())
+    ini = ini + m[0]`),
+   etapes:[
+    {f:'res = [] et ini = \'\' avant la boucle.',w:'Ce sont des accumulateurs : la liste vide et la chaîne vide sont les valeurs neutres.'},
+    {f:'\'un\' et \'est\' ont au plus 3 lettres : ils ne vont pas dans res.',w:'Le filtre est la condition du if.'},
+    {f:'\'arbre\' et \'vert\' passent : res = [\'ARBRE\', \'VERT\'].',w:'La transformation est l’expression passée à append.'},
+    {f:'ini reçoit chaque première lettre : \'u\', \'ua\', \'uae\', \'uaev\'.',w:'Cette ligne est hors du if : elle s’exécute pour chaque mot.'}],
+   conclusion:'res = [\'ARBRE\', \'VERT\'] et ini = \'uaev\'. La liste mots n’a pas changé.'}},
  {kind:'Défi',h:'Parcourir et filtrer',p:'Qu’affiche ce code&nbsp;?',fig:py(`mots = ['chat', 'Ours', 'zèbre', 'Ane']
 res = []
 for m in mots:
@@ -517,6 +847,20 @@ for m in mots:
 print(sorted(res))`),
   opts:[cd("['Ane', 'Ours']"),cd("['ours', 'ane']"),cd("['ane', 'ours']"),cd('None')],ans:2,
   why:`Seuls 'Ours' et 'Ane' commencent par une majuscule. On ajoute 'ours' puis 'ane'. sorted renvoie une nouvelle liste triée : ['ane', 'ours'].`},
+ {kind:'Méthode',h:'Comparer des voisins',
+  p:`<p>Pour comparer chaque élément à son <b>suivant</b>, parcours les indices de 0 à len(L) − 2 : ${cd('for i in range(len(L) - 1):')}, puis compare ${cd('L[i]')} et ${cd('L[i + 1]')}. On fait ainsi len(L) − 1 comparaisons.</p><p>Avec ${cd('range(len(L))')}, le dernier tour lirait ${cd('L[len(L)]')}, qui n’existe pas : IndexError. Ce motif sert à tester si une liste est triée, à compter les hausses, à trouver le plus grand écart entre voisins.</p>`,
+  demo:{enonce:'La liste [2, 5, 5, 9, 4] est-elle triée dans l’ordre croissant&nbsp;? Combien de comparaisons faut-il&nbsp;?'+py(`def est_triee(L):
+    for i in range(len(L) - 1):
+        if L[i] > L[i + 1]:
+            return False
+    return True`),
+   etapes:[
+    {f:'len(L) − 1 = 4 : i prend les valeurs 0, 1, 2, 3.',w:'Le dernier voisin comparé est L[3] avec L[4], le dernier élément.'},
+    {f:'2 &gt; 5 ? non. 5 &gt; 5 ? non. 5 &gt; 9 ? non.',w:'Deux voisins égaux sont dans l’ordre : on teste &gt;, pas ≥.'},
+    {f:'9 &gt; 4 ? oui : return False.',w:'Un seul couple mal rangé suffit (méthode du contre-exemple).'}],
+   conclusion:'La liste n’est pas triée, et on l’a su après 4 comparaisons.'}},
+ {h:'Compter les hausses',p:`Pour ${cd('L = [3, 5, 2, 8, 9, 1]')}, combien d’indices <i>i</i> vérifient ${cd('L[i] < L[i + 1]')}&nbsp;?`,lab:'hausses =',ans:3,
+  why:'On compare les 5 couples voisins : 3 &lt; 5 oui, 5 &lt; 2 non, 2 &lt; 8 oui, 8 &lt; 9 oui, 9 &lt; 1 non. Trois hausses.'},
  {kind:'Problème',h:'Transformer une phrase',p:`Ce programme découpe une phrase en mots. Il met une majuscule aux mots de plus de 3 lettres et renverse les autres, puis recolle le tout. Trace-le mot par mot.`+py(`phrase = 'le chat dort sur le tapis'
 mots = phrase.split()
 res = []
@@ -595,12 +939,50 @@ stock['pommes'] += 3
 del stock['poires']
 print(sum(stock.values()))`),lab:'affichage :',ans:12,
   why:"On ajoute 'kiwis': 5, pommes passe à 7, on retire les poires. Il reste {'pommes': 7, 'kiwis': 5}, dont la somme des valeurs vaut 12."},
+ {kind:'Méthode',h:'Parcourir un dictionnaire',
+  p:`<p>${cd('for k in d:')} parcourt les <b>clés</b>, dans l’ordre où elles ont été ajoutées, et ${cd('d[k]')} donne la valeur. ${cd('for k, v in d.items():')} donne directement chaque couple (clé, valeur). ${cd('d.values()')} donne seulement les valeurs, par exemple pour ${cd('sum(d.values())')}.</p><p>Pour la clé de plus grande valeur, applique la méthode du maximum aux couples : garde la meilleure clé et sa valeur.</p>`,
+  demo:{enonce:'Quel jour a les meilleures ventes, et quel est le total&nbsp;?'+py(`ventes = {'lun': 12, 'mar': 17, 'mer': 9, 'jeu': 17}
+jour, best = '', 0
+for j, v in ventes.items():
+    if v > best:
+        jour, best = j, v
+total = 0
+for j in ventes:
+    total = total + ventes[j]`),
+   etapes:[
+    {f:'Couples dans l’ordre : (\'lun\', 12), (\'mar\', 17), (\'mer\', 9), (\'jeu\', 17).',w:'items() suit l’ordre d’insertion des clés.'},
+    {f:'lun : 12 &gt; 0, meilleur lun. mar : 17 &gt; 12, meilleur mar. mer : non. jeu : 17 &gt; 17 est faux.',w:'Toutes les ventes sont positives, donc partir de 0 est sans danger ici. Avec &gt;, le premier ex æquo reste.'},
+    {f:'for j in ventes : j vaut \'lun\', \'mar\', \'mer\', \'jeu\'. total = 12 + 17 + 9 + 17 = 55.',w:'Parcourir le dictionnaire donne les clés. On lit chaque valeur avec ventes[j]. sum(ventes.values()) donnerait la même chose.'}],
+   conclusion:'Le meilleur jour est \'mar\' (17), et le total vaut 55.'}},
  {h:'Parcourir items()',p:'Qu’affiche ce code&nbsp;?',fig:py(`d = {'a': 3, 'b': 1, 'c': 2}
 for k, v in d.items():
     if v > 1:
         print(k * v, end=' ')`),
   opts:[cd('aaa cc'),cd('a c'),cd('3 2'),cd('aaa b cc')],ans:0,
   why:`On parcourt les couples ('a', 3), ('b', 1), ('c', 2). Seuls a et c ont une valeur &gt; 1. 'a' * 3 = 'aaa' et 'c' * 2 = 'cc'.`},
+ {kind:'Méthode',h:'Regrouper dans un dictionnaire de listes',
+  p:`Pour ranger des éléments par catégorie, utilise un dictionnaire dont chaque valeur est une <b>liste</b>. Pour chaque élément : calcule sa catégorie <i>c</i> ; si <i>c</i> n’est pas encore une clé, crée ${cd('d[c] = []')} ; puis ${cd('d[c].append(x)')}. Sans la création, le premier ${cd('d[c]')} lèverait KeyError.`,
+  demo:{enonce:'Regrouper les mots par première lettre.'+py(`mots = ['ane', 'bus', 'arc', 'cle', 'bol']
+gr = {}
+for m in mots:
+    c = m[0]
+    if c not in gr:
+        gr[c] = []
+    gr[c].append(m)`),
+   etapes:[
+    {f:'\'ane\' : la clé \'a\' n’existe pas, on crée gr[\'a\'] = [] puis on ajoute : {\'a\': [\'ane\']}.',w:'La catégorie est la première lettre, m[0].'},
+    {f:'\'bus\' : nouvelle clé \'b\' : {\'a\': [\'ane\'], \'b\': [\'bus\']}.',w:'Chaque nouvelle catégorie commence par une liste vide.'},
+    {f:'\'arc\' : la clé \'a\' existe, on ajoute seulement : [\'ane\', \'arc\'].',w:'On ne recrée pas la liste, sinon on perdrait \'ane\'.'},
+    {f:'\'cle\' puis \'bol\' : gr = {\'a\': [\'ane\', \'arc\'], \'b\': [\'bus\', \'bol\'], \'c\': [\'cle\']}.',w:'Dans chaque liste, les mots gardent l’ordre du parcours.'}],
+   conclusion:'Trois clés, et chaque mot est dans la liste de sa lettre.'}},
+ {h:'Regrouper par reste',p:'Que vaut ' + cd('sum(g[1])') + ' à la fin&nbsp;?',fig:py(`L = [4, 7, 2, 9, 5, 1]
+g = {}
+for x in L:
+    r = x % 3
+    if r not in g:
+        g[r] = []
+    g[r].append(x)`),lab:'somme =',ans:12,
+  why:'Les restes par 3 sont 1, 1, 2, 0, 2, 1. g = {1: [4, 7, 1], 2: [2, 5], 0: [9]}, donc sum(g[1]) = 4 + 7 + 1 = 12.'},
  {h:'Compréhensions',p:`Une <b>compréhension</b> construit une liste en une ligne : ${cd('[expr for x in iterable if condition]')}. Elle équivaut à une boucle qui fait ${cd('append(expr)')}. Avec des accolades et ${cd('clé: valeur')}, on construit un dictionnaire.`,
   fig:py(`carres = [x * x for x in range(6) if x % 2 == 0]
 # [0, 4, 16]
@@ -616,6 +998,34 @@ longueurs = {m: len(m) for m in ['le', 'chat']}
   note:'Le filtre if se place à la fin. Pour transformer selon un cas, mets une expression conditionnelle au début : [x if x > 0 else 0 for x in L].'},
  {h:'Compter avec une compréhension',p:`Que vaut ${cd('len([x for x in range(20) if x % 3 == 0])')}&nbsp;?`,lab:'longueur =',ans:7,
   why:'Les multiples de 3 de 0 à 19 sont 0, 3, 6, 9, 12, 15, 18 : il y en a 7. Attention à ne pas oublier 0.'},
+ {kind:'Méthode',h:'Compréhension à deux for, et ordre des chaînes',
+  p:`<p>${cd('[e for a in A for b in B if cond]')} équivaut à deux boucles imbriquées, dans le <b>même ordre</b> que les for : la première est l’extérieure. Pour chaque couple (a, b), on ajoute e si la condition est vraie.</p><p>Les chaînes se comparent avec ${cd('<')} dans l’ordre du dictionnaire : on compare lettre à lettre, et la première différence décide. ${cd("'chat' < 'chien'")} est vrai car a vient avant i. Un préfixe passe devant (${cd("'ab' < 'abc'")}), et les majuscules passent avant les minuscules (${cd("'Zoé' < 'ana'")}). Pour former des paires sans doublon, on garde seulement a &lt; b.</p>`,
+  demo:{enonce:'Que vaut <i>P</i>&nbsp;?'+py(`L = ['x', 'y', 'z']
+P = [(a, b) for a in L for b in L if a < b]`),
+   etapes:[
+    {f:py(`P = []
+for a in L:
+    for b in L:
+        if a < b:
+            P.append((a, b))`),w:'On réécrit la compréhension en boucles : c’est la façon sûre de la lire.'},
+    {f:'a = \'x\' : b = \'x\' non, \'y\' oui, \'z\' oui.',w:'a &lt; b exclut (x, x) et ne garde qu’un des deux ordres.'},
+    {f:'a = \'y\' : seul b = \'z\' convient. a = \'z\' : aucun.',w:'On a examiné 3 × 3 = 9 couples.'}],
+   conclusion:'P = [(\'x\', \'y\'), (\'x\', \'z\'), (\'y\', \'z\')] : les 3 paires distinctes, chacune une fois.'}},
+ {h:'Paires de même parité',p:`Que vaut ${cd('len([(a, b) for a in range(5) for b in range(5) if a < b and (a + b) % 2 == 0])')}&nbsp;?`,lab:'longueur =',ans:4,
+  why:'a + b est pair quand a et b ont la même parité. Avec a &lt; b : (0, 2), (0, 4), (2, 4) et (1, 3). Il y en a 4.'},
+ {kind:'Méthode',h:'Choisir la bonne structure de données',
+  p:`<ul><li><b>Liste</b> : des éléments dans un <b>ordre</b>, doublons permis, accès par position ${cd('L[i]')}.</li><li><b>Tuple</b> : un petit groupe fixe (des coordonnées, plusieurs valeurs renvoyées). Immuable, il peut servir de clé.</li><li><b>Dictionnaire</b> : associer une <b>clé</b> à une valeur (nom → note), et retrouver vite la valeur d’une clé.</li><li><b>Ensemble</b> (${cd('set')}) : des éléments <b>sans doublon</b>, sans ordre, avec un test ${cd('x in s')} rapide. ${cd('set()')} est l’ensemble vide, ${cd('s.add(x)')} ajoute, et ${cd('len(set(L))')} compte les valeurs distinctes de L.</li></ul>`,
+  demo:{enonce:'Pour un vote, on doit (1) savoir qui a déjà voté, (2) compter les voix de chaque candidat, (3) garder l’ordre d’arrivée des bulletins. Quelle structure pour chaque besoin&nbsp;?',
+   etapes:[
+    {f:`(1) un ensemble : ${cd('votants = set()')}, puis ${cd('if nom in votants')} et ${cd('votants.add(nom)')}.`,w:'On ne pose qu’une question, « est-il dedans ? », et un votant ne doit pas apparaître deux fois.'},
+    {f:`(2) un dictionnaire : ${cd('voix[c] = voix.get(c, 0) + 1')}.`,w:'On associe à chaque candidat (la clé) un nombre (la valeur).'},
+    {f:`(3) une liste : ${cd('bulletins.append(c)')}.`,w:'Seule la liste garde l’ordre et accepte les doublons : deux bulletins pour le même candidat.'}],
+   conclusion:'Ensemble pour l’appartenance, dictionnaire pour associer, liste pour l’ordre.'}},
+ {h:'Valeurs distinctes',p:`Que vaut ${cd("len(set('abracadabra'))")}&nbsp;?`,lab:'longueur =',ans:5,
+  why:'set garde chaque lettre une seule fois : {a, b, r, c, d}. Il y en a 5.'},
+ {h:'Quelle structure&nbsp;?',p:'Tu dois retrouver très souvent le numéro de téléphone d’une personne à partir de son nom. Que choisis-tu&nbsp;?',
+  opts:['Une liste de numéros','Un ensemble de noms','Un dictionnaire nom → numéro','Un tuple de noms'],ans:2,
+  why:'On associe une valeur (le numéro) à une clé (le nom) : c’est un dictionnaire, et annuaire[nom] répond directement. Un ensemble ne stocke pas de valeur associée.'},
  {kind:'Défi',h:'Dictionnaire de listes',p:'Qu’affiche ce code&nbsp;?',fig:py(`notes = {'Ana': [5, 6, 4], 'Ben': [3, 4], 'Léo': [6, 6, 5, 5]}
 print(sum([len(L) for n, L in notes.items() if sum(L) / len(L) >= 5]))`),lab:'affichage :',ans:7,
   why:'Moyennes : Ana 5, Ben 3,5, Léo 5,5. On garde Ana et Léo, et on additionne leurs nombres de notes : 3 + 4 = 7.'},

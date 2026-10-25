@@ -9,7 +9,7 @@ const run=f=>vm.runInContext(fs.readFileSync(path.join(ROOT,f),'utf8'),ctx,{file
 run('lib.js'); for(const f of files) run(f);
 const COURS=vm.runInContext('COURS',ctx), SUBJ=vm.runInContext('MATIERES',ctx);
 const MATHS=vm.runInContext('typeof MATHS!=="undefined"?MATHS:[]',ctx);
-const errs=[], warn=[], ids=new Set(); let steps=0, probs=0;
+const errs=[], warn=[], ids=new Set(); let steps=0, probs=0, demos=0;
 const bad=s=>/NaN(?![₀-₉])|undefined|\[object Object\]|Infinity/.test(s);
 const grid=p=>{ const a=[]; for(let x=p.min;x<=p.max+1e-9;x+=(p.step||1)) a.push(+x.toFixed(6)); return a; };
 function* combos(params,limit=4000){ const g=params.map(grid); const tot=g.reduce((n,a)=>n*a.length,1);
@@ -36,7 +36,7 @@ function checkAnswer(q,w){
 function checkSteps(id,stepsArr,{min=5,maths=false}={}){
   const W=`[${id}]`;
   if(!Array.isArray(stepsArr)||stepsArr.length<min){ errs.push(`${W} au moins ${min} étapes`); return; }
-  let ex=0, inter=0, nprob=0, firstProb=-1;
+  let ex=0, inter=0, nprob=0, firstProb=-1, ndemo=0;
   stepsArr.forEach((st,i)=>{ steps++; const w=`${W} étape ${i+1}`;
     try{
       if(st.render){ if(!maths) errs.push(`${w}: render() interdit, utiliser le format données`); return; }
@@ -54,6 +54,12 @@ function checkSteps(id,stepsArr,{min=5,maths=false}={}){
           if(st.ok(v0)) errs.push(`${w}: la position initiale est déjà la bonne réponse`);
           let found=false; for(const v of combos(st.params,200000)){ if(st.ok(v)){ found=true; break; } } if(!found) errs.push(`${w}: aucune position des curseurs ne satisfait ok()`); }
       }
+      if(st.demo){ ndemo++; demos++; const d=st.demo;
+        if(typeof d.enonce!=='string'||!d.enonce) errs.push(`${w}: demo.enonce manquant`);
+        if(!Array.isArray(d.etapes)||d.etapes.length<2) errs.push(`${w}: demo.etapes doit contenir au moins 2 étapes`);
+        else d.etapes.forEach((e,k)=>{ if(typeof e==='string') html+=e; else if(e&&typeof e.f==='string') html+=e.f+(e.w||''); else errs.push(`${w}: demo.etapes[${k}] doit être une chaîne ou {f, w}`); });
+        html+=(d.enonce||'')+(d.conclusion||'');
+        if(st.parts||st.opts||'ans' in st||st.ok) errs.push(`${w}: une étape Méthode (demo) n’est pas un exercice ; mets l’exercice d’application dans l’étape suivante`); }
       if(st.parts){ // problème en plusieurs questions
         nprob++; probs++; if(firstProb<0) firstProb=i;
         if(st.ok||st.opts||'ans' in st) errs.push(`${w}: un problème porte ses réponses dans parts, pas au niveau de l’étape`);
@@ -76,6 +82,7 @@ function checkSteps(id,stepsArr,{min=5,maths=false}={}){
   });
   if(!maths){ if(ex<3) errs.push(`${W} au moins 3 exercices (QCM, numérique ou curseurs avec ok)`);
     if(inter<1) errs.push(`${W} au moins une figure à curseurs`); }
+  if(ndemo<1) errs.push(`${W} au moins une étape Méthode avec exemple résolu (demo)`);
   if(nprob<2) errs.push(`${W} au moins 2 problèmes (étapes avec parts) à la fin du chapitre`);
   else if(stepsArr.slice(firstProb).some(s=>!s.parts)) errs.push(`${W} les problèmes doivent être les dernières étapes du chapitre`);
 }
@@ -90,6 +97,6 @@ for(const ch of COURS){
 }
 for(const c of MATHS){ if(c.use) continue; if(ids.has(c.id)) errs.push(`[${c.id}] id en double`); ids.add(c.id); checkSteps(c.id,c.steps,{min:4,maths:true}); }
 
-console.log(`${COURS.length} chapitres${MATHS.length?` + ${MATHS.filter(c=>!c.use).length} cours de maths`:''}, ${steps} étapes, ${probs} problèmes`);
+console.log(`${COURS.length} chapitres${MATHS.length?` + ${MATHS.filter(c=>!c.use).length} cours de maths`:''}, ${steps} étapes, ${demos} méthodes, ${probs} problèmes`);
 warn.forEach(w=>console.log('  avertissement : '+w));
 if(errs.length){ console.log(`${errs.length} erreur(s) :`); errs.slice(0,80).forEach(e=>console.log('  ✗ '+e)); if(errs.length>80) console.log(`  … et ${errs.length-80} autres`); process.exit(1); } else console.log('OK');

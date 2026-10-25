@@ -7,6 +7,9 @@ const RC=(x,y,w,h,o={})=>`<rect x="${(+x).toFixed(1)}" y="${(+y).toFixed(1)}" wi
 const LN=(x1,y1,x2,y2,o={})=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${o.c||'var(--muted)'}" stroke-width="${o.w??2}" ${o.dash?'stroke-dasharray="6 5"':''} opacity="${o.op??1}" stroke-linecap="round"/>`;
 const sq=c=>`<span style="color:${c}">■</span>`;
 const legend=l=>l.map(([c,s])=>`${sq(c)} ${s}`).join(' &nbsp; ');
+const cc=s=>`<code class="code">${esc(s)}</code>`;
+// petit tableau HTML (traces à la main)
+const tab=(h,rows)=>`<table style="margin:6px auto;border-collapse:collapse;text-align:center"><tr>${h.map(x=>`<th style="padding:2px 9px;border-bottom:1px solid var(--line)">${x}</th>`).join('')}</tr>${rows.map(r=>`<tr>${r.map(x=>`<td style="padding:2px 9px">${x}</td>`).join('')}</tr>`).join('')}</table>`;
 
 /* Barres : a = tableau ; o.cmp (indices comparés), o.done (placés), o.key (indice spécial), o.dim(i), o.lab {i:'g'} */
 function bars(a,o={}){ const n=a.length, mx=Math.max(...a), w=300/n; let s='';
@@ -153,6 +156,9 @@ const TDFS=(()=>{ const vu=[], par={}, st=[{ord:[],cur:null,path:[],par:{},msg:'
     st.push({ord:vu.slice(),cur:u,path,par:{...par},msg:`On visite ${u}. Pile d’appels : ${path.join(' → ')}`});
     ADJ[u].forEach(v=>{ if(!vu.includes(v)){ par[v]=u; rec(v); } }); };
   rec('A'); return st; })();
+/* petit graphe des méthodes de parcours */
+const HN={'1':[30,100],'2':[115,35],'3':[115,165],'4':[205,35],'5':[205,165],'6':[290,100]};
+const HE=[['1','2'],['1','3'],['2','4'],['3','4'],['3','5'],['4','6'],['5','6']];
 const treeEdge=par=>(u,v)=>(par[v]===u||par[u]===v)?{c:'var(--accent)',w:4,op:1}:{c:'var(--muted)',w:2,op:.5};
 
 /* ---------- chapitre 8 ---------- */
@@ -174,6 +180,10 @@ const KR=(()=>{ const E=WE.slice().sort((a,b)=>a[2]-b[2]), p={}; Object.keys(WN)
     else { rej.push(e); msg=`${e[0]}–${e[1]} (${e[2]}) fermerait un cycle : on la rejette.`; }
     st.push({acc:acc.slice(),rej:rej.slice(),cur:e,tot,msg}); });
   return st; })();
+
+/* petit graphe pondéré des méthodes */
+const DN={S:[30,100],A:[160,35],B:[160,165],C:[290,100]};
+const DE=[['S','A',1],['S','B',4],['A','B',2],['A','C',6],['B','C',3]];
 
 /* ---------- graphes des problèmes ---------- */
 const PB7N={S:[30,105],A:[115,45],B:[115,165],C:[205,45],D:[205,165],E:[290,45],T:[290,165]};
@@ -223,6 +233,18 @@ def pgcd(a, b):
    why:'1071 mod 462 = 147, puis 462 mod 147 = 21, puis 147 mod 21 = 0. Trois tours : (1071, 462) → (462, 147) → (147, 21) → (21, 0), et le pgcd vaut 21.'},
   {kind:'Méthode',h:'Une preuve en trois temps',p:`Pour Euclide, l’invariant est <b>pgcd(a, b) = pgcd(a₀, b₀)</b>. <b>Initialisation</b> : vrai avant la boucle. <b>Conservation</b> : pgcd(a, b) = pgcd(b, a mod b), car tout diviseur commun de a et b divise a − qb, et réciproquement. <b>Sortie</b> : b = 0 et pgcd(a, 0) = a.`,
    fig:'<p style="text-align:center;font-size:18px"><b>Invariant + condition de sortie ⟹ résultat</b><br><b>Variant entier ≥ 0 strictement décroissant ⟹ arrêt</b></p>',
+   demo:{enonce:'Prouver que cette boucle, avec <i>n</i> entier ≥ 0, s’arrête et donne <i>p</i> = <i>x</i>ⁿ.'+py(`
+p, k = 1, 0
+while k < n:
+    p = p * x
+    k = k + 1`),
+    etapes:[
+     {f:'Invariant choisi : p = xᵏ et k ≤ n.',w:'Il relie les variables, et combiné à la sortie (k ≥ n) il donnera le résultat. La partie k ≤ n servira à conclure k = n.'},
+     {f:'Initialisation : p = 1 = x⁰, k = 0 et 0 ≤ n.',w:'On vérifie la propriété avec les valeurs juste avant la boucle.'},
+     {f:'Conservation : si p = xᵏ et k &lt; n au début d’un tour, alors p devient xᵏ · x = xᵏ⁺¹ et k devient k + 1 ≤ n.',w:'On suppose l’invariant vrai, on exécute le corps une fois, et on le vérifie avec les nouvelles valeurs. La condition de boucle (k &lt; n) est utilisable, puisqu’on est entré.'},
+     {f:'Sortie : k ≥ n (condition fausse) et k ≤ n (invariant), donc k = n et p = xⁿ.',w:'Invariant + négation de la condition : c’est toujours ainsi qu’on conclut.'},
+     {f:'Terminaison : n − k est un entier, ≥ 0 par l’invariant, qui baisse de 1 à chaque tour.',w:'C’est un variant. Il part de n, donc la boucle fait exactement n tours.'}],
+    conclusion:'La boucle s’arrête après n tours avec p = xⁿ.'},
    note:'Le même schéma marche pour toutes les boucles <code class="code">while</code>. Pour une boucle <code class="code">for</code>, la terminaison est automatique.'},
   {h:'Est-ce que ça s’arrête&nbsp;?',p:'On part de <i>i</i> = 0. Pour quelles valeurs de <i>n</i> ≥ 0 cette boucle termine-t-elle&nbsp;?',
    fig:py(`
@@ -237,6 +259,21 @@ while i != n:
    info:v=>`${nbTours(89,v.b)} tour(s)`,
    ok:v=>nbTours(89,v.b)===9,
    why:'b = 55 donne 9 tours : (89, 55) → (55, 34) → (34, 21) → … → (1, 0). Deux nombres de Fibonacci consécutifs sont le pire cas d’Euclide (théorème de Lamé) : presque tous les quotients valent 1, donc le variant b décroît le plus lentement possible.'},
+  {kind:'Méthode',h:'Trouver un invariant avec un tableau',
+   p:'Un invariant ne se devine pas dans le vide. <b>Fais tourner</b> la boucle à la main sur quelques tours et note les variables dans un tableau. Cherche une relation qui lie les colonnes sur <b>toutes</b> les lignes, souvent en comparant à des carrés, des produits ou des puissances. Puis prouve-la : initialisation, conservation, et regarde ce qu’elle donne à la sortie.',
+   demo:{enonce:'Que renvoie <code class="code">f(n)</code>&nbsp;? Le prouver.'+py(`
+def f(n):
+    s, k = 0, 0
+    while k < n:
+        k = k + 1
+        s = s + 2 * k
+    return s`),
+    etapes:[
+     {f:tab(['k',0,1,2,3,4],[['s',0,2,6,12,20]]),w:'On calcule quelques tours. Chaque colonne est l’état à la fin d’un tour.'},
+     {f:'0 = 0 · 1, 2 = 1 · 2, 6 = 2 · 3, 12 = 3 · 4, 20 = 4 · 5 : on devine s = k(k + 1).',w:'On compare s à des expressions simples en k jusqu’à trouver celle qui marche sur toutes les colonnes.'},
+     {f:'Initialisation : 0 = 0 · 1. Conservation : k(k + 1) + 2(k + 1) = (k + 1)(k + 2).',w:'Le corps fait k → k + 1 et s → s + 2(k + 1). On vérifie que la formule suit.'},
+     {f:'Sortie : k = n, donc s = n(n + 1).',w:'k part de 0, augmente de 1 et s’arrête dès que k = n.'}],
+    conclusion:'f(n) = n(n + 1). Par exemple f(10) = 110.'}},
   {kind:'Défi',h:'Trouve l’invariant',p:'Que renvoie <code class="code">mystere(12)</code>&nbsp;? Cherche une propriété liant <i>r</i> et <i>k</i>.',
    fig:py(`
 def mystere(n):
@@ -289,11 +326,34 @@ for i in range(n):
     for j in range(i):
         c += 1`)+pairsGrid(v.n),
    info:v=>`Ligne i : i cases. Total c = 0 + 1 + … + (n − 1) = n(n − 1)/2 = <b>${v.n*(v.n-1)/2}</b>`},
+  {kind:'Méthode',h:'Compter les tours d’une double boucle dépendante',
+   p:`<p>Si la boucle intérieure ne dépend pas de <i>i</i>, on multiplie les nombres de tours. Si elle <b>dépend</b> de <i>i</i>, on <b>additionne</b> : pour chaque <i>i</i>, combien de tours fait l’intérieure&nbsp;? On tombe très souvent sur la somme</p><p style="text-align:center;font-size:18px"><b>1 + 2 + … + n = n(n + 1)/2</b></p><p>Pour la retrouver : écris la somme à l’endroit, puis à l’envers en dessous. Chaque colonne vaut n + 1 et il y a n colonnes, donc deux fois la somme vaut n(n + 1). De même, 0 + 1 + … + (n − 1) = n(n − 1)/2.</p>`,
+   demo:{enonce:'Combien de fois <code class="code">c += 1</code> est-il exécuté pour <i>n</i> = 20&nbsp;?'+py(`
+c = 0
+for i in range(1, n + 1):
+    for j in range(i, n + 1):
+        c += 1`),
+    etapes:[
+     {f:'Pour un i fixé, j va de i à n : n − i + 1 tours.',w:'range(i, n + 1) contient n + 1 − i entiers.'},
+     {f:'i = 1 : n tours, i = 2 : n − 1 tours, …, i = n : 1 tour.',w:'On écrit le nombre de tours pour la première et la dernière valeur de i, pour voir la forme de la somme.'},
+     {f:'Total : n + (n − 1) + … + 1 = n(n + 1)/2.',w:'C’est la somme 1 + 2 + … + n, écrite à l’envers.'},
+     {f:'Pour n = 20 : 20 · 21 / 2 = 210.',w:'On remplace n à la fin seulement.'}],
+    conclusion:'c += 1 est exécuté 210 fois. En grand-O : n(n + 1)/2 = O(n²).'},
+   note:'Vérifie la formule sur un petit n en comptant à la main : pour n = 3, 3 + 2 + 1 = 6 = 3 · 4 / 2.'},
   {h:'À toi',p:'Avec ce même code et <i>n</i> = 100, combien de fois <code class="code">c += 1</code> est-il exécuté&nbsp;?',lab:'c =',ans:4950,
    why:'c = n(n − 1)/2 = 100 × 99 / 2 = 4950.'},
   {kind:'Théorie',h:'La notation grand-O',p:`On écrit <b>f(n) = O(g(n))</b> s’il existe une constante <i>C</i> &gt; 0 et un rang <i>n</i>₀ tels que f(n) ≤ C·g(n) pour tout n ≥ n₀. En pratique, on garde le <b>terme dominant</b> et on oublie les constantes : n(n − 1)/2 = O(n²).`,
    fig:`<p style="text-align:center;line-height:1.9">O(1) &lt; O(log n) &lt; O(n) &lt; O(n log n) &lt; O(n²) &lt; O(2ⁿ)<br><span style="color:var(--muted)">accès L[i] · dichotomie · parcours · tri fusion · double boucle · Fibonacci naïf</span></p>`,
    note:'En informatique, log n désigne en général log₂ n. Le changement de base ne change qu’une constante, donc O(log n) ne dépend pas de la base.'},
+  {kind:'Méthode',h:'Simplifier en grand-O',
+   p:'Pour donner la complexité d’une formule : <b>développe</b> pour obtenir une somme de termes ; <b>classe</b> chaque terme sur l’échelle 1 &lt; log n &lt; n &lt; n log n &lt; n² &lt; n³ &lt; 2ⁿ ; <b>garde</b> le plus fort ; <b>enlève</b> sa constante multiplicative.',
+   demo:{enonce:'Donner la complexité de f(n) = n(n + 3)/2 + 10 n log₂ n + 50.',
+    etapes:[
+     {f:'f(n) = n²/2 + 3n/2 + 10 n log₂ n + 50',w:'On développe le produit pour voir chaque terme séparément.'},
+     {f:'Termes : n² (avec 1/2), n, n log n (avec 10), constante.',w:'On repère la forme de chaque terme sans regarder les constantes.'},
+     {f:'Le plus fort est n²/2. Pour n = 1024 : n²/2 = 524 288, 10 n log₂ n = 102 400, 3n/2 = 1536.',w:'Un 10 devant n log n ne le fait pas passer devant n² : il ne gagne que pour les petits n.'},
+     {f:'f(n) = O(n²)',w:'On enlève le facteur 1/2.'}],
+    conclusion:'f(n) = O(n²).'}},
   {h:'Terme dominant',p:'Quelle est la complexité de <i>f</i>(<i>n</i>) = 3<i>n</i>² + 100 <i>n</i> log <i>n</i> + 7&nbsp;?',
    opts:['O(n log n)','O(3n²)','O(n²)','O(100 n log n)'],ans:2,
    why:'n log n est négligeable devant n² quand n grandit, et la constante 3 disparaît : f(n) = O(n²). Écrire O(3n²) n’est pas faux mais n’est pas l’usage.'},
@@ -305,6 +365,15 @@ for i in range(n):
      P.text(N*.97,Math.log2(N),'log n',{a:'end',dy:-6,c:'var(--ok)'}).text(N*.97,N*.97,'n',{a:'end',dy:-8,c:'var(--math)'}).text(N*.82,N*.82*Math.log2(N*.82),'n log n',{a:'end',dy:-8,c:'var(--spark)'}).text(xs,xs*xs,'n²',{dx:6,dy:12,c:'var(--bad)'});
      return P.svg(); },
    info:v=>`En n = ${v.N} : log₂ n = ${fmt(Math.log2(v.N),1)}, n = ${v.N}, n log₂ n = ${fmt(v.N*Math.log2(v.N),0)}, n² = ${v.N*v.N}`},
+  {kind:'Méthode',h:'Prévoir un temps par proportionnalité',
+   p:`<p>Si le temps vaut à peu près T(n) ≈ C · g(n), la constante C s’élimine dans un rapport : <b>T(n₂) / T(n₁) = g(n₂) / g(n₁)</b>. Quand <i>n</i> est multiplié par <i>k</i> :</p><ul><li>O(n) : le temps est multiplié par <i>k</i> ;</li><li>O(n²) : par <i>k</i>² ; O(n³) : par <i>k</i>³ ;</li><li>O(log n) : on ajoute seulement un petit nombre de tours (log₂ <i>k</i>) ;</li><li>O(2ⁿ) : chaque unité ajoutée à <i>n</i> double le temps.</li></ul>`,
+   demo:{enonce:'Un algorithme en O(n²) met 3 s pour n = 2000. Combien de temps environ pour n = 10 000&nbsp;?',
+    etapes:[
+     {f:'k = 10 000 / 2000 = 5',w:'On cherche d’abord par combien n est multiplié.'},
+     {f:'g(n) = n², donc le temps est multiplié par 5² = 25.',w:'(5n)² = 25 n² : la constante C est la même pour les deux tailles.'},
+     {f:'T ≈ 3 × 25 = 75 s',w:'On applique le facteur au temps connu.'}],
+    conclusion:'Environ 75 s. Un algorithme en O(n) n’aurait mis que 15 s.'},
+   note:'Ce calcul n’est fiable que pour des n assez grands, quand le terme dominant écrase les autres.'},
   {h:'Prévoir un temps de calcul',p:'Un algorithme en O(<i>n</i>²) met 2 s pour <i>n</i> = 1000. Combien de temps environ pour <i>n</i> = 3000&nbsp;?',lab:'t ≈',unit:'s',ans:18,tol:0.01,
    why:'Si n est multiplié par 3, n² est multiplié par 3² = 9. Donc t ≈ 2 × 9 = 18 s.'},
   {kind:'Théorie',h:'Meilleur cas, pire cas',p:`Pour une même taille <i>n</i>, le coût peut dépendre des données. Dans une recherche linéaire, si <i>x</i> est en tête, on fait <b>1</b> comparaison (meilleur cas) ; s’il est absent, on en fait <b>n</b> (pire cas). Sauf mention contraire, la complexité annoncée est celle du <b>pire cas</b>.`,
@@ -315,6 +384,15 @@ def contient(L, x):
             return True
     return False`),
    note:'Le pire cas est une garantie : l’algorithme ne fera jamais plus que ça.'},
+  {kind:'Méthode',h:'Reconnaître O(log n)',
+   p:`<p>Dès qu’une quantité est <b>divisée par 2</b> à chaque tour, ou <b>doublée</b> jusqu’à atteindre <i>n</i>, la boucle fait environ log₂ <i>n</i> tours, car 2ᵏ dépasse <i>n</i> dès que <i>k</i> dépasse log₂ <i>n</i>. Pour le nombre exact, encadre <i>n</i> entre deux puissances de 2 :</p><ul><li>${cc('while n > 1: n = n // 2')} fait ⌊log₂ n⌋ tours : le plus grand k tel que 2ᵏ ≤ n.</li><li>${cc('i = 1')} puis ${cc('while i < n: i = 2 * i')} fait ⌈log₂ n⌉ tours : le plus petit k tel que 2ᵏ ≥ n.</li></ul><p>Repères : 2¹⁰ = 1024 ≈ mille, 2²⁰ ≈ un million.</p>`,
+   demo:{enonce:'Combien de tours font ces deux boucles pour n = 100&nbsp;?',
+    etapes:[
+     {f:'Division : n prend les valeurs 100, 50, 25, 12, 6, 3, 1. Six tours.',w:'On trace les valeurs de n jusqu’à ce que n &gt; 1 soit faux.'},
+     {f:'Contrôle : 2⁶ = 64 ≤ 100 &lt; 128 = 2⁷, donc ⌊log₂ 100⌋ = 6.',w:'L’encadrement par les puissances de 2 donne le résultat sans tracer.'},
+     {f:'Doublement : i prend les valeurs 1, 2, 4, 8, 16, 32, 64 avec i &lt; 100, puis 128. Sept tours.',w:'Un tour par valeur de i inférieure à 100. C’est le plus petit k avec 2ᵏ ≥ 100, soit 7.'},
+     {f:'Dans les deux cas : O(log n).',w:'Une différence d’un tour ne change pas l’ordre de grandeur.'}],
+    conclusion:'6 tours pour la division, 7 pour le doublement : environ log₂ 100 ≈ 6,6.'}},
   {h:'Diviser par deux',p:'Quelle est la complexité de cette fonction&nbsp;?',
    fig:py(`
 def f(n):
@@ -327,6 +405,23 @@ def f(n):
    why:'À chaque tour n est divisé par 2. Après k tours il reste environ n/2ᵏ, et la boucle s’arrête quand 2ᵏ ≥ n, soit k ≈ log₂ n : O(log n).'},
   {kind:'Défi',h:'Fais tourner la boucle',p:'Avec la même fonction, que renvoie <code class="code">f(1000)</code>&nbsp;?',lab:'f(1000) =',ans:9,
    why:'1000 → 500 → 250 → 125 → 62 → 31 → 15 → 7 → 3 → 1 : 9 tours. C’est ⌊log₂ 1000⌋ = 9, car 2⁹ = 512 ≤ 1000 &lt; 1024.'},
+  {kind:'Méthode',h:'Compter de l’intérieur vers l’extérieur',
+   p:'Avec plusieurs boucles imbriquées et des bornes qui dépendent les unes des autres, compte <b>une boucle à la fois, en partant de la plus intérieure</b>. Pour des valeurs fixées des boucles extérieures, combien de tours fait l’intérieure&nbsp;? Remplace-la par ce nombre, puis recommence avec la boucle suivante. Les sommes 0 + 1 + … + (m − 1) = m(m − 1)/2 reviennent à chaque étage. Pour un résultat numérique, un tableau des valeurs suffit.',
+   demo:{enonce:'Combien de fois <code class="code">c += 1</code> est-il exécuté pour <i>n</i> = 5&nbsp;?'+py(`
+c = 0
+for i in range(n):
+    for j in range(i):
+        for k in range(j):
+            c += 1`),
+    etapes:[
+     {f:'Boucle sur k, i et j fixés : j tours.',w:'range(j) contient j valeurs.'},
+     {f:'Boucle sur j, i fixé : 0 + 1 + … + (i − 1) = i(i − 1)/2 tours.',w:'On additionne les j tours intérieurs pour j = 0, …, i − 1.'},
+     {f:tab(['i',0,1,2,3,4],[['i(i − 1)/2',0,0,1,3,6]]),w:'Boucle sur i : on additionne ces nombres pour i = 0, …, n − 1.'},
+     {f:'Total : 0 + 0 + 1 + 3 + 6 = 10.',w:'On fait la somme de la dernière ligne.'},
+     {f:'En général ≈ somme de i²/2 pour i jusqu’à n, soit environ n³/6 : O(n³).',w:'Trois boucles imbriquées dont les bornes valent au plus n : n³ divisé par une constante.'}],
+    conclusion:'c += 1 est exécuté 10 fois pour n = 5, et le coût est en O(n³).'}},
+  {h:'Trois boucles à toi',p:'Avec le code de la méthode, combien de fois <code class="code">c += 1</code> est-il exécuté pour <i>n</i> = 6&nbsp;?',lab:'c =',ans:20,
+   why:'On ajoute la ligne i = 5 : 5 · 4 / 2 = 10. Total 0 + 0 + 1 + 3 + 6 + 10 = 20.'},
   {kind:'Problème',h:'Une boucle qui double',p:`Dans la fonction ci-dessous, la boucle extérieure double <i>i</i> à chaque tour, et la boucle intérieure fait toujours <i>n</i> tours. Compte les passages par <code class="code">c += 1</code> pour deux valeurs de <i>n</i>, puis déduis-en la complexité.`+py(`
 def f(n):
     c = 0
@@ -378,6 +473,30 @@ def fact(n):
    why:'fact(3) appelle fact(2), fact(1), fact(0), fact(−1)… sans fin. La pile grandit jusqu’à la limite de Python (environ 1000 appels) et on obtient RecursionError.'},
   {h:'Compter les appels',p:'Combien d’appels à <code class="code">fact</code> au total (le premier compris) pour calculer <code class="code">fact(5)</code>&nbsp;?',lab:'appels =',ans:6,
    why:'fact(5), fact(4), fact(3), fact(2), fact(1), fact(0) : 6 appels. En général n + 1 appels, donc O(n).'},
+  {kind:'Méthode',h:'Écrire une fonction récursive',
+   p:`<p>Réponds à trois questions, dans cet ordre :</p><ol><li><b>Cas de base</b> : quelle est la plus petite entrée, dont je connais la réponse sans calcul&nbsp;? (0, une liste vide, un seul chiffre…)</li><li><b>Réduction</b> : comment obtenir la réponse pour <i>n</i> à partir de la réponse pour une entrée <b>plus petite</b> (${cc('n - 1')}, ${cc('n // 10')}, la liste sans son premier élément ${cc('L[1:]')})&nbsp;?</li><li><b>Progrès</b> : chaque appel se rapproche-t-il vraiment du cas de base&nbsp;?</li></ol><p>Pour la réduction, fais confiance à l’appel récursif : suppose qu’il renvoie la bonne réponse pour l’entrée plus petite, et demande-toi seulement comment t’en servir.</p>`,
+   demo:{enonce:'Écrire <code class="code">nb_chiffres(n)</code>, le nombre de chiffres d’un entier <i>n</i> ≥ 1, puis calculer nb_chiffres(4725).',
+    etapes:[
+     {f:'Cas de base : si n &lt; 10, n a un seul chiffre, on renvoie 1.',w:'C’est la plus petite entrée possible, et la réponse est immédiate.'},
+     {f:'Réduction : n // 10 a un chiffre de moins que n, donc nb_chiffres(n) = 1 + nb_chiffres(n // 10).',w:'n // 10 efface le dernier chiffre. On suppose que l’appel compte bien les chiffres restants.'},
+     {f:'Progrès : si n ≥ 10, alors n // 10 &lt; n et n // 10 ≥ 1.',w:'L’entrée diminue strictement et reste valide : on finit par passer sous 10.'},
+     {f:py(`
+def nb_chiffres(n):
+    if n < 10:
+        return 1
+    return 1 + nb_chiffres(n // 10)`),w:'Le code suit exactement les deux premières réponses.'},
+     {f:'nb_chiffres(4725) = 1 + nb_chiffres(472) = 2 + nb_chiffres(47) = 3 + nb_chiffres(4) = 3 + 1 = 4.',w:'On vérifie sur un exemple : 4725 a bien 4 chiffres.'}],
+    conclusion:'nb_chiffres(4725) = 4, avec 4 appels.'}},
+  {h:'Un appel qui ne progresse pas',p:'Que fait <code class="code">compte([3, 5], 5)</code>&nbsp;?',
+   fig:py(`
+def compte(L, x):
+    if len(L) == 0:
+        return 0
+    if L[0] == x:
+        return 1 + compte(L[1:], x)
+    return compte(L, x)`),
+   opts:['Elle renvoie 1','Elle renvoie 0','Elle lève IndexError','Elle lève RecursionError'],ans:3,
+   why:'L[0] = 3 ≠ 5, donc on appelle compte(L, x) avec la même liste. Rien ne se rapproche du cas de base : les appels s’empilent sans fin. La dernière ligne doit être return compte(L[1:], x).'},
   {kind:'Théorie',h:'Fibonacci naïf : l’arbre explose',p:`F(0) = 0, F(1) = 1 et F(n) = F(n − 1) + F(n − 2). La version récursive directe fait <b>deux</b> appels par niveau et recalcule sans cesse les mêmes valeurs (en orange : les appels à F(2)).`,
    params:[{id:'n',l:'n',min:1,max:6,v:4}],
    draw:v=>py(`
@@ -387,8 +506,29 @@ def fib(n):
     return fib(n - 1) + fib(n - 2)`)+FIB[v.n].svg,
    info:v=>`fib(${v.n}) = ${fibv(v.n)} &nbsp; ${FIB[v.n].calls} appels${FIB[v.n].f2?`, dont ${FIB[v.n].f2} fois fib(2)`:''}<br>${legend([['var(--ok)','cas de base'],['var(--spark)','fib(2)'],['var(--accent)','autres']])}`,
    note:'Le nombre d’appels A(n) vérifie A(n) = 1 + A(n − 1) + A(n − 2) : il croît comme Fibonacci lui-même, c’est-à-dire exponentiellement (environ 1,618ⁿ).'},
+  {kind:'Méthode',h:'Écrire la récurrence du coût',
+   p:`<p>Pour compter les appels d’une fonction récursive, note A(n) leur nombre pour l’entrée n, le premier appel compris. Écris :</p><ul><li>le <b>cas de base</b> : A(base) = 1, car l’appel ne lance rien ;</li><li>la <b>récurrence</b> : A(n) = 1 + la somme des A(…) de chaque appel lancé.</li></ul><p>Calcule ensuite un <b>tableau</b> des premières valeurs, devine une formule et vérifie-la. Repères : un appel sur n − 1 donne O(n) ; un appel sur n // 2 donne O(log n) ; deux appels ou plus sur n − 1 donnent un coût exponentiel.</p>`,
+   demo:{enonce:'Combien d’appels fait <code class="code">trois(n)</code>&nbsp;?'+py(`
+def trois(n):
+    if n == 0:
+        return 1
+    return trois(n - 1) + trois(n - 1) + trois(n - 1)`),
+    etapes:[
+     {f:'A(0) = 1',w:'trois(0) est le cas de base : un seul appel.'},
+     {f:'A(n) = 1 + 3 A(n − 1)',w:'L’appel lui-même, plus trois appels identiques sur n − 1.'},
+     {f:tab(['n',0,1,2,3,4],[['A(n)',1,4,13,40,121]]),w:'Chaque valeur vaut 1 + 3 fois la précédente.'},
+     {f:'On devine A(n) = (3ⁿ⁺¹ − 1)/2 : (3 − 1)/2 = 1, (9 − 1)/2 = 4, (27 − 1)/2 = 13.',w:'Les valeurs sont proches de 3ⁿ⁺¹/2 : on ajuste la constante. Hérédité : 1 + 3(3ⁿ − 1)/2 = (3ⁿ⁺¹ − 1)/2.'},
+     {f:'A(n) = O(3ⁿ)',w:'Chaque niveau triple le nombre d’appels.'}],
+    conclusion:'trois(n) fait (3ⁿ⁺¹ − 1)/2 appels, par exemple 121 pour n = 4 : coût exponentiel.'}},
   {h:'Le coût de la version naïve',p:'Combien d’appels à <code class="code">fib</code> (le premier compris) pour calculer <code class="code">fib(7)</code>&nbsp;?',lab:'appels =',ans:41,
    why:'A(0) = A(1) = 1 et A(n) = 1 + A(n − 1) + A(n − 2). Donc A(2) = 3, A(3) = 5, A(4) = 9, A(5) = 15, A(6) = 25, A(7) = 1 + 25 + 15 = 41.'},
+  {h:'Une autre récurrence',p:'Combien d’appels à <code class="code">t</code> (le premier compris) pour calculer <code class="code">t(5)</code>&nbsp;?',
+   fig:py(`
+def t(n):
+    if n <= 0:
+        return 1
+    return t(n - 1) + t(n - 3)`),lab:'appels =',ans:17,
+   why:'A(n) = 1 pour n ≤ 0, et A(n) = 1 + A(n − 1) + A(n − 3). A(1) = 1 + 1 + 1 = 3, A(2) = 1 + 3 + 1 = 5, A(3) = 1 + 5 + 1 = 7, A(4) = 1 + 7 + 3 = 11, A(5) = 1 + 11 + 5 = 17.'},
   {kind:'Théorie',h:'Récursion ou itération',p:`Toute fonction récursive peut s’écrire avec une boucle. La version itérative de Fibonacci garde les deux derniers termes : <b>O(n)</b> opérations au lieu d’un coût exponentiel, et aucune pile d’appels.`,
    fig:py(`
 def fib_iter(n):
@@ -400,6 +540,19 @@ def fib_iter(n):
   {h:'Mémoire de la pile',p:'Combien de mémoire la pile d’appels utilise-t-elle au maximum pour <code class="code">fact(n)</code> récursif&nbsp;?',
    opts:['O(1)','O(log n)','O(n)','O(n²)'],ans:2,
    why:'Au moment du cas de base, les n + 1 appels fact(n), …, fact(0) sont tous en attente sur la pile : O(n). La version itérative, elle, n’utilise que O(1).'},
+  {kind:'Méthode',h:'Dérouler une récursion par substitution',
+   p:'Pour calculer à la main la valeur d’une fonction récursive, <b>remplace</b> chaque appel par sa définition, en descendant jusqu’au cas de base. Garde en attente ce qui reste à faire autour de l’appel (le « 7 + … »). Une fois au cas de base, remonte en calculant. C’est exactement ce que fait la pile d’appels.',
+   demo:{enonce:'Que renvoie <code class="code">g(7)</code>&nbsp;?'+py(`
+def g(n):
+    if n <= 1:
+        return n
+    return n + g(n - 2)`),
+    etapes:[
+     {f:'g(7) = 7 + g(5)',w:'7 &gt; 1 : on applique la ligne récursive. Le « 7 + » attend le résultat de g(5).'},
+     {f:'= 7 + 5 + g(3) = 7 + 5 + 3 + g(1)',w:'On substitue de la même façon tant qu’on n’est pas au cas de base.'},
+     {f:'g(1) = 1',w:'1 ≤ 1 : cas de base, on renvoie n.'},
+     {f:'g(7) = 7 + 5 + 3 + 1 = 16',w:'On remonte : chaque appel en attente ajoute son terme.'}],
+    conclusion:'g(7) = 16 : la somme des impairs jusqu’à 7, en 4 appels.'}},
   {kind:'Défi',h:'Que calcule-t-elle&nbsp;?',p:'Que renvoie <code class="code">f(2024)</code>&nbsp;?',
    fig:py(`
 def f(n):
@@ -470,6 +623,19 @@ def dichotomie(L, x):
    params:[{id:'c',l:'Cible',min:0,max:CIBLES.length-1,v:11},{id:'k',l:'Étape',min:0,max:DTMAX,v:0}],
    draw:v=>dichoFig(DT[v.c],v.k),
    info:v=>{ const t=DT[v.c]; return `x = <b>${CIBLES[v.c]}</b> &nbsp; ${t[Math.min(v.k,t.length-1)].msg}`; }},
+  {kind:'Méthode',h:'Simuler une dichotomie avec un tableau',
+   p:'Écris les indices sous la liste. Puis fais un tableau avec les colonnes <b>g</b>, <b>d</b>, <b>m</b>, <b>L[m]</b> et <b>décision</b>. À chaque tour : m = (g + d) // 2 (division entière, donc arrondi vers le bas), compare L[m] à x, puis mets à jour <b>une seule</b> borne : g = m + 1 si L[m] &lt; x, d = m − 1 si L[m] &gt; x. On s’arrête si L[m] = x, ou quand g &gt; d : la zone est vide et x est absent.',
+   demo:{enonce:'Chercher 20, puis 7, dans la liste triée ci-dessous.'+py(`
+L = [1, 4, 6, 9, 13, 17, 20, 25, 31]
+#    0  1  2  3   4   5   6   7   8   (indices)`),
+    etapes:[
+     {f:'x = 20 :'+tab(['g','d','m','L[m]','décision'],[[0,8,4,13,'13 &lt; 20 : g = 5'],[5,8,6,20,'trouvé']]),w:'(0 + 8) // 2 = 4, puis (5 + 8) // 2 = 6, arrondi vers le bas. Trouvé en 2 tours.'},
+     {f:'x = 7 :'+tab(['g','d','m','L[m]','décision'],[[0,8,4,13,'13 &gt; 7 : d = 3'],[0,3,1,4,'4 &lt; 7 : g = 2'],[2,3,2,6,'6 &lt; 7 : g = 3'],[3,3,3,9,'9 &gt; 7 : d = 2']]),w:'On ne recalcule m qu’avec les nouvelles bornes. Un seul élément dans la zone (g = d = 3) fait encore un tour.'},
+     {f:'Après le 4e tour : g = 3 &gt; d = 2, on renvoie −1.',w:'La zone [g ; d] est vide : 7 n’est pas dans la liste, et il se placerait à l’indice g = 3, entre 6 et 9.'}],
+    conclusion:'20 est trouvé à l’indice 6 en 2 tours ; 7 est déclaré absent après 4 tours.'}},
+  {h:'Les milieux successifs',p:'On cherche <i>x</i> = 4 dans <code class="code">L = [3, 7, 10, 14, 18, 21, 27, 30]</code> avec la fonction <code class="code">dichotomie</code>. Quelles sont les valeurs successives de <i>m</i>&nbsp;?',
+   opts:['3, 1','4, 2, 1, 0','3, 1, 0','3, 1, 0, 1'],ans:2,
+   why:'g = 0, d = 7 : m = 3, 14 &gt; 4, d = 2. m = 1, 7 &gt; 4, d = 0. m = 0, 3 &lt; 4, g = 1. Puis g = 1 &gt; d = 0 : on s’arrête après 3 tours et on renvoie −1.'},
   {kind:'Pratique',h:'Le chemin le plus long',p:'Choisis une cible <b>présente</b> dans la liste que la dichotomie ne trouve qu’au <b>4e tour</b>.',
    params:[{id:'c',l:'Cible',min:0,max:LD.length-1,v:7}],
    draw:v=>dichoFig(DT[v.c],DTMAX),
@@ -479,6 +645,15 @@ def dichotomie(L, x):
   {kind:'Théorie',h:'Combien de tours au plus&nbsp;?',p:`Chaque tour fait passer la zone de <i>k</i> éléments à au plus ⌊k/2⌋. Avec <i>t</i> tours, on traite au plus 2ᵗ − 1 éléments. Le nombre maximal de tours est donc`,
    fig:`<p style="text-align:center;font-size:20px"><b>⌈log₂(n + 1)⌉</b></p><p style="text-align:center;color:var(--muted)">n = 1, 3, 7, 15, 31 → 1, 2, 3, 4, 5 tours</p>`,
    note:'Doubler la taille de la liste n’ajoute qu’<b>un</b> tour : la dichotomie est en O(log n).'},
+  {kind:'Méthode',h:'Borner le nombre de tours avec les puissances de 2',
+   p:'Pour le nombre maximal de tours de la dichotomie sur <i>n</i> éléments, cherche le plus petit <i>t</i> tel que <b>2ᵗ ≥ n + 1</b>. Pour cela, encadre n + 1 entre deux puissances de 2 consécutives : 2ᵗ⁻¹ &lt; n + 1 ≤ 2ᵗ. Garde en tête les premières puissances : 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024.',
+   demo:{enonce:'Combien de tours au plus pour une liste triée de 100 éléments&nbsp;?',
+    etapes:[
+     {f:'n + 1 = 101',w:'Avec t tours, on traite au plus 2ᵗ − 1 éléments : il faut 2ᵗ − 1 ≥ n, soit 2ᵗ ≥ n + 1.'},
+     {f:'2⁶ = 64 &lt; 101 ≤ 128 = 2⁷',w:'On place 101 entre deux puissances de 2 consécutives.'},
+     {f:'t = 7',w:'C’est l’exposant de la puissance du dessus : ⌈log₂ 101⌉ = 7.'},
+     {f:'Contrôle : avec 6 tours, on ne traite que 2⁶ − 1 = 63 éléments, moins que 100.',w:'On vérifie que t − 1 tours ne suffiraient pas.'}],
+    conclusion:'Au plus 7 tours pour 100 éléments, contre 100 comparaisons pour la recherche linéaire.'}},
   {h:'Mille éléments',p:'Combien de tours au plus fait la dichotomie sur une liste triée de 1000 éléments&nbsp;?',lab:'tours =',ans:10,
    why:'⌈log₂(1001)⌉ = 10, car 2⁹ = 512 &lt; 1001 ≤ 1024 = 2¹⁰.'},
   {h:'Sans la précondition',p:'On applique <code class="code">dichotomie([4, 1, 9, 7, 3], 1)</code>. Que se passe-t-il&nbsp;?',
@@ -532,6 +707,14 @@ def tri_insertion(L):
    draw:v=>sortStep(TINS,v.k),
    info:v=>`${TINS[v.k].msg}<br>${sortLeg}`,
    note:`Sur cette liste : ${TINS.length-2} comparaisons. Sur une liste déjà triée, chaque élément ne fait qu’une comparaison.`},
+  {kind:'Méthode',h:'Dérouler un tri passe par passe',
+   p:`<p>Pour prédire l’état d’une liste, ne simule pas chaque comparaison : applique la <b>règle d’une passe</b> (un tour de la boucle extérieure), et écris la liste après chaque passe en marquant la partie triée.</p><ul><li><b>Insertion</b>, passe i : l’élément L[i] recule vers la gauche tant que son voisin est plus grand. Les cases 0 à i sont alors triées.</li><li><b>Bulles</b>, passe p : on balaie les voisins de gauche à droite, en échangeant chaque paire mal rangée. Le plus grand élément restant arrive au bout.</li><li><b>Sélection</b>, passe i : on cherche le minimum des cases i à n − 1 et on l’échange avec la case i. Un seul échange par passe.</li></ul>`,
+   demo:{enonce:'Trier [4, 1, 3, 2] par insertion, passe par passe, et compter les échanges.',
+    etapes:[
+     {f:'Passe i = 1 : 1 recule devant 4. [<b>1, 4</b>, 3, 2], 1 échange.',w:'Le préfixe trié [4] reçoit 1, qui va tout au début.'},
+     {f:'Passe i = 2 : 3 recule devant 4, mais pas devant 1. [<b>1, 3, 4</b>, 2], 1 échange.',w:'On s’arrête dès que le voisin de gauche est plus petit : 1 &lt; 3.'},
+     {f:'Passe i = 3 : 2 recule devant 4, puis devant 3. [<b>1, 2, 3, 4</b>], 2 échanges.',w:'2 s’insère entre 1 et 3.'}],
+    conclusion:'La liste est triée après 3 passes et 1 + 1 + 2 = 4 échanges.'}},
   {h:'Après deux tours',p:'On applique le tri par insertion à <code class="code">[7, 3, 5, 1]</code>. À quoi ressemble la liste à la fin du tour <i>i</i> = 2&nbsp;?',
    opts:['[3, 7, 5, 1]','[1, 3, 5, 7]','[3, 5, 7, 1]','[3, 5, 1, 7]'],ans:2,
    why:'Tour i = 1 : 3 passe devant 7, on obtient [3, 7, 5, 1]. Tour i = 2 : 5 passe devant 7 mais pas devant 3, on obtient [3, 5, 7, 1]. Le 1 n’a pas encore été traité.'},
@@ -546,6 +729,9 @@ def tri_bulles(L):
         for j in range(n - 1 - i):
             if L[j] > L[j+1]:
                 L[j], L[j+1] = L[j+1], L[j]`)},
+  {h:'Une passe de bulles',p:'On fait <b>une seule</b> passe du tri à bulles sur <code class="code">[4, 3, 1, 5, 2]</code>. Quelle liste obtient-on&nbsp;?',
+   opts:['[3, 4, 1, 2, 5]','[1, 3, 4, 2, 5]','[3, 1, 4, 5, 2]','[3, 1, 4, 2, 5]'],ans:3,
+   why:'4 &gt; 3 : échange, [3, 4, 1, 5, 2]. 4 &gt; 1 : échange, [3, 1, 4, 5, 2]. 4 &lt; 5 : rien. 5 &gt; 2 : échange, [3, 1, 4, 2, 5]. Le maximum 5 est arrivé au bout.'},
   {h:'Compter les comparaisons',p:'Combien de comparaisons <code class="code">L[j] &gt; L[j+1]</code> fait ce tri à bulles sur une liste de 10 éléments&nbsp;?',lab:'comparaisons =',ans:45,
    why:'La passe i fait n − 1 − i comparaisons : 9 + 8 + … + 1 = 10 × 9 / 2 = 45, quel que soit l’ordre initial.'},
   {kind:'Théorie',h:'Le tri par sélection',p:'On cherche le minimum de la partie non triée, puis on l’échange avec la première case de cette partie. Le minimum provisoire est en violet.',
@@ -561,12 +747,24 @@ def tri_selection(L):
             if L[j] < L[m]:
                 m = j
         L[i], L[m] = L[m], L[i]`)},
+  {h:'Deux passes de sélection',p:'On fait deux passes (i = 0 puis i = 1) du tri par sélection sur <code class="code">[4, 3, 1, 5, 2]</code>. Quelle liste obtient-on&nbsp;?',
+   opts:['[1, 2, 4, 5, 3]','[1, 3, 4, 5, 2]','[1, 2, 3, 4, 5]','[3, 1, 4, 2, 5]'],ans:0,
+   why:'i = 0 : le minimum 1 (case 2) s’échange avec 4 : [1, 3, 4, 5, 2]. i = 1 : le minimum de [3, 4, 5, 2] est 2 (case 4), échangé avec 3 : [1, 2, 4, 5, 3].'},
   {h:'Une liste déjà triée',p:'On donne une liste <b>déjà triée</b> de <i>n</i> éléments. Quel tri fait le moins de comparaisons&nbsp;?',
    opts:['Le tri à bulles','Le tri par sélection','Les trois en font autant','Le tri par insertion'],ans:3,
    why:'L’insertion compare chaque élément à son voisin de gauche, voit qu’il est en ordre et s’arrête : n − 1 comparaisons, O(n). Bulles (sans arrêt anticipé) et sélection en font toujours n(n − 1)/2.'},
   {kind:'Théorie',h:'Bilan des complexités',p:'Les trois tris sont <b>en place</b> (aucune liste auxiliaire) et coûtent <b>O(n²)</b> dans le pire cas, à cause des deux boucles imbriquées.',
    fig:`<table style="margin:auto;border-collapse:collapse;text-align:center"><tr><th style="padding:4px 10px"></th><th style="padding:4px 10px">meilleur cas</th><th style="padding:4px 10px">pire cas</th><th style="padding:4px 10px">échanges</th></tr><tr><td><b>insertion</b></td><td>O(n)</td><td>O(n²)</td><td>O(n²)</td></tr><tr><td><b>bulles</b></td><td>O(n²)</td><td>O(n²)</td><td>O(n²)</td></tr><tr><td><b>sélection</b></td><td>O(n²)</td><td>O(n²)</td><td>≤ n − 1</td></tr></table>`,
    note:'Le tri à bulles devient O(n) dans le meilleur cas si on s’arrête dès qu’une passe ne fait aucun échange.'},
+  {kind:'Méthode',h:'Compter les inversions',
+   p:'Une <b>inversion</b> est une paire d’éléments mal rangés : a placé avant b avec a &gt; b. Pour les compter sans en oublier, prends chaque élément tour à tour et compte les éléments <b>plus petits situés après lui</b>, puis additionne. Une liste triée en a 0, une liste à l’envers en a le maximum, n(n − 1)/2. Échanger deux <b>voisins</b> mal rangés supprime exactement une inversion, sans toucher aux autres paires : le tri par insertion fait donc autant d’échanges que la liste a d’inversions.',
+   demo:{enonce:'Combien d’inversions dans [3, 1, 4, 2]&nbsp;? Combien d’échanges fera le tri par insertion&nbsp;?',
+    etapes:[
+     {f:'3 : après lui, 1 et 2 sont plus petits. 2 inversions.',w:'On ne regarde que vers la droite, pour compter chaque paire une seule fois.'},
+     {f:'1 : rien de plus petit après. 4 : seul 2 est plus petit après. 2 : dernier élément.',w:'0, puis 1, puis 0.'},
+     {f:'Total : 2 + 0 + 1 + 0 = 3 inversions : (3, 1), (3, 2), (4, 2).',w:'On liste les paires pour vérifier.'},
+     {f:'Insertion : 1 recule d’une case (1 échange), 4 ne bouge pas, 2 recule de deux cases (2 échanges). Total 3.',w:'Chaque échange de voisins corrige une inversion : le décompte concorde.'}],
+    conclusion:'3 inversions, donc 3 échanges pour le tri par insertion.'}},
   {kind:'Défi',h:'Compter les échanges',p:'Combien d’échanges fait le tri par insertion sur <code class="code">[5, 2, 9, 1, 6, 3, 8, 4]</code>&nbsp;? Indice : chaque échange corrige exactement une paire mal ordonnée (une <b>inversion</b>).',
    lab:'échanges =',ans:13,
    why:'On compte les inversions, les paires (a, b) avec a avant b et a &gt; b : 5 en crée 4 (avec 2, 1, 3, 4), 2 en crée 1, 9 en crée 5, 1 aucune, 6 en crée 2, 3 aucune, 8 en crée 1. Total 4 + 1 + 5 + 2 + 1 = 13.'},
@@ -624,11 +822,32 @@ def tri_fusion(L):
    note:'Chaque comparaison place un élément dans R : la fusion de listes de longueurs p et q coûte au plus p + q − 1 comparaisons.'},
   {h:'Au plus combien&nbsp;?',p:'On fusionne une liste triée de 5 éléments avec une liste triée de 7 éléments. Combien de comparaisons au maximum&nbsp;?',lab:'comparaisons =',ans:11,
    why:'Chaque comparaison place un élément. Dans le pire cas, il reste un seul élément quand une liste se vide : 5 + 7 − 1 = 11.'},
+  {kind:'Méthode',h:'Dérouler un tri fusion avec l’arbre des appels',
+   p:'Dessine l’<b>arbre des découpages</b> : chaque liste se coupe en L[:m] et L[m:] avec m = len(L) // 2, jusqu’aux listes d’un élément. Les fusions se font en <b>remontant</b>, dans l’ordre où les appels se terminent : Python finit toute la branche gauche avant de commencer la droite. Pour chaque fusion, compare les têtes, prends la plus petite, et arrête de compter dès qu’une des deux listes est vide.',
+   demo:{enonce:'Dérouler <code class="code">tri_fusion([7, 2, 6, 3])</code> : nombre d’appels et de comparaisons.',
+    etapes:[
+     {f:'[7, 2, 6, 3] → [7, 2] et [6, 3] → [7], [2], [6], [3].',w:'m = 2, puis m = 1. Les 4 feuilles sont des cas de base : 1 + 2 + 4 = 7 appels.'},
+     {f:'fusion([7], [2]) = [2, 7] : 1 comparaison.',w:'La branche gauche se termine en premier. 7 &gt; 2, on prend 2, puis B est vide et on recopie 7.'},
+     {f:'fusion([6], [3]) = [3, 6] : 1 comparaison.',w:'Puis la branche droite.'},
+     {f:'fusion([2, 7], [3, 6]) : 2 ≤ 3 prend 2, 7 &gt; 3 prend 3, 7 &gt; 6 prend 6, B est vide. 3 comparaisons, résultat [2, 3, 6, 7].',w:'Le reste de A (le 7) est recopié sans comparaison.'}],
+    conclusion:'7 appels et 1 + 1 + 3 = 5 comparaisons pour obtenir [2, 3, 6, 7].'}},
+  {h:'Un petit tri fusion',p:'Combien de comparaisons <code class="code">A[i] &lt;= B[j]</code> fait <code class="code">tri_fusion([3, 1, 2])</code>&nbsp;?',lab:'comparaisons =',ans:3,
+   why:'m = 1 : [3] et [1, 2]. La droite se coupe en [1] et [2], fusionnés en 1 comparaison. Puis fusion([3], [1, 2]) : 3 &gt; 1, 3 &gt; 2, B est vide. Total 1 + 2 = 3.'},
   {kind:'Théorie',h:'Les niveaux de la récursion',p:`Vu de bas en haut, on fusionne des blocs de 1, puis de 2, puis de 4… Il y a <b>log₂ n</b> niveaux, et chaque niveau coûte au plus <b>n</b> comparaisons. D’où un coût <b>O(n log n)</b>, même dans le pire cas.`,
    params:[{id:'k',l:'Niveau',min:0,max:NIV.length-1,v:0}],
    draw:v=>nivFig(v.k),
    info:v=>v.k===0?'Niveau 0 : 8 blocs de taille 1, triés par définition.':`Niveau ${v.k} : blocs de taille ${NIV[v.k].b}, ${NIV[v.k].c} comparaisons à ce niveau (au plus 8).`,
    note:'Équation de coût : C(n) = 2 C(n/2) + n, qui donne C(n) = n log₂ n pour n = 2ᵏ. Le prix à payer : une mémoire auxiliaire O(n) pour les listes fusionnées.'},
+  {kind:'Méthode',h:'Résoudre C(n) = 2 C(n/2) + n',
+   p:'Cette récurrence est celle de tout algorithme qui coupe en deux moitiés, traite chacune récursivement, puis recolle en O(n). Deux façons de la résoudre pour n = 2ᵏ. <b>Par les niveaux</b> : il y a k = log₂ n niveaux de découpage, et chaque niveau coûte au total n (deux moitiés de n/2, quatre quarts de n/4…), d’où C(n) = n log₂ n. <b>Par un tableau</b> : calcule C(2), C(4), C(8)… à partir de C(1) et compare à n log₂ n.',
+   demo:{enonce:'Calculer C(8) avec C(1) = 0 et C(n) = 2 C(n/2) + n.',
+    etapes:[
+     {f:'C(2) = 2 · 0 + 2 = 2, C(4) = 2 · 2 + 4 = 8, C(8) = 2 · 8 + 8 = 24.',w:'On remonte depuis le cas de base en doublant n à chaque fois.'},
+     {f:'Niveaux : 8 → 4 → 2 → 1, soit log₂ 8 = 3 niveaux, chacun de coût 8.',w:'Au niveau des blocs de 4, deux fusions coûtent 4 chacune : 8 en tout. Idem pour les autres niveaux.'},
+     {f:'3 × 8 = 24 = 8 log₂ 8 ✓',w:'Les deux méthodes donnent le même résultat.'}],
+    conclusion:'C(8) = 24 et, en général, C(n) = n log₂ n : O(n log n).'}},
+  {h:'Résoudre la récurrence',p:'Avec C(1) = 0 et C(n) = 2 C(n/2) + n, que vaut C(32)&nbsp;?',lab:'C(32) =',ans:160,
+   why:'32 = 2⁵ : 5 niveaux de coût 32, donc C(32) = 32 · 5 = 160. Au tableau : C(16) = 64, puis C(32) = 2 · 64 + 32 = 160.'},
   {h:'Combien de niveaux&nbsp;?',p:'Pour trier 1024 éléments, combien de niveaux de fusion le tri fusion empile-t-il&nbsp;?',lab:'niveaux =',ans:10,
    why:'On passe de blocs de 1 à un bloc de 1024 en doublant à chaque niveau : 2¹⁰ = 1024, donc 10 niveaux.'},
   {kind:'Théorie',h:'La stabilité',p:`Un tri est <b>stable</b> s’il garde l’ordre initial des éléments égaux. Exemple : on trie des élèves par note, Ana (5) avant Léo (5) dans la liste de départ. Un tri stable laisse Ana devant Léo.`,
@@ -688,6 +907,29 @@ G = {'A': ['B', 'C'], 'B': ['A', 'D', 'E'],
      'E': ['B', 'F'], 'F': ['C', 'E', 'G'],
      'G': ['D', 'F']}`); })(),
    note:'La matrice occupe n² cases même si le graphe a peu d’arêtes. Les listes n’occupent que O(n + m), avec m le nombre d’arêtes.'},
+  {kind:'Méthode',h:'Construire une liste d’adjacence',
+   p:`<p>On part souvent d’une simple liste d’arêtes. Pour chaque arête {u, v} : crée la liste de u et celle de v si elles n’existent pas encore, puis ajoute v aux voisins de u <b>et</b> u aux voisins de v, car le graphe est non orienté.</p><p>Contrôle : la somme des longueurs des listes vaut <b>2m</b> (chaque arête est écrite deux fois), et la longueur de G[u] est le degré de u.</p>`,
+   demo:{enonce:'Construire G à partir des arêtes A–B, A–C, B–C et C–D.'+py(`
+aretes = [('A', 'B'), ('A', 'C'), ('B', 'C'), ('C', 'D')]
+G = {}
+for u, v in aretes:
+    if u not in G:
+        G[u] = []
+    if v not in G:
+        G[v] = []
+    G[u].append(v)
+    G[v].append(u)     # non orienté : dans les deux sens`),
+    etapes:[
+     {f:'A–B : G = {\'A\': [\'B\'], \'B\': [\'A\']}',w:'Deux nouvelles listes, puis un ajout dans chaque sens.'},
+     {f:'A–C : G[\'A\'] = [\'B\', \'C\'] et G[\'C\'] = [\'A\'].',w:'A existe déjà : on ne recrée pas sa liste, on la complète.'},
+     {f:'B–C : G[\'B\'] = [\'A\', \'C\'] et G[\'C\'] = [\'A\', \'B\'].',w:'Les voisins s’ajoutent dans l’ordre des arêtes.'},
+     {f:'C–D : G[\'C\'] = [\'A\', \'B\', \'D\'] et G[\'D\'] = [\'C\'].',w:'Dernière arête.'},
+     {f:'Contrôle : 2 + 2 + 3 + 1 = 8 = 2 × 4 arêtes.',w:'La somme des degrés vaut deux fois le nombre d’arêtes.'}],
+    conclusion:'G = {\'A\': [\'B\', \'C\'], \'B\': [\'A\', \'C\'], \'C\': [\'A\', \'B\', \'D\'], \'D\': [\'C\']}. C est de degré 3.'}},
+  {h:'Degrés à partir des arêtes',p:'On construit G avec le code de la méthode à partir des arêtes ci-dessous. Que vaut <code class="code">len(G[3]) + len(G[5])</code>&nbsp;?',
+   fig:py(`
+aretes = [(1, 2), (2, 3), (3, 1), (3, 4), (4, 5)]`),lab:'résultat =',ans:4,
+   why:'3 apparaît dans trois arêtes (2–3, 3–1, 3–4), donc G[3] = [2, 1, 4]. 5 n’apparaît que dans 4–5 : G[5] = [4]. 3 + 1 = 4.'},
   {h:'Compter les 1',p:'Combien de 1 contient la matrice d’adjacence de ce graphe à 8 arêtes&nbsp;?',lab:'nombre de 1 =',ans:16,
    why:'Chaque arête {u, v} donne deux 1, en (u, v) et en (v, u) : 2 × 8 = 16. C’est aussi la somme des degrés.'},
   {h:'Choisir la représentation',p:'Tu dois tester très souvent si deux sommets <i>u</i> et <i>v</i> sont voisins. Quelle représentation répond en O(1)&nbsp;?',
@@ -713,6 +955,15 @@ def bfs(G, s):
    draw:v=>{ const s=TBFS[v.k]; return graph(GN,GE,{nc:k=>k===s.cur?'var(--spark)':s.ord.includes(k)?'var(--ok)':s.F.includes(k)?'var(--other)':null,ec:treeEdge(s.par)},200); },
    info:v=>{ const s=TBFS[v.k]; return `${s.msg}<br>Ordre : ${s.ord.join(', ')||'–'} &nbsp; File : [${s.F.join(', ')}]<br>${legend([['var(--spark)','défilé'],['var(--ok)','visité'],['var(--other)','dans la file']])}`; },
    note:'Dans l’arbre du BFS, le chemin de A à un sommet est un plus court chemin en nombre d’arêtes.'},
+  {kind:'Méthode',h:'Dérouler un BFS avec la file',
+   p:`<p>Fais un tableau avec trois colonnes : le sommet <b>défilé</b>, les voisins <b>nouveaux</b> qu’il enfile, et la <b>file</b> après l’étape. Règles : on défile toujours à gauche (${cc('file.popleft()')}), on enfile à droite (${cc('append')}), dans l’ordre de la liste de voisins, et un sommet est marqué « vu » <b>dès qu’il entre</b> dans la file, pour ne jamais l’enfiler deux fois.</p><p>L’ordre de visite est l’ordre des défilements. La distance d’un sommet vaut celle de son « parent » (celui qui l’a enfilé) plus 1.</p>`+graph(HN,HE,{},200),
+   demo:{enonce:'Dérouler le BFS depuis 1, avec G = {1: [2, 3], 2: [1, 4], 3: [1, 4, 5], 4: [2, 3, 6], 5: [3, 6], 6: [4, 5]}.',
+    etapes:[
+     {f:'Départ : file [1], vus {1}.',w:'On marque le départ en même temps qu’on l’enfile.'},
+     {f:tab(['défilé','enfilés','file'],[[1,'2, 3','[2, 3]'],[2,'4','[3, 4]'],[3,'5','[4, 5]'],[4,'6','[5, 6]'],[5,'–','[6]'],[6,'–','[ ]']]),w:'Quand 3 est défilé, 4 est déjà vu (enfilé par 2) : seul 5 est nouveau. De même, 6 n’est enfilé qu’une fois, par 4.'},
+     {f:'Ordre : 1, 2, 3, 4, 5, 6.',w:'On lit la colonne des défilés.'},
+     {f:'Distances : d(1) = 0 ; d(2) = d(3) = 1 ; d(4) = d(5) = 2 ; d(6) = 3.',w:'4 a été enfilé par 2 et 5 par 3, tous deux à distance 1. 6 a été enfilé par 4.'}],
+    conclusion:'Le BFS visite 1, 2, 3, 4, 5, 6, couche par couche, et d(1, 6) = 3.'}},
   {h:'Ordre du BFS',p:'Dans quel ordre le BFS depuis A visite-t-il les sommets (voisins par ordre alphabétique)&nbsp;?',
    opts:['A, B, D, G, F, C, E','A, C, B, F, E, D, G','A, B, C, D, E, F, G','A, B, C, D, E, G, F'],ans:2,
    why:'Distance 0 : A. Distance 1 : B, C. Distance 2 : D, E (voisins de B), puis F (voisin de C). Distance 3 : G. D’où A, B, C, D, E, F, G. La première option est l’ordre du DFS.'},
@@ -727,9 +978,52 @@ def dfs(G, u, vus):
         if v not in vus:
             dfs(G, v, vus)
     return vus     # dfs(G, 'A', [])`)},
+  {kind:'Méthode',h:'Dérouler un DFS avec la pile d’appels',
+   p:'Écris la <b>pile</b> des appels en cours, du départ au sommet courant. Depuis le sommet courant, prends le <b>premier voisin non vu</b> de sa liste : il est visité et posé sur la pile. Si tous ses voisins sont vus, l’appel se termine : retire-le et reprends le sommet du dessous, là où il en était dans sa liste. L’ordre de visite est l’ordre des empilements.'+graph(HN,HE,{},200),
+   demo:{enonce:'Dérouler <code class="code">dfs(G, 1, [])</code> sur le même graphe, G = {1: [2, 3], 2: [1, 4], 3: [1, 4, 5], 4: [2, 3, 6], 5: [3, 6], 6: [4, 5]}.',
+    etapes:[
+     {f:'Pile 1. Voisins de 1 : 2 est non vu → pile 1 → 2.',w:'On prend toujours le premier voisin non vu, dans l’ordre de la liste.'},
+     {f:'Voisins de 2 : 1 vu, 4 non vu → pile 1 → 2 → 4.',w:'On descend sans attendre d’avoir vu les autres voisins de 1.'},
+     {f:'Voisins de 4 : 2 vu, 3 non vu → pile 1 → 2 → 4 → 3.',w:'Le DFS fonce en profondeur.'},
+     {f:'Voisins de 3 : 1 et 4 vus, 5 non vu → pile … → 3 → 5. Voisins de 5 : 3 vu, 6 non vu → pile … → 5 → 6.',w:'La pile contient maintenant les 6 sommets.'},
+     {f:'6 n’a plus de voisin non vu : les appels se terminent un à un (6, 5, 3, 4, 2, 1), sans nouvelle visite.',w:'En redescendant, chaque appel finit sa liste de voisins : tous sont déjà vus.'}],
+    conclusion:'Ordre du DFS : 1, 2, 4, 3, 5, 6. Le BFS donnait 1, 2, 3, 4, 5, 6.'}},
   {kind:'Défi',h:'Un DFS depuis C',p:'On lance le DFS depuis <b>C</b>, voisins par ordre alphabétique. Quel est le <b>4e</b> sommet visité&nbsp;?',fig:graph(GN,GE,{},200),
    opts:['B','F','G','D'],ans:3,
    why:'C a pour voisins A, F : on va en A. A a pour voisins B, C : on va en B. B a pour voisins A, D, E : on va en D. L’ordre complet est C, A, B, D, G, F, E.'},
+  {kind:'Méthode',h:'Un DFS avec une pile explicite',
+   p:`<p>Sans récursion, on remplace la pile d’appels par une liste ${cc('pile')}. ${cc('pile.pop()')} retire le <b>dernier</b> élément ajouté. À chaque étape : dépile u ; s’il est déjà vu, passe ; sinon marque-le et empile <b>tous</b> ses voisins, dans l’ordre de sa liste.</p><p>Conséquence : le <b>dernier</b> voisin empilé est exploré en premier, donc l’ordre peut différer de la version récursive. Un sommet peut être empilé plusieurs fois, mais le test « déjà vu » ne le traite qu’une fois.</p>`+py(`
+def dfs_pile(G, s):
+    vus, pile = [], [s]
+    while pile:
+        u = pile.pop()
+        if u not in vus:
+            vus.append(u)
+            for v in G[u]:
+                pile.append(v)
+    return vus`),
+   demo:{enonce:'Dérouler <code class="code">dfs_pile(G, 1)</code> avec le graphe des deux méthodes précédentes.',
+    etapes:[
+     {f:tab(['dépilé','vus','pile après'],[[1,'1','[2, 3]'],[3,'1, 3','[2, 1, 4, 5]'],[5,'1, 3, 5','[2, 1, 4, 3, 6]'],[6,'1, 3, 5, 6','[2, 1, 4, 3, 4, 5]'],['5, puis 4','… 4','[2, 1, 4, 3, 2, 3, 6]'],['6, 3, puis 2','… 2','[2, 1, 4, 3, 1, 4]']]),w:'On dépile toujours à droite. 5, 6 et 3 ressortent alors qu’ils sont déjà vus : on les jette.'},
+     {f:'Il reste [2, 1, 4, 3, 1, 4] : tous déjà vus, on les dépile sans rien faire.',w:'La boucle s’arrête quand la pile est vide.'}],
+    conclusion:'Ordre : 1, 3, 5, 6, 4, 2. La version récursive donnait 1, 2, 4, 3, 5, 6 : ici, c’est le dernier voisin de 1, le sommet 3, qui passe en premier.'}},
+  {h:'Pile explicite à toi',p:'Dans quel ordre <code class="code">dfs_pile</code> visite-t-il les sommets depuis A&nbsp;?',
+   fig:py(`
+K = {'A': ['B', 'C'], 'B': ['A', 'D'],
+     'C': ['A', 'D'], 'D': ['B', 'C']}`),
+   opts:['A, B, D, C','A, C, D, B','A, B, C, D','A, C, B, D'],ans:1,
+   why:'On dépile A et on empile B, C. On dépile C (le dernier) et on empile A, D. On dépile D et on empile B, C. C est déjà vu, puis on dépile B. Ordre : A, C, D, B.'},
+  {kind:'Méthode',h:'Composantes connexes et nombre d’arêtes',
+   p:`<p>Un parcours lancé depuis s marque exactement les sommets de la <b>composante</b> de s. Pour compter les composantes, parcours tous les sommets et lance un nouveau parcours depuis chaque sommet <b>pas encore vu</b> : le nombre de parcours lancés est le nombre de composantes.</p><p>Pour les arêtes, pars de n sommets isolés, soit n composantes. Une arête qui relie deux composantes différentes en fusionne deux, et ne crée pas de cycle. Une arête dans une même composante ne change rien au nombre de composantes, mais ferme un cycle. Donc :</p><ul><li>un <b>arbre</b> (connexe, sans cycle) à n sommets a <b>n − 1</b> arêtes ;</li><li>un graphe sans cycle à n sommets et c composantes a <b>n − c</b> arêtes ;</li><li>avec plus d’arêtes, il y a forcément un cycle.</li></ul>`,
+   demo:{enonce:'Un graphe a 7 sommets et les arêtes 1–2, 2–3, 1–3, 4–5, 6–7. Combien de composantes&nbsp;? A-t-il un cycle&nbsp;?',
+    etapes:[
+     {f:'Parcours depuis 1 : il marque 1, 2, 3. Depuis 4 : 4, 5. Depuis 6 : 6, 7.',w:'2, 3, 5 et 7 sont déjà vus quand la boucle les atteint : on ne relance rien.'},
+     {f:'3 parcours lancés : 3 composantes.',w:'Un parcours par composante.'},
+     {f:'Sans cycle, il y aurait 7 − 3 = 4 arêtes. Il y en a 5.',w:'On compare au nombre d’arêtes d’une forêt de mêmes sommets et composantes.'},
+     {f:'Il y a donc un cycle : 1 – 2 – 3.',w:'L’arête en trop, 1–3, relie deux sommets déjà dans la même composante.'}],
+    conclusion:'3 composantes et un cycle. Pour rendre le graphe connexe, il faudrait au moins 3 − 1 = 2 arêtes de plus.'}},
+  {h:'Une forêt',p:'Un graphe <b>sans cycle</b> a 12 sommets et 3 composantes connexes. Combien a-t-il d’arêtes&nbsp;?',lab:'arêtes =',ans:9,
+   why:'Chaque composante est un arbre à kᵢ sommets et kᵢ − 1 arêtes. En tout : 12 − 3 = 9 arêtes.'},
   {kind:'Problème',h:'BFS et DFS avec un ordre imposé',p:`On parcourt le graphe ci-dessous depuis <b>S</b> avec les fonctions <code class="code">bfs</code> et <code class="code">dfs</code> du cours. Attention : les voisins ne sont <b>pas</b> rangés par ordre alphabétique. Les parcours les lisent dans l’ordre du dictionnaire.`+graph(PB7N,PB7E,{},210)+py(`
 G = {'S': ['B', 'A'], 'A': ['C', 'S'],
      'B': ['D', 'C', 'S'], 'C': ['E', 'B', 'A'],
@@ -794,6 +1088,16 @@ def dijkstra(G, s):        # G[u] = [(v, poids), ...]
    draw:v=>{ const s=TDIJ[v.k]; return graph(WN,WE,{nc:k=>k===s.cur?'var(--spark)':s.fix.includes(k)?'var(--ok)':null,ec:treeEdge(s.par),sub:k=>s.d[k]===Infinity?'∞':String(s.d[k])},220); },
    info:v=>`${TDIJ[v.k].msg}<br>${legend([['var(--spark)','fixé à cette étape'],['var(--ok)','fixé']])}`,
    note:'Une fois fixée, une distance ne change plus : tout autre chemin passe par un sommet non fixé, déjà au moins aussi loin.'},
+  {kind:'Méthode',h:'Dérouler Dijkstra avec un tableau des distances',
+   p:'Fais un tableau avec une colonne par sommet et une ligne par étape. Chaque case contient la distance provisoire et, en petit, le <b>prédécesseur</b> qui l’a donnée. À chaque étape : <b>fixe</b> le sommet non fixé de plus petite distance (souligne-le), puis, pour chacun de ses voisins non fixés v, calcule d(u) + poids(u, v) et garde le minimum avec l’ancienne valeur. Pour retrouver un chemin, remonte les prédécesseurs depuis l’arrivée.'+graph(DN,DE,{},200),
+   demo:{enonce:'Distances depuis S, et plus court chemin de S à C.',
+    etapes:[
+     {f:'Départ : d(S) = 0, d(A) = d(B) = d(C) = ∞.',w:'Seule la source a une distance connue.'},
+     {f:tab(['fixé','S','A','B','C'],[['S','<u>0</u>','1 (S)','4 (S)','∞'],['A','','<u>1</u>','3 (A)','7 (A)'],['B','','','<u>3</u>','6 (B)'],['C','','','','<u>6</u>']]),w:'Fixer A : B passe de 4 à 1 + 2 = 3 et C reçoit 1 + 6 = 7. Fixer B : C passe de 7 à 3 + 3 = 6.'},
+     {f:'Distances : 0, 1, 3, 6.',w:'Les sommets sont fixés par distance croissante.'},
+     {f:'Chemin : C ← B ← A ← S, soit S → A → B → C.',w:'On remonte les prédécesseurs de la dernière mise à jour de chaque sommet.'}],
+    conclusion:'d(C) = 6 par S → A → B → C, alors que les arêtes directes S–B et A–C font croire à des chemins de 7.'},
+   note:'Le tas de la fonction Python joue le rôle de « chercher le plus petit non fixé » : heappop renvoie le couple (distance, sommet) de plus petite distance.'},
   {h:'Changer un poids',p:'Dans ce même graphe, l’arête C–E passe de 10 à <b>5</b>. Quelle est alors la distance de A à F&nbsp;?',
    fig:graph(WN,WE.map(e=>e[0]==='C'&&e[1]==='E'?['C','E',5]:e),{},220),
    lab:'d(F) =',ans:10,
@@ -822,6 +1126,15 @@ def kruskal(sommets, aretes):   # aretes = [(w, u, v), ...]
    draw:v=>{ const s=KR[v.k], has=(L,u,w)=>L.some(e=>same(e[0],e[1],u,w));
      return graph(WN,WE,{ec:(u,w)=>s.cur&&same(s.cur[0],s.cur[1],u,w)&&has(s.acc,u,w)?{c:'var(--spark)',w:5,op:1}:has(s.acc,u,w)?{c:'var(--ok)',w:5,op:1}:has(s.rej,u,w)?{c:'var(--bad)',w:2,dash:true,op:1}:{c:'var(--muted)',w:2,op:.5}},220); },
    info:v=>`${KR[v.k].msg}<br>Arêtes gardées : ${KR[v.k].acc.length}, poids total ${KR[v.k].tot}`},
+  {kind:'Méthode',h:'Dérouler Kruskal en suivant les morceaux',
+   p:'Trie les arêtes par poids croissant. Tiens la liste des <b>morceaux</b> déjà formés : au départ, chaque sommet est seul. Pour chaque arête u–v : si u et v sont dans deux morceaux <b>différents</b>, garde l’arête et fusionne les deux morceaux ; s’ils sont dans le <b>même</b> morceau, un chemin les relie déjà, et l’arête fermerait un cycle : rejette-la. Arrête-toi dès que tu as n − 1 arêtes. Dans le code, chef et racine servent exactement à savoir si deux sommets sont dans le même morceau.'+graph(DN,DE,{},200),
+   demo:{enonce:'Arbre couvrant minimal du graphe ci-dessus.',
+    etapes:[
+     {f:'Ordre : S–A (1), A–B (2), B–C (3), S–B (4), A–C (6).',w:'On trie une fois pour toutes.'},
+     {f:'S–A : {S}, {A} différents, on garde. Morceaux {S, A}, {B}, {C}.',w:'Une arête gardée fusionne deux morceaux.'},
+     {f:'A–B : gardée, {S, A, B}, {C}. B–C : gardée, {S, A, B, C}.',w:'On a n − 1 = 3 arêtes : l’arbre est complet.'},
+     {f:'S–B serait rejetée : S et B sont dans le même morceau (S – A – B les relie).',w:'C’est la détection de cycle. Ici on s’arrête même avant de l’examiner.'}],
+    conclusion:'Arbre : S–A, A–B, B–C, de poids 1 + 2 + 3 = 6.'}},
   {h:'Une arête rejetée',p:'Kruskal examine A–B (poids 4) après avoir gardé B–C, A–C, D–E et E–F. Pourquoi la rejette-t-il&nbsp;?',
    opts:['Son poids est trop grand','A–B fermerait le cycle A–B–C','A a déjà deux voisins dans l’arbre','B n’est relié à aucun autre sommet'],ans:1,
    why:'A et B sont déjà reliés par A–C puis C–B. Ajouter A–B créerait le cycle A–B–C : ce n’est plus un arbre.'},

@@ -255,6 +255,16 @@ const LESSONS = {
 
 /* Deux problèmes pour la leçon de démonstration sur la pente */
 LESSONS.pente.steps.push(
+  {kind:'Méthode', h:'Trouver l’équation d’une droite',
+   p:'Deux situations reviennent sans cesse. <b>On connaît deux points</b> : la pente vaut la variation de y divisée par la variation de x, puis on trouve b en remplaçant un point. <b>On connaît un départ et un taux</b> (prise en charge + prix par km) : b est la valeur de départ, a le taux. Pour comparer deux droites, on cherche où elles se coupent en posant a₁x + b₁ = a₂x + b₂.',
+   demo:{enonce:'Trouver la droite qui passe par A(2 ; 7) et B(6 ; 15).',
+    etapes:[
+     {f:'a = (15 − 7) ÷ (6 − 2) = 8 ÷ 4 = 2', w:'La pente est le quotient des écarts : de combien y monte quand x avance.'},
+     {f:'y = 2x + b, et A est sur la droite : 7 = 2·2 + b', w:'Un point de la droite vérifie son équation. On remplace x et y par ses coordonnées.'},
+     {f:'b = 7 − 4 = 3', w:'On isole b.'},
+     {f:'Contrôle avec B : 2·6 + 3 = 15 ✓', w:'Le second point doit aussi vérifier l’équation : c’est la vérification gratuite.'}],
+    conclusion:'La droite est y = 2x + 3.'},
+   note:'Pour savoir quand une offre devient meilleure qu’une autre, résous l’égalité des deux prix : c’est le point d’intersection des droites.'},
   {kind:'Problème', h:'Deux taxis',
    p:'Le taxi A facture 6 CHF de prise en charge, puis 3,50 CHF par kilomètre. Le taxi B facture 2 CHF de prise en charge, puis 4 CHF par kilomètre. Chaque prix est une fonction affine de la distance <i>x</i> en km.',
    fig:(()=>{ const P=plane({x:[-1,16],y:[-6,70],h:240,grid:false,lx:5,ly:20}); P.fn(x=>6+3.5*x,{from:0,c:'var(--math)'}).fn(x=>2+4*x,{from:0,c:'var(--other)'}).text(15,6+3.5*15,'A',{dx:6,c:'var(--math)'}).text(15,62,'B',{dx:6,dy:-4,c:'var(--other)'}); return P.svg(); })(),
@@ -349,7 +359,9 @@ function renderSubject(id){
     const box=$(`<div class="sem"><h2>${sem.h}</h2><p class="sub">${sem.s}</p><ol class="lessons"></ol></div>`);
     list.forEach(c=>{ n++; const st=lessonState(c.id), np=nbProblems(c.steps);
       const li=$(`<li class="${st.cls}"><span class="n">${st.cls==='fin'?'✓':n}</span><div><b>${c.h}</b><div class="s">${st.s?st.s+' · ':''}${c.steps.length-np} étapes${np?` + ${np} problèmes`:''} · ${c.p}</div></div><button class="btn">${st.label}</button></li>`);
-      li.querySelector('button').onclick=()=>openLesson(c.id); box.querySelector('ol').append(li); });
+      li.querySelector('button').onclick=()=>openLesson(c.id);
+      const nm=methodSteps(c.steps).length; if(nm){ const f=$(`<button class="linkish fm-link" type="button">Fiche méthodes (${nm})</button>`); f.onclick=()=>openMethods(c.id); li.querySelector('div').append(f); }
+      box.querySelector('ol').append(li); });
     page.querySelector('#sems').append(box);
   });
   page.querySelector('#back').onclick=()=>{ go('home'); requestAnimationFrame(()=>document.getElementById('cours')?.scrollIntoView()); };
@@ -389,6 +401,7 @@ function renderCourse(id){
     </div><div class="ill">${thumb(c)}</div></section>`);
   page.querySelector('#back').onclick=()=>{ go('home'); requestAnimationFrame(()=>document.getElementById('maths')?.scrollIntoView()); };
   page.querySelector('#start').onclick=()=>openLesson(c.lid);
+  const nm=methodSteps(steps).length; if(nm){ const f=$(`<button class="linkish fm-link" type="button">Fiche méthodes (${nm})</button>`); f.onclick=()=>openMethods(c.lid); page.querySelector('.lessons li div').append(f); }
   h.append(page);
 }
 
@@ -470,7 +483,30 @@ function buildStep(st,c,ctx){
   if(st.parts) buildProblem(st,c,ctx);
   else if(st.opts){ c.append(choices(st.opts,ctx,st.opts.every(o=>o.replace(/<[^>]+>/g,'').length<14))); ctx.check=()=>({ok:ctx.answer===st.ans,why:st.why}); }
   else if('ans' in st){ const w=numInput(st,ctx,ctx.uid); c.append(w); ctx.check=()=>({ok:isRight(st,ctx.answer),why:st.why}); setTimeout(()=>w.querySelector('input').focus({preventScroll:true}),50); }
+  if(st.demo) c.append(demoBox(st.demo,false));
   if(st.note) c.append($(`<div class="note">${st.note}</div>`));
+}
+/* Exemple résolu : l'énoncé, puis les étapes une à une (« Étape suivante »), puis la conclusion */
+function demoBox(d,all){
+  const box=$(`<div class="demo"><div class="demo-h">Exemple résolu</div><div class="demo-q">${d.enonce}</div><ol class="demo-steps"></ol><div class="demo-c" hidden>${d.conclusion||''}</div><div class="demo-btns"></div></div>`);
+  const ol=box.querySelector('ol'), btns=box.querySelector('.demo-btns'); let k=0;
+  const step=e=>{ const li=document.createElement('li'); if(typeof e==='string') li.innerHTML=e; else li.innerHTML=`${e.f}${e.w?`<div class="demo-w">${e.w}</div>`:''}`; ol.append(li); };
+  const next=()=>{ if(k<d.etapes.length) step(d.etapes[k++]); if(k>=d.etapes.length){ box.querySelector('.demo-c').hidden=!d.conclusion; btns.remove(); } };
+  if(all){ while(k<d.etapes.length) next(); next(); return box; }
+  const b1=$(`<button class="btn ghost" type="button">Étape suivante</button>`), b2=$(`<button class="linkish" type="button">Tout afficher</button>`);
+  b1.onclick=()=>next(); b2.onclick=()=>{ while(k<d.etapes.length) next(); };
+  btns.append(b1,b2); return box;
+}
+/* Fiche méthodes d'un chapitre : toutes ses étapes « Méthode » et leurs exemples, d'un coup d'œil */
+function methodSteps(steps){ return steps.filter(s=>s.demo||s.kind==='Méthode'); }
+function openMethods(id){
+  const L0=LESSONS[id], ms=methodSteps(L0.steps);
+  document.getElementById('compte-modal')?.remove();
+  const m=$(`<div class="modal" id="compte-modal" role="dialog" aria-modal="true" aria-labelledby="fm-t"><div class="modal-box fiche"><div class="row" style="justify-content:space-between"><h2 id="fm-t">Fiche méthodes</h2><button class="ard-ib" id="fm-x" aria-label="Fermer">×</button></div><p style="margin:0;color:var(--muted)">${L0.title}</p></div></div>`);
+  const box=m.querySelector('.modal-box');
+  ms.forEach(st=>{ const sec=$(`<section class="fm-sec"><h3>${st.h||''}</h3>${st.p?`<div class="ptext">${st.p}</div>`:''}</section>`); if(st.demo) sec.append(demoBox(st.demo,true)); if(st.note) sec.append($(`<div class="note">${st.note}</div>`)); box.append(sec); });
+  const close=()=>m.remove(); m.querySelector('#fm-x').onclick=close; m.addEventListener('click',e=>{ if(e.target===m) close(); }); m.addEventListener('keydown',e=>{ if(e.key==='Escape') close(); });
+  document.body.append(m); m.querySelector('#fm-x').focus();
 }
 
 /* Problème en plusieurs questions : une question active à la fois, indice, correction, puis solution rédigée */
@@ -501,7 +537,7 @@ function buildProblem(st,c,ctx){
   activate(0);
 }
 
-const kindOf=st=>st.kind||(st.parts?'Problème':st.ok?'Pratique':(st.opts||'ans' in st)?'Question':'Théorie');
+const kindOf=st=>st.kind||(st.demo?'Méthode':st.parts?'Problème':st.ok?'Pratique':(st.opts||'ans' in st)?'Question':'Théorie');
 function segs(){ document.getElementById('segs').innerHTML=L.steps.map((s,i)=>`<span class="${i<idx?'done':i===idx?'cur':''}${s.parts?' prob':''}"></span>`).join(''); }
 function setFoot(state,title,txt,label,enabled=true){
   foot.className='p-foot'+(state?' '+state:''); fb.innerHTML=title?`<strong>${title}</strong><span>${txt||''}</span>`:''; act.textContent=label; act.disabled=!enabled;

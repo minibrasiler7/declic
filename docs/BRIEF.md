@@ -28,6 +28,7 @@ COURS.push(
 - **Pratique à curseurs** : comme l'exploration, plus `ok:v=>booléen` et `why`. La position initiale ne doit PAS être la solution.
 - **QCM** : `{h, p, fig?, opts:['…','…'], ans:indiceDeLaBonne, why}`. Varie la position de la bonne réponse.
 - **Réponse numérique** : `{h, p, fig?, lab:'x =', unit:'m', ans:nombre, tol:0.01, why}`. L'élève peut taper une virgule, un point ou une fraction `1/3`. S'il faut arrondir, l'énoncé le dit et `tol` l'accepte.
+- **Méthode** : `{kind:'Méthode', h, p, demo:{enonce, etapes:[…], conclusion}, note?}`. Elle enseigne une technique : quand la reconnaître, pourquoi elle marche, comment l'appliquer, puis un **exemple résolu** que l'élève dévoile étape par étape. Chaque étape est une chaîne HTML, ou `{f:'le calcul', w:'pourquoi on fait ça'}`. Pas de question dans une étape Méthode : l'exercice d'application vient juste après.
 - **Problème** (voir plus bas) : `{kind:'Problème', h, p, fig?, params?/draw?, parts:[…], sol}`.
 - `kind` règle le petit sur-titre (`'Théorie'`, `'Question'`, `'Pratique'`, `'Défi'`, `'Méthode'`, `'Problème'`…).
 - `why` s'affiche après une bonne réponse, ou après le 2e essai raté. C'est la correction rédigée, en une ou deux phrases avec le calcul.
@@ -53,6 +54,11 @@ Exemple :
  ],
  sol:'On pose V(x) = x(30 − 2x)² sur ]0 ; 15[. …'}
 ```
+
+## Toutes les techniques, enseignées avant d'être demandées
+L'élève ne connaît que ce qu'il a vu dans les étapes précédentes (et dans les chapitres précédents de la même matière). Règle absolue : **aucun exercice, indice, correction ou problème ne demande une technique qui n'a pas été enseignée avant**, avec une explication et un exemple résolu. Par exemple, avant un exercice où il faut multiplier par la quantité conjuguée, il faut une étape Méthode qui montre dans quelle situation on le fait (forme ∞ − ∞ ou 0/0 avec une racine), pourquoi ça marche ((a − b)(a + b) = a² − b² fait disparaître la racine) et un exemple calculé de bout en bout.
+
+Chaque chapitre doit aussi donner **la boîte à outils complète du thème** : toutes les techniques classiques dont on a besoin pour réussir une grande variété d'exercices sur ce sujet, pas seulement celles des exercices déjà présents. Chaque technique a son étape Méthode, puis au moins un exercice qui la fait pratiquer. Une fiche « Méthodes » rassemble automatiquement les étapes Méthode du chapitre.
 
 ## Exigences de contenu
 - **Exactitude avant tout.** Recalcule chaque réponse avec `node -e` ou `python3 -c`. Une erreur dans une correction ruine la confiance.

@@ -237,6 +237,21 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .modal-box .msg.ok{background:var(--ok-soft);color:var(--ok)}
 .linkish{background:none;border:0;color:var(--accent);font-weight:700;cursor:pointer;padding:0;font-size:14px}
 
+/* Méthodes : exemple résolu pas à pas, fiche */
+.demo{border:2px solid var(--math);border-radius:16px;background:var(--surface);padding:14px 16px;display:grid;gap:10px}
+.demo-h{font:700 12px var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--math)}
+.demo-q{font-weight:700}
+.demo-steps{margin:0;padding-left:22px;display:grid;gap:8px}
+.demo-steps li{animation:in .3s ease-out}
+.demo-w{font-size:14px;color:var(--muted);margin-top:2px}
+.demo-c{background:color-mix(in srgb,var(--math) 10%,var(--surface));border-radius:10px;padding:8px 12px;font-weight:700}
+.demo-btns{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.demo-btns .btn{padding:8px 16px;font-size:15px}
+.modal-box.fiche{width:min(720px,100%);max-height:88vh;overflow-y:auto}
+.fm-sec{display:grid;gap:10px;border-top:1px solid var(--line);padding-top:14px}
+.fm-sec h3{font-size:19px}
+.fm-link{display:block;margin-top:4px;font-size:13px}
+
 @media (max-width:860px){ .branches{grid-template-columns:1fr} .cpage{grid-template-columns:1fr} }
 @media (max-width:720px){
   .hero{grid-template-columns:1fr;padding-block:24px 8px}
