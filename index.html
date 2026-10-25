@@ -197,6 +197,46 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .lessons li .s{font-size:13px;color:var(--muted);font-weight:700}
 .lessons li .btn{padding:9px 16px;font-size:15px}
 
+
+/* Problèmes en plusieurs questions */
+.segs span.prob{height:8px;outline:2px solid color-mix(in srgb,var(--spark) 60%,transparent);outline-offset:1px}
+.parts{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.part{border:1px solid var(--line);border-radius:16px;padding:14px 16px;background:var(--surface);display:grid;gap:10px}
+.part .q{font-weight:700}
+.part.locked{opacity:.45}
+.part.locked .zone{display:none}
+.part.active{border:2px solid var(--accent)}
+.part.done{border-color:var(--ok);background:color-mix(in srgb,var(--ok-soft) 60%,var(--surface))}
+.part .zone{display:grid;gap:10px;justify-items:start}
+.part .zone .choices{width:100%}
+.hint-btn{background:none;border:1.5px dashed var(--spark);color:var(--ink);border-radius:10px;padding:6px 12px;cursor:pointer;font-weight:700;font-size:14px}
+.hint{background:var(--spark-soft);border-radius:12px;padding:10px 14px;font-size:15px}
+.pwhy{font-size:15px;color:var(--ink)}
+.pwhy::before{content:"✓ ";color:var(--ok);font-weight:700}
+.sol{border:1px solid var(--line);border-radius:16px;background:var(--surface);padding:12px 16px}
+.sol summary{cursor:pointer;font:700 17px var(--f-display)}
+.sol>div{margin-top:10px;line-height:1.6}
+
+/* En-tête : compte et ardoise */
+.pill.act{cursor:pointer;font-family:var(--f-display)}
+.pill.act:hover{border-color:var(--accent)}
+.pill .av{width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-size:12px}
+.x.ard{width:auto;padding:0 12px;gap:6px;display:flex;align-items:center;font:700 14px var(--f-display);flex:none}
+@media (max-width:520px){ .x.ard span{display:none} .pill.act .t{display:none} }
+
+/* Fenêtres (compte) */
+.modal{position:fixed;inset:0;z-index:40;background:color-mix(in srgb,var(--ink) 45%,transparent);display:grid;place-items:center;padding:16px}
+.modal-box{background:var(--surface);border-radius:20px;padding:22px;width:min(420px,100%);display:grid;gap:14px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.modal-box h2{font-size:24px}
+.modal-box label{display:grid;gap:6px;font-weight:700;font-size:15px}
+.modal-box input[type=email],.modal-box input[type=password]{font:16px var(--f-body);padding:11px 14px;border-radius:12px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
+.modal-box input:focus{border-color:var(--accent);outline:none}
+.modal-box .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.modal-box .msg{font-size:14px;border-radius:10px;padding:8px 12px}
+.modal-box .msg.err{background:var(--bad-soft);color:var(--bad)}
+.modal-box .msg.ok{background:var(--ok-soft);color:var(--ok)}
+.linkish{background:none;border:0;color:var(--accent);font-weight:700;cursor:pointer;padding:0;font-size:14px}
+
 @media (max-width:860px){ .branches{grid-template-columns:1fr} .cpage{grid-template-columns:1fr} }
 @media (max-width:720px){
   .hero{grid-template-columns:1fr;padding-block:24px 8px}
@@ -211,7 +251,9 @@ input[type=range]{width:100%;accent-color:var(--accent)}
   <button class="logo" id="home-btn" aria-label="Accueil Déclic"><i></i>Déclic</button>
   <div class="stats">
     <div class="pill" title="Jours d'affilée"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2c1 4 5 6 5 11a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5 0 2 1 3 2 3-1-3 0-7 1-9.5Z" fill="var(--other)"/></svg><span id="streak">0</span></div>
+    <button class="pill act" id="ardoise-open" title="Ouvrir l’ardoise de calcul"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M7 9h4M9 7v4M14 9h3M7 14h3M14 13l3 3M17 13l-3 3"/></svg><span class="t">Ardoise</span></button>
     <div class="pill" title="Points d'expérience"><svg viewBox="0 0 24 24"><path d="m12 2 2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 21l1.6-7L2 9.2l7.1-.6Z" fill="var(--spark)"/></svg><span id="xp">0</span></div>
+    <button class="pill act" id="account-btn"><span class="t">Se connecter</span></button>
   </div>
 </div></header>
 
@@ -221,6 +263,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
   <div class="wrap p-top" style="max-width:712px;width:100%">
     <button class="x" id="quit" aria-label="Quitter la leçon"><svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     <div class="segs" id="segs"></div>
+    <button class="x ard" id="ardoise-btn" aria-label="Ouvrir l’ardoise"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M7 9h4M9 7v4M14 9h3M7 14h3M14 13l3 3M17 13l-3 3"/></svg><span>Ardoise</span></button>
   </div>
   <div class="p-body"><div class="wrap"><div class="card" id="card"></div></div></div>
   <div class="p-foot" id="foot"><div class="wrap">
@@ -230,491 +273,20 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 </div>
 
 <script src="lib.js"></script>
-<script src="maths.js"></script>
-<script src="cms-an1.js"></script>
-<script src="cms-an2a.js"></script>
-<script src="cms-an2p.js"></script>
-<script src="cms-al.js"></script>
-<script src="cms-ga.js"></script>
-<script src="cms-ics-py.js"></script>
-<script src="cms-ics-algo.js"></script>
-<script src="cms-phy.js"></script>
-<script src="cms-chi.js"></script>
-
-<script>
-/* ---------- état (localStorage optionnel) ---------- */
-const store = {
-  get(){ try{ return JSON.parse(localStorage.getItem('declic')||'{}') }catch(e){ return {} } },
-  set(v){ try{ localStorage.setItem('declic',JSON.stringify(v)) }catch(e){} }
-};
-let S = Object.assign({xp:0, streak:1, done:{}}, store.get());
-function save(){ store.set(S); renderStats(); }
-function renderStats(){ document.getElementById('xp').textContent=S.xp; document.getElementById('streak').textContent=S.streak; }
-
-const $ = (h)=>{ const t=document.createElement('template'); t.innerHTML=h.trim(); return t.content.firstElementChild; };
-
-/* ---------- audio (après interaction) ---------- */
-let AC=null;
-function tone(semi, when=0, dur=.6){
-  try{
-    AC = AC || new (window.AudioContext||window.webkitAudioContext)();
-    const f = 261.63*Math.pow(2,semi/12), t=AC.currentTime+when;
-    const o=AC.createOscillator(), g=AC.createGain(), o2=AC.createOscillator(), g2=AC.createGain();
-    o.type='triangle'; o.frequency.value=f; o2.type='sine'; o2.frequency.value=f*2;
-    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.35,t+.01); g.gain.exponentialRampToValueAtTime(.001,t+dur);
-    g2.gain.setValueAtTime(.08,t); g2.gain.exponentialRampToValueAtTime(.001,t+dur*.6);
-    o.connect(g).connect(AC.destination); o2.connect(g2).connect(AC.destination);
-    o.start(t); o2.start(t); o.stop(t+dur); o2.stop(t+dur);
-  }catch(e){}
-}
-
-/* ---------- widgets ---------- */
-function choices(opts, ctx, row){
-  const el=$(`<div class="choices ${row?'row':''}"></div>`);
-  opts.forEach((o,i)=>{
-    const b=$(`<button class="choice" id="c${i}"></button>`); b.innerHTML=o;
-    b.onclick=()=>{ el.querySelectorAll('.choice').forEach(x=>x.classList.remove('sel','wrong','right')); b.classList.add('sel'); ctx.answer=i; ctx.ready(true); };
-    el.appendChild(b);
-  });
-  ctx.mark=(ok)=>{ const s=el.querySelector('.sel'); if(s) s.classList.add(ok?'right':'wrong'); };
-  return el;
-}
-function stepper(init,min,max,on){
-  const el=$(`<div class="stepper"><button aria-label="Moins">−</button><output>${init}</output><button aria-label="Plus">+</button></div>`);
-  let v=init; const out=el.querySelector('output');
-  const set=n=>{ v=Math.max(min,Math.min(max,n)); out.textContent=v; on(v); };
-  el.children[0].onclick=()=>set(v-1); el.children[2].onclick=()=>set(v+1);
-  return el;
-}
-
-/* Graphique cartésien pour la pente */
-function graph(a,b,opts={}){
-  const U=24,O=156,W=312; const X=x=>O+x*U, Y=y=>O-y*U;
-  let g='';
-  for(let i=-6;i<=6;i++){ g+=`<line x1="${X(i)}" y1="12" x2="${X(i)}" y2="${W-12}" stroke="var(--line)" stroke-width="1"/><line x1="12" y1="${Y(i)}" x2="${W-12}" y2="${Y(i)}" stroke="var(--line)" stroke-width="1"/>`; }
-  g+=`<line x1="12" y1="${O}" x2="${W-12}" y2="${O}" stroke="var(--muted)" stroke-width="1.5"/><line x1="${O}" y1="12" x2="${O}" y2="${W-12}" stroke="var(--muted)" stroke-width="1.5"/>`;
-  for(const i of [-4,-2,2,4]){ g+=`<text x="${X(i)}" y="${O+16}" font-size="11" text-anchor="middle" fill="var(--muted)">${i}</text><text x="${O-8}" y="${Y(i)+4}" font-size="11" text-anchor="end" fill="var(--muted)">${i}</text>`; }
-  // droite clipée
-  const x1=-6.5,x2=6.5;
-  g+=`<clipPath id="cp"><rect x="12" y="12" width="${W-24}" height="${W-24}"/></clipPath><line clip-path="url(#cp)" x1="${X(x1)}" y1="${Y(a*x1+b)}" x2="${X(x2)}" y2="${Y(a*x2+b)}" stroke="var(--accent)" stroke-width="4" stroke-linecap="round"/>`;
-  if(opts.tri){ // triangle de pente à partir de x=1
-    const x0=1,y0=a*x0+b;
-    g+=`<path d="M${X(x0)} ${Y(y0)} H${X(x0+1)} V${Y(y0+a)}" fill="none" stroke="var(--spark)" stroke-width="3" stroke-dasharray="5 4"/>
-        <text x="${X(x0+.5)}" y="${Y(y0)+(a>=0?18:-8)}" font-size="13" font-weight="700" text-anchor="middle" fill="var(--ink)">+1</text>
-        <text x="${X(x0+1)+8}" y="${Y(y0+a/2)+4}" font-size="13" font-weight="700" fill="var(--ink)">${a>=0?'+':''}${a}</text>`;
-  }
-  (opts.pts||[]).forEach(p=>{ g+=`<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="7" fill="${p[2]||'var(--spark)'}" stroke="var(--surface)" stroke-width="2"/>`; if(p[3]) g+=`<text x="${X(p[0])+10}" y="${Y(p[1])-10}" font-size="13" font-weight="700" fill="var(--ink)">${p[3]}</text>`; });
-  g+=`<circle cx="${X(0)}" cy="${Y(b)}" r="5" fill="var(--accent)"/>`;
-  return `<svg viewBox="0 0 ${W} ${W}" width="${W}" role="img" aria-label="Droite y = ${a}x + ${b}">${g}</svg>`;
-}
-
-/* Grille du robot */
-function robotWorld(cfg){
-  const C=56, N=cfg.n||5;
-  const el=$(`<div class="fig"><svg viewBox="0 0 ${N*C} ${N*C}" width="${N*C}"></svg><div class="cap">${cfg.cap||''}</div></div>`);
-  const svg=el.querySelector('svg');
-  let st={x:cfg.start[0],y:cfg.start[1],d:cfg.dir}, trail=[[st.x,st.y]];
-  const DX=[1,0,-1,0], DY=[0,1,0,-1]; // 0 est, 1 sud, 2 ouest, 3 nord
-  function draw(){
-    let g='';
-    for(let i=0;i<N;i++)for(let j=0;j<N;j++) g+=`<rect x="${i*C+2}" y="${j*C+2}" width="${C-4}" height="${C-4}" rx="8" fill="color-mix(in srgb,var(--code) 7%,var(--surface))" stroke="var(--line)"/>`;
-    if(trail.length>1) g+=`<polyline points="${trail.map(p=>`${p[0]*C+C/2},${p[1]*C+C/2}`).join(' ')}" fill="none" stroke="var(--code)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity=".45"/>`;
-    if(cfg.flag){ const [fx,fy]=cfg.flag; g+=`<g transform="translate(${fx*C+C/2-8},${fy*C+10})"><rect x="0" y="0" width="3" height="36" fill="var(--ink)"/><path d="M3 0h20l-6 7 6 7H3z" fill="var(--spark)"/></g>`; }
-    const cx=st.x*C+C/2, cy=st.y*C+C/2, rot=st.d*90;
-    g+=`<g transform="translate(${cx},${cy}) rotate(${rot})"><rect x="-17" y="-17" width="34" height="34" rx="10" fill="var(--code)"/><circle cx="6" cy="-6" r="3.5" fill="#fff"/><circle cx="6" cy="6" r="3.5" fill="#fff"/><path d="M17 -6 L25 0 L17 6Z" fill="var(--code)"/></g>`;
-    svg.innerHTML=g;
-  }
-  draw();
-  const api={el,
-    reset(){ st={x:cfg.start[0],y:cfg.start[1],d:cfg.dir}; trail=[[st.x,st.y]]; draw(); },
-    run(prog, done){ // prog = tableau de 'A' (avancer) / 'R' (tourner à droite)
-      api.reset(); let i=0, crashed=false;
-      const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const tick=()=>{
-        if(i>=prog.length||crashed){ done({x:st.x,y:st.y,d:st.d,crashed}); return; }
-        const c=prog[i++];
-        if(c==='A'){ const nx=st.x+DX[st.d], ny=st.y+DY[st.d]; if(nx<0||ny<0||nx>=N||ny>=N){crashed=true;} else {st.x=nx;st.y=ny;trail.push([nx,ny]);} }
-        else st.d=(st.d+1)%4;
-        draw(); setTimeout(tick, reduce?40:330);
-      };
-      setTimeout(tick,200);
-    }};
-  return api;
-}
-
-/* Piano Do3 → Mi4 */
-const NOTE=['Do','Do♯','Ré','Ré♯','Mi','Fa','Fa♯','Sol','Sol♯','La','La♯','Si'];
-function piano(onKey, hi=[]){
-  const el=$(`<div class="piano" role="group" aria-label="Clavier de piano"></div>`);
-  const whites=[0,2,4,5,7,9,11,12,14,16], blacks=[[1,0],[3,1],[6,3],[8,4],[10,5],[13,7],[15,8]];
-  const ww=100/whites.length, keys={};
-  whites.forEach((s,i)=>{ const k=$(`<button class="key w" aria-label="${NOTE[s%12]}" style="left:${i*ww}%;width:${ww}%">${NOTE[s%12]}</button>`); keys[s]=k; el.appendChild(k); });
-  blacks.forEach(([s,i])=>{ const k=$(`<button class="key b" aria-label="${NOTE[s%12]}" style="left:${(i+1)*ww-ww*.3}%;width:${ww*.6}%"></button>`); keys[s]=k; el.appendChild(k); });
-  Object.entries(keys).forEach(([s,k])=>{ s=+s; if(hi.includes(s)) k.classList.add('hi');
-    k.onclick=()=>{ tone(s); k.classList.add('on'); setTimeout(()=>k.classList.remove('on'),220); onKey&&onKey(s,keys); }; });
-  el.keys=keys; return el;
-}
-
-/* ---------- contenu des cours ---------- */
-const LESSONS = {
-  pente:{ title:'La pente d’une droite', domain:'Maths', steps:[
-    {kind:'Théorie', render(c,ctx){
-      c.append($(`<h2>Une droite, deux nombres</h2>`),
-        $(`<p>Toute droite non verticale s’écrit <code>y = a·x + b</code>. Le nombre <b>b</b> dit où elle coupe l’axe vertical. Le nombre <b>a</b>, la <b>pente</b>, dit de combien elle monte quand on avance d’une case vers la droite.</p>`));
-      const fig=$(`<div class="fig"></div>`); const box=$(`<div></div>`);
-      const f=$(`<div class="formula">y = <b>1</b>·x + 0</div>`);
-      const sl=$(`<div class="slider"><label for="sa">Pente a <output>1</output></label><input id="sa" type="range" min="-3" max="3" step="0.5" value="1"></div>`);
-      const upd=()=>{ const a=+sl.querySelector('input').value; box.innerHTML=graph(a,0,{tri:true}); f.innerHTML=`y = <b>${a}</b>·x + 0`; sl.querySelector('output').textContent=a; };
-      sl.querySelector('input').oninput=upd; upd();
-      fig.append(f,box,sl,$(`<div class="cap">Bouge le curseur. Le triangle jaune montre : +1 vers la droite, +a vers le haut.</div>`)); c.append(fig);
-    }},
-    {kind:'Question', render(c,ctx){
-      c.append($(`<h2>Lis la pente</h2>`),$(`<p>Cette droite passe par les deux points jaunes. Quelle est sa pente&nbsp;?</p>`));
-      c.append($(`<div class="fig">${graph(2,1,{pts:[[0,1,null,'(0, 1)'],[2,5,null,'(2, 5)']]})}</div>`));
-      c.append(choices(['a = 1','a = 2','a = 4','a = 5'],ctx,true));
-      ctx.check=()=>({ok:ctx.answer===1, why: ctx.answer===2 ? 'Elle monte de 4, mais sur 2 cases. Divise : 4 ÷ 2.' : 'On monte de 5 − 1 = 4 en avançant de 2 cases : a = 4 ÷ 2 = 2.'});
-    }},
-    {kind:'Pratique', render(c,ctx){
-      c.append($(`<h2>Vise le point</h2>`),$(`<p>La droite part de <code>(0, 1)</code>. Règle la pente pour qu’elle passe par le drapeau <code>(4, −1)</code>.</p>`));
-      const fig=$(`<div class="fig"></div>`), box=$(`<div></div>`);
-      const sl=$(`<div class="slider"><label for="sb">Pente a <output>1</output></label><input id="sb" type="range" min="-2" max="2" step="0.25" value="1"></div>`);
-      const upd=()=>{ const a=+sl.querySelector('input').value; ctx.answer=a; box.innerHTML=graph(a,1,{pts:[[4,-1,'var(--bad)','drapeau']]}); sl.querySelector('output').textContent=a; ctx.ready(true); };
-      sl.querySelector('input').oninput=upd; upd(); ctx.ready(false);
-      fig.append(box,sl); c.append(fig);
-      ctx.check=()=>({ok:ctx.answer===-0.5, why:'Pour aller de y = 1 à y = −1, on descend de 2 en 4 cases : a = −2 ÷ 4 = −0,5.'});
-    }},
-    {kind:'Théorie', render(c){
-      c.append($(`<h2>Le signe raconte une histoire</h2>`),
-        $(`<p>Pente positive : ça monte. Pente négative : ça descend. Pente nulle : c’est plat. Plus |a| est grand, plus c’est raide.</p>`),
-        $(`<div class="fig" style="grid-template-columns:repeat(3,1fr);gap:8px">${[2,0,-1].map(a=>`<div style="display:grid;gap:4px;justify-items:center">${graph(a,0).replace('width="312"','width="100%"')}<code>a = ${a}</code></div>`).join('')}</div>`),
-        $(`<div class="note"><b>Dans la vraie vie :</b> une route à 10 % a une pente de 0,1. Tu montes de 10 m tous les 100 m.</div>`));
-    }},
-    {kind:'Défi', render(c,ctx){
-      c.append($(`<h2>Le col du Grand-Saint-Bernard</h2>`),
-        $(`<p>Une route monte de 240 m sur une distance horizontale de 3 km. Quelle est sa pente, en pourcentage&nbsp;?</p>`),
-        choices(['0,8 %','8 %','12,5 %','80 %'],ctx,true));
-      ctx.check=()=>({ok:ctx.answer===1, why:'3 km = 3000 m. 240 ÷ 3000 = 0,08, soit 8 %.'});
-    }},
-  ]},
-
-  boucles:{ title:'Les boucles', domain:'Code', steps:[
-    {kind:'Théorie', render(c){
-      c.append($(`<h2>Arrête de te répéter</h2>`),
-        $(`<p>Ce robot comprend deux ordres : <code class="fn">avancer()</code> et <code class="fn">tourner()</code> (un quart de tour à droite). Pour aller loin, on pourrait écrire <code>avancer()</code> dix fois… ou utiliser une <b>boucle</b>.</p>`),
-        $(`<pre class="code"><span class="kw">répéter</span> <span class="num">3</span> <span class="kw">fois</span> :\n    <span class="fn">avancer</span>()</pre>`),
-        $(`<p>La boucle exécute son bloc indenté le nombre de fois demandé.</p>`));
-      const w=robotWorld({start:[0,2],dir:0,cap:'Le robot exécute le programme ci-dessus.'});
-      const b=$(`<button class="btn ghost" style="justify-self:center">▶ Lancer</button>`); b.onclick=()=>w.run(['A','A','A'],()=>{});
-      w.el.append(b); c.append(w.el);
-    }},
-    {kind:'Pratique', render(c,ctx){
-      c.append($(`<h2>Atteins le drapeau</h2>`),$(`<p>Combien de répétitions pour que le robot s’arrête pile sur le drapeau&nbsp;?</p>`));
-      let n=1; const code=$(`<pre class="code"></pre>`);
-      const show=()=>code.innerHTML=`<span class="kw">répéter</span> <span class="num">${n}</span> <span class="kw">fois</span> :\n    <span class="fn">avancer</span>()`;
-      const w=robotWorld({start:[0,4],dir:3,flag:[0,0],cap:'Le robot regarde vers le haut.'});
-      c.append(code, stepper(1,1,9,v=>{n=v;show();w.reset();}), w.el); show(); ctx.ready(true);
-      ctx.check=()=>new Promise(res=>w.run(Array(n).fill('A'),r=>res({ok:!r.crashed&&r.x===0&&r.y===0, why: r.crashed?'Boum ! Le robot est sorti de la grille. Compte les cases jusqu’au drapeau.':'Pas encore sur le drapeau. Compte les cases entre le robot et lui.'})));
-    }},
-    {kind:'Pratique', render(c,ctx){
-      c.append($(`<h2>Fais le tour</h2>`),$(`<p>On peut mettre plusieurs ordres dans une boucle. Combien de répétitions pour que le robot dessine un carré complet et revienne à son point de départ, dans la même direction&nbsp;?</p>`));
-      let n=1; const code=$(`<pre class="code"></pre>`);
-      const show=()=>code.innerHTML=`<span class="kw">répéter</span> <span class="num">${n}</span> <span class="kw">fois</span> :\n    <span class="fn">avancer</span>()\n    <span class="fn">avancer</span>()\n    <span class="fn">avancer</span>()\n    <span class="fn">tourner</span>()`;
-      const w=robotWorld({start:[1,1],dir:0,cap:'Départ en haut à gauche, regard vers la droite.'});
-      c.append(code, stepper(1,1,8,v=>{n=v;show();w.reset();}), w.el); show(); ctx.ready(true);
-      ctx.check=()=>new Promise(res=>{ const p=[]; for(let i=0;i<n;i++) p.push('A','A','A','R'); w.run(p,r=>res({ok:r.x===1&&r.y===1&&r.d===0, why:'Un carré a 4 côtés, et il faut 4 quarts de tour pour retrouver la direction de départ.'})); });
-    }},
-    {kind:'Théorie', render(c){
-      c.append($(`<h2>La même idée en Python</h2>`),
-        $(`<p>En Python, la boucle s’écrit <code class="kw">for</code>. La variable <code>i</code> prend une valeur différente à chaque tour.</p>`),
-        $(`<pre class="code"><span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">4</span>):\n    <span class="fn">avancer</span>()</pre>`),
-        $(`<div class="note"><b>Piège classique :</b> <code>range(4)</code> donne 0, 1, 2, 3. Ça fait bien 4 valeurs, mais on commence à 0.</div>`));
-    }},
-    {kind:'Défi', render(c,ctx){
-      c.append($(`<h2>Que va afficher ce programme&nbsp;?</h2>`),
-        $(`<pre class="code">total = <span class="num">0</span>\n<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">4</span>):\n    total = total + i\n<span class="fn">print</span>(total)</pre>`),
-        choices(['4','6','10','0 1 2 3'],ctx,true));
-      ctx.check=()=>({ok:ctx.answer===1, why:'i vaut 0, 1, 2 puis 3. 0 + 1 + 2 + 3 = 6. Le 4 n’est jamais atteint.'});
-    }},
-  ]},
-
-  intervalles:{ title:'Les intervalles', domain:'Musique', steps:[
-    {kind:'Théorie', render(c){
-      c.append($(`<h2>Le demi-ton, l’unité de mesure</h2>`),
-        $(`<p>Sur un piano, passer d’une touche à sa <b>voisine immédiate</b> (blanche ou noire) fait un <b>demi-ton</b>. Un <b>intervalle</b>, c’est la distance entre deux notes, comptée en demi-tons.</p>`));
-      const fig=$(`<div class="fig"></div>`), lab=$(`<div class="cap">Touche les notes pour les entendre.</div>`);
-      let last=null;
-      fig.append(piano((s)=>{ lab.textContent = last===null ? `${NOTE[s%12]}` : `${NOTE[last%12]} → ${NOTE[s%12]} : ${Math.abs(s-last)} demi-ton${Math.abs(s-last)>1?'s':''}`; last=s; }), lab);
-      c.append(fig, $(`<div class="note">Entre Mi et Fa, ou entre Si et Do, il n’y a pas de touche noire. Ce sont déjà des demi-tons.</div>`));
-    }},
-    {kind:'Question', render(c,ctx){
-      c.append($(`<h2>Compte les marches</h2>`),$(`<p>Combien de demi-tons séparent <b>Do</b> de <b>Mi</b>&nbsp;? Compte toutes les touches, noires comprises.</p>`));
-      const fig=$(`<div class="fig"></div>`); fig.append(piano(null,[0,4])); c.append(fig);
-      c.append(choices(['2','3','4','5'],ctx,true));
-      ctx.check=()=>({ok:ctx.answer===2, why:'Do → Do♯ → Ré → Ré♯ → Mi : 4 pas. C’est une tierce majeure.'});
-    }},
-    {kind:'Théorie', render(c){
-      c.append($(`<h2>Trois intervalles à connaître</h2>`));
-      const rows=[['Tierce majeure',4,'joyeux, lumineux'],['Quinte juste',7,'stable, ouvert'],['Octave',12,'la même note, plus aiguë']];
-      rows.forEach(([n,s,d])=>{
-        const r=$(`<div class="fig" style="grid-template-columns:1fr auto;justify-items:start;align-items:center"><div><b>${n}</b> · ${s} demi-tons<br><span class="cap" style="text-align:left">${d}</span></div><button class="btn ghost">▶ Écouter</button></div>`);
-        r.querySelector('button').onclick=()=>{ tone(0,0,.9); tone(s,.45,.9); tone(0,1.1,1.2); tone(s,1.1,1.2); };
-        c.append(r);
-      });
-    }},
-    {kind:'Pratique', render(c,ctx){
-      c.append($(`<h2>Construis une tierce majeure</h2>`),$(`<p>Joue la note qui se trouve une <b>tierce majeure</b> (4 demi-tons) au-dessus de <b>Ré</b>.</p>`));
-      const lab=$(`<div class="cap">Choisis une touche.</div>`);
-      const p=piano((s,keys)=>{ ctx.answer=s; Object.values(keys).forEach(k=>k.classList.remove('hi')); keys[2].classList.add('hi'); keys[s].classList.add('hi'); lab.textContent=`Ré → ${NOTE[s%12]}`; ctx.ready(true); },[2]);
-      const fig=$(`<div class="fig"></div>`); fig.append(p,lab); c.append(fig);
-      ctx.check=()=>{ const ok=ctx.answer===6; if(ok){ tone(2,0,.8); tone(6,.35,.8);} return {ok, why:'Ré → Ré♯ → Mi → Fa → Fa♯. La réponse est une touche noire : Fa♯.'}; };
-    }},
-    {kind:'Oreille', render(c,ctx){
-      c.append($(`<h2>Entraîne ton oreille</h2>`),$(`<p>Écoute les deux notes. Quel intervalle entends-tu&nbsp;?</p>`));
-      const b=$(`<button class="btn" style="justify-self:center">▶ Écouter</button>`); b.onclick=()=>{ tone(0,0,.9); tone(7,.6,1.1); };
-      c.append(b, choices(['Tierce majeure','Quinte juste','Octave'],ctx));
-      ctx.check=()=>({ok:ctx.answer===1, why:'Do puis Sol : 7 demi-tons, une quinte juste. C’est l’intervalle du début de « Star Wars ».'});
-    }},
-  ]},
-};
-
-/* Le parcours de maths (maths.js) devient des leçons jouables */
-MATHS.forEach(c=>{
-  if(c.use){ LESSONS[c.use].domain=BRANCHES[c.br]; c.lid=c.use; return; }
-  c.lid=c.id; LESSONS[c.id]={title:c.lessons[0], domain:BRANCHES[c.br], steps:c.steps};
-});
-const COURSE_OF={}; MATHS.forEach(c=>COURSE_OF[c.lid]=c);
-/* Programme de l'année préparatoire (fichiers cms-*.js) */
-const CMS_OF={};
-CMS.forEach(ch=>{ const sj=CMS_SUBJECTS.find(s=>s.id===ch.subj); LESSONS[ch.id]={title:ch.h, domain:sj.h, steps:ch.steps}; CMS_OF[ch.id]={sj, sem:sj.sems[ch.sem], ch}; });
-const cmsChapters=sj=>Object.keys(sj.sems).flatMap(k=>CMS.filter(c=>c.subj===sj.id&&c.sem===k));
-
-const CATALOG = [
-  {name:'Sciences', c:'var(--sci)', sub:'Comprendre le monde qui bouge', items:[
-    {h:'Mécanique', p:'Chute libre, vitesse et forces en jeu.', ill:'drop'},
-    {h:'Chimie du quotidien', p:'Pourquoi le pain lève et le fer rouille.', ill:'flask'},
-    {h:'Astronomie', p:'Phases de la Lune, saisons et orbites.', ill:'moon'},
-  ]},
-  {name:'Code', c:'var(--code)', sub:'Penser comme une machine', items:[
-    {id:'boucles', h:'Premiers pas en code', p:'Instructions, boucles, puis Python pour de vrai.', ill:'robot'},
-    {h:'Algorithmes', p:'Trier, chercher, et compter les étapes.', ill:'bars'},
-  ]},
-  {name:'Au-delà', c:'var(--other)', sub:'Ce qu’on n’apprend nulle part ailleurs, en français', items:[
-    {id:'intervalles', h:'Solfège interactif', p:'Lire, entendre et construire les intervalles.', ill:'keys', new:true},
-    {h:'Finances perso', p:'Intérêts composés, 3e pilier, inflation.', ill:'curve', new:true},
-    {h:'Navigation', p:'Vent apparent, caps et marées.', ill:'sail', new:true},
-    {h:'Logique', p:'Énigmes, syllogismes et biais cognitifs.', ill:'logic', new:true},
-  ]},
-];
-
-const ILL={
-  line:c=>`<svg viewBox="0 0 200 92"><g stroke="${c}" opacity=".25">${[20,46,72].map(y=>`<line x1="0" x2="200" y1="${y}" y2="${y}"/>`).join('')}</g><line x1="20" y1="82" x2="180" y2="12" stroke="${c}" stroke-width="5" stroke-linecap="round"/><circle cx="100" cy="47" r="7" fill="var(--spark)"/></svg>`,
-  dice:c=>`<svg viewBox="0 0 200 92"><rect x="62" y="20" width="50" height="50" rx="10" fill="${c}" transform="rotate(-10 87 45)"/><rect x="104" y="24" width="44" height="44" rx="9" fill="none" stroke="${c}" stroke-width="4" transform="rotate(12 126 46)"/>${[[77,32],[97,56],[87,44]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="4.5" fill="#fff"/>`).join('')}</svg>`,
-  tri:c=>`<svg viewBox="0 0 200 92"><path d="M60 80 L140 80 L60 15Z" fill="${c}" opacity=".85"/><rect x="60" y="68" width="12" height="12" fill="none" stroke="#fff" stroke-width="2"/></svg>`,
-  drop:c=>`<svg viewBox="0 0 200 92">${[14,30,50,76].map((y,i)=>`<circle cx="100" cy="${y}" r="${6}" fill="${c}" opacity="${.25+i*.25}"/>`).join('')}<line x1="60" y1="86" x2="140" y2="86" stroke="${c}" stroke-width="3"/></svg>`,
-  flask:c=>`<svg viewBox="0 0 200 92"><path d="M88 10h24M92 10v26l-22 42a6 6 0 0 0 5 9h50a6 6 0 0 0 5-9l-22-42V10" fill="none" stroke="${c}" stroke-width="4"/><path d="M78 62h44l8 17H70z" fill="${c}"/><circle cx="104" cy="48" r="4" fill="${c}"/></svg>`,
-  moon:c=>`<svg viewBox="0 0 200 92">${[0,1,2,3,4].map(i=>`<circle cx="${40+i*30}" cy="46" r="11" fill="none" stroke="${c}" stroke-width="2"/><path d="M${40+i*30} 35 a11 11 0 0 ${i<2?1:0} 0 22 a${Math.abs(11-i*5.5)} 11 0 0 ${i<2?0:1} 0 -22" fill="${c}"/>`).join('')}</svg>`,
-  robot:c=>`<svg viewBox="0 0 200 92"><g fill="none" stroke="${c}" opacity=".3">${[0,1,2,3,4].map(i=>`<rect x="${40+i*24}" y="34" width="22" height="22" rx="4"/>`).join('')}</g><path d="M51 45 H135" stroke="${c}" stroke-width="5" opacity=".5" stroke-linecap="round"/><rect x="128" y="34" width="22" height="22" rx="6" fill="${c}"/></svg>`,
-  bars:c=>`<svg viewBox="0 0 200 92">${[30,50,20,70,40,60].map((h,i)=>`<rect x="${42+i*20}" y="${84-h}" width="14" height="${h}" rx="3" fill="${c}" opacity="${.4+i*.1}"/>`).join('')}</svg>`,
-  keys:c=>`<svg viewBox="0 0 200 92">${[0,1,2,3,4,5,6].map(i=>`<rect x="${44+i*16}" y="14" width="15" height="66" rx="3" fill="${i===2?'var(--spark)':'var(--surface)'}" stroke="${c}"/>`).join('')}${[0,1,3,4,5].map(i=>`<rect x="${54+i*16}" y="14" width="10" height="40" rx="2" fill="${c}"/>`).join('')}</svg>`,
-  curve:c=>`<svg viewBox="0 0 200 92"><path d="M30 80 C90 78 130 60 170 12" fill="none" stroke="${c}" stroke-width="5" stroke-linecap="round"/><path d="M30 80 L170 52" stroke="${c}" stroke-width="2" stroke-dasharray="4 4" opacity=".5"/></svg>`,
-  sail:c=>`<svg viewBox="0 0 200 92"><path d="M100 10 V68 H66Z" fill="${c}"/><path d="M104 18 V68 H128Z" fill="${c}" opacity=".5"/><path d="M60 72 H140 L128 84 H72Z" fill="${c}"/></svg>`,
-  logic:c=>`<svg viewBox="0 0 200 92"><circle cx="86" cy="46" r="28" fill="${c}" opacity=".35"/><circle cx="114" cy="46" r="28" fill="${c}" opacity=".35"/></svg>`,
-};
-
-/* ---------- accueil ---------- */
-let VIEW='home', LV=(()=>{ try{ return localStorage.getItem('declic-lv')||'ecole' }catch(e){ return 'ecole' } })();
-function thumb(c){
-  if(c.use) return graph(1,0,{tri:true});
-  const st=c.steps.find(s=>s.draw); const v={}; st.params.forEach(p=>v[p.id]=p.v); return st.draw(v);
-}
-function render(){ if(VIEW==='home') renderHome(); else if(VIEW.startsWith('cms:')) renderSubject(VIEW.slice(4)); else renderCourse(VIEW); window.scrollTo(0,0); }
-function stepsThumb(steps){ const st=(steps||[]).find(s=>s.draw); if(!st) return ''; const v={}; st.params.forEach(p=>v[p.id]=p.v); try{ return st.draw(v); }catch(e){ return ''; } }
-
-function renderCMS(h){
-  const live=CMS_SUBJECTS.filter(sj=>CMS.some(c=>c.subj===sj.id)); if(!live.length) return;
-  const sec=$(`<section class="wrap domain" id="cms">
-    <div class="math-head"><div><h2>Année préparatoire</h2><p>Le programme du cours de mathématiques spéciales (CMS) : ${CMS.length} chapitres en ${live.length} branches, chacun avec sa théorie et ses exercices.</p>
-    <p class="disclaim">Contenu indépendant, construit à partir du programme officiel.</p></div></div>
-    <div class="subjects"></div></section>`);
-  live.forEach(sj=>{
-    const chs=cmsChapters(sj), fin=chs.filter(c=>S.done[c.id]).length, codes=[...new Set(Object.values(sj.sems).map(s=>s.code))].join(' · ');
-    const card=$(`<button class="course" style="--c:${sj.c}"><div class="ill plot">${stepsThumb(chs[0].steps)}</div><h3>${sj.h}</h3><span class="codes">${codes}</span>
-      <div class="bar"><span style="width:${fin/chs.length*100}%"></span></div>
-      <div class="meta"><span>${fin} / ${chs.length} chapitres</span><span class="tag">${Object.values(sj.sems).map(s=>s.h).join(' + ')}</span></div></button>`);
-    card.onclick=()=>go('cms:'+sj.id); sec.querySelector('.subjects').append(card);
-  });
-  h.append(sec);
-}
-
-function renderSubject(id){
-  const sj=CMS_SUBJECTS.find(s=>s.id===id), h=document.getElementById('home'); h.innerHTML='';
-  const chs=cmsChapters(sj), fin=chs.filter(c=>S.done[c.id]).length;
-  const page=$(`<section class="wrap cpage"><div>
-      <button class="crumb" id="back">← Année préparatoire</button>
-      <div class="kicker" style="margin-top:18px">${[...new Set(Object.values(sj.sems).map(s=>s.code))].join(' · ')}</div>
-      <h1>${sj.h}</h1><p class="lead">${chs.length} chapitres · ${fin} terminé${fin>1?'s':''}</p>
-      <div class="bar" style="margin-top:12px"><span style="width:${fin/chs.length*100}%"></span></div>
-      <div id="sems"></div>
-    </div><div class="ill">${stepsThumb(chs[0].steps)}</div></section>`);
-  let n=0;
-  Object.entries(sj.sems).forEach(([k,sem])=>{
-    const list=CMS.filter(c=>c.subj===id&&c.sem===k); if(!list.length) return;
-    const box=$(`<div class="sem"><h2>${sem.h} <span class="codes" style="font:600 14px var(--f-mono);color:var(--muted)">${sem.code}</span></h2><p class="sub">${sem.s}</p><ol class="lessons"></ol></div>`);
-    list.forEach(c=>{ n++; const d=S.done[c.id];
-      const li=$(`<li class="${d?'fin':'play'}"><span class="n">${d?'✓':n}</span><div><b>${c.h}</b><div class="s">${c.steps.length} étapes · ${c.p}</div></div><button class="btn">${d?'Revoir':'Commencer'}</button></li>`);
-      li.querySelector('button').onclick=()=>openLesson(c.id); box.querySelector('ol').append(li); });
-    page.querySelector('#sems').append(box);
-  });
-  page.querySelector('#back').onclick=()=>{ go('home'); requestAnimationFrame(()=>document.getElementById('cms')?.scrollIntoView()); };
-  h.append(page);
-}
-function go(v){ VIEW=v; render(); }
-
-function renderMath(h){
-  const sec=$(`<section class="wrap domain" id="maths">
-    <div class="math-head"><div><h2>Mathématiques</h2><p>${MATHS.length} cours, de l’école obligatoire à l’université. Algèbre, analyse et géométrie.</p></div>
-    <div class="levels" role="tablist" aria-label="Niveau">${Object.entries(LEVELS).map(([k,l])=>`<button role="tab" id="lv-${k}" aria-selected="${k===LV}" data-lv="${k}">${l.h}<small>${l.s}</small></button>`).join('')}</div></div>
-    <div class="branches"></div></section>`);
-  sec.querySelectorAll('.levels button').forEach(b=>b.onclick=()=>{ LV=b.dataset.lv; try{ localStorage.setItem('declic-lv',LV) }catch(e){} renderHome(); document.getElementById('lv-'+LV).focus(); });
-  const br=sec.querySelector('.branches');
-  Object.entries(BRANCHES).forEach(([k,name])=>{
-    const col=$(`<div class="branch"><h3>${name}</h3></div>`);
-    MATHS.filter(c=>c.br===k&&c.lv===LV).forEach(c=>{
-      const fin=S.done[c.lid];
-      const card=$(`<button class="course" style="--c:var(--math)"><div class="ill plot">${thumb(c)}</div><h3>${c.h}</h3><p>${c.p}</p>
-        <div class="meta">${fin?'<span style="color:var(--ok)">✓ 1re leçon terminée</span>':`<span>${c.lessons.length} leçons</span>`}<span class="tag">${LEVELS[c.lv].h}</span></div></button>`);
-      card.onclick=()=>go(c.id); col.append(card);
-    });
-    br.append(col);
-  });
-  h.append(sec);
-}
-
-function renderCourse(id){
-  const c=MATHS.find(m=>m.id===id), h=document.getElementById('home'); h.innerHTML='';
-  const page=$(`<section class="wrap cpage"><div>
-      <button class="crumb" id="back">← Mathématiques</button>
-      <div class="kicker" style="margin-top:18px">${BRANCHES[c.br]} · ${LEVELS[c.lv].h}</div>
-      <h1>${c.h}</h1><p class="lead">${c.p}</p>
-      <ol class="lessons">${c.lessons.map((t,i)=>{ const fin=i===0&&S.done[c.lid];
-        return `<li class="${i===0?(fin?'fin':'play'):''}"><span class="n">${fin?'✓':i+1}</span><div><b>${t}</b><div class="s">${i===0?(fin?'Terminée · à revoir quand tu veux':'4 étapes · 5 min'):'Bientôt'}</div></div>${i===0?`<button class="btn" id="start">${fin?'Revoir':'Commencer'}</button>`:''}</li>`; }).join('')}</ol>
-    </div><div class="ill">${thumb(c)}</div></section>`);
-  page.querySelector('#back').onclick=()=>{ go('home'); requestAnimationFrame(()=>document.getElementById('maths')?.scrollIntoView()); };
-  page.querySelector('#start').onclick=()=>openLesson(c.lid);
-  h.append(page);
-}
-
-function renderHome(){
-  const order=[...CMS.map(c=>({lid:c.id})),...MATHS.filter(c=>c.lv===LV),...MATHS.filter(c=>c.lv!==LV)].map(c=>c.lid).concat(['boucles','intervalles']);
-  const total=Object.keys(LESSONS).length, done=Object.keys(S.done).filter(k=>LESSONS[k]).length;
-  const next=order.find(k=>!S.done[k])||order[0];
-  const h=document.getElementById('home'); h.innerHTML='';
-  const hero=$(`<section class="wrap hero">
-    <div><h1>Comprendre<br>en <em>faisant</em>.</h1>
-    <p>Des leçons de cinq minutes : un peu de théorie, une illustration que tu manipules, puis un exercice qui te répond tout de suite.</p></div>
-    <div class="resume"><small>Reprendre</small><h3>${LESSONS[next].title}</h3>
-      <div class="bar"><span style="width:${done/total*100}%"></span></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><span style="color:var(--muted);font-size:15px">${done} / ${total} leçons terminées</span><button class="btn" id="go">${done?'Continuer':'Commencer'}</button></div></div>
-  </section>`);
-  hero.querySelector('#go').onclick=()=>openLesson(next);
-  h.append(hero);
-  renderCMS(h);
-  renderMath(h);
-  CATALOG.forEach(d=>{
-    const sec=$(`<section class="wrap domain"><div class="domain-head"><h2>${d.name}</h2><span>${d.sub}</span></div><div class="grid"></div></section>`);
-    d.items.forEach(it=>{
-      const playable=!!it.id, fin=playable&&S.done[it.id];
-      const card=$(`<button class="course ${playable?'':'soon'}" style="--c:${d.c}" ${playable?'':'aria-disabled="true"'}>
-        <div class="ill">${ILL[it.ill](d.c)}</div><h3>${it.h}</h3><p>${it.p}</p>
-        <div class="meta">${playable?(fin?'<span style="color:var(--ok)">✓ Terminé</span>':'<span>5 étapes · 5 min</span>'):'<span>Bientôt</span>'}${it.new?'<span class="tag new">Inédit</span>':`<span class="tag">${d.name.split(' ')[0]}</span>`}</div></button>`);
-      if(playable) card.onclick=()=>openLesson(it.id);
-      sec.querySelector('.grid').append(card);
-    });
-    h.append(sec);
-  });
-  h.append($(`<footer class="wrap">Prototype Déclic · ${total} leçons jouables. Ta progression reste dans ce navigateur.</footer>`));
-}
-
-/* ---------- lecteur ---------- */
-let L=null, idx=0, ctx=null, phase='idle';
-const foot=document.getElementById('foot'), fb=document.getElementById('fb'), act=document.getElementById('action');
-function openLesson(id){ L=LESSONS[id]; L.id=id; idx=0; document.getElementById('player').hidden=false; document.body.style.overflow='hidden'; showStep(); }
-function closeLesson(){ document.getElementById('player').hidden=true; document.body.style.overflow=''; render(); }
-
-/* Étape décrite par des données (voir l'en-tête de maths.js) */
-function parseNum(s){ s=s.replace(/[\s']/g,'').replace(/,/g,'.').replace(/−/g,'-'); if(!s) return NaN; if(s.includes('/')){ const [a,b]=s.split('/').map(Number); return a/b; } return Number(s); }
-function buildStep(st,c,ctx){
-  if(st.h) c.append($(`<h2>${st.h}</h2>`));
-  if(st.p) c.append($(`<div class="ptext">${st.p}</div>`));
-  if(st.fig) c.append($(`<div class="fig">${st.fig}</div>`));
-  if(st.params){
-    const vals={}; st.params.forEach(p=>vals[p.id]=p.v);
-    const fig=$(`<div class="fig"><div class="draw"></div><div class="cap info"></div><div class="sliders"></div></div>`);
-    const upd=()=>{ fig.querySelector('.draw').innerHTML=st.draw(vals); const inf=fig.querySelector('.info'); inf.hidden=!st.info; if(st.info) inf.innerHTML=st.info(vals); };
-    st.params.forEach(p=>{
-      const sid=`s-${ctx.uid}-${p.id}`, s=$(`<div class="slider"><label for="${sid}">${p.l} <output>${fmt(p.v)}${p.u||''}</output></label><input id="${sid}" type="range" min="${p.min}" max="${p.max}" step="${p.step||1}" value="${p.v}"></div>`);
-      const inp=s.querySelector('input');
-      inp.oninput=()=>{ const st0=p.step||1; vals[p.id]=+(p.min+Math.round((+inp.value-p.min)/st0)*st0).toFixed(6); s.querySelector('output').textContent=fmt(vals[p.id])+(p.u||''); upd(); if(phase==='ask') setFoot('','','','Vérifier'); };
-      fig.querySelector('.sliders').append(s);
-    });
-    upd(); c.append(fig);
-    if(st.ok){ ctx.answer=vals; ctx.check=()=>({ok:st.ok(vals),why:st.why}); }
-  }
-  if(st.opts){ c.append(choices(st.opts,ctx,st.opts.every(o=>o.replace(/<[^>]+>/g,'').length<14))); ctx.check=()=>({ok:ctx.answer===st.ans,why:st.why}); }
-  else if('ans' in st){
-    const id='n-'+ctx.uid, w=$(`<div class="numin"><label for="${id}">${st.lab||'Ta réponse'}</label><div><input id="${id}" type="text" inputmode="decimal" autocomplete="off" placeholder="?"><span>${st.unit||''}</span></div></div>`);
-    const inp=w.querySelector('input');
-    inp.oninput=()=>{ inp.classList.remove('right','wrong'); const v=parseNum(inp.value); ctx.answer=isNaN(v)?null:v; ctx.ready(!isNaN(v)); };
-    inp.onkeydown=e=>{ if(e.key==='Enter'&&!act.disabled) act.click(); };
-    ctx.mark=ok=>inp.classList.add(ok?'right':'wrong');
-    ctx.check=()=>({ok:Math.abs(ctx.answer-st.ans)<=(st.tol??1e-9),why:st.why});
-    c.append(w); setTimeout(()=>inp.focus({preventScroll:true}),50);
-  }
-  if(st.note) c.append($(`<div class="note">${st.note}</div>`));
-}
-const kindOf=st=>st.kind||(st.ok?'Pratique':(st.opts||'ans' in st)?'Question':'Théorie');
-function segs(){ document.getElementById('segs').innerHTML=L.steps.map((_,i)=>`<span class="${i<idx?'done':i===idx?'cur':''}"></span>`).join(''); }
-function setFoot(state,title,txt,label,enabled=true){
-  foot.className='p-foot'+(state?' '+state:''); fb.innerHTML=title?`<strong>${title}</strong><span>${txt||''}</span>`:''; act.textContent=label; act.disabled=!enabled;
-}
-function showStep(){
-  segs(); const card=document.getElementById('card'); card.innerHTML=''; card.style.animation='none'; card.offsetHeight; card.style.animation='';
-  const st=L.steps[idx];
-  const course=COURSE_OF[L.id], cms=CMS_OF[L.id];
-  card.append($(`<div class="kicker">${L.domain}${course?' · '+LEVELS[course.lv].h:''}${cms?' · '+cms.sem.h:''} · ${kindOf(st)}</div>`));
-  ctx={answer:null, tries:0, uid:L.id+idx, ready:(r)=>{ if(phase==='ask') act.disabled=!r; }};
-  phase='build';
-  if(st.render) st.render(card,ctx); else buildStep(st,card,ctx);
-  document.querySelector('.p-body').scrollTop=0;
-  if(ctx.check){ phase='ask'; setFoot('', '', '', 'Vérifier', ctx.answer!==null); }
-  else { phase='next'; setFoot('', '', '', 'Continuer'); }
-}
-async function onAction(){
-  if(phase==='ask'){
-    act.disabled=true; phase='checking';
-    const r=await ctx.check(); ctx.tries++;
-    ctx.mark&&ctx.mark(r.ok);
-    if(r.ok){ phase='next'; S.xp+=ctx.tries===1?10:5; save(); setFoot('ok', ctx.tries===1?'Bravo !':'C’est ça !', r.why, 'Continuer'); }
-    else { phase='ask'; setFoot('bad','Pas tout à fait', ctx.tries>=2?r.why:'Essaie encore. Indice disponible au prochain essai.', 'Vérifier'); }
-    return;
-  }
-  if(phase==='next'){
-    if(idx<L.steps.length-1){ idx++; showStep(); }
-    else finish();
-  } else if(phase==='end') closeLesson();
-}
-function finish(){
-  idx=L.steps.length; segs();
-  const first=!S.done[L.id]; S.done[L.id]=true; if(first) S.xp+=20; save();
-  const card=document.getElementById('card');
-  card.innerHTML=`<div class="done-wrap"><svg width="120" height="120" viewBox="0 0 120 120"><circle cx="60" cy="60" r="54" fill="var(--spark-soft)"/><path d="m60 22 10.6 23.4 25.4 2.4-19.2 16.8 5.6 25L60 76.8 37.6 89.6l5.6-25L24 47.8l25.4-2.4Z" fill="var(--spark)"/></svg>
-    <h2>Leçon terminée</h2><div class="big-xp">${S.xp} XP</div><p style="color:var(--muted)">${first?'+20 XP de bonus pour ta première fois.':'Révision faite.'} Reviens demain pour garder ta série.</p></div>`;
-  phase='end'; setFoot('', '', '', (COURSE_OF[L.id]||CMS_OF[L.id])?'Retour au cours':'Retour au catalogue');
-}
-act.onclick=onAction;
-document.getElementById('quit').onclick=closeLesson;
-document.getElementById('home-btn').onclick=()=>{ document.getElementById('player').hidden=true; document.body.style.overflow=''; go('home'); };
-renderStats(); render();
-</script>
+<script src="cours/maths.js"></script>
+<script src="cours/an1.js"></script>
+<script src="cours/an2a.js"></script>
+<script src="cours/an2p.js"></script>
+<script src="cours/al.js"></script>
+<script src="cours/al3.js"></script>
+<script src="cours/ga.js"></script>
+<script src="cours/coniques.js"></script>
+<script src="cours/ics-py.js"></script>
+<script src="cours/ics-algo.js"></script>
+<script src="cours/phy.js"></script>
+<script src="cours/chi.js"></script>
+<script src="app.js"></script>
+<script src="compte.js"></script>
+<script src="ardoise.js"></script>
 </body>
 </html>

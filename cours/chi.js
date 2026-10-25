@@ -1,4 +1,4 @@
-/* Déclic — Chimie (PREPA-012) */
+/* Déclic — Chimie */
 (()=>{
 const R=8.314, KW=1e-14;
 const SUPD={'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
@@ -62,9 +62,9 @@ function titrDraw(V,weak){ const P=plane({x:[0,40],y:[0,14],h:230,grid:false,lx:
   P.text(39,0.6,'V (mL)',{a:'end',s:11,c:'var(--muted)'}).text(1,13.2,'pH',{s:11,c:'var(--muted)'});
   return P.svg(); }
 
-CMS.push(
+COURS.push(
 /* ================= 1. ATOMES ================= */
-{subj:'chi', sem:'pri', id:'cms-chi-atomes', h:'Atomes', p:'Orbitales, configuration électronique, tableau périodique et raies de l’hydrogène.', steps:[
+{subj:'chi', sem:'pri', id:'chi-atomes', h:'Atomes', p:'Orbitales, configuration électronique, tableau périodique et raies de l’hydrogène.', steps:[
  {kind:'Théorie',h:'Quatre nombres quantiques',p:`Chaque électron d’un atome est décrit par quatre nombres : <b>n</b> (couche, n ≥ 1), <b>ℓ</b> (sous-couche, 0 ≤ ℓ ≤ n − 1), <b>m<sub>ℓ</sub></b> (orbitale, −ℓ ≤ m<sub>ℓ</sub> ≤ ℓ) et <b>m<sub>s</sub></b> = ±½ (spin). ℓ = 0, 1, 2, 3 se notent s, p, d, f. Change <i>n</i> pour voir les orbitales disponibles.`,
   params:[{id:'n',l:'n',min:1,max:4,v:2}],
   draw:v=>{ const P=plane({x:[-5,5],y:[-0.5,4.3],h:200,grid:false,axes:false});
@@ -110,10 +110,31 @@ CMS.push(
   note:'La série de Balmer (n<sub>f</sub> = 2) tombe dans le visible : 3 → 2 donne la raie rouge à 656 nm.'},
  {kind:'Défi',h:'La raie bleu-vert',p:'Calcule la longueur d’onde émise par la transition n = 4 → n = 2 de l’hydrogène (E<sub>n</sub> = −13,6/n² eV, hc = 1240 eV·nm). Arrondis au nm.',lab:'λ =',unit:'nm',ans:486,tol:1,
   why:'ΔE = 13,6·(1/4 − 1/16) = 2,55 eV, donc λ = 1240 / 2,55 ≈ 486 nm.'},
+ {kind:'Problème',h:'L’élément mystère',
+  p:'Un élément X de la <b>3e période</b> a pour énergies d’ionisation successives E₁ = 738, E₂ = 1451, E₃ = 7733 et E₄ = 10 543 kJ/mol. On veut l’identifier et prévoir l’ion qu’il forme. Donnée : 1 eV par atome correspond à 96,485 kJ/mol.',
+  fig:(()=>{ const P=plane({x:[0,5],y:[0,12],h:180,grid:false,ly:2}), E=[0.738,1.451,7.733,10.543];
+    E.forEach((e,i)=>P.rect(i+0.6,0,0.8,e,{fill:i<2?'var(--ok)':'var(--bad)',fo:.6,c:null}).text(i+1,0,`E${'₁₂₃₄'[i]}`,{a:'middle',dy:-6,s:11}));
+    P.text(4.9,11.2,'10³ kJ/mol',{a:'end',s:11,c:'var(--muted)'}); return P.svg(); })(),
+  parts:[
+   {q:'a) Combien d’électrons de valence X possède-t-il&nbsp;?',lab:'électrons :',ans:2,hint:'Cherche le grand saut entre deux énergies successives : il signale qu’on attaque une couche interne.',why:'E₃/E₂ ≈ 5,3 alors que E₂/E₁ ≈ 2 : les deux premiers électrons sont faciles à arracher, le 3e appartient à la couche n = 2. X a 2 électrons de valence.'},
+   {q:'b) Quel est son numéro atomique Z&nbsp;?',lab:'Z =',ans:12,hint:'3e période et 2 électrons de valence : la configuration se termine par 3s².',why:'1s² 2s² 2p⁶ 3s² compte 12 électrons : Z = 12, c’est le magnésium Mg.'},
+   {q:'c) Convertis E₁ en eV par atome, au centième.',lab:'E₁ =',unit:'eV',ans:7.65,tol:.01,hint:'Divise par 96,485.',why:'738 / 96,485 ≈ 7,65 eV, la valeur du tableau pour Mg.'},
+   {q:'d) Quel ion X forme-t-il le plus facilement&nbsp;?',opts:['X⁺, car E₁ est la plus petite','X²⁻, pour compléter l’octet','X²⁺, car le 3e électron coûte beaucoup plus cher','X³⁺, comme l’aluminium'],ans:2,hint:'Regarde jusqu’où l’on peut ioniser sans entamer la couche complète n = 2.',why:'Perdre deux électrons donne la configuration du néon. Le 3e coûte environ 5 fois plus : on forme Mg²⁺ (l’énergie de réseau compense E₂ dans les solides ioniques).'},
+  ],
+  sol:'Les énergies d’ionisation croissent régulièrement tant qu’on retire des électrons de la même couche, puis font un bond quand on attaque une couche interne. Ici E₃/E₂ ≈ 5,3 contre E₂/E₁ ≈ 2 : X a <b>2 électrons de valence</b>.<br>En 3e période, la configuration est donc [Ne] 3s², soit <b>Z = 12</b> : le magnésium.<br>E₁ = 738 / 96,485 ≈ <b>7,65 eV</b> par atome.<br>Mg perd ses deux électrons 3s pour prendre la configuration du néon : il forme l’ion <b>Mg²⁺</b>.'},
+ {kind:'Problème',h:'Une raie violette',
+  p:'Un tube à hydrogène émet, entre autres, une raie visible à <b>λ = 434 nm</b>. On veut savoir de quelle transition elle provient, puis jusqu’où s’étend la série. Données : E<sub>n</sub> = −13,6 eV / n², hc = 1240 eV·nm. Toutes les raies visibles de l’hydrogène aboutissent au niveau n = 2.',
+  parts:[
+   {q:'a) Quelle est l’énergie du photon émis, au centième d’eV&nbsp;?',lab:'ΔE =',unit:'eV',ans:2.86,tol:.01,hint:'ΔE = hc/λ.',why:'ΔE = 1240 / 434 ≈ 2,86 eV.'},
+   {q:'b) De quel niveau n<sub>i</sub> l’électron est-il parti&nbsp;?',lab:'nᵢ =',ans:5,hint:'Écris 13,6·(1/2² − 1/n<sub>i</sub>²) = ΔE et isole 1/n<sub>i</sub>².',why:'1/n<sub>i</sub>² = 0,25 − 2,857/13,6 = 0,0399, donc n<sub>i</sub>² ≈ 25 et n<sub>i</sub> = 5. C’est la transition 5 → 2.'},
+   {q:'c) Quelle énergie faut-il pour ioniser un atome dont l’électron est sur n = 2&nbsp;? Au dixième d’eV.',lab:'E =',unit:'eV',ans:3.4,tol:.01,hint:'Ioniser, c’est amener l’électron de E₂ jusqu’à E = 0.',why:'E = 0 − E₂ = 13,6 / 4 = 3,4 eV.'},
+   {q:'d) La série de Balmer a une limite : la plus courte longueur d’onde possible quand n<sub>i</sub> devient très grand. Que vaut-elle, au nm&nbsp;?',lab:'λ<sub>lim</sub> =',unit:'nm',ans:365,tol:1,hint:'Quand n<sub>i</sub> → ∞, E<sub>i</sub> → 0 : le photon emporte l’énergie trouvée en c).',why:'λ<sub>lim</sub> = 1240 / 3,4 ≈ 365 nm, dans le proche ultraviolet. Toutes les raies de Balmer sont entre 365 et 656 nm.'},
+  ],
+  sol:'Le photon a pour énergie ΔE = hc/λ = 1240/434 ≈ <b>2,86 eV</b>.<br>La raie est visible, donc n<sub>f</sub> = 2 : 13,6·(1/4 − 1/n<sub>i</sub>²) = 2,857, d’où 1/n<sub>i</sub>² ≈ 0,0399 et <b>n<sub>i</sub> = 5</b>. Vérification : 1240 / (13,6 × 0,21) ≈ 434 nm.<br>Depuis n = 2, l’ionisation coûte −E₂ = <b>3,4 eV</b>.<br>Quand n<sub>i</sub> → ∞, ΔE → 3,4 eV : la limite de la série est λ = 1240/3,4 ≈ <b>365 nm</b>. Les raies se resserrent vers cette limite.'},
 ]},
 
 /* ================= 2. MOLÉCULES ================= */
-{subj:'chi', sem:'pri', id:'cms-chi-molecules', h:'Molécules', p:'Liaisons, structures de Lewis, géométrie VSEPR et forces entre molécules.', steps:[
+{subj:'chi', sem:'pri', id:'chi-molecules', h:'Molécules', p:'Liaisons, structures de Lewis, géométrie VSEPR et forces entre molécules.', steps:[
  {kind:'Théorie',h:'Du covalent à l’ionique',p:`L’<b>électronégativité</b> χ mesure la tendance d’un atome à attirer les électrons d’une liaison. Plus la différence Δχ est grande, plus le doublet est déplacé vers l’atome le plus électronégatif. Repères usuels : Δχ &lt; 0,4 covalente apolaire, 0,4 à 1,7 covalente polaire, au-delà plutôt ionique.`,
   params:[{id:'d',l:'Δχ',min:0,max:3.2,step:.1,v:.9}],
   draw:v=>{ const P=plane({x:[-5,5],y:[-2,2],h:130,grid:false,axes:false}), s=Math.min(v.d,3.2)/3.2*1.9;
@@ -154,10 +175,28 @@ CMS.push(
  {kind:'Défi',h:'Forces intermoléculaires',p:'H₂O bout à 100 °C alors que H₂S, plus lourde, bout vers −60 °C. Pourquoi&nbsp;?',
   opts:['H₂S est apolaire','Les forces de London sont plus fortes dans H₂O','H₂O est ionique','H₂O forme des liaisons hydrogène'],ans:3,
   why:'O est très électronégatif et petit : un H lié à O est attiré par un doublet libre d’une molécule voisine. Ces liaisons hydrogène sont bien plus fortes que les interactions de van der Waals de H₂S.'},
+ {kind:'Problème',h:'Une molécule inconnue',
+  p:'Le trifluorure d’azote NF₃ sert à graver les puces électroniques. L’azote (5 électrons de valence) est l’atome central, lié à trois fluors (7 électrons de valence chacun). On veut sa structure de Lewis, sa géométrie et sa polarité. Données : χ(N) = 3,04, χ(F) = 3,98.',
+  parts:[
+   {q:'a) Combien d’électrons de valence compte la molécule&nbsp;?',lab:'électrons :',ans:26,hint:'Additionne les électrons de valence de chaque atome.',why:'5 + 3 × 7 = 26 électrons, soit 13 doublets.'},
+   {q:'b) Combien de doublets libres porte l’azote&nbsp;?',lab:'doublets libres :',ans:1,hint:'Place les 3 liaisons N–F, complète l’octet des fluors (3 doublets chacun), puis répartis ce qui reste.',why:'3 liaisons (3 doublets) + 3 × 3 doublets sur les F = 12 doublets. Il en reste 1, sur l’azote, qui a alors son octet.'},
+   {q:'c) Quelle est la géométrie de NF₃&nbsp;?',opts:['Trigonale plane','Pyramidale à base triangulaire','En T','Tétraédrique'],ans:1,hint:'Compte les domaines X + E autour de N.',why:'AX₃E₁ : quatre domaines en tétraèdre, dont un doublet libre. La forme visible est une pyramide à base triangulaire, comme NH₃.'},
+   {q:'d) NF₃ est-elle polaire&nbsp;?',opts:['Non, car ses trois liaisons sont identiques','Non, car Δχ est inférieur à 1,7','Oui, car les trois moments N–F pointent vers le même côté de la pyramide et ne s’annulent pas','Oui, mais seulement à cause du doublet libre'],ans:2,hint:'Une molécule est apolaire si ses moments de liaison s’annulent par symétrie. Est-ce le cas d’une pyramide&nbsp;?',why:'Δχ = 0,94 : chaque liaison est polaire. Dans une pyramide, les trois moments ont tous une composante vers la base : la somme n’est pas nulle et NF₃ est polaire (μ ≈ 0,2 D).'},
+  ],
+  sol:'NF₃ compte 5 + 3 × 7 = <b>26 électrons</b> de valence, soit 13 doublets : 3 liaisons N–F, 3 doublets libres sur chaque F et <b>1 doublet libre</b> sur N.<br>L’azote est AX₃E₁ : 4 domaines en tétraèdre, la molécule est <b>pyramidale à base triangulaire</b> (angle un peu inférieur à 109,5°).<br>Les liaisons N–F sont polaires (Δχ = 0,94) et la pyramide n’est pas assez symétrique pour annuler leurs moments : NF₃ est <b>polaire</b>. Par contraste, BF₃ (AX₃, plane) est apolaire.'},
+ {kind:'Problème',h:'Les charges partielles de l’eau',
+  p:'Le moment dipolaire mesuré de l’eau vaut <b>μ = 1,85 D</b>, l’angle H–O–H est de 104,5° et la longueur d’une liaison O–H est d = 0,958·10⁻¹⁰ m. On veut en déduire le moment de chaque liaison, puis la charge partielle portée par chaque H. Données : 1 D = 3,336·10⁻³⁰ C·m, e = 1,602·10⁻¹⁹ C.',
+  parts:[
+   {q:'a) Quel est le type VSEPR de l’oxygène dans H₂O&nbsp;?',opts:['AX₂','AX₂E₁','AX₂E₂','AX₄'],ans:2,hint:'O a 6 électrons de valence, dont 2 sont engagés dans les liaisons.',why:'Il reste 4 électrons non liants, soit 2 doublets libres : AX₂E₂, coudée.'},
+   {q:'b) Calcule le moment d’une liaison O–H, au centième de debye.',lab:'μ<sub>O–H</sub> =',unit:'D',ans:1.51,tol:.01,hint:'μ = 2μ<sub>O–H</sub>·cos(θ/2). Isole μ<sub>O–H</sub>.',why:'μ<sub>O–H</sub> = 1,85 / (2 cos 52,25°) = 1,85 / 1,224 ≈ 1,51 D.'},
+   {q:'c) En modélisant la liaison par deux charges ±δ·e séparées de d, que vaut δ&nbsp;? Au centième.',lab:'δ =',ans:.33,tol:.01,hint:'μ = q·d en C·m, puis δ = q/e.',why:'q = 1,511 × 3,336·10⁻³⁰ / 0,958·10⁻¹⁰ ≈ 5,26·10⁻²⁰ C, soit δ = q/e ≈ 0,33.'},
+   {q:'d) Que dit ce résultat de la liaison O–H&nbsp;?',opts:['Elle est ionique : H porte une charge +1','Elle est covalente polaire : environ un tiers de charge sur chaque H','Elle est apolaire, puisque δ &lt; 1','On ne peut rien conclure sans connaître la masse de l’eau'],ans:1,hint:'Compare δ à 0 (covalent pur) et à 1 (ionique pur).',why:'δ ≈ 0,33 est entre les deux extrêmes : la liaison est covalente polaire, en accord avec Δχ = 1,24.'},
+  ],
+  sol:'L’oxygène est AX₂E₂ : la molécule est coudée et ses deux moments de liaison s’additionnent.<br>Par la somme vectorielle, μ = 2μ<sub>O–H</sub>·cos(52,25°), d’où μ<sub>O–H</sub> = 1,85 / 1,224 ≈ <b>1,51 D</b>.<br>En unités SI : 1,511 × 3,336·10⁻³⁰ ≈ 5,04·10⁻³⁰ C·m. Avec μ = q·d : q = 5,04·10⁻³⁰ / 0,958·10⁻¹⁰ ≈ 5,26·10⁻²⁰ C, soit <b>δ ≈ 0,33</b> charge élémentaire.<br>La liaison O–H est donc <b>covalente polaire</b> : le doublet est nettement déplacé vers O, sans transfert complet d’électron.'},
 ]},
 
 /* ================= 3. QUANTITÉS ================= */
-{subj:'chi', sem:'pri', id:'cms-chi-quantites', h:'Quantités de matière', p:'La mole, les masses molaires, les concentrations et les pressions partielles.', steps:[
+{subj:'chi', sem:'pri', id:'chi-quantites', h:'Quantités de matière', p:'La mole, les masses molaires, les concentrations et les pressions partielles.', steps:[
  {kind:'Théorie',h:'La mole',p:`Une <b>mole</b> contient N<sub>A</sub> = 6,022·10²³ entités. La <b>masse molaire</b> M (g/mol) est la masse d’une mole : <b>m = n·M</b> et <b>N = n·N<sub>A</sub></b>. Avec la même quantité <i>n</i>, des substances différentes ont des masses différentes.`,
   params:[{id:'n',l:'n (mol)',min:.5,max:5,step:.5,v:1}],
   draw:v=>{ const P=plane({x:[0,10],y:[0,300],h:200,grid:false,ly:50}), sub=[['H₂O',18],['CO₂',44],['NaCl',58.5]];
@@ -194,10 +233,28 @@ CMS.push(
   why:'p(O₂) = x(O₂)·p = 0,21 × 101,3 ≈ 21,3 kPa.'},
  {kind:'Défi',h:'Un mélange en bouteille',p:'Une bouteille de 50 L contient 2,0 mol de N₂ et 1,0 mol de O₂ à 300 K. Calcule la pression partielle de O₂ en kPa, arrondie à 0,1 kPa (R = 8,314 J/(mol·K)).',lab:'p(O₂) =',unit:'kPa',ans:49.9,tol:.1,
   why:'p(O₂) = nRT/V = 1,0 × 8,314 × 300 / 0,050 = 49 884 Pa ≈ 49,9 kPa. N₂ n’y change rien : il ajoute seulement sa propre pression partielle.'},
+ {kind:'Problème',h:'Une solution de sulfate de cuivre',
+  p:'Au laboratoire, tu dois préparer <b>250 mL</b> d’une solution de sulfate de cuivre à <b>0,100 mol/L</b> à partir de cristaux bleus de CuSO₄·5H₂O (chaque unité contient 5 molécules d’eau). Tu dilueras ensuite cette solution mère. Masses molaires : Cu 63,5 ; S 32 ; O 16 ; H 1 g/mol. N<sub>A</sub> = 6,022·10²³ mol⁻¹.',
+  parts:[
+   {q:'a) Quelle est la masse molaire de CuSO₄·5H₂O&nbsp;?',lab:'M =',unit:'g/mol',ans:249.5,tol:.05,hint:'N’oublie pas les 5 molécules d’eau (18 g/mol chacune).',why:'M = 63,5 + 32 + 4 × 16 + 5 × 18 = 159,5 + 90 = 249,5 g/mol.'},
+   {q:'b) Quelle masse de cristaux faut-il peser&nbsp;? Au centième de gramme.',lab:'m =',unit:'g',ans:6.24,tol:.01,hint:'n = c·V, puis m = n·M.',why:'n = 0,100 × 0,250 = 0,0250 mol, m = 0,0250 × 249,5 ≈ 6,24 g.'},
+   {q:'c) On prélève 10,0 mL de cette solution, qu’on verse dans une fiole de 100 mL complétée à l’eau. Quelle est la nouvelle concentration&nbsp;?',lab:'c =',unit:'mol/L',ans:.01,tol:.0001,hint:'c₁V₁ = c₂V₂.',why:'c₂ = 0,100 × 10,0 / 100 = 0,0100 mol/L : on a dilué 10 fois.'},
+   {q:'d) Combien d’ions Cu²⁺ contient 1,0 mL de la solution diluée&nbsp;? Donne le résultat en 10¹⁸ ions, au centième.',lab:'N =',unit:'·10¹⁸ ions',ans:6.02,tol:.01,hint:'n = c·V avec V en litres, puis N = n·N<sub>A</sub>.',why:'n = 0,0100 × 1,0·10⁻³ = 1,0·10⁻⁵ mol, N = 1,0·10⁻⁵ × 6,022·10²³ ≈ 6,02·10¹⁸ ions.'},
+  ],
+  sol:'La masse molaire du sel hydraté inclut l’eau de cristallisation : M = 159,5 + 5 × 18 = <b>249,5 g/mol</b>.<br>Il faut n = cV = 0,100 × 0,250 = 0,0250 mol, soit m = 0,0250 × 249,5 ≈ <b>6,24 g</b>. On les dissout dans un peu d’eau dans la fiole jaugée de 250 mL, puis on complète jusqu’au trait.<br>La dilution conserve la quantité de soluté : c₂ = c₁V₁/V₂ = <b>0,0100 mol/L</b>.<br>Dans 1,0 mL : n = 1,0·10⁻⁵ mol, soit N = n·N<sub>A</sub> ≈ <b>6,02·10¹⁸ ions</b> Cu²⁺. Même une solution diluée contient un nombre immense d’ions.'},
+ {kind:'Problème',h:'L’acide chlorhydrique du commerce',
+  p:'Une bouteille d’acide chlorhydrique concentré indique : <b>37 % en masse de HCl</b>, masse volumique <b>1,19 g/mL</b>. On veut connaître sa concentration molaire, puis préparer <b>500 mL</b> d’acide à <b>0,50 mol/L</b>. Masse molaire : M(HCl) = 36,5 g/mol.',
+  parts:[
+   {q:'a) Quelle est la masse d’un litre de cette solution&nbsp;?',lab:'m =',unit:'g',ans:1190,tol:.5,hint:'Masse = masse volumique × volume, avec 1 L = 1000 mL.',why:'m = 1,19 × 1000 = 1190 g.'},
+   {q:'b) Quelle masse de HCl ce litre contient-il&nbsp;? Au dixième de gramme.',lab:'m(HCl) =',unit:'g',ans:440.3,tol:.1,hint:'37 % de la masse totale est du HCl.',why:'m(HCl) = 0,37 × 1190 = 440,3 g.'},
+   {q:'c) Quelle est la concentration molaire de l’acide concentré&nbsp;? Au centième.',lab:'c =',unit:'mol/L',ans:12.06,tol:.02,hint:'n = m/M dans 1 L.',why:'n = 440,3 / 36,5 ≈ 12,06 mol dans 1 L : c ≈ 12,06 mol/L.'},
+   {q:'d) Quel volume d’acide concentré faut-il prélever pour la dilution&nbsp;? Au dixième de mL.',lab:'V =',unit:'mL',ans:20.7,tol:.1,hint:'Calcule d’abord la quantité de HCl voulue dans 500 mL.',why:'n = 0,50 × 0,500 = 0,25 mol, V = 0,25 / 12,06 ≈ 0,0207 L = 20,7 mL.'},
+  ],
+  sol:'On raisonne sur 1 L de solution commerciale : sa masse vaut 1,19 × 1000 = <b>1190 g</b>, dont 37 % de HCl, soit <b>440,3 g</b>.<br>Cela fait n = 440,3 / 36,5 ≈ 12,06 mol, donc <b>c ≈ 12,1 mol/L</b>.<br>Pour 500 mL à 0,50 mol/L il faut 0,25 mol de HCl, contenus dans V = 0,25 / 12,06 ≈ <b>20,7 mL</b> d’acide concentré.<br>En pratique, on verse cet acide dans environ 300 mL d’eau, puis on complète à 500 mL : on verse toujours l’acide dans l’eau, jamais l’inverse.'},
 ]},
 
 /* ================= 4. STŒCHIOMÉTRIE ================= */
-{subj:'chi', sem:'pri', id:'cms-chi-stoechio', h:'Stœchiométrie', p:'Équilibrer une équation, trouver le réactif limitant et calculer un rendement.', steps:[
+{subj:'chi', sem:'pri', id:'chi-stoechio', h:'Stœchiométrie', p:'Équilibrer une équation, trouver le réactif limitant et calculer un rendement.', steps:[
  {kind:'Pratique',h:'Équilibrer la combustion',p:`Une équation équilibrée conserve chaque élément : autant d’atomes de C, H et O de chaque côté. Règle les coefficients de <b>C₃H₈ + <i>b</i> O₂ → <i>c</i> CO₂ + <i>d</i> H₂O</b> jusqu’à ce que les barres coïncident.`,
   params:[{id:'b',l:'b (O₂)',min:1,max:8,v:1},{id:'c',l:'c (CO₂)',min:1,max:8,v:1},{id:'d',l:'d (H₂O)',min:1,max:8,v:1}],
   draw:v=>{ const L=[3,8,2*v.b], Rr=[v.c,2*v.d,2*v.c+v.d], P=plane({x:[0,10],y:[0,18],h:200,grid:false,ly:4});
@@ -226,10 +283,27 @@ CMS.push(
   why:'η = 25,5 / 34 = 0,75, soit 75 %.'},
  {kind:'Défi',h:'Le gaz de la calcination',p:'On chauffe 10 g de CaCO₃ (M = 100 g/mol) : CaCO₃ → CaO + CO₂. Quel volume de CO₂ obtient-on à 298 K et 100 kPa (R = 8,314 J/(mol·K))&nbsp;? Arrondis au centième de litre.',lab:'V =',unit:'L',ans:2.48,tol:.02,
   why:'n(CO₂) = n(CaCO₃) = 10/100 = 0,10 mol. V = nRT/p = 0,10 × 8,314 × 298 / 100 000 = 2,48·10⁻³ m³ ≈ 2,48 L.'},
+ {kind:'Problème',h:'Le coussin gonflable',
+  p:'Un coussin gonflable de voiture se remplit d’azote en quelques millisecondes grâce à la décomposition de l’azoture de sodium : <b>2 NaN₃ → 2 Na + 3 N₂</b>. Le coussin doit contenir <b>60 L</b> de gaz à 298 K et 100 kPa. Le sodium formé, dangereux, est ensuite neutralisé par du nitrate de potassium : 10 Na + 2 KNO₃ → K₂O + 5 Na₂O + N₂. Données : R = 8,314 J/(mol·K), Na 23, N 14, K 39, O 16 g/mol.',
+  parts:[
+   {q:'a) Quelle quantité de N₂ faut-il produire&nbsp;? Au centième de mole.',lab:'n(N₂) =',unit:'mol',ans:2.42,tol:.01,hint:'pV = nRT, avec V en m³ et p en Pa.',why:'n = pV/RT = 100 000 × 0,060 / (8,314 × 298) ≈ 2,42 mol.'},
+   {q:'b) Quelle masse d’azoture de sodium faut-il&nbsp;? Au gramme près.',lab:'m(NaN₃) =',unit:'g',ans:105,tol:.6,hint:'2 NaN₃ donnent 3 N₂. M(NaN₃) = 23 + 3 × 14.',why:'n(NaN₃) = (2/3) × 2,422 ≈ 1,615 mol, et M = 65 g/mol : m ≈ 105 g.'},
+   {q:'c) Quelle masse de KNO₃ neutralise tout le sodium formé&nbsp;? Au gramme près.',lab:'m(KNO₃) =',unit:'g',ans:33,tol:.6,hint:'n(Na) = n(NaN₃). Il faut 2 KNO₃ pour 10 Na, et M(KNO₃) = 101 g/mol.',why:'n(Na) = 1,615 mol, n(KNO₃) = 1,615 / 5 ≈ 0,323 mol, soit 0,323 × 101 ≈ 33 g.'},
+  ],
+  sol:'Le volume fixe la quantité de gaz : n(N₂) = pV/RT = 6000 / 2477,6 ≈ <b>2,42 mol</b>.<br>D’après l’équation, n(NaN₃) = (2/3)·n(N₂) ≈ 1,615 mol. Avec M(NaN₃) = 65 g/mol : m ≈ <b>105 g</b> : une petite charge suffit pour 60 L de gaz.<br>Cette décomposition libère aussi 1,615 mol de sodium. La seconde réaction consomme 2 KNO₃ pour 10 Na : n(KNO₃) = 0,323 mol, soit <b>33 g</b> (M = 39 + 14 + 48 = 101 g/mol). Elle libère au passage un peu plus de N₂ (0,16 mol), que l’on néglige ici.'},
+ {kind:'Problème',h:'Le CO₂ d’une voiture',
+  p:'On assimile l’essence à de l’octane C₈H₁₈ (M = 114 g/mol, masse volumique 0,70 kg/L). Une voiture consomme <b>6,0 L aux 100 km</b>. La combustion complète s’écrit C₈H₁₈ + <i>b</i> O₂ → 8 CO₂ + 9 H₂O. L’air contient 21 % de O₂ en moles. Données : M(CO₂) = 44 g/mol, R = 8,314 J/(mol·K), gaz à 298 K et 100 kPa.',
+  parts:[
+   {q:'a) Que vaut le coefficient <i>b</i>&nbsp;?',lab:'b =',ans:12.5,tol:.01,hint:'Compte les atomes d’oxygène à droite : 8 CO₂ et 9 H₂O.',why:'À droite : 8 × 2 + 9 = 25 atomes de O, donc b = 25/2 = 12,5 (ou 2 C₈H₁₈ + 25 O₂ → 16 CO₂ + 18 H₂O).'},
+   {q:'b) Quelle masse de CO₂ la voiture émet-elle par kilomètre&nbsp;? Au gramme près.',lab:'m(CO₂) =',unit:'g/km',ans:130,tol:.6,hint:'Masse d’essence aux 100 km, puis moles d’octane, puis 8 CO₂ par octane.',why:'6,0 L pèsent 4,2 kg, soit 4200/114 ≈ 36,8 mol d’octane, qui donnent 8 × 36,8 = 294,7 mol de CO₂ = 12 968 g aux 100 km, environ 130 g/km.'},
+   {q:'c) Dans un cylindre, on injecte 0,0400 g d’octane avec 0,50 L d’air (298 K, 100 kPa). Quel est le réactif limitant&nbsp;?',opts:['L’octane, car sa masse est bien plus petite que celle de l’air','L’octane, car il faut 12,5 fois plus de O₂ que d’octane et il y en a assez','Le dioxygène : il en faudrait 4,39·10⁻³ mol et il n’y en a que 4,24·10⁻³','Aucun, les proportions sont exactement stœchiométriques'],ans:2,hint:'Calcule n(octane), n(O₂) = 0,21·pV/RT, puis compare n(O₂) à 12,5·n(octane).',why:'n(octane) = 0,0400/114 = 3,51·10⁻⁴ mol, qui demande 12,5 × 3,51·10⁻⁴ = 4,39·10⁻³ mol de O₂. L’air n’en apporte que 0,21 × 0,0202 = 4,24·10⁻³ mol : O₂ est limitant, le mélange est trop riche et produit du CO.'},
+   {q:'d) Quel volume d’air faut-il pour brûler l’essence de 100 km&nbsp;? Au dixième de m³.',lab:'V(air) =',unit:'m³',ans:54.3,tol:.1,hint:'n(O₂) = 12,5 × n(octane), puis n(air) = n(O₂)/0,21, puis pV = nRT.',why:'n(O₂) = 12,5 × 36,84 = 460,5 mol, n(air) = 460,5/0,21 ≈ 2193 mol, V = 2193 × 8,314 × 298 / 100 000 ≈ 54,3 m³.'},
+  ],
+  sol:'On équilibre C, puis H, puis O : <b>b = 12,5</b>.<br>Aux 100 km : 6,0 × 0,70 = 4,2 kg d’octane, soit 36,84 mol, qui produisent 8 × 36,84 = 294,7 mol de CO₂, soit 12,97 kg. Cela fait <b>≈ 130 g de CO₂ par km</b> : la voiture rejette trois fois plus de CO₂ (en masse) qu’elle ne brûle d’essence, car elle fixe de l’oxygène de l’air.<br>Dans le cylindre, l’octane réclame 4,39·10⁻³ mol de O₂ pour 4,24·10⁻³ mol disponibles : <b>O₂ est limitant</b>.<br>Pour 100 km, il faut 460,5 mol de O₂, donc 2193 mol d’air : V = nRT/p ≈ <b>54,3 m³</b> d’air.'},
 ]},
 
 /* ================= 5. ÉQUILIBRES ================= */
-{subj:'chi', sem:'pri', id:'cms-chi-equilibres', h:'Équilibres chimiques', p:'Quotient réactionnel, enthalpie libre, constante d’équilibre et principe de Le Chatelier.', steps:[
+{subj:'chi', sem:'pri', id:'chi-equilibres', h:'Équilibres chimiques', p:'Quotient réactionnel, enthalpie libre, constante d’équilibre et principe de Le Chatelier.', steps:[
  {kind:'Théorie',h:'Le quotient réactionnel',p:`Pour <i>a</i>A + <i>b</i>B ⇌ <i>c</i>C + <i>d</i>D, le <b>quotient réactionnel</b> est <b>Q = (a<sub>C</sub><sup>c</sup>·a<sub>D</sub><sup>d</sup>) / (a<sub>A</sub><sup>a</sup>·a<sub>B</sub><sup>b</sup>)</b>, où a désigne l’activité : c/c° pour un soluté (c° = 1 mol/L), p/p° pour un gaz (p° = 1 bar), 1 pour un solide pur ou le solvant. À l’équilibre, Q prend une valeur fixe : la <b>constante d’équilibre K</b>.`,
   fig:(()=>{ const P=plane({x:[0,10],y:[0,3],h:90,grid:false,axes:false}); P.text(5,1.5,'Q &lt; K → sens direct · Q = K → équilibre · Q &gt; K → sens inverse',{a:'middle',dy:5,s:11}); return P.svg(); })(),
   note:'K ne dépend que de la température. Les concentrations à l’équilibre, elles, dépendent des conditions initiales.'},
@@ -264,10 +338,29 @@ CMS.push(
   why:'4 mol de gaz donnent 2 mol : augmenter la pression favorise le côté qui a moins de moles de gaz, donc NH₃. Chauffer favorise le sens endothermique (inverse), et un catalyseur ne déplace pas l’équilibre.'},
  {kind:'Défi',h:'Composition à l’équilibre',p:'Pour A ⇌ B en solution, K = 4. On part de [A]₀ = 1,0 mol/L et [B]₀ = 0. Quelle est [B] à l’équilibre&nbsp;?',lab:'[B] =',unit:'mol/L',ans:.8,tol:.005,
   why:'Avec [B] = x et [A] = 1 − x : x/(1 − x) = 4, donc x = 4 − 4x et x = 0,8 mol/L.'},
+ {kind:'Problème',h:'La synthèse de l’ammoniac',
+  p:'L’ammoniac des engrais se fabrique par la réaction <b>N₂(g) + 3 H₂(g) ⇌ 2 NH₃(g)</b>, exothermique (ΔH° = −92 kJ/mol). À 298 K, ΔG° = −32,9 kJ/mol. Les activités des gaz sont p/p° avec p° = 1 bar. Donnée : R = 8,314 J/(mol·K).',
+  parts:[
+   {q:'a) Calcule log₁₀ K à 298 K, au centième.',lab:'log₁₀ K =',ans:5.77,tol:.01,hint:'K = exp(−ΔG°/RT), puis log₁₀ K = ln K / ln 10.',why:'ln K = 32 900 / (8,314 × 298) ≈ 13,28, donc K ≈ 5,8·10⁵ et log₁₀ K ≈ 5,77.'},
+   {q:'b) Un réacteur contient p(N₂) = 1,0 bar, p(H₂) = 3,0 bar et p(NH₃) = 0,50 bar à 298 K. Calcule ΔG, au dixième de kJ/mol.',lab:'ΔG =',unit:'kJ/mol',ans:-44.5,tol:.1,hint:'Q = p(NH₃)² / (p(N₂)·p(H₂)³), puis ΔG = ΔG° + RT ln Q.',why:'Q = 0,25 / 27 ≈ 9,26·10⁻³, ln Q ≈ −4,68. ΔG = −32,9 + 2,478 × (−4,68) ≈ −44,5 kJ/mol : la réaction avance dans le sens direct.'},
+   {q:'c) On divise brusquement le volume par 2 à température constante : toutes les pressions partielles doublent. Par quel facteur Q est-il multiplié&nbsp;?',lab:'facteur :',ans:.25,tol:.001,hint:'Remplace chaque p par 2p dans l’expression de Q.',why:'Q′ = (2p<sub>NH₃</sub>)² / (2p<sub>N₂</sub>·(2p<sub>H₂</sub>)³) = Q × 4/16 = Q/4. Q s’éloigne de K par le bas : le système évolue vers NH₃, comme le prévoit Le Chatelier.'},
+   {q:'d) Pourtant, l’industrie travaille vers 450 °C alors que la réaction est exothermique. Pourquoi&nbsp;?',opts:['Parce que K augmente avec la température','Parce qu’à basse température la réaction est beaucoup trop lente, même avec un catalyseur','Parce que chauffer augmente la pression, ce qui déplace l’équilibre','Parce que le catalyseur déplace l’équilibre vers NH₃ à haute température'],ans:1,hint:'Le Chatelier dit où va l’équilibre, pas à quelle vitesse on l’atteint.',why:'Chauffer diminue K (sens endothermique favorisé), donc le rendement. Mais à température ambiante la vitesse est quasi nulle : 450 °C, une pression de 150 à 300 bar et un catalyseur au fer réalisent un compromis entre rendement et vitesse.'},
+  ],
+  sol:'À 298 K, K = exp(32 900 / 2477,6) = e<sup>13,28</sup> ≈ 5,8·10⁵, soit <b>log₁₀ K ≈ 5,77</b> : l’équilibre est très favorable à NH₃.<br>Dans le réacteur, Q = 0,5² / (1 × 3³) ≈ 9,3·10⁻³ ≪ K, et ΔG = −32,9 + RT ln Q ≈ <b>−44,5 kJ/mol</b> &lt; 0 : sens direct.<br>Doubler toutes les pressions multiplie Q par 2² / 2⁴ = <b>1/4</b> : 4 moles de gaz deviennent 2, la compression favorise NH₃.<br>Chauffer défavorise l’équilibre (ΔH &lt; 0) mais accélère la réaction : le procédé Haber-Bosch choisit <b>un compromis cinétique</b>, haute pression pour le rendement, 450 °C et catalyseur pour la vitesse.'},
+ {kind:'Problème',h:'Le gaz roux N₂O₄ ⇌ 2 NO₂',
+  p:'Dans un ballon de volume fixe à 298 K, on introduit du tétraoxyde de diazote incolore sous <b>1,00 bar</b>. Il se dissocie partiellement en dioxyde d’azote roux : <b>N₂O₄(g) ⇌ 2 NO₂(g)</b>, avec K = 0,15 (activités p/p°, p° = 1 bar). On note <i>x</i> la pression de N₂O₄ qui a disparu à l’équilibre. Donnée : R = 8,314 J/(mol·K).',
+  parts:[
+   {q:'a) Quelle équation <i>x</i> vérifie-t-il&nbsp;?',opts:[`${F('2x','1 − x')} = 0,15`,`${F('x²','1 − x')} = 0,15`,`${F('4x²','1 − x')} = 0,15`,`${F('1 − x','4x²')} = 0,15`],ans:2,hint:'À l’équilibre, p(N₂O₄) = 1 − x et p(NO₂) = 2x. Le coefficient 2 apparaît en exposant dans K.',why:'K = p(NO₂)² / p(N₂O₄) = (2x)² / (1 − x) = 4x² / (1 − x).'},
+   {q:'b) Résous : que vaut <i>x</i>, au millième de bar&nbsp;?',lab:'x =',unit:'bar',ans:.176,tol:.002,hint:'4x² + 0,15x − 0,15 = 0. Garde la racine positive.',why:'x = (−0,15 + √(0,0225 + 2,4)) / 8 = (−0,15 + 1,556) / 8 ≈ 0,176 bar.'},
+   {q:'c) Quelle est la pression totale à l’équilibre&nbsp;? Au centième.',lab:'p =',unit:'bar',ans:1.18,tol:.01,hint:'p = p(N₂O₄) + p(NO₂).',why:'p = (1 − x) + 2x = 1 + x ≈ 1,18 bar : la dissociation crée des molécules et fait monter la pression.'},
+   {q:'d) Que vaut ΔG° de la dissociation, au centième de kJ/mol&nbsp;?',lab:'ΔG° =',unit:'kJ/mol',ans:4.7,tol:.02,hint:'ΔG° = −RT ln K.',why:'ΔG° = −8,314 × 298 × ln 0,15 / 1000 ≈ +4,70 kJ/mol. ΔG° &gt; 0 veut dire K &lt; 1, pas que la réaction est impossible.'},
+   {q:'e) On comprime le mélange jusqu’à diviser son volume par 2. Le nouvel équilibre est celui qu’on obtiendrait en partant de 2,00 bar de N₂O₄. Quel pourcentage du N₂O₄ est alors dissocié&nbsp;? Au dixième.',lab:'α =',unit:'%',ans:12.8,tol:.1,hint:'Résous 4y² / (2 − y) = 0,15, puis α = y / 2.',why:'4y² + 0,15y − 0,30 = 0 donne y ≈ 0,256 bar, soit α = 0,256 / 2 ≈ 12,8 % contre 17,6 % avant : la compression favorise le côté qui compte le moins de moles de gaz.'},
+  ],
+  sol:'Tableau d’avancement en pressions : p(N₂O₄) = 1 − x, p(NO₂) = 2x, donc <b>4x²/(1 − x) = 0,15</b>.<br>L’équation 4x² + 0,15x − 0,15 = 0 a pour racine positive <b>x ≈ 0,176 bar</b> : 17,6 % du N₂O₄ est dissocié et la pression totale monte à <b>1,18 bar</b>.<br>ΔG° = −RT ln K ≈ <b>+4,70 kJ/mol</b>, cohérent avec K &lt; 1 : à l’équilibre, il reste plus de N₂O₄ que de NO₂.<br>Après compression, 4y²/(2 − y) = 0,15 donne y ≈ 0,256 bar, soit une dissociation de <b>12,8 %</b> seulement. Le ballon devient d’abord plus foncé (NO₂ plus concentré), puis s’éclaircit un peu : c’est Le Chatelier.'},
 ]},
 
 /* ================= 6. SOLUTIONS ================= */
-{subj:'chi', sem:'pri', id:'cms-chi-solutions', h:'Solutions', p:'Solubilité, produit de solubilité et propriétés colligatives.', steps:[
+{subj:'chi', sem:'pri', id:'chi-solutions', h:'Solutions', p:'Solubilité, produit de solubilité et propriétés colligatives.', steps:[
  {kind:'Théorie',h:'Produit de solubilité',p:`Pour un sel peu soluble, AgCl(s) ⇌ Ag⁺ + Cl⁻, l’équilibre est décrit par <b>K<sub>s</sub> = [Ag⁺]·[Cl⁻]</b> = 1,8·10⁻¹⁰. Si le produit ionique Q = [Ag⁺][Cl⁻] dépasse K<sub>s</sub>, un précipité se forme. Déplace le point dans le plan des logarithmes.`,
   params:[{id:'a',l:'log₁₀ [Ag⁺]',min:-7,max:-2,step:.25,v:-6},{id:'c',l:'log₁₀ [Cl⁻]',min:-7,max:-2,step:.25,v:-5}],
   draw:v=>{ const lk=Math.log10(1.8e-10), P=plane({x:[-7.5,-1.5],y:[-7.5,-1.5],h:260,lab:1});
@@ -297,10 +390,28 @@ CMS.push(
   why:'Π = cRT avec c = 0,10 mol/L = 100 mol/m³ : Π = 100 × 8,314 × 298 ≈ 247 800 Pa ≈ 248 kPa, soit près de 2,5 bar.'},
  {kind:'Défi',h:'Ébullioscopie',p:'On dissout 18 g de glucose (M = 180 g/mol) dans 500 g d’eau (K<sub>éb</sub> = 0,512 K·kg/mol). De combien la température d’ébullition augmente-t-elle&nbsp;? Au millième de kelvin.',lab:'ΔT =',unit:'K',ans:.102,tol:.001,
   why:'n = 18/180 = 0,10 mol, b = 0,10 / 0,500 kg = 0,20 mol/kg. ΔT = 1 × 0,512 × 0,20 ≈ 0,102 K.'},
+ {kind:'Problème',h:'Saler les routes en hiver',
+  p:'Les services de voirie répandent du sel pour empêcher la neige fondue de regeler. On veut que <b>1,0 kg d’eau</b> reste liquide jusqu’à <b>−5,0 °C</b>. On compare le chlorure de sodium NaCl (M = 58,5 g/mol, i = 2) et le chlorure de calcium CaCl₂ (M = 111 g/mol, i = 3). Donnée : K<sub>f</sub>(eau) = 1,86 K·kg/mol.',
+  parts:[
+   {q:'a) Quelle molalité de NaCl faut-il&nbsp;? Au centième.',lab:'b =',unit:'mol/kg',ans:1.34,tol:.01,hint:'ΔT = i·K<sub>f</sub>·b avec ΔT = 5,0 K.',why:'b = 5,0 / (2 × 1,86) ≈ 1,34 mol/kg.'},
+   {q:'b) Quelle masse de NaCl faut-il dissoudre dans 1,0 kg d’eau&nbsp;? Au gramme près.',lab:'m =',unit:'g',ans:79,tol:.6,hint:'m = b × (masse d’eau en kg) × M.',why:'m = 1,344 × 1,0 × 58,5 ≈ 79 g.'},
+   {q:'c) Même question avec CaCl₂. Au gramme près.',lab:'m =',unit:'g',ans:99,tol:.6,hint:'Recommence avec i = 3 et M = 111 g/mol.',why:'b = 5,0 / (3 × 1,86) ≈ 0,896 mol/kg, m = 0,896 × 111 ≈ 99 g.'},
+   {q:'d) À masse égale, quel sel abaisse le plus la température de fusion&nbsp;?',opts:['CaCl₂, car il libère 3 ions au lieu de 2','NaCl, car il libère plus de particules par gramme','Les deux sont équivalents, seul compte le nombre de moles de sel','CaCl₂, car sa masse molaire est plus grande'],ans:1,hint:'Compare le nombre de moles de particules par gramme : i/M.',why:'NaCl donne 2/58,5 ≈ 0,034 mol de particules par gramme, CaCl₂ seulement 3/111 ≈ 0,027. Par gramme, NaCl est plus efficace. CaCl₂ sert quand il fait très froid, car il reste très soluble et sa dissolution dégage de la chaleur.'},
+  ],
+  sol:'La cryoscopie ne dépend que du nombre de particules : ΔT = i·K<sub>f</sub>·b.<br>Pour NaCl : b = 5,0 / 3,72 ≈ <b>1,34 mol/kg</b>, soit m ≈ 1,344 × 58,5 ≈ <b>79 g</b> par kg d’eau.<br>Pour CaCl₂ : b = 5,0 / 5,58 ≈ 0,896 mol/kg, soit m ≈ <b>99 g</b>.<br>CaCl₂ libère plus d’ions par unité, mais chaque unité est presque deux fois plus lourde : <b>par gramme, NaCl gagne</b> (0,034 contre 0,027 mol de particules). Le modèle suppose une solution idéale, ce qui surestime un peu l’effet à ces concentrations.'},
+ {kind:'Problème',h:'Le calcaire de l’eau dure',
+  p:'Le calcaire est du carbonate de calcium : <b>CaCO₃(s) ⇌ Ca²⁺ + CO₃²⁻</b>, K<sub>s</sub> = 3,4·10⁻⁹ à 25 °C. Une eau du robinet « dure » contient [Ca²⁺] = 2,0·10⁻³ mol/L. On néglige les réactions acide-base des ions carbonate. Donnée : M(CaCO₃) = 100 g/mol.',
+  parts:[
+   {q:'a) Quelle masse de CaCO₃ se dissout au plus dans 1 L d’eau pure&nbsp;? Au dixième de mg.',lab:'m =',unit:'mg',ans:5.8,tol:.05,hint:'K<sub>s</sub> = s², puis m = s·M pour 1 L.',why:'s = √(3,4·10⁻⁹) ≈ 5,83·10⁻⁵ mol/L, soit 5,83·10⁻³ g ≈ 5,8 mg par litre.'},
+   {q:'b) Dans l’eau dure, quelle concentration de CO₃²⁻ suffit à faire précipiter le calcaire&nbsp;? Donne-la en 10⁻⁶ mol/L, au dixième.',lab:'[CO₃²⁻] =',unit:'·10⁻⁶ mol/L',ans:1.7,tol:.01,hint:'Le précipité apparaît dès que [Ca²⁺][CO₃²⁻] dépasse K<sub>s</sub>.',why:'[CO₃²⁻] = K<sub>s</sub> / [Ca²⁺] = 3,4·10⁻⁹ / 2,0·10⁻³ = 1,7·10⁻⁶ mol/L.'},
+   {q:'c) On verse 1,0 mL de Na₂CO₃ à 0,010 mol/L dans 99 mL de cette eau. Que se passe-t-il&nbsp;?',opts:['Rien : 1 mL est une quantité négligeable','Un précipité se forme, car Q ≈ 2·10⁻⁷ dépasse K<sub>s</sub>','Rien, car Q ≈ 2·10⁻⁹ est inférieur à K<sub>s</sub>','Le calcaire déjà présent se dissout'],ans:1,hint:'Calcule les concentrations après mélange dans 100 mL, puis Q = [Ca²⁺][CO₃²⁻].',why:'[CO₃²⁻] = 0,010 × 1/100 = 1,0·10⁻⁴ et [Ca²⁺] = 2,0·10⁻³ × 99/100 = 1,98·10⁻³ mol/L. Q = 1,98·10⁻⁷ ≈ 58 K<sub>s</sub> : CaCO₃ précipite.'},
+   {q:'d) Pour adoucir 1 L de cette eau, on y ajoute 1,0·10⁻³ mol de CO₃²⁻ (volume inchangé). Quelle masse de calcaire précipite&nbsp;? Au dixième de mg.',lab:'m =',unit:'mg',ans:99.7,tol:.1,hint:'Si x mol/L précipitent : (2,0·10⁻³ − x)(1,0·10⁻³ − x) = K<sub>s</sub>. Les carbonates sont presque tous consommés.',why:'Presque tout le carbonate part : x ≈ 1,0·10⁻³ − K<sub>s</sub>/(1,0·10⁻³) = 0,9966·10⁻³ mol, soit 99,7 mg. Il reste [Ca²⁺] ≈ 1,0·10⁻³ mol/L.'},
+  ],
+  sol:'Dans l’eau pure, s = √K<sub>s</sub> ≈ 5,8·10⁻⁵ mol/L : à peine <b>5,8 mg</b> de calcaire par litre.<br>Dans l’eau dure, le calcium est déjà présent : il suffit de [CO₃²⁻] = K<sub>s</sub>/[Ca²⁺] = <b>1,7·10⁻⁶ mol/L</b> pour précipiter (effet d’ion commun).<br>Après le mélange, Q = 1,98·10⁻³ × 1,0·10⁻⁴ ≈ 2·10⁻⁷ &gt; K<sub>s</sub> : <b>précipité</b>.<br>Pour l’adoucissement, (2,0·10⁻³ − x)(1,0·10⁻³ − x) = 3,4·10⁻⁹. La racine physique est x ≈ 9,966·10⁻⁴ mol/L, soit <b>99,7 mg</b> de CaCO₃ par litre : le carbonate ajouté est presque entièrement consommé et la dureté est divisée par deux.'},
 ]},
 
 /* ================= 7. ACIDES ET BASES ================= */
-{subj:'chi', sem:'pri', id:'cms-chi-acides', h:'Acides et bases', p:'pH, pKa, acides forts et faibles, titrages et solutions tampons.', steps:[
+{subj:'chi', sem:'pri', id:'chi-acides', h:'Acides et bases', p:'pH, pKa, acides forts et faibles, titrages et solutions tampons.', steps:[
  {kind:'Théorie',h:'L’échelle de pH',p:`Selon <b>Brønsted</b>, un acide cède un proton H⁺ et une base le capte : HA + H₂O ⇌ A⁻ + H₃O⁺, HA/A⁻ forme un <b>couple acide-base</b>. On définit <b>pH = −log₁₀[H₃O⁺]</b>. L’eau s’autoprotolyse : <b>K<sub>e</sub> = [H₃O⁺][OH⁻] = 10⁻¹⁴</b> à 25 °C.`,
   params:[{id:'p',l:'pH',min:0,max:14,step:.5,v:3}],
   draw:v=>{ const P=plane({x:[-0.5,14.5],y:[0,4],h:110,grid:false,axes:false});
@@ -338,10 +449,28 @@ CMS.push(
   why:'pH = 4,76 + log(0,20/0,10) = 4,76 + 0,30 = 5,06.'},
  {kind:'Défi',h:'Fabriquer un tampon',p:'On veut un tampon NH₄⁺/NH₃ (pKa = 9,25) à pH 9,55. Quel rapport [NH₃]/[NH₄⁺] faut-il&nbsp;? Au dixième.',lab:'[NH₃]/[NH₄⁺] =',ans:2,tol:.05,
   why:'log([NH₃]/[NH₄⁺]) = pH − pKa = 0,30, donc le rapport vaut 10<sup>0,30</sup> ≈ 2,0.'},
+ {kind:'Problème',h:'Le titrage d’un vinaigre',
+  p:'On veut mesurer l’acidité d’un vinaigre (acide acétique CH₃COOH, pKa = 4,76). On le dilue d’abord <b>10 fois</b>. On titre ensuite <b>10,0 mL</b> du vinaigre dilué par de la soude à <b>0,100 mol/L</b> : l’équivalence est atteinte pour <b>14,0 mL</b>. Réaction : CH₃COOH + OH⁻ → CH₃COO⁻ + H₂O. Donnée : M(CH₃COOH) = 60 g/mol.',
+  parts:[
+   {q:'a) Quelle est la concentration du vinaigre dilué&nbsp;? Au centième.',lab:'c =',unit:'mol/L',ans:.14,tol:.001,hint:'À l’équivalence, n(acide) = n(OH⁻ versé).',why:'n = 0,100 × 0,0140 = 1,40·10⁻³ mol dans 10,0 mL : c = 1,40·10⁻³ / 0,0100 = 0,140 mol/L.'},
+   {q:'b) Quelle masse d’acide acétique contient un litre de vinaigre pur&nbsp;?',lab:'m =',unit:'g/L',ans:84,tol:.2,hint:'N’oublie pas la dilution d’un facteur 10.',why:'Vinaigre pur : c = 1,40 mol/L, soit 1,40 × 60 = 84 g/L.'},
+   {q:'c) Quel est le pH du mélange après ajout de 7,0 mL de soude&nbsp;? Au centième.',lab:'pH =',ans:4.76,tol:.01,hint:'7,0 mL, c’est la moitié du volume équivalent.',why:'À la demi-équivalence, la moitié de l’acide est devenue CH₃COO⁻ : [A⁻] = [HA] et pH = pKa = 4,76.'},
+   {q:'d) Quel indicateur coloré choisir pour repérer l’équivalence&nbsp;?',opts:['L’hélianthine (virage 3,1 à 4,4), car le vinaigre est acide','Le bleu de bromothymol (virage 6,0 à 7,6), car l’équivalence est à pH 7','La phénolphtaléine (virage 8,2 à 10), car à l’équivalence la solution d’acétate est basique','N’importe lequel, le saut de pH est assez grand'],ans:2,hint:'Quelle espèce reste en solution à l’équivalence, et est-elle acide, neutre ou basique&nbsp;?',why:'À l’équivalence, il ne reste que de l’acétate, une base faible : le pH vaut environ 8,8. La zone de virage de la phénolphtaléine tombe dans le saut.'},
+  ],
+  sol:'À l’équivalence, n(CH₃COOH) = n(OH⁻) = 0,100 × 14,0·10⁻³ = 1,40·10⁻³ mol, contenus dans 10,0 mL : <b>c = 0,140 mol/L</b> pour le vinaigre dilué.<br>Le vinaigre pur est 10 fois plus concentré, 1,40 mol/L, soit 1,40 × 60 = <b>84 g/L</b> d’acide acétique (environ 8 % en masse, un vinaigre fort).<br>À 7,0 mL, on est à la demi-équivalence : <b>pH = pKa = 4,76</b>.<br>À l’équivalence, la solution contient la base faible CH₃COO⁻, pH ≈ 8,8 : on choisit la <b>phénolphtaléine</b>.'},
+ {kind:'Problème',h:'Le tampon du sang',
+  p:'Le pH du sang est maintenu près de 7,40 par le couple <b>CO₂ / HCO₃⁻</b> (CO₂ + H₂O ⇌ HCO₃⁻ + H⁺), de pKa = 6,1 à 37 °C. Dans un sang normal, [HCO₃⁻] = 24 mmol/L et [CO₂] = 1,2 mmol/L. Pendant un effort intense, les muscles libèrent de l’acide lactique, qu’on traite comme un acide fort apportant <b>3,0 mmol/L</b> de H⁺.',
+  parts:[
+   {q:'a) Vérifie le pH du sang normal, au centième.',lab:'pH =',ans:7.4,tol:.01,hint:'Henderson-Hasselbalch : pH = pKa + log([HCO₃⁻]/[CO₂]).',why:'pH = 6,1 + log(24/1,2) = 6,1 + log 20 = 6,1 + 1,30 = 7,40.'},
+   {q:'b) Si le CO₂ formé restait dans le sang (système fermé), quel serait le pH après l’arrivée de l’acide&nbsp;? Au centième.',lab:'pH =',ans:6.8,tol:.01,hint:'Chaque H⁺ transforme un HCO₃⁻ en CO₂.',why:'[HCO₃⁻] = 24 − 3 = 21 et [CO₂] = 1,2 + 3 = 4,2 mmol/L : pH = 6,1 + log 5 ≈ 6,80.'},
+   {q:'c) En réalité, la respiration évacue le CO₂ en excès et maintient [CO₂] = 1,2 mmol/L. Quel est alors le pH&nbsp;? Au centième.',lab:'pH =',ans:7.34,tol:.01,hint:'Seul HCO₃⁻ change par rapport à la situation normale.',why:'pH = 6,1 + log(21/1,2) = 6,1 + 1,24 ≈ 7,34 : la baisse est bien plus faible.'},
+   {q:'d) Une personne angoissée hyperventile : elle rejette trop de CO₂, dont la concentration tombe à 0,9 mmol/L (HCO₃⁻ reste à 24 mmol/L). Que se passe-t-il&nbsp;?',opts:['Le pH baisse vers 7,2 : acidose','Le pH ne change pas, le tampon compense tout','Le pH monte vers 7,53 : alcalose','Le pH monte au-dessus de 8'],ans:2,hint:'Calcule le nouveau rapport [HCO₃⁻]/[CO₂].',why:'pH = 6,1 + log(24/0,9) = 6,1 + 1,43 ≈ 7,53 : le sang devient trop basique (alcalose respiratoire), d’où vertiges et fourmillements.'},
+  ],
+  sol:'Le sang normal a pH = 6,1 + log(24/1,2) = <b>7,40</b>.<br>L’acide lactique est neutralisé par HCO₃⁻ : H⁺ + HCO₃⁻ → CO₂. En système fermé, le rapport passe de 20 à 21/4,2 = 5 et le pH tombe à <b>6,80</b>, une valeur mortelle.<br>Les poumons rejettent le CO₂ en excès : [CO₂] reste à 1,2 mmol/L et pH = 6,1 + log(21/1,2) ≈ <b>7,34</b>. Le tampon est efficace parce que l’une de ses deux espèces est un gaz que la respiration régule.<br>À l’inverse, trop expirer de CO₂ fait monter le pH à ≈ <b>7,53</b> : c’est l’alcalose respiratoire.'},
 ]},
 
 /* ================= 8. CINÉTIQUE ================= */
-{subj:'chi', sem:'pri', id:'cms-chi-cinetique', h:'Cinétique chimique', p:'Vitesse de réaction, lois de vitesse, demi-vie et loi d’Arrhenius.', steps:[
+{subj:'chi', sem:'pri', id:'chi-cinetique', h:'Cinétique chimique', p:'Vitesse de réaction, lois de vitesse, demi-vie et loi d’Arrhenius.', steps:[
  {kind:'Théorie',h:'La vitesse de réaction',p:`Pour <i>a</i>A → produits, la <b>vitesse</b> est <b>v = −(1/a)·d[A]/dt</b>, en mol/(L·s). Graphiquement, c’est l’opposé de la pente de la tangente à la courbe [A](t), divisé par a. Elle diminue en général au fil de la réaction.`,
   params:[{id:'t',l:'t',min:0,max:6,step:.5,v:1,u:' s'}],
   draw:v=>{ const A=t=>Math.exp(-0.5*t), m=-0.5*A(v.t), P=plane({x:[0,7],y:[0,1.15],h:200,grid:false,lx:1});
@@ -382,6 +511,27 @@ CMS.push(
   why:'k₃₀₈/k₂₉₈ = exp[(E<sub>a</sub>/R)(1/298 − 1/308)] = exp[6014 × 1,09·10⁻⁴] = exp(0,655) ≈ 1,93.'},
  {kind:'Défi',h:'Ordre 2',p:'Une réaction d’ordre 2 a k = 0,20 L/(mol·s) et [A]₀ = 0,50 mol/L. Que vaut [A] après 10 s&nbsp;?',lab:'[A] =',unit:'mol/L',ans:.25,tol:.002,
   why:'1/[A] = 1/0,50 + 0,20 × 10 = 2 + 2 = 4 L/mol, donc [A] = 0,25 mol/L. C’est exactement une demi-vie : t<sub>½</sub> = 1/(k[A]₀) = 10 s.'},
+ {kind:'Problème',h:'La datation au carbone 14',
+  p:'Un être vivant échange du carbone avec l’atmosphère : son carbone a une activité de <b>0,250 Bq par gramme</b>, due au ¹⁴C. À sa mort, les échanges cessent et le ¹⁴C se désintègre selon une cinétique d’ordre 1, de demi-vie <b>t<sub>½</sub> = 5730 ans</b>. Un os retrouvé dans une grotte a une activité de <b>0,080 Bq par gramme</b> de carbone. L’activité est proportionnelle au nombre de noyaux de ¹⁴C.',
+  fig:(()=>{ const P=plane({x:[0,25],y:[0,1.1],w:320,h:180,grid:false,lx:5}); P.fn(t=>0.5**(t/5.73),{from:0,to:25});
+    P.seg(0,0.32,9.42,0.32,{c:'var(--spark)',w:1.5,dash:true}).seg(9.42,0,9.42,0.32,{c:'var(--spark)',w:1.5,dash:true}).dot(9.42,0.32,{c:'var(--ink)',l:'os'});
+    P.text(24.8,0.1,'t (milliers d’années)',{a:'end',s:11,c:'var(--muted)'}).text(0.4,1.02,'A / A₀',{s:11,c:'var(--muted)'}); return P.svg(); })(),
+  parts:[
+   {q:'a) Calcule la constante de désintégration k, en 10⁻⁴ an⁻¹, au centième.',lab:'k =',unit:'·10⁻⁴ an⁻¹',ans:1.21,tol:.01,hint:'Ordre 1 : t<sub>½</sub> = ln 2 / k.',why:'k = 0,693 / 5730 ≈ 1,21·10⁻⁴ an⁻¹.'},
+   {q:'b) Quelle fraction de l’activité initiale reste-t-il dans l’os&nbsp;? En %.',lab:'A/A₀ =',unit:'%',ans:32,tol:.1,hint:'Divise l’activité mesurée par celle d’un être vivant.',why:'0,080 / 0,250 = 0,32, soit 32 %.'},
+   {q:'c) Quel est l’âge de l’os&nbsp;? À la centaine d’années près.',lab:'t =',unit:'ans',ans:9400,tol:60,hint:'A = A₀·e<sup>−kt</sup>, donc t = ln(A₀/A) / k.',why:'t = ln(1/0,32) / 1,21·10⁻⁴ = 1,139 / 1,2097·10⁻⁴ ≈ 9420 ans, soit environ 9400 ans.'},
+   {q:'d) Pourquoi la méthode ne permet-elle pas de dater un fossile de dinosaure (65 millions d’années)&nbsp;?',opts:['Parce que les dinosaures ne contenaient pas de carbone','Parce qu’après plus de 10 000 demi-vies il ne reste plus aucun ¹⁴C mesurable','Parce que la demi-vie du ¹⁴C change avec le temps','Parce que la cinétique devient d’ordre 2 pour les vieux échantillons'],ans:1,hint:'Combien de demi-vies représentent 65 millions d’années&nbsp;?',why:'65·10⁶ / 5730 ≈ 11 000 demi-vies : la fraction restante est 2<sup>−11 000</sup>, rigoureusement nulle en pratique. Au-delà d’environ 50 000 ans (moins de 0,2 %), la mesure n’est plus fiable.'},
+  ],
+  sol:'La désintégration est d’ordre 1 : <b>k = ln 2 / t<sub>½</sub> ≈ 1,21·10⁻⁴ an⁻¹</b>.<br>L’os a gardé A/A₀ = 0,080/0,250 = <b>32 %</b> de son activité, soit entre une et deux demi-vies (50 % et 25 %).<br>De A = A₀·e<sup>−kt</sup> on tire t = ln(A₀/A)/k = ln(3,125) / 1,2097·10⁻⁴ ≈ <b>9400 ans</b>.<br>La méthode ne sert que jusqu’à quelques dizaines de milliers d’années : pour les dinosaures, il faut des isotopes de demi-vie bien plus longue (potassium 40, uranium 238).'},
+ {kind:'Problème',h:'Le lait au réfrigérateur',
+  p:'Un lait entamé tourne au bout de <b>3 jours</b> à 20 °C (293 K) et de <b>12 jours</b> au réfrigérateur à 5 °C (278 K). On suppose que la durée de conservation est inversement proportionnelle à la constante de vitesse k du développement des bactéries, et que k suit la loi d’Arrhenius k = A·e<sup>−E<sub>a</sub>/RT</sup>. Donnée : R = 8,314 J/(mol·K).',
+  parts:[
+   {q:'a) Que vaut le rapport k(293 K) / k(278 K)&nbsp;?',lab:'rapport :',ans:4,tol:.01,hint:'Si la durée est divisée par un facteur, la vitesse est multipliée par ce même facteur.',why:'La durée passe de 12 à 3 jours : k est multipliée par 12/3 = 4.'},
+   {q:'b) Déduis-en l’énergie d’activation, au dixième de kJ/mol.',lab:'E<sub>a</sub> =',unit:'kJ/mol',ans:62.6,tol:.1,hint:'ln(k₂/k₁) = (E<sub>a</sub>/R)·(1/T₁ − 1/T₂).',why:'E<sub>a</sub> = R ln 4 / (1/278 − 1/293) = 8,314 × 1,386 / 1,842·10⁻⁴ ≈ 62 600 J/mol = 62,6 kJ/mol.'},
+   {q:'c) Combien d’heures le lait tient-il par une journée de canicule à 30 °C (303 K)&nbsp;? À l’heure près.',lab:'durée :',unit:'h',ans:31,tol:.6,hint:'Calcule k(303)/k(293) avec E<sub>a</sub>, puis divise 72 h par ce facteur.',why:'k(303)/k(293) = exp[(62 587/8,314)(1/293 − 1/303)] = exp(0,848) ≈ 2,33. Durée = 72 / 2,33 ≈ 31 h.'},
+   {q:'d) Et dans un réfrigérateur mieux réglé à 0 °C (273 K)&nbsp;? Au jour près.',lab:'durée :',unit:'jours',ans:20,tol:.6,hint:'Même méthode en partant des 3 jours à 293 K, avec 1/273 − 1/293.',why:'k(293)/k(273) = exp[7528 × (1/273 − 1/293)] = exp(1,882) ≈ 6,57. Durée ≈ 3 × 6,57 ≈ 20 jours.'},
+  ],
+  sol:'La durée de conservation varie comme 1/k : passer de 12 à 3 jours signifie <b>k multiplié par 4</b> entre 278 K et 293 K.<br>Arrhenius donne ln 4 = (E<sub>a</sub>/R)(1/278 − 1/293), d’où <b>E<sub>a</sub> ≈ 62,6 kJ/mol</b>.<br>À 303 K : k est multipliée par exp(7528 × 1,126·10⁻⁴) ≈ 2,33 par rapport à 293 K, le lait tient 72/2,33 ≈ <b>31 h</b>.<br>À 273 K : k est divisée par exp(7528 × 2,50·10⁻⁴) ≈ 6,57, le lait tient ≈ <b>20 jours</b>.<br>Quelques degrés comptent beaucoup : c’est l’exponentielle d’Arrhenius qui fait l’efficacité du froid. Le modèle reste approché, la croissance bactérienne ne suit Arrhenius que sur un domaine limité.'},
 ]},
 );
 })();

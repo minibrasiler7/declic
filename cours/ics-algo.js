@@ -1,4 +1,4 @@
-/* Déclic — Informatique, Algorithmique (PREPA-025 / 026) */
+/* Déclic — Informatique, Algorithmique */
 (()=>{
 /* ---------- petits outils SVG ---------- */
 const SV=(h,s)=>`<svg viewBox="0 0 320 ${h}" width="320" role="img">${s}</svg>`;
@@ -175,9 +175,17 @@ const KR=(()=>{ const E=WE.slice().sort((a,b)=>a[2]-b[2]), p={}; Object.keys(WN)
     st.push({acc:acc.slice(),rej:rej.slice(),cur:e,tot,msg}); });
   return st; })();
 
-CMS.push(
+/* ---------- graphes des problèmes ---------- */
+const PB7N={S:[30,105],A:[115,45],B:[115,165],C:[205,45],D:[205,165],E:[290,45],T:[290,165]};
+const PB7E=[['S','A'],['S','B'],['A','C'],['B','C'],['B','D'],['C','E'],['D','T'],['E','T']];
+const PB7CN={'1':[40,45],'2':[130,45],'3':[210,45],'4':[85,120],'5':[285,40],'6':[285,120],'7':[40,180],'8':[140,180],'9':[250,180]};
+const PB7CE=[['1','2'],['1','4'],['2','3'],['2','4'],['5','6'],['7','8']];
+const PB8E1=[['A','B',7],['A','C',2],['B','C',3],['B','D',1],['C','D',8],['C','E',5],['D','E',2],['D','F',6],['E','F',4]];
+const PB8E2=[['A','B',4],['A','C',3],['B','C',2],['B','D',5],['C','D',6],['C','E',4],['D','E',1],['D','F',3],['E','F',6]];
+
+COURS.push(
 /* ================= 1. Correction et terminaison ================= */
-{subj:'ics', sem:'algo', id:'cms-ics-correction', h:'Correction et terminaison', p:'Prouver qu’une boucle s’arrête et qu’elle calcule bien ce qu’on veut.', steps:[
+{subj:'ics', sem:'algo', id:'ics-correction', h:'Correction et terminaison', p:'Prouver qu’une boucle s’arrête et qu’elle calcule bien ce qu’on veut.', steps:[
   {kind:'Théorie',h:'Deux questions pour chaque algorithme',p:`Un algorithme est <b>correct</b> s’il <b>termine</b> pour toute entrée valide et s’il renvoie le résultat annoncé par sa spécification. Pour une boucle, on prouve la terminaison avec un <b>variant</b> et le résultat avec un <b>invariant</b>. Exemple : la somme 1 + 2 + … + <i>n</i>.`,
    fig:py(`
 def somme(n):
@@ -239,10 +247,40 @@ def mystere(n):
     return r`),
    lab:'résultat =',ans:144,
    why:'Invariant : r = k². Il est vrai au départ (0 = 0²) et conservé, car k² + 2(k + 1) − 1 = (k + 1)². À la sortie k = n, donc r = n² = 144.'},
+  {kind:'Problème',h:'Diviser avec des soustractions',p:`La fonction ci-dessous calcule le quotient et le reste de la division euclidienne de <i>a</i> ≥ 0 par <i>b</i> &gt; 0, uniquement avec des soustractions. On veut prouver qu’elle est correcte et qu’elle s’arrête, puis tester une variante fautive.`+py(`
+def div(a, b):          # a >= 0 et b > 0
+    q, r = 0, a
+    while r >= b:
+        r = r - b
+        q = q + 1
+    return q, r`),
+   parts:[
+    {q:'a) Quelle propriété est un invariant de la boucle&nbsp;?',opts:['r &lt; b','q = a // b','a = b·q + r et r ≥ 0','r = a − q'],ans:2,hint:'Un invariant est vrai <b>avant</b> la boucle. Teste chaque proposition avec q = 0 et r = a.',why:'Au départ, b·0 + a = a et a ≥ 0. Si a = bq + r au début d’un tour, alors b(q + 1) + (r − b) = bq + r, et r − b ≥ 0 car on est entré avec r ≥ b. r &lt; b et q = a // b ne sont vrais qu’à la sortie.'},
+    {q:'b) Combien de tours de boucle fait ' + '<code class="code">div(100, 7)</code>&nbsp;?',lab:'tours =',ans:14,hint:'Chaque tour ajoute 1 à q. Quelle est la valeur finale de q&nbsp;?',why:'100 = 7 · 14 + 2. La boucle fait un tour par unité du quotient : 14 tours, et renvoie (14, 2).'},
+    {q:'c) Quel est un variant qui prouve l’arrêt&nbsp;?',opts:['q','a − r','r','b'],ans:2,hint:'Il faut un entier positif ou nul qui décroît strictement à chaque tour.',why:'r est un entier ≥ 0 (invariant) et diminue de b ≥ 1 à chaque tour. q et a − r augmentent, b ne change pas.'},
+    {q:'d) On remplace <code class="code">while r &gt;= b</code> par <code class="code">while r &gt; b</code>. Pour combien de valeurs de <i>a</i> entre 0 et 30 (inclus) <code class="code">div(a, 7)</code> renvoie-t-il un résultat faux&nbsp;?',lab:'valeurs =',ans:4,hint:'La variante s’arrête une fois de trop tôt dans un seul cas : quand r tombe exactement sur b.',why:'La boucle s’arrête avec r = 7 au lieu de continuer jusqu’à 0. Cela arrive quand a est un multiple non nul de 7 : 7, 14, 21, 28. Quatre valeurs.'},
+   ],
+   sol:`<p><b>Invariant</b> : a = b·q + r et r ≥ 0. Initialisation : q = 0 et r = a ≥ 0. Conservation : on entre avec r ≥ b, et b(q + 1) + (r − b) = bq + r, avec r − b ≥ 0.</p><p><b>Sortie</b> : la condition est fausse, donc r &lt; b. Avec l’invariant, a = bq + r et 0 ≤ r &lt; b : q et r sont bien le quotient et le reste.</p><p><b>Terminaison</b> : r est un entier ≥ 0 qui baisse de b ≥ 1 à chaque tour. div(100, 7) fait 14 tours.</p><p>Avec r &gt; b, la sortie donne seulement r ≤ b. Le cas r = b donne un résultat faux, par exemple div(14, 7) = (1, 7). Entre 0 et 30, c’est le cas pour a = 7, 14, 21, 28.</p>`},
+  {kind:'Problème',h:'La multiplication du paysan russe',p:`Cette méthode multiplie deux entiers <i>a</i> et <i>b</i> ≥ 0 avec seulement des doublements, des divisions par 2 et des additions. À chaque tour, si <i>y</i> est impair, on ajoute <i>x</i> à <i>r</i>. Puis on double <i>x</i> et on divise <i>y</i> par 2. Tu dois concevoir l’invariant qui prouve que le résultat vaut <i>a</i>·<i>b</i>.`+py(`
+def produit(a, b):
+    r, x, y = 0, a, b
+    while y > 0:
+        if y % 2 == 1:
+            r = r + x
+        x = 2 * x
+        y = y // 2
+    return r`),
+   parts:[
+    {q:'a) Combien de tours de boucle fait <code class="code">produit(13, 11)</code>&nbsp;?',lab:'tours =',ans:4,hint:'Suis seulement y : 11, puis 11 // 2…',why:'y prend les valeurs 11, 5, 2, 1, puis 0 : 4 tours.'},
+    {q:'b) Que vaut <i>r</i> après 2 tours&nbsp;?',lab:'r =',ans:39,hint:'Tour 1 : y = 11 est impair. Tour 2 : y = 5. Pense à doubler x entre les deux.',why:'Tour 1 : r = 13, x = 26, y = 5. Tour 2 : y impair, r = 13 + 26 = 39, puis x = 52 et y = 2.'},
+    {q:'c) Quel invariant prouve la correction&nbsp;?',opts:['r = a·y','r + x·y = a·b','x·y = a·b','r = x − a'],ans:1,hint:'Vérifie au départ (r, x, y) = (0, 13, 11), puis après le tour 1 : (13, 26, 5).',why:'0 + 13 · 11 = 143 et 13 + 26 · 5 = 143. Si y est pair : 2x · (y/2) = xy. Si y est impair : r + x + 2x · (y − 1)/2 = r + xy. La quantité r + xy ne change jamais.'},
+    {q:'d) Pourquoi la fonction renvoie-t-elle bien a·b&nbsp;?',opts:['Car x vaut 2ᵏ·a après k tours','Car la boucle fait environ log₂ b tours','Car r est toujours pair','Car à la sortie y = 0, et l’invariant donne r + x·0 = a·b'],ans:3,hint:'Combine l’invariant avec la négation de la condition de boucle.',why:'À la sortie, y ≤ 0, et y ≥ 0 reste vrai, donc y = 0. L’invariant r + xy = ab devient r = ab. Le nombre de tours sert à la complexité, pas à la correction.'},
+   ],
+   sol:`<p>Trace de produit(13, 11) : (r, x, y) = (0, 13, 11) → (13, 26, 5) → (39, 52, 2) → (39, 104, 1) → (143, 208, 0). 4 tours, résultat 143 = 13 · 11.</p><p><b>Invariant</b> : r + x·y = a·b. Il vaut 0 + ab au départ. Si y est pair, r ne change pas et (2x)(y/2) = xy. Si y est impair, y // 2 = (y − 1)/2 et (r + x) + 2x(y − 1)/2 = r + xy.</p><p><b>Sortie</b> : y est un entier ≥ 0 et la condition y &gt; 0 est fausse, donc y = 0 et r = ab.</p><p><b>Terminaison</b> : y est un variant (y // 2 &lt; y pour y ≥ 1). La boucle fait autant de tours que b a de chiffres en binaire : O(log b).</p>`},
 ]},
 
 /* ================= 2. Complexité ================= */
-{subj:'ics', sem:'algo', id:'cms-ics-complexite', h:'Complexité et notation grand-O', p:'Compter les opérations d’un algorithme et comparer les vitesses de croissance.', steps:[
+{subj:'ics', sem:'algo', id:'ics-complexite', h:'Complexité et notation grand-O', p:'Compter les opérations d’un algorithme et comparer les vitesses de croissance.', steps:[
   {h:'Compter les opérations',p:`La <b>complexité</b> d’un algorithme est le nombre d’opérations élémentaires (affectation, comparaison, calcul, accès L[i]) en fonction de la taille <i>n</i> de l’entrée. Ici, chaque case colorée est un passage par <code class="code">c += 1</code>.`,
    params:[{id:'n',l:'n',min:2,max:12,v:5}],
    draw:v=>py(`
@@ -289,10 +327,40 @@ def f(n):
    why:'À chaque tour n est divisé par 2. Après k tours il reste environ n/2ᵏ, et la boucle s’arrête quand 2ᵏ ≥ n, soit k ≈ log₂ n : O(log n).'},
   {kind:'Défi',h:'Fais tourner la boucle',p:'Avec la même fonction, que renvoie <code class="code">f(1000)</code>&nbsp;?',lab:'f(1000) =',ans:9,
    why:'1000 → 500 → 250 → 125 → 62 → 31 → 15 → 7 → 3 → 1 : 9 tours. C’est ⌊log₂ 1000⌋ = 9, car 2⁹ = 512 ≤ 1000 &lt; 1024.'},
+  {kind:'Problème',h:'Une boucle qui double',p:`Dans la fonction ci-dessous, la boucle extérieure double <i>i</i> à chaque tour, et la boucle intérieure fait toujours <i>n</i> tours. Compte les passages par <code class="code">c += 1</code> pour deux valeurs de <i>n</i>, puis déduis-en la complexité.`+py(`
+def f(n):
+    c = 0
+    i = 1
+    while i < n:
+        for j in range(n):
+            c += 1
+        i = 2 * i
+    return c`),
+   parts:[
+    {q:'a) Que renvoie <code class="code">f(16)</code>&nbsp;?',lab:'f(16) =',ans:64,hint:'Liste les valeurs de i pour lesquelles i &lt; 16. Chacune donne 16 passages.',why:'i vaut 1, 2, 4, 8 : 4 tours extérieurs de 16 passages, soit 64.'},
+    {q:'b) Que renvoie <code class="code">f(1000)</code>&nbsp;?',lab:'f(1000) =',ans:10000,hint:'Quelle est la plus grande puissance de 2 strictement inférieure à 1000&nbsp;?',why:'i vaut 1, 2, 4, …, 512 = 2⁹ : 10 tours extérieurs. 10 × 1000 = 10 000.'},
+    {q:'c) Quelle est la complexité de <i>f</i>&nbsp;?',opts:['O(n)','O(n²)','O(log n)','O(n log n)'],ans:3,hint:'Combien de tours fait la boucle while, en fonction de n&nbsp;? Et chacun coûte combien&nbsp;?',why:'La boucle while fait ⌈log₂ n⌉ tours, chacun de coût n : f(n) = n ⌈log₂ n⌉ = O(n log n).'},
+   ],
+   sol:`<p>La boucle extérieure s’exécute pour i = 1, 2, 4, …, tant que i &lt; n. Le nombre de tours est le plus petit k tel que 2ᵏ ≥ n, soit ⌈log₂ n⌉.</p><p>Chaque tour extérieur fait exactement n passages par c += 1, quel que soit i. Donc f(n) = n · ⌈log₂ n⌉.</p><p>f(16) = 16 · 4 = 64 et f(1000) = 1000 · 10 = 10 000.</p><p>Le coût est O(n log n) : bien moins qu’une double boucle O(n²), mais plus qu’un simple parcours.</p>`},
+  {kind:'Problème',h:'Trois boucles imbriquées',p:`Les bornes des boucles intérieures dépendent des boucles extérieures. On ne peut donc pas simplement multiplier les nombres de tours. Pour chaque couple (<i>i</i>, <i>j</i>), la boucle sur <i>k</i> fait <i>j</i> − <i>i</i> tours. On cherche une formule, puis un ordre de grandeur.`+py(`
+def g(n):
+    c = 0
+    for i in range(n):
+        for j in range(i, n):
+            for k in range(i, j):
+                c += 1
+    return c`),
+   parts:[
+    {q:'a) Que renvoie <code class="code">g(4)</code>&nbsp;?',lab:'g(4) =',ans:10,hint:'Pour i = 0, j va de 0 à 3 et la boucle sur k fait 0 + 1 + 2 + 3 tours. Recommence pour i = 1, 2, 3.',why:'i = 0 : 0 + 1 + 2 + 3 = 6. i = 1 : 0 + 1 + 2 = 3. i = 2 : 0 + 1 = 1. i = 3 : 0. Total 10.'},
+    {q:'b) Que renvoie <code class="code">g(10)</code>&nbsp;?',lab:'g(10) =',ans:165,hint:'Les valeurs g(1), g(2), g(3), g(4) valent 0, 1, 4, 10. Cherche une formule de la forme (n + 1)n(n − 1)/6.',why:'g(n) = (n + 1)n(n − 1)/6, car chaque passage correspond à un triplet i ≤ k &lt; j. Donc g(10) = 11 · 10 · 9 / 6 = 165.'},
+    {q:'c) Quelle est la complexité de <i>g</i>&nbsp;?',opts:['O(n²)','O(n³)','O(n log n)','O(2ⁿ)'],ans:1,hint:'Garde le terme dominant de (n + 1)n(n − 1)/6.',why:'(n + 1)n(n − 1)/6 = (n³ − n)/6, dont le terme dominant est n³/6 : O(n³).'},
+    {q:'d) <i>g</i>(200) prend 0,5 s. On admet que le temps est proportionnel à <i>n</i>³. Combien de temps environ pour <i>g</i>(600)&nbsp;?',lab:'t ≈',unit:'s',ans:13.5,tol:0.01,hint:'n est multiplié par 3. Par combien est multiplié n³&nbsp;?',why:'3³ = 27, donc t ≈ 0,5 × 27 = 13,5 s.'},
+   ],
+   sol:`<p>Pour i et j fixés, la boucle sur k fait j − i tours. Pour i fixé, on obtient 0 + 1 + … + (n − 1 − i).</p><p>g(4) = 6 + 3 + 1 + 0 = 10. Plus généralement, c compte les triplets (i, k, j) avec 0 ≤ i ≤ k &lt; j ≤ n − 1, et on trouve g(n) = (n + 1)n(n − 1)/6. Ainsi g(10) = 165.</p><p>Le terme dominant est n³/6, donc g est en O(n³). Les bornes dépendantes divisent le coût par 6 par rapport à n³, mais ne changent pas l’ordre de grandeur.</p><p>Tripler n multiplie le temps par 27 : 0,5 s devient environ 13,5 s.</p>`},
 ]},
 
 /* ================= 3. Récursivité ================= */
-{subj:'ics', sem:'algo', id:'cms-ics-recursivite', h:'Récursivité', p:'Une fonction qui s’appelle elle-même, la pile d’appels et le coût caché de Fibonacci.', steps:[
+{subj:'ics', sem:'algo', id:'ics-recursivite', h:'Récursivité', p:'Une fonction qui s’appelle elle-même, la pile d’appels et le coût caché de Fibonacci.', steps:[
   {kind:'Théorie',h:'Une fonction qui s’appelle',p:`Une fonction <b>récursive</b> s’appelle elle-même sur une entrée plus petite. Il lui faut un <b>cas de base</b>, traité sans appel, et un <b>appel récursif</b> qui s’en rapproche. Exemple : n! = n × (n − 1)! et 0! = 1.`,
    fig:py(`
 def fact(n):
@@ -340,10 +408,41 @@ def f(n):
     return n % 10 + f(n // 10)`),
    lab:'f(2024) =',ans:8,
    why:'n % 10 est le dernier chiffre et n // 10 enlève ce chiffre : f fait la somme des chiffres. f(2024) = 4 + 2 + 0 + 2 + f(0) = 8.'},
+  {kind:'Problème',h:'L’exponentiation rapide',p:`Pour calculer <i>x</i>ⁿ, on utilise <i>x</i>ⁿ = (<i>x</i>ⁿᐟ²)² si <i>n</i> est pair et <i>x</i>ⁿ = <i>x</i> · <i>x</i>ⁿ⁻¹ si <i>n</i> est impair. La fonction calcule une seule fois la moitié, puis l’élève au carré. On compte les appels à <code class="code">puiss</code>, le premier compris.`+py(`
+def puiss(x, n):
+    if n == 0:
+        return 1
+    if n % 2 == 0:
+        y = puiss(x, n // 2)
+        return y * y
+    return x * puiss(x, n - 1)`),
+   parts:[
+    {q:'a) Combien d’appels pour <code class="code">puiss(2, 10)</code>&nbsp;?',lab:'appels =',ans:6,hint:'Suis la suite des valeurs de n : 10, puis 5, puis…',why:'n vaut 10, 5, 4, 2, 1, 0 : 6 appels, et le résultat est 1024.'},
+    {q:'b) Combien d’appels pour <code class="code">puiss(3, 13)</code>&nbsp;?',lab:'appels =',ans:7,hint:'Un n impair perd 1, un n pair est divisé par 2.',why:'n vaut 13, 12, 6, 3, 2, 1, 0 : 7 appels.'},
+    {q:'c) Quelle est la complexité de <code class="code">puiss</code> en nombre d’appels&nbsp;?',opts:['O(n)','O(log n)','O(n log n)','O(1)'],ans:1,hint:'Après au plus deux appels de suite, que devient n&nbsp;?',why:'Un appel impair donne un n pair, qui est ensuite divisé par 2. n est donc au moins divisé par 2 tous les deux appels : au plus environ 2 log₂ n appels, O(log n).'},
+    {q:'d) Un élève remplace les lignes 6 et 7 par <code class="code">return puiss(x, n // 2) * puiss(x, n // 2)</code>. Combien d’appels pour <code class="code">puiss(3, 8)</code>&nbsp;?',lab:'appels =',ans:23,hint:'Note A(n) le nombre d’appels. Ici A(n) = 1 + 2A(n/2) pour n pair, et A(1) = 1 + A(0) = 2.',why:'A(1) = 2, A(2) = 1 + 2 · 2 = 5, A(4) = 1 + 2 · 5 = 11, A(8) = 1 + 2 · 11 = 23. Le résultat est juste, mais les deux appels identiques font perdre tout le gain.'},
+   ],
+   sol:`<p>Le cas pair divise n par 2 avec un seul appel. Le cas impair retire 1 et rend n pair. Pour n = 10 : 10 → 5 → 4 → 2 → 1 → 0, 6 appels. Pour n = 13 : 13 → 12 → 6 → 3 → 2 → 1 → 0, 7 appels.</p><p>n est au moins divisé par 2 tous les deux appels, donc le nombre d’appels est au plus environ 2 log₂ n + 2 : O(log n), contre n + 1 appels pour la récursion naïve x · xⁿ⁻¹.</p><p>Si on écrit deux fois puiss(x, n // 2), chaque appel pair en lance deux. A(n) = 1 + 2A(n/2) donne A(8) = 23 et, pour n = 2ᵏ, A(n) = 3n − 1 : on revient à O(n). Garder le résultat dans une variable y est donc essentiel.</p>`},
+  {kind:'Problème',h:'Les tours de Hanoï',p:`On doit déplacer <i>n</i> disques de la tour <i>a</i> vers la tour <i>c</i>, en s’aidant de <i>b</i>, sans jamais poser un disque sur un plus petit. Pour cela, on déplace les <i>n</i> − 1 disques du haut vers <i>b</i>, puis le grand disque vers <i>c</i>, puis les <i>n</i> − 1 disques de <i>b</i> vers <i>c</i>. La fonction affiche chaque déplacement et renvoie leur nombre.`+py(`
+def h(n, a, b, c):
+    if n == 0:
+        return 0
+    m = h(n - 1, a, c, b)
+    print(a, '->', c)
+    return m + 1 + h(n - 1, b, a, c)
+
+h(3, 'A', 'B', 'C')`),
+   parts:[
+    {q:'a) Que renvoie <code class="code">h(5, \'A\', \'B\', \'C\')</code>&nbsp;?',lab:'déplacements =',ans:31,hint:'Note D(n) la valeur renvoyée : D(0) = 0 et D(n) = 2D(n − 1) + 1.',why:'D(1) = 1, D(2) = 3, D(3) = 7, D(4) = 15, D(5) = 31. En général D(n) = 2ⁿ − 1.'},
+    {q:'b) Combien d’appels à <i>h</i> (le premier compris, et les appels avec n = 0) pour <code class="code">h(3, \'A\', \'B\', \'C\')</code>&nbsp;?',lab:'appels =',ans:15,hint:'Note C(n) le nombre d’appels : C(0) = 1 et chaque appel avec n ≥ 1 en lance deux.',why:'C(n) = 1 + 2C(n − 1) avec C(0) = 1 : C(1) = 3, C(2) = 7, C(3) = 15. En général C(n) = 2ⁿ⁺¹ − 1.'},
+    {q:'c) Quelle est la première ligne affichée par <code class="code">h(3, \'A\', \'B\', \'C\')</code>&nbsp;?',opts:['<code class=\"code\">A -&gt; B</code>','<code class=\"code\">A -&gt; C</code>','<code class=\"code\">B -&gt; C</code>','<code class=\"code\">C -&gt; B</code>'],ans:1,hint:'Descends toujours dans le premier appel récursif jusqu’à n = 1. Attention : b et c s’échangent à chaque niveau.',why:'h(3, A, B, C) appelle h(2, A, C, B), qui appelle h(1, A, B, C). Celui-ci affiche A -> C, la tour c de cet appel. Le plus petit disque va donc d’abord en C.'},
+    {q:'d) Quelle est la complexité de <i>h</i>&nbsp;?',opts:['O(n)','O(n²)','O(2ⁿ)','O(n log n)'],ans:2,hint:'Regarde les formules trouvées en a) et b).',why:'Il y a 2ⁿ − 1 déplacements et 2ⁿ⁺¹ − 1 appels : O(2ⁿ). Ajouter un disque double presque le travail.'},
+   ],
+   sol:`<p>Le nombre de déplacements vérifie D(0) = 0 et D(n) = D(n − 1) + 1 + D(n − 1) = 2D(n − 1) + 1. Par récurrence, D(n) = 2ⁿ − 1, donc D(5) = 31.</p><p>Le nombre d’appels vérifie C(0) = 1 et C(n) = 1 + 2C(n − 1), d’où C(n) = 2ⁿ⁺¹ − 1 et C(3) = 15.</p><p>Pour la première ligne, on suit les premiers appels : h(3, A, B, C) → h(2, A, C, B) → h(1, A, B, C) → h(0, …), qui ne fait rien. On revient dans h(1, A, B, C), qui affiche A -> C.</p><p>La séquence complète pour n = 3 est A→C, A→B, C→B, A→C, B→A, B→C, A→C : 7 déplacements. Le coût est en O(2ⁿ), et on peut montrer qu’aucune méthode ne fait moins de 2ⁿ − 1 déplacements.</p>`},
 ]},
 
 /* ================= 4. Recherche ================= */
-{subj:'ics', sem:'algo', id:'cms-ics-recherche', h:'Recherche linéaire et dichotomique', p:'Chercher un élément, et aller beaucoup plus vite quand la liste est triée.', steps:[
+{subj:'ics', sem:'algo', id:'ics-recherche', h:'Recherche linéaire et dichotomique', p:'Chercher un élément, et aller beaucoup plus vite quand la liste est triée.', steps:[
   {kind:'Théorie',h:'La recherche linéaire',p:`On parcourt la liste du début à la fin et on s’arrête dès qu’on trouve <i>x</i>. Elle marche sur <b>n’importe quelle liste</b>, mais coûte jusqu’à <b>n</b> comparaisons : O(n).`,
    fig:py(`
 def recherche(L, x):
@@ -387,10 +486,39 @@ def dichotomie(L, x):
    why:'g = 0, d = 4, m = 2 : L[2] = 9 &gt; 1, donc d = 1. Puis m = 0 : L[0] = 4 &gt; 1, donc d = −1 et on sort avec −1. La liste n’étant pas triée, l’élimination d’une moitié n’est plus justifiée.'},
   {kind:'Défi',h:'Un million',p:'Une liste triée contient 1 000 000 d’éléments. Combien de tours au plus fait la dichotomie&nbsp;?',lab:'tours =',ans:20,
    why:'2¹⁹ = 524 288 &lt; 1 000 001 ≤ 2²⁰ = 1 048 576, donc ⌈log₂(1 000 001)⌉ = 20. La recherche linéaire pourrait faire un million de comparaisons.'},
+  {kind:'Problème',h:'Trace d’une dichotomie',p:`On applique la fonction <code class="code">dichotomie</code> du cours à la liste triée de 11 éléments ci-dessous. Un <b>tour</b> est un passage dans la boucle while, avec calcul de <i>m</i>. On cherche une valeur présente, puis une valeur absente.`+py(`
+L = [3, 8, 11, 15, 21, 27, 34, 40, 46, 52, 59]
+#    0  1   2   3   4   5   6   7   8   9  10   (indices)`),
+   parts:[
+    {q:'a) Combien de tours pour <code class="code">dichotomie(L, 46)</code>&nbsp;?',lab:'tours =',ans:2,hint:'Au départ g = 0 et d = 10. Calcule m = (g + d) // 2 et compare L[m] à 46.',why:'m = 5 : L[5] = 27 &lt; 46, donc g = 6. m = (6 + 10) // 2 = 8 : L[8] = 46, trouvé en 2 tours.'},
+    {q:'b) Pour <code class="code">dichotomie(L, 10)</code>, quelles sont les valeurs successives de <i>m</i>&nbsp;?',opts:['5, 2, 1','5, 2, 0, 1','5, 1, 0','5, 3, 1, 0'],ans:1,hint:'Après chaque comparaison, mets à jour g ou d, puis recalcule m. Continue tant que g ≤ d.',why:'m = 5 (27 &gt; 10, d = 4), m = 2 (11 &gt; 10, d = 1), m = 0 (3 &lt; 10, g = 1), m = 1 (8 &lt; 10, g = 2). Puis g = 2 &gt; d = 1 : on renvoie −1.'},
+    {q:'c) À la sortie de la boucle pour <i>x</i> = 10, que vaut <i>g</i>&nbsp;?',lab:'g =',ans:2,hint:'Reprends la fin de la trace de b).',why:'Le dernier tour fait g = m + 1 = 2, et d vaut 1.'},
+    {q:'d) Quand <i>x</i> est absent, que représente la valeur finale de <i>g</i>&nbsp;?',opts:['L’indice du plus grand élément de L','Le nombre de tours effectués','L’indice où insérer x pour que L reste triée','Toujours len(L) // 2'],ans:2,hint:'Pour x = 10, g = 2 : où faudrait-il placer 10 dans L&nbsp;?',why:'Invariant : tout élément avant g est &lt; x, tout élément après d est &gt; x. À la sortie g = d + 1, donc x se place exactement à l’indice g. Pour 10, c’est entre 8 et 11, à l’indice 2.'},
+   ],
+   sol:`<p>Pour x = 46 : (g, d) = (0, 10), m = 5, 27 &lt; 46, g = 6. Puis m = 8 et L[8] = 46 : trouvé en 2 tours.</p><p>Pour x = 10 : m = 5 (d = 4), m = 2 (d = 1), m = 0 (g = 1), m = 1 (g = 2). La zone est vide (g = 2 &gt; d = 1) après 4 tours, et on renvoie −1. Ce sont 4 tours, soit ⌈log₂ 12⌉ = 4 au plus pour 11 éléments.</p><p>On a toujours L[i] &lt; x pour i &lt; g et L[i] &gt; x pour i &gt; d. À la sortie, g = d + 1 : tous les éléments avant g sont plus petits que x et tous les autres plus grands. g est donc la position d’insertion de x, ici 2. Une recherche infructueuse donne cette information gratuitement.</p>`},
+  {kind:'Problème',h:'Première occurrence et boucle infinie',p:`Cette variante de la dichotomie renvoie l’indice de la <b>première</b> occurrence de <i>x</i> dans une liste triée non vide, ou −1. Elle s’arrête quand <i>g</i> = <i>d</i>, et ne teste l’égalité qu’à la fin. Remarque la mise à jour <code class="code">d = m</code>, sans le −1 habituel.`+py(`
+def premiere(L, x):
+    g, d = 0, len(L) - 1
+    while g < d:
+        m = (g + d) // 2
+        if L[m] < x:
+            g = m + 1
+        else:
+            d = m
+    return g if L[g] == x else -1
+
+L = [1, 3, 3, 3, 5, 8, 9]`),
+   parts:[
+    {q:'a) Que renvoie <code class="code">premiere(L, 3)</code>&nbsp;?',lab:'résultat =',ans:1,hint:'Quand L[m] vaut 3, on garde m dans la zone avec d = m et on continue à gauche.',why:'La première occurrence de 3 est à l’indice 1 : la fonction renvoie 1.'},
+    {q:'b) Combien de tours fait cet appel&nbsp;?',lab:'tours =',ans:3,hint:'Départ (g, d) = (0, 6). Calcule m, puis la nouvelle zone, jusqu’à g = d.',why:'m = 3 : L[3] = 3, d = 3. m = 1 : L[1] = 3, d = 1. m = 0 : L[0] = 1 &lt; 3, g = 1. g = d = 1 : 3 tours.'},
+    {q:'c) Un élève écrit <code class="code">g = m</code> au lieu de <code class="code">g = m + 1</code>. Que fait <code class="code">premiere([1, 3], 3)</code>&nbsp;?',opts:['Elle renvoie 1','Elle renvoie −1','Elle lève IndexError','Elle boucle sans fin'],ans:3,hint:'Avec g = 0 et d = 1, que vaut m&nbsp;? Et la zone change-t-elle&nbsp;?',why:'m = (0 + 1) // 2 = 0 et L[0] = 1 &lt; 3, donc g = m = 0. Rien ne change : la boucle tourne pour toujours.'},
+    {q:'d) Pourquoi la version correcte, avec <code class="code">d = m</code>, termine-t-elle toujours&nbsp;?',opts:['Car d diminue de 1 à chaque tour','Car si g &lt; d, alors m = (g + d) // 2 est strictement inférieur à d, donc d − g diminue dans les deux branches','Car la liste est triée','Car m est toujours pair'],ans:1,hint:'Le variant est d − g. Montre qu’il baisse quand g devient m + 1, puis quand d devient m.',why:'Si g &lt; d, alors g ≤ m &lt; d. g = m + 1 &gt; g et d = m &lt; d font tous les deux baisser d − g, qui reste ≥ 0. La boucle s’arrête. Le danger est seulement g = m, puisque m peut valoir g.'},
+   ],
+   sol:`<p><b>Invariant</b> : si x est dans L, sa première occurrence est dans L[g..d]. Si L[m] &lt; x, elle est après m : g = m + 1. Sinon L[m] ≥ x, et la première occurrence est en m ou avant : d = m, sans exclure m.</p><p>Trace pour x = 3 : (0, 6) → m = 3 → (0, 3) → m = 1 → (0, 1) → m = 0 → (1, 1). 3 tours, L[1] = 3 : on renvoie 1.</p><p><b>Terminaison</b> : tant que g &lt; d, on a g ≤ m &lt; d, car la division entière arrondit vers le bas. Les deux branches font baisser l’entier d − g ≥ 0.</p><p>Avec g = m, la branche L[m] &lt; x ne fait rien progresser quand m = g, par exemple pour d = g + 1. premiere([1, 3], 3) boucle alors sans fin.</p>`},
 ]},
 
 /* ================= 5. Tris simples ================= */
-{subj:'ics', sem:'algo', id:'cms-ics-tris', h:'Tris simples', p:'Insertion, bulles et sélection, pas à pas, et pourquoi ils coûtent O(n²).', steps:[
+{subj:'ics', sem:'algo', id:'ics-tris', h:'Tris simples', p:'Insertion, bulles et sélection, pas à pas, et pourquoi ils coûtent O(n²).', steps:[
   {kind:'Théorie',h:'Le tri par insertion',p:`On trie comme une main de cartes : le début de la liste est déjà trié, et on y fait glisser l’élément suivant vers la gauche tant que son voisin est plus grand. Invariant : après le tour <i>i</i>, <i>L</i>[0..i] est trié.`,
    fig:py(`
 def tri_insertion(L):
@@ -442,10 +570,37 @@ def tri_selection(L):
   {kind:'Défi',h:'Compter les échanges',p:'Combien d’échanges fait le tri par insertion sur <code class="code">[5, 2, 9, 1, 6, 3, 8, 4]</code>&nbsp;? Indice : chaque échange corrige exactement une paire mal ordonnée (une <b>inversion</b>).',
    lab:'échanges =',ans:13,
    why:'On compte les inversions, les paires (a, b) avec a avant b et a &gt; b : 5 en crée 4 (avec 2, 1, 3, 4), 2 en crée 1, 9 en crée 5, 1 aucune, 6 en crée 2, 3 aucune, 8 en crée 1. Total 4 + 1 + 5 + 2 + 1 = 13.'},
+  {kind:'Problème',h:'Trois tris, une liste',p:`On trie la liste <code class="code">[6, 3, 8, 2, 7, 1]</code> avec les trois tris du chapitre, dans leur version du cours. Pour chacun, il faut prédire l’état du tableau après quelques passes, sans tout dérouler. Une <b>passe</b> est un tour de la boucle extérieure.`+bars([6,3,8,2,7,1]),
+   parts:[
+    {q:'a) Tri à bulles : quel est l’état de la liste après 2 passes&nbsp;?',opts:['[3, 6, 2, 7, 1, 8]','[2, 3, 6, 1, 7, 8]','[3, 2, 6, 1, 7, 8]','[1, 2, 8, 3, 7, 6]'],ans:2,hint:'Une passe fait remonter le plus grand élément restant à la fin. Fais la première passe en entier, puis la seconde jusqu’à l’avant-dernière case.',why:'Passe 1 : [3, 6, 2, 7, 1, 8], le 8 est en place. Passe 2 : 3 &lt; 6 reste, 6 et 2 s’échangent, 6 &lt; 7 reste, 7 et 1 s’échangent : [3, 2, 6, 1, 7, 8].'},
+    {q:'b) Tri par sélection : quel est l’état de la liste après 2 passes (i = 0 puis i = 1)&nbsp;?',opts:['[1, 3, 8, 2, 7, 6]','[1, 2, 8, 3, 7, 6]','[1, 2, 3, 6, 7, 8]','[1, 2, 6, 3, 7, 8]'],ans:1,hint:'À chaque passe, on échange seulement deux cases : la case i et celle du minimum restant.',why:'i = 0 : le minimum 1 s’échange avec 6, d’où [1, 3, 8, 2, 7, 6]. i = 1 : le minimum restant 2 s’échange avec 3, d’où [1, 2, 8, 3, 7, 6].'},
+    {q:'c) Tri par insertion : combien d’échanges au total pour trier la liste&nbsp;?',lab:'échanges =',ans:10,hint:'Chaque échange de voisins corrige exactement une inversion. Compte les paires (a, b) avec a avant b et a &gt; b.',why:'6 est plus grand que 3, 2 et 1 placés après lui : 3 inversions. 3 en fait 2 (avec 2 et 1), 8 en fait 3 (avec 2, 7 et 1), 2 en fait 1 et 7 en fait 1. Total : 3 + 2 + 3 + 1 + 1 = 10.'},
+   ],
+   sol:`<p><b>Bulles.</b> La passe 1 compare les 5 paires voisines et pousse 8 au bout : [3, 6, 2, 7, 1, 8]. La passe 2 pousse 7 en avant-dernière place : [3, 2, 6, 1, 7, 8]. Invariant : après p passes, les p plus grands sont à leur place finale.</p><p><b>Sélection.</b> Chaque passe place le minimum restant en case i par un seul échange : [1, 3, 8, 2, 7, 6], puis [1, 2, 8, 3, 7, 6]. Invariant : après p passes, les p plus petits sont à leur place finale.</p><p><b>Insertion.</b> Chaque échange de deux voisins mal ordonnés supprime exactement une inversion. Le nombre d’échanges est donc le nombre d’inversions de la liste de départ : 3 (pour 6) + 2 (pour 3) + 3 (pour 8) + 1 (pour 2) + 1 (pour 7) = 10.</p>`},
+  {kind:'Problème',h:'Le tri à bulles qui s’arrête tôt',p:`Cette version du tri à bulles s’arrête dès qu’une passe ne fait aucun échange. Elle renvoie le nombre de passes effectuées, la dernière passe comprise, même si elle ne fait aucune comparaison. Une liste déjà triée ne coûte ainsi qu’une passe. Mais toutes les listes « presque triées » ne se valent pas.`+py(`
+def tri(L):
+    n = len(L)
+    passes = 0
+    echange = True
+    while echange:
+        echange = False
+        passes += 1
+        for j in range(n - passes):
+            if L[j] > L[j+1]:
+                L[j], L[j+1] = L[j+1], L[j]
+                echange = True
+    return passes`),
+   parts:[
+    {q:'a) Que renvoie <code class="code">tri([6, 1, 2, 3, 4, 5])</code>&nbsp;?',lab:'passes =',ans:2,hint:'Le 6 est un grand élément mal placé. Combien de passes faut-il pour l’envoyer au bout, puis pour constater que tout est trié&nbsp;?',why:'Passe 1 : le 6 remonte jusqu’au bout en 5 échanges, la liste est triée. Passe 2 : aucun échange, on s’arrête. 2 passes.'},
+    {q:'b) Que renvoie <code class="code">tri([2, 3, 4, 5, 6, 1])</code>&nbsp;?',lab:'passes =',ans:6,hint:'Le 1 est un petit élément mal placé. De combien de cases recule-t-il à chaque passe&nbsp;?',why:'Le 1 ne recule que d’une case par passe : il lui faut 5 passes, et la 5e fait encore un échange. La passe 6 (range(0), aucune comparaison) ne fait aucun échange : on renvoie 6.'},
+    {q:'c) Combien de comparaisons <code class="code">L[j] &gt; L[j+1]</code> au total pour cette même liste&nbsp;?',lab:'comparaisons =',ans:15,hint:'La passe p fait n − p comparaisons.',why:'Passes 1 à 6 : 5 + 4 + 3 + 2 + 1 + 0 = 15, autant que pour une liste dans l’ordre inverse.'},
+    {q:'d) Quel invariant justifie <code class="code">range(n - passes)</code>&nbsp;?',opts:['Après p passes, les p premiers éléments sont les p plus petits','Chaque passe fait au moins un échange','Après p passes, la liste a exactement p inversions de moins','Après p passes, les p derniers éléments sont les p plus grands, à leur place finale'],ans:3,hint:'Que devient le plus grand élément non placé pendant une passe&nbsp;?',why:'Pendant une passe, le maximum de la partie non triée est poussé d’échange en échange jusqu’au bout de cette partie. Les p dernières cases sont donc définitives et la passe p + 1 peut s’arrêter avant elles.'},
+   ],
+   sol:`<p>Un grand élément mal placé (« lièvre ») remonte en une seule passe, car chaque échange le pousse d’une case et il reste le maximum. Un petit élément mal placé (« tortue ») ne recule que d’une case par passe.</p><p>[6, 1, 2, 3, 4, 5] : une passe pour envoyer 6 au bout, une passe sans échange, donc 2 passes et 5 + 4 = 9 comparaisons.</p><p>[2, 3, 4, 5, 6, 1] : le 1 doit reculer de 5 cases, soit 5 passes avec échange, puis une 6e passe vide. On fait 5 + 4 + 3 + 2 + 1 + 0 = 15 comparaisons, le pire cas.</p><p>L’invariant « après p passes, les p plus grands sont en place » justifie la borne n − passes. Grâce à l’arrêt anticipé, le meilleur cas devient O(n) mais le pire cas reste O(n²).</p>`},
 ]},
 
 /* ================= 6. Tri fusion ================= */
-{subj:'ics', sem:'algo', id:'cms-ics-fusion', h:'Tri fusion', p:'Diviser pour régner : couper en deux, trier chaque moitié, fusionner.', steps:[
+{subj:'ics', sem:'algo', id:'ics-fusion', h:'Tri fusion', p:'Diviser pour régner : couper en deux, trier chaque moitié, fusionner.', steps:[
   {kind:'Théorie',h:'Diviser pour régner',p:`On <b>divise</b> la liste en deux moitiés, on les trie <b>récursivement</b>, puis on <b>fusionne</b> les deux listes triées. Le cas de base est une liste de longueur 0 ou 1, déjà triée.`,
    fig:py(`
 def fusion(A, B):
@@ -484,10 +639,45 @@ def tri_fusion(L):
    why:'En cas d’égalité, A[i] &lt;= B[j] prend l’élément de A, qui était avant dans la liste. Avec &lt;, on prendrait celui de B en premier et on inverserait les ex æquo.'},
   {kind:'Défi',h:'Le gain concret',p:'Pour <i>n</i> = 2¹⁶ = 65 536, l’insertion fait environ <i>n</i>²/2 comparaisons dans le pire cas et le tri fusion environ <i>n</i> log₂ <i>n</i>. Combien de fois moins de comparaisons pour le tri fusion&nbsp;?',lab:'rapport =',ans:2048,
    why:'(n²/2) / (n log₂ n) = n / (2 log₂ n) = 65 536 / 32 = 2048.'},
+  {kind:'Problème',h:'Dérouler un tri fusion',p:`On applique <code class="code">tri_fusion</code> du cours à <code class="code">[5, 1, 4, 2, 3]</code>. Avec 5 éléments, m = 5 // 2 = 2 : la moitié gauche a 2 éléments et la droite 3. Python évalue <code class="code">tri_fusion(L[:m])</code> en entier avant <code class="code">tri_fusion(L[m:])</code>. On compte les appels et les comparaisons <code class="code">A[i] &lt;= B[j]</code>.`,
+   parts:[
+    {q:'a) Combien d’appels à <code class="code">tri_fusion</code> au total, le premier compris&nbsp;?',lab:'appels =',ans:9,hint:'Dessine l’arbre des découpages : [5, 1, 4, 2, 3] → [5, 1] et [4, 2, 3], et ainsi de suite jusqu’aux listes d’un élément.',why:'Un appel pour la liste entière, 2 pour [5, 1] et [4, 2, 3], 2 pour [5] et [1], 2 pour [4] et [2, 3], 2 pour [2] et [3] : 9 appels.'},
+    {q:'b) Quel est le premier appel à <code class="code">fusion</code> exécuté&nbsp;?',opts:['fusion([2], [3])','fusion([5], [1])','fusion([1, 5], [2, 3, 4])','fusion([4], [2, 3])'],ans:1,hint:'Une fusion n’a lieu qu’une fois les deux moitiés triées. Quelle branche se termine en premier&nbsp;?',why:'L’appel sur [5, 1] est lancé en premier et ses deux moitiés [5] et [1] sont des cas de base. On fusionne donc d’abord [5] et [1].'},
+    {q:'c) Combien de comparaisons <code class="code">A[i] &lt;= B[j]</code> en tout&nbsp;?',lab:'comparaisons =',ans:8,hint:'Il y a 4 fusions : [5] et [1], [2] et [3], [4] et [2, 3], puis la dernière. Une fusion s’arrête dès qu’une des listes est vide.',why:'1 + 1 + 2 comparaisons pour les trois premières fusions. Pour [1, 5] et [2, 3, 4] : 1 ≤ 2, puis 5 &gt; 2, 5 &gt; 3, 5 &gt; 4, soit 4. Total 8.'},
+    {q:'d) Combien d’appels à <code class="code">tri_fusion</code> pour une liste de <i>n</i> ≥ 1 éléments&nbsp;?',opts:['n','n log₂ n','2n − 1','2ⁿ'],ans:2,hint:'Les feuilles de l’arbre sont les listes d’un élément. Chaque autre appel a exactement deux enfants.',why:'Il y a n feuilles. Un arbre où chaque nœud interne a deux enfants a une feuille de plus que de nœuds internes : n − 1 nœuds internes, soit 2n − 1 appels. Pour n = 5 : 9.'},
+   ],
+   sol:`<p>Arbre des appels : [5, 1, 4, 2, 3] → [5, 1] et [4, 2, 3] ; [5, 1] → [5] et [1] ; [4, 2, 3] → [4] et [2, 3] ; [2, 3] → [2] et [3]. Cela fait 9 appels, dont 5 cas de base.</p><p>Les fusions s’exécutent dans l’ordre où les appels se terminent : fusion([5], [1]) donne [1, 5] (1 comparaison). fusion([2], [3]) donne [2, 3] (1). fusion([4], [2, 3]) donne [2, 3, 4] (2 : 4 &gt; 2, 4 &gt; 3, puis B est vide).</p><p>Enfin fusion([1, 5], [2, 3, 4]) fait 4 comparaisons et donne [1, 2, 3, 4, 5]. Total : 8 comparaisons.</p><p>En général, l’arbre a n feuilles et n − 1 nœuds internes, soit 2n − 1 appels. Le coût vient des fusions : au plus n comparaisons par niveau.</p>`},
+  {kind:'Problème',h:'Compter les inversions en O(n log n)',p:`Une <b>inversion</b> d’une liste est une paire d’indices <i>i</i> &lt; <i>j</i> avec L[i] &gt; L[j]. Les compter toutes coûte O(n²) avec deux boucles. On adapte le tri fusion : quand on prend B[j] avant A[i], B[j] est plus petit que tous les éléments restants de A.`+py(`
+def fus_inv(A, B):
+    i, j, R, inv = 0, 0, [], 0
+    while i < len(A) and j < len(B):
+        if A[i] <= B[j]:
+            R.append(A[i]); i += 1
+        else:
+            R.append(B[j]); j += 1
+            inv += len(A) - i
+    return R + A[i:] + B[j:], inv
+
+def tri_inv(L):
+    if len(L) <= 1:
+        return L, 0
+    m = len(L) // 2
+    A, a = tri_inv(L[:m])
+    B, b = tri_inv(L[m:])
+    R, c = fus_inv(A, B)
+    return R, a + b + c`),
+   parts:[
+    {q:'a) Quelle valeur de <i>inv</i> renvoie <code class="code">fus_inv([2, 5, 8], [1, 3, 9])</code>&nbsp;?',lab:'inv =',ans:5,hint:'Note la valeur de len(A) − i chaque fois qu’on prend un élément de B.',why:'On prend 1 avec i = 0 : +3. On prend 2. On prend 3 avec i = 1 : +2. On prend 5, puis 8, et A est vide. Total 5 : (2, 1), (5, 1), (8, 1), (5, 3), (8, 3).'},
+    {q:'b) Pourquoi ajoute-t-on <code class="code">len(A) - i</code> quand on prend B[j]&nbsp;?',opts:['Parce que B est plus courte que A','Parce que A est triée : A[i], A[i+1], … sont tous &gt; B[j], et chacun forme une inversion avec B[j]','Parce que chaque comparaison coûte len(A) − i opérations','Parce que i compte les éléments de B déjà pris'],ans:1,hint:'Dans la liste de départ, tous les éléments de A étaient avant ceux de B. Lesquels sont plus grands que B[j]&nbsp;?',why:'On prend B[j] parce que A[i] &gt; B[j]. Comme A est triée, les len(A) − i éléments restants de A sont tous &gt; B[j]. Ils étaient avant B[j] : ce sont autant d’inversions, comptées d’un coup.'},
+    {q:'c) Pour <code class="code">tri_inv([4, 7, 1, 8, 2, 6])</code>, combien d’inversions la <b>dernière</b> fusion compte-t-elle&nbsp;?',lab:'inversions =',ans:3,hint:'Les deux moitiés triées sont [1, 4, 7] et [2, 6, 8]. Applique fus_inv.',why:'On prend 1, puis 2 avec i = 1 : +2. On prend 4, puis 6 avec i = 2 : +1. On prend 7, puis A est vide. Total 3 : (4, 2), (7, 2), (7, 6).'},
+    {q:'d) Combien d’inversions au total dans <code class="code">[4, 7, 1, 8, 2, 6]</code>&nbsp;?',lab:'inversions =',ans:7,hint:'Ajoute les inversions internes à chaque moitié [4, 7, 1] et [8, 2, 6].',why:'[4, 7, 1] en contient 2 ((4, 1) et (7, 1)), [8, 2, 6] en contient 2 ((8, 2) et (8, 6)), et la fusion 3 : total 7.'},
+    {q:'e) Quelle est la complexité de <code class="code">tri_inv</code>&nbsp;?',opts:['O(n²)','O(n)','O(n log n)','O(log n)'],ans:2,hint:'Compare avec le tri fusion : le travail ajouté dans fus_inv coûte-t-il plus que O(1) par tour&nbsp;?',why:'fus_inv fait le même travail que fusion, plus une addition par tour. On garde C(n) = 2C(n/2) + O(n), donc O(n log n).'},
+   ],
+   sol:`<p>Une inversion (x, y) de L est soit dans la moitié gauche, soit dans la moitié droite, soit « à cheval » : x à gauche et y à droite. tri_inv compte récursivement les deux premières sortes (a et b). fus_inv compte la troisième (c).</p><p>Pendant la fusion, prendre B[j] signifie A[i] &gt; B[j]. Comme A est triée, les len(A) − i éléments restants de A dépassent B[j] : ce sont exactement les inversions à cheval qui finissent en B[j].</p><p>Pour [4, 7, 1, 8, 2, 6] : la moitié [4, 7, 1] a 2 inversions, la moitié [8, 2, 6] en a 2, et la fusion de [1, 4, 7] et [2, 6, 8] en compte 3. Total 7, ce qu’on vérifie avec les paires (4, 1), (4, 2), (7, 1), (7, 2), (7, 6), (8, 2), (8, 6).</p><p>Le coût reste celui du tri fusion, O(n log n), au lieu de O(n²) pour la double boucle.</p>`},
 ]},
 
 /* ================= 7. Graphes ================= */
-{subj:'ics', sem:'algo', id:'cms-ics-graphes', h:'Graphes et parcours', p:'Représenter un graphe et le parcourir en largeur ou en profondeur.', steps:[
+{subj:'ics', sem:'algo', id:'ics-graphes', h:'Graphes et parcours', p:'Représenter un graphe et le parcourir en largeur ou en profondeur.', steps:[
   {kind:'Théorie',h:'Sommets et arêtes',p:`Un <b>graphe</b> G = (S, A) est un ensemble de <b>sommets</b> S reliés par des <b>arêtes</b> A. Il est <b>non orienté</b> si chaque arête se parcourt dans les deux sens. Deux sommets reliés sont <b>voisins</b>, et le <b>degré</b> d’un sommet est son nombre de voisins.`,
    fig:graph(GN,GE,{sub:k=>''},200),
    note:'Ce graphe a 7 sommets et 8 arêtes. B a pour voisins A, D et E : son degré vaut 3.'},
@@ -540,10 +730,47 @@ def dfs(G, u, vus):
   {kind:'Défi',h:'Un DFS depuis C',p:'On lance le DFS depuis <b>C</b>, voisins par ordre alphabétique. Quel est le <b>4e</b> sommet visité&nbsp;?',fig:graph(GN,GE,{},200),
    opts:['B','F','G','D'],ans:3,
    why:'C a pour voisins A, F : on va en A. A a pour voisins B, C : on va en B. B a pour voisins A, D, E : on va en D. L’ordre complet est C, A, B, D, G, F, E.'},
+  {kind:'Problème',h:'BFS et DFS avec un ordre imposé',p:`On parcourt le graphe ci-dessous depuis <b>S</b> avec les fonctions <code class="code">bfs</code> et <code class="code">dfs</code> du cours. Attention : les voisins ne sont <b>pas</b> rangés par ordre alphabétique. Les parcours les lisent dans l’ordre du dictionnaire.`+graph(PB7N,PB7E,{},210)+py(`
+G = {'S': ['B', 'A'], 'A': ['C', 'S'],
+     'B': ['D', 'C', 'S'], 'C': ['E', 'B', 'A'],
+     'D': ['T', 'B'], 'E': ['T', 'C'],
+     'T': ['E', 'D']}`),
+   parts:[
+    {q:'a) Dans quel ordre <code class="code">bfs(G, \'S\')</code> visite-t-il les sommets&nbsp;?',opts:['S, A, B, C, D, E, T','S, B, D, T, E, C, A','S, B, A, C, D, E, T','S, B, A, D, C, T, E'],ans:3,hint:'Simule la file. S enfile B puis A. Quand on défile B, quels voisins non vus sont enfilés, et dans quel ordre&nbsp;?',why:'S enfile B, A. B enfile D, C. A n’apporte rien (C déjà vu). D enfile T. C enfile E. Ordre : S, B, A, D, C, T, E.'},
+    {q:'b) Combien d’arêtes contient un plus court chemin de S à T&nbsp;?',lab:'arêtes =',ans:3,hint:'Le BFS visite par distance croissante : à quelle « couche » T apparaît-il&nbsp;?',why:'Couche 1 : B, A. Couche 2 : D, C. Couche 3 : T, E. Un plus court chemin est S – B – D – T, soit 3 arêtes.'},
+    {q:'c) Dans quel ordre <code class="code">dfs(G, \'S\', [])</code> visite-t-il les sommets&nbsp;?',opts:['S, B, D, T, E, C, A','S, B, A, D, C, T, E','S, A, C, E, T, D, B','S, B, C, E, T, D, A'],ans:0,hint:'Va toujours vers le premier voisin non vu de la liste, et ne reviens en arrière que si tous sont vus.',why:'S → B (premier voisin) → D → T → E (T a pour voisins E, D) → C (E a pour voisins T, C) → A. Ordre : S, B, D, T, E, C, A.'},
+    {q:'d) Au moment où le DFS visite A, combien d’appels sont en attente sur la pile, celui de A compris&nbsp;?',lab:'appels =',ans:7,hint:'Le chemin de la pile est S → B → D → … → A. Aucun appel n’est encore terminé&nbsp;?',why:'Chaque sommet a été atteint depuis le précédent, sans retour en arrière : la pile contient S, B, D, T, E, C, A, soit 7 appels. Le DFS a suivi un chemin qui passe par tous les sommets.'},
+   ],
+   sol:`<p><b>BFS.</b> File [S]. On défile S et on enfile B, A. On défile B et on enfile D, C (S est vu). On défile A : C et S sont déjà vus. On défile D et on enfile T. On défile C et on enfile E. Puis T et E n’apportent rien. Ordre : S, B, A, D, C, T, E.</p><p>Le BFS visite par couches de distance : {S}, {B, A}, {D, C}, {T, E}. d(S, T) = 3, par exemple S – B – D – T.</p><p><b>DFS.</b> On suit à chaque fois le premier voisin non vu : S → B → D → T → E → C → A. Arrivé en A, aucun appel n’est terminé : la pile contient les 7 sommets. Le DFS a trouvé un chemin passant par tous les sommets, alors que le BFS, lui, construit un arbre « large ».</p><p>Changer l’ordre des listes d’adjacence change l’ordre de visite, mais pas les distances du BFS.</p>`},
+  {kind:'Problème',h:'Compter les composantes connexes',p:`Une <b>composante connexe</b> est un groupe de sommets reliés entre eux par des chemins, et à rien d’autre. La fonction ci-dessous lance un parcours en profondeur, avec une pile explicite, depuis chaque sommet pas encore vu. Elle compte combien de parcours elle a dû lancer.`+graph(PB7CN,PB7CE,{},200)+py(`
+G = {1: [2, 4], 2: [1, 3, 4], 3: [2], 4: [1, 2],
+     5: [6], 6: [5], 7: [8], 8: [7], 9: []}
+
+def composantes(G):
+    vus, nb = set(), 0
+    for s in G:
+        if s not in vus:
+            nb += 1
+            pile = [s]
+            while pile:
+                u = pile.pop()
+                if u not in vus:
+                    vus.add(u)
+                    for v in G[u]:
+                        pile.append(v)
+    return nb`),
+   parts:[
+    {q:'a) Que renvoie <code class="code">composantes(G)</code>&nbsp;?',lab:'nb =',ans:4,hint:'Un sommet isolé forme une composante à lui seul.',why:'Les composantes sont {1, 2, 3, 4}, {5, 6}, {7, 8} et {9} : 4 parcours lancés.'},
+    {q:'b) Dans quel ordre les sommets 1, 2, 3, 4 sont-ils ajoutés à <i>vus</i>&nbsp;?',opts:['1, 2, 3, 4','1, 2, 4, 3','1, 4, 3, 2','1, 4, 2, 3'],ans:3,hint:'pop() retire le <b>dernier</b> élément empilé. Après 1, la pile vaut [2, 4].',why:'On dépile 1 et on empile 2, 4. On dépile 4 et on empile 1, 2. On dépile 2 et on empile 1, 3, 4. On dépile 4 (déjà vu), puis 3. Ordre : 1, 4, 2, 3.'},
+    {q:'c) Combien de fois <code class="code">pile.append(v)</code> est-il exécuté en tout&nbsp;?',lab:'empilements =',ans:12,hint:'Chaque sommet n’est traité qu’une fois, et on empile alors tous ses voisins.',why:'On empile la liste de voisins de chaque sommet une seule fois : la somme des degrés, 2 + 3 + 1 + 2 + 1 + 1 + 1 + 1 + 0 = 12, soit 2 × 6 arêtes.'},
+    {q:'d) Combien d’arêtes faut-il ajouter, au minimum, pour rendre le graphe connexe&nbsp;?',lab:'arêtes =',ans:3,hint:'Une arête nouvelle relie au mieux deux composantes en une seule.',why:'Chaque arête ajoutée fait baisser le nombre de composantes d’au plus 1. Pour passer de 4 à 1, il en faut au moins 3, et 3 suffisent (par exemple 3–5, 6–7, 8–9).'},
+    {q:'e) Le graphe a 9 sommets, 4 composantes et 6 arêtes. Que peut-on en conclure&nbsp;?',opts:['Il n’a aucun cycle','Il contient au moins un cycle, car un graphe sans cycle à 9 sommets et 4 composantes a exactement 5 arêtes','On ne peut rien dire sans le dessin','Il est connexe'],ans:1,hint:'Une forêt (graphe sans cycle) est faite d’arbres. Combien d’arêtes a un arbre à k sommets&nbsp;?',why:'Chaque composante sans cycle est un arbre à kᵢ sommets et kᵢ − 1 arêtes. Le total vaut alors 9 − 4 = 5. Avec 6 arêtes, il y a un cycle : ici 1 – 2 – 4.'},
+   ],
+   sol:`<p>La boucle for lance un parcours depuis 1, ce qui marque 1, 4, 2, 3. Puis elle saute 2, 3, 4, lance un parcours depuis 5 (marque 5, 6), depuis 7 (marque 7, 8) et depuis 9. nb = 4.</p><p>Avec une pile, le dernier voisin empilé est exploré en premier. Les sommets peuvent être empilés plusieurs fois, mais le test u not in vus garantit qu’on ne les traite qu’une fois. Chaque liste de voisins est donc parcourue une fois : 12 empilements, soit la somme des degrés. Le coût total est O(n + m).</p><p>Il faut au moins nb − 1 = 3 arêtes pour tout relier. Enfin, une forêt à n sommets et k composantes a n − k arêtes. Ici 9 − 4 = 5 &lt; 6 : le graphe a un cycle, 1 – 2 – 4.</p>`},
 ]},
 
 /* ================= 8. Plus court chemin et arbre couvrant ================= */
-{subj:'ics', sem:'algo', id:'cms-ics-dijkstra', h:'Plus court chemin et arbre couvrant', p:'L’algorithme de Dijkstra et l’arbre couvrant minimal de Kruskal.', steps:[
+{subj:'ics', sem:'algo', id:'ics-dijkstra', h:'Plus court chemin et arbre couvrant', p:'L’algorithme de Dijkstra et l’arbre couvrant minimal de Kruskal.', steps:[
   {kind:'Théorie',h:'L’idée de Dijkstra',p:`Dans un graphe à poids <b>positifs</b>, on cherche les distances depuis A. On garde une distance provisoire d(v) pour chaque sommet. À chaque étape, on <b>fixe</b> le sommet non fixé de plus petite distance, puis on <b>relâche</b> ses arêtes : d(v) ← min(d(v), d(u) + poids(u, v)).`,
    fig:py(`
 import heapq
@@ -604,6 +831,23 @@ def kruskal(sommets, aretes):   # aretes = [(w, u, v), ...]
    fig:graph(WN,WE.map(e=>e[0]==='D'&&e[1]==='E'?['D','E',7]:e),{},220),
    lab:'poids =',ans:17,
    why:'Ordre : B–C (1), A–C (2), E–F (3), A–B (4, cycle), B–D (5), D–F (6), D–E (7, cycle)… On garde B–C, A–C, E–F, B–D, D–F : 1 + 2 + 3 + 5 + 6 = 17.'},
+  {kind:'Problème',h:'Dijkstra sur un nouveau réseau',p:`Le graphe ci-dessous a les mêmes sommets et les mêmes arêtes que dans le cours, mais d’autres poids. On applique Dijkstra depuis <b>A</b>. À chaque étape, on fixe le sommet non fixé de plus petite distance provisoire, puis on relâche ses arêtes. Garde un tableau des distances provisoires.`+graph(WN,PB8E1,{},220),
+   parts:[
+    {q:'a) Quelle est la distance d(B) de A à B&nbsp;?',lab:'d(B) =',ans:5,hint:'L’arête directe A–B pèse 7. Y a-t-il un détour plus léger&nbsp;?',why:'Le détour A → C → B coûte 2 + 3 = 5 &lt; 7. C est fixé en premier (d = 2) et fait passer d(B) de 7 à 5.'},
+    {q:'b) Quelle est la distance d(F)&nbsp;?',lab:'d(F) =',ans:11,hint:'Calcule d’abord d(D) et d(E), puis compare les deux façons d’arriver en F.',why:'d(D) = 5 + 1 = 6 et d(E) = 2 + 5 = 7 (le chemin par D donne 6 + 2 = 8). Puis d(F) = min(6 + 6, 7 + 4) = 11.'},
+    {q:'c) Dans quel ordre les sommets sont-ils fixés&nbsp;?',opts:['A, B, C, D, E, F','A, C, E, B, D, F','A, C, B, D, E, F','A, C, B, E, D, F'],ans:2,hint:'Les distances finales sont 0, 2, 5, 6, 7, 11 : Dijkstra fixe les sommets par distance croissante.',why:'d(A) = 0, d(C) = 2, d(B) = 5, d(D) = 6, d(E) = 7, d(F) = 11. Les distances sont toutes différentes, donc l’ordre est A, C, B, D, E, F.'},
+    {q:'d) Quel est le plus court chemin de A à F&nbsp;?',opts:['A → B → D → F','A → C → B → D → F','A → C → E → F','A → C → B → D → E → F'],ans:2,hint:'Remonte depuis F : quel relâchement a donné d(F) = 11&nbsp;?',why:'d(F) = 11 vient de E (7 + 4), et d(E) = 7 vient de C (2 + 5). Chemin : A → C → E → F. Les autres pèsent 14, 12 et 12.'},
+   ],
+   sol:`<p>Départ : d(A) = 0. On fixe A : d(B) = 7, d(C) = 2.</p><p>On fixe C (2) : d(B) = min(7, 2 + 3) = 5, d(D) = 10, d(E) = 7. On fixe B (5) : d(D) = min(10, 5 + 1) = 6. On fixe D (6) : d(E) reste 7 (6 + 2 = 8), d(F) = 12. On fixe E (7) : d(F) = min(12, 7 + 4) = 11. On fixe F.</p><p>Ordre de fixation : A, C, B, D, E, F, avec les distances 0, 2, 5, 6, 7, 11.</p><p>En notant pour chaque sommet d’où vient sa dernière mise à jour, on remonte F ← E ← C ← A : le plus court chemin est A → C → E → F, de poids 11.</p>`},
+  {kind:'Problème',h:'Plus courts chemins ou arbre couvrant&nbsp;?',p:`Sur ce nouveau graphe, on calcule les distances depuis <b>A</b> avec Dijkstra, puis l’arbre couvrant minimal avec Kruskal. Les deux algorithmes construisent un arbre qui relie les 6 sommets. Mais ils ne répondent pas à la même question, et leurs arbres peuvent être différents.`+graph(WN,PB8E2,{},220),
+   parts:[
+    {q:'a) Quelle est la distance d(D) depuis A&nbsp;?',lab:'d(D) =',ans:8,hint:'Il y a trois façons d’arriver en D : par B, par C ou par E. Calcule d’abord d(B), d(C) et d(E).',why:'d(C) = 3, d(B) = 4 et d(E) = 3 + 4 = 7. Puis d(D) = min(4 + 5, 3 + 6, 7 + 1) = 8, par A → C → E → D.'},
+    {q:'b) Quelle est la distance d(F)&nbsp;?',lab:'d(F) =',ans:11,hint:'Compare l’arrivée par D et l’arrivée par E.',why:'d(F) = min(d(D) + 3, d(E) + 6) = min(11, 13) = 11.'},
+    {q:'c) Quel est le poids de l’arbre couvrant minimal&nbsp;?',lab:'poids =',ans:13,hint:'Trie les arêtes : D–E (1), B–C (2), A–C (3), D–F (3), A–B (4), C–E (4)… Garde-les tant qu’elles ne ferment pas de cycle, jusqu’à 5 arêtes.',why:'On garde D–E (1), B–C (2), A–C (3), D–F (3), on rejette A–B (4), et on garde C–E (4). 1 + 2 + 3 + 3 + 4 = 13.'},
+    {q:'d) Quelle est la première arête rejetée par Kruskal&nbsp;?',opts:['C–E (4)','B–D (5)','A–B (4)','E–F (6)'],ans:2,hint:'Après D–E, B–C, A–C et D–F, les sommets A, B et C sont-ils déjà reliés&nbsp;?',why:'A–C et B–C relient déjà A, B et C. A–B fermerait le cycle A–B–C : elle est rejetée. C–E, de même poids, relie deux morceaux différents et est gardée, quel que soit l’ordre entre les deux.'},
+    {q:'e) L’arbre des plus courts chemins depuis A (A–C, A–B, C–E, E–D, D–F) pèse 15, plus que l’arbre couvrant minimal. Est-ce une contradiction&nbsp;?',opts:['Oui : Dijkstra a dû se tromper','Non : Dijkstra minimise chaque distance depuis A, Kruskal minimise la somme de tous les poids de l’arbre, ce sont deux objectifs différents','Oui : les deux arbres devraient toujours être égaux','Non : c’est parce que le graphe contient des poids égaux'],ans:1,hint:'Compare ce que chaque algorithme cherche à rendre minimal.',why:'L’arbre de Kruskal relie B par B–C (2), mais alors A → B coûte 3 + 2 = 5 au lieu de 4. Chaque algorithme est optimal pour son propre critère : distances depuis une source pour Dijkstra, poids total pour Kruskal.'},
+   ],
+   sol:`<p><b>Dijkstra.</b> On fixe A (0) : d(B) = 4, d(C) = 3. On fixe C (3) : d(D) = 9, d(E) = 7. On fixe B (4) : D reste à 9. On fixe E (7) : d(D) = 8, d(F) = 13. On fixe D (8) : d(F) = 11. On fixe F. L’arbre des plus courts chemins est A–C, A–B, C–E, E–D, D–F, de poids 3 + 4 + 4 + 1 + 3 = 15.</p><p><b>Kruskal.</b> Ordre : D–E 1, B–C 2, A–C 3, D–F 3, A–B 4, C–E 4, B–D 5, C–D 6, E–F 6. On garde D–E, B–C, A–C, D–F, on rejette A–B (cycle A–B–C), on garde C–E. Les 5 arêtes sont trouvées : poids 13.</p><p>Les deux arbres diffèrent : l’arbre couvrant minimal remplace A–B (4) par B–C (2), ce qui allonge le trajet de A à B. Minimiser chaque distance depuis A et minimiser le poids total sont deux problèmes différents.</p>`},
 ]},
 );
 })();

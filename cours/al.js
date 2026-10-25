@@ -1,4 +1,4 @@
-/* Déclic — Algèbre linéaire (PREPA-001 / 002) — tout le programme en dimension 2 */
+/* Déclic — Algèbre linéaire, dans le plan (dimension 2) */
 (()=>{
 /* ---------- helpers locaux ---------- */
 let VN=0;
@@ -52,9 +52,9 @@ function grille(P,a,b,c,d,n=3){
 const ln=(P,dx,dy,q)=>P.seg(-20*dx,-20*dy,20*dx,20*dy,q);
 const inR=(x,y,r)=>Math.abs(x)<=r&&Math.abs(y)<=r;
 
-CMS.push(
+COURS.push(
 /* ===================== 1. ENSEMBLES ===================== */
-{subj:'al',sem:'all',id:'cms-al-ensembles',h:'Ensembles',p:'Appartenance, inclusion, opérations et lois de De Morgan, vues sur des diagrammes de Venn.',steps:[
+{subj:'al',sem:'all',id:'al-ensembles',h:'Ensembles',p:'Appartenance, inclusion, opérations et lois de De Morgan, vues sur des diagrammes de Venn.',steps:[
   {h:'Appartenir ou être inclus',p:`Un <b>ensemble</b> est une collection d’objets, ses <b>éléments</b>. On écrit <i>x</i> ∈ <i>A</i> si <i>x</i> est un élément de <i>A</i>. On dit que <i>A</i> est <b>inclus</b> dans <i>B</i>, et on écrit <i>A</i> ⊂ <i>B</i>, si tout élément de <i>A</i> est aussi dans <i>B</i>.<br><b>Exemple :</b> ℕ ⊂ ℤ ⊂ ℚ ⊂ ℝ, et 3 ∈ ℕ.`,
    fig:`<svg viewBox="0 0 320 200" width="320" role="img"><rect x="10" y="10" width="300" height="180" rx="10" fill="none" stroke="var(--muted)" stroke-width="1.5"/><circle cx="160" cy="105" r="80" fill="var(--math)" fill-opacity=".15" stroke="var(--math)" stroke-width="2"/><circle cx="185" cy="105" r="40" fill="var(--spark)" fill-opacity=".35" stroke="var(--ink)" stroke-width="2"/><text x="105" y="110" font-size="15" font-weight="700" fill="var(--ink)">B</text><text x="180" y="110" font-size="15" font-weight="700" fill="var(--ink)">A</text><text x="292" y="180" font-size="14" font-weight="700" text-anchor="middle" fill="var(--muted)">E</text><text x="24" y="180" font-size="13" font-weight="700" fill="var(--muted)">A ⊂ B</text></svg>`,
    note:'<b>Piège :</b> ∈ relie un élément à un ensemble, ⊂ relie deux ensembles. On a 1 ∈ {1 ; 2} mais {1} ⊂ {1 ; 2}. Et l’ensemble vide ∅ est inclus dans tout ensemble.'},
@@ -97,10 +97,33 @@ CMS.push(
   {kind:'Défi',h:'Complémentaire d’une intersection',p:'À quoi est égal (<i>A</i> ∩ <i>B</i>ᶜ)ᶜ&nbsp;?',
    opts:['<i>A</i>ᶜ ∩ <i>B</i>','<i>A</i> ∪ <i>B</i>ᶜ','<i>A</i>ᶜ ∪ <i>B</i>ᶜ','<i>A</i>ᶜ ∪ <i>B</i>'],ans:3,
    why:'De Morgan : (A ∩ Bᶜ)ᶜ = Aᶜ ∪ (Bᶜ)ᶜ = Aᶜ ∪ B. Le complémentaire du complémentaire redonne B.'},
+  {kind:'Problème',h:'Trois langues dans une classe',
+   p:'Une classe compte 40 élèves. 28 apprennent l’anglais (<i>A</i>), 15 l’allemand (<i>D</i>) et 10 l’italien (<i>I</i>). 8 élèves font anglais et allemand, 5 anglais et italien, 4 allemand et italien, et 2 font les trois langues. On veut savoir combien d’élèves n’apprennent aucune de ces langues, en découpant la classe en régions disjointes.',
+   parts:[
+    {q:'a) Combien d’élèves apprennent l’anglais <b>et</b> l’allemand, mais <b>pas</b> l’italien&nbsp;?',lab:'élèves :',ans:6,hint:'Dans A ∩ D, retire ceux qui sont aussi dans I, c’est-à-dire A ∩ D ∩ I.',why:'card(A ∩ D) − card(A ∩ D ∩ I) = 8 − 2 = 6.'},
+    {q:'b) Combien d’élèves apprennent <b>seulement</b> l’anglais&nbsp;?',lab:'élèves :',ans:17,hint:'Pars de 28 et retire les élèves de A qui font aussi D ou I, sans retirer deux fois ceux qui font les trois.',why:'Anglais et allemand seulement : 6. Anglais et italien seulement : 5 − 2 = 3. Les trois : 2. Il reste 28 − 6 − 3 − 2 = 17.'},
+    {q:'c) Combien d’élèves apprennent au moins une langue, c’est-à-dire card(<i>A</i> ∪ <i>D</i> ∪ <i>I</i>)&nbsp;?',lab:'card =',ans:38,hint:'Formule du crible : on ajoute les trois cardinaux, on retire les intersections deux à deux, puis on rajoute l’intersection des trois.',why:'28 + 15 + 10 − 8 − 5 − 4 + 2 = 38.'},
+    {q:'d) Combien d’élèves n’apprennent aucune des trois langues&nbsp;?',lab:'élèves :',ans:2,hint:'C’est le cardinal de (A ∪ D ∪ I)ᶜ dans la classe.',why:'Par De Morgan, Aᶜ ∩ Dᶜ ∩ Iᶜ = (A ∪ D ∪ I)ᶜ, qui a 40 − 38 = 2 éléments.'},
+   ],
+   sol:'On découpe la classe en 8 régions disjointes.<br>Les trois langues : 2. Exactement deux langues : A ∩ D seul 8 − 2 = 6, A ∩ I seul 5 − 2 = 3, D ∩ I seul 4 − 2 = 2.<br>Une seule langue : anglais 28 − 6 − 3 − 2 = 17, allemand 15 − 6 − 2 − 2 = 5, italien 10 − 3 − 2 − 2 = 3.<br>Total : 17 + 5 + 3 + 6 + 3 + 2 + 2 = 38, ce que confirme le crible 28 + 15 + 10 − 8 − 5 − 4 + 2 = 38.<br>Les élèves sans langue forment (A ∪ D ∪ I)ᶜ = Aᶜ ∩ Dᶜ ∩ Iᶜ : il y en a <b>40 − 38 = 2</b>.'},
+  {kind:'Problème',h:'La différence symétrique',
+   p:'On note <i>A</i> Δ <i>B</i> = (<i>A</i> \\ <i>B</i>) ∪ (<i>B</i> \\ <i>A</i>) la <b>différence symétrique</b> : les éléments qui sont dans <b>exactement un</b> des deux ensembles. On veut démontrer que <i>A</i> Δ <i>B</i> = (<i>A</i> ∪ <i>B</i>) \\ (<i>A</i> ∩ <i>B</i>), puis s’en servir pour compter. La figure montre <i>A</i> Δ <i>B</i>.',
+   fig:venn({a:1,b:1}),
+   parts:[
+    {q:'a) Pour démontrer une égalité d’ensembles <i>X</i> = <i>Y</i>, quelle méthode est correcte&nbsp;?',opts:['Trouver un élément commun à X et Y','Montrer X ⊂ Y, puis Y ⊂ X','Montrer que X et Y ont le même nombre d’éléments','Vérifier l’égalité sur un exemple'],ans:1,
+     hint:'Deux ensembles sont égaux quand chacun est inclus dans l’autre.',why:'C’est la <b>double inclusion</b>. Le même cardinal ne suffit pas : {1} et {2} en ont chacun un. Un exemple ne prouve rien en général.'},
+    {q:'b) Soit <i>x</i> ∈ <i>A</i> \\ <i>B</i>. Pourquoi <i>x</i> ∈ (<i>A</i> ∪ <i>B</i>) \\ (<i>A</i> ∩ <i>B</i>)&nbsp;?',opts:['Car x ∈ A ∩ B','Car x ∉ A, donc x ∉ A ∩ B','Car x ∈ B, donc x ∈ A ∪ B','Car x ∈ A donne x ∈ A ∪ B, et x ∉ B donne x ∉ A ∩ B'],ans:3,
+     hint:'Écris ce que signifie x ∈ A \\ B : deux informations.',why:'x ∈ A \\ B signifie x ∈ A et x ∉ B. La première donne x ∈ A ∪ B, la seconde x ∉ A ∩ B. Le cas x ∈ B \\ A est symétrique : A Δ B ⊂ (A ∪ B) \\ (A ∩ B).'},
+    {q:'c) Réciproquement, soit <i>x</i> ∈ (<i>A</i> ∪ <i>B</i>) \\ (<i>A</i> ∩ <i>B</i>) avec <i>x</i> ∈ <i>A</i>. Que peut-on conclure&nbsp;?',opts:['x ∈ B, donc x ∈ B \\ A','x ∉ B, sinon x serait dans A ∩ B : donc x ∈ A \\ B','On ne peut rien conclure sur B','x ∈ A ∩ B'],ans:1,
+     hint:'Que se passerait-il si x était aussi dans B ?',why:'Si x ∈ B, alors x ∈ A ∩ B, ce qui est exclu. Donc x ∈ A \\ B ⊂ A Δ B. Si x ∈ B, même raisonnement : x ∈ B \\ A. D’où l’autre inclusion.'},
+    {q:'d) Dans <i>E</i> = {1, …, 12}, <i>A</i> est l’ensemble des nombres pairs et <i>B</i> celui des multiples de 3. Combien d’éléments a <i>A</i> Δ <i>B</i>&nbsp;?',lab:'card =',ans:6,
+     hint:'Avec l’égalité démontrée : card(A Δ B) = card(A ∪ B) − card(A ∩ B).',why:'A a 6 éléments, B en a 4, A ∩ B = {6 ; 12}. card(A ∪ B) = 6 + 4 − 2 = 8, donc card(A Δ B) = 8 − 2 = 6 : {2 ; 3 ; 4 ; 8 ; 9 ; 10}.'},
+   ],
+   sol:'On procède par double inclusion.<br>⊂ : si x ∈ A \\ B, alors x ∈ A ⊂ A ∪ B et x ∉ B, donc x ∉ A ∩ B. Même chose si x ∈ B \\ A.<br>⊃ : si x ∈ A ∪ B et x ∉ A ∩ B, alors x est dans A ou dans B, mais pas dans les deux. S’il est dans A, il n’est pas dans B : x ∈ A \\ B. Sinon x ∈ B \\ A.<br>Donc <b>A Δ B = (A ∪ B) \\ (A ∩ B)</b>, et card(A Δ B) = card(A) + card(B) − 2 card(A ∩ B).<br>Exemple : 6 + 4 − 2·2 = <b>6</b>.'},
 ]},
 
 /* ===================== 2. LOGIQUE ===================== */
-{subj:'al',sem:'all',id:'cms-al-logique',h:'Logique',p:'Connecteurs, tables de vérité, quantificateurs et l’art de nier une phrase.',steps:[
+{subj:'al',sem:'all',id:'al-logique',h:'Logique',p:'Connecteurs, tables de vérité, quantificateurs et l’art de nier une phrase.',steps:[
   {h:'Les connecteurs',p:`Une <b>proposition</b> est vraie (V) ou fausse (F). On la combine avec <b>non</b>, <b>et</b>, <b>ou</b>, <b>⇒</b> (implication) et <b>⇔</b> (équivalence). Une <b>table de vérité</b> donne la valeur pour chaque cas. Choisis P et Q pour surligner la ligne.`,
    params:[{id:'p',l:'P (0 = F, 1 = V)',min:0,max:1,v:1},{id:'q',l:'Q (0 = F, 1 = V)',min:0,max:1,v:0}],
    draw:v=>truth(v.p,v.q),
@@ -135,10 +158,39 @@ CMS.push(
   {kind:'Défi',h:'Compter les lignes vraies',p:'La table de vérité de (<i>P</i> ⇒ <i>Q</i>) et (<i>Q</i> ⇒ <i>R</i>) a 8 lignes. Combien sont vraies&nbsp;?',
    lab:'lignes vraies :',ans:4,
    why:'Il ne faut jamais « V puis F » dans l’ordre P, Q, R. Les triplets possibles sont FFF, FFV, FVV et VVV : 4 lignes.'},
+  {kind:'Problème',h:'Prouver qu’une fonction saute',
+   p:'On dit que <i>f</i> est <b>continue en <i>a</i></b> si ∀ε > 0, ∃δ > 0, ∀<i>x</i> ∈ ℝ, |<i>x</i> − <i>a</i>| < δ ⇒ |<i>f</i>(<i>x</i>) − <i>f</i>(<i>a</i>)| < ε. On étudie la fonction marche <i>H</i>, qui vaut 0 si <i>x</i> < 0 et 1 si <i>x</i> ≥ 0. Son graphe saute en 0 : on veut le prouver avec la définition, en écrivant d’abord sa négation.',
+   fig:(()=>{ const P=plane({x:[-3,3],y:[-1,2],lab:1}); P.seg(-3,0,-0.1,0,{w:4}).seg(0,1,3,1,{w:4}).circ(0,0,.1,{c:'var(--accent)',w:2}).dot(0,1,{r:5,c:'var(--accent)'}); P.text(2.9,1.3,'H',{a:'end'}); return P.svg(); })(),
+   parts:[
+    {q:'a) Quelle est la négation de « <i>f</i> est continue en <i>a</i> »&nbsp;?',opts:['∀ε > 0, ∃δ > 0, ∀x ∈ ℝ, |x − a| < δ ⇒ |f(x) − f(a)| ≥ ε','∃ε > 0, ∀δ > 0, ∃x ∈ ℝ, |x − a| ≥ δ et |f(x) − f(a)| ≥ ε','∃ε > 0, ∀δ > 0, ∃x ∈ ℝ, |x − a| < δ et |f(x) − f(a)| ≥ ε','∃ε ≤ 0, ∀δ ≤ 0, ∃x ∈ ℝ, |x − a| < δ ⇒ |f(x) − f(a)| ≥ ε'],ans:2,
+     hint:'Échange ∀ et ∃ en gardant les domaines, puis utilise non(P ⇒ Q) ⇔ P et (non Q).',why:'Les quantificateurs s’échangent (ε > 0 et δ > 0 restent tels quels), et la négation de « |x − a| < δ ⇒ |f(x) − f(a)| < ε » est « |x − a| < δ et |f(x) − f(a)| ≥ ε ».'},
+    {q:'b) On prend <i>a</i> = 0 et ε = ½. Pour un δ > 0 quelconque, quel <i>x</i> sert de témoin&nbsp;?',opts:['x = δ','x = −δ/2','x = 0','x = −2δ'],ans:1,
+     hint:'Il faut un x à distance moins de δ de 0, mais où H ne vaut pas H(0) = 1.',why:'x = −δ/2 vérifie |x| = δ/2 < δ et x < 0, donc |H(x) − H(0)| = 1 ≥ ½. x = δ donne H(δ) = 1, sans écart ; x = −2δ est trop loin de 0.'},
+    {q:'c) Quel est le <b>plus grand</b> ε pour lequel ce raisonnement fonctionne&nbsp;?',lab:'ε =',ans:1,
+     hint:'Le témoin donne toujours un écart |H(x) − H(0)| égal à 1.',why:'Il faut 1 ≥ ε. Tout ε ∈ ]0 ; 1] convient, le plus grand est ε = 1. Pour ε > 1, l’écart 1 est < ε et la négation échoue.'},
+    {q:'d) En <i>a</i> = 1, <i>H</i> est continue : un même δ convient pour tout ε. Quel est le plus grand δ possible&nbsp;?',lab:'δ =',ans:1,
+     hint:'Il faut que |x − 1| < δ garantisse x ≥ 0, pour avoir H(x) = H(1).',why:'|x − 1| < δ donne x > 1 − δ. Si δ ≤ 1, alors x > 0 et |H(x) − H(1)| = 0 < ε. Si δ > 1, l’intervalle contient des x < 0 où l’écart vaut 1.'},
+   ],
+   sol:'La négation de la continuité en a s’écrit : ∃ε > 0, ∀δ > 0, ∃x, |x − a| < δ et |f(x) − f(a)| ≥ ε.<br>Pour H en 0, on prend ε = ½. Soit δ > 0 quelconque. Le réel x = −δ/2 vérifie |x − 0| < δ et H(x) = 0, donc |H(x) − H(0)| = 1 ≥ ½.<br>La négation est vraie : <b>H n’est pas continue en 0</b>. Le raisonnement marche pour tout ε ≤ 1.<br>En revanche, en a = 1, le choix δ = 1 donne |H(x) − H(1)| = 0 < ε pour tout ε : H est continue en 1.'},
+  {kind:'Problème',h:'Converger, ou pas',
+   p:'Une suite (<i>u</i>ₙ) <b>converge vers ℓ</b> si ∀ε > 0, ∃<i>N</i> ∈ ℕ*, ∀<i>n</i> ≥ <i>N</i>, |<i>u</i>ₙ − ℓ| < ε. On veut montrer que <i>u</i>ₙ = 1/<i>n</i> converge vers 0, puis que <i>v</i>ₙ = (−1)ⁿ ne converge vers <b>aucun</b> réel ℓ. Les deux preuves demandent de manier les quantificateurs dans le bon ordre.',
+   parts:[
+    {q:'a) Pour ε = 0,01, quel est le plus petit entier <i>N</i> tel que 1/<i>n</i> < ε pour tout <i>n</i> ≥ <i>N</i>&nbsp;?',lab:'N =',ans:101,
+     hint:'1/n < 0,01 ⇔ n > 100. Attention à l’inégalité stricte.',why:'1/100 = 0,01 n’est pas strictement inférieur à 0,01. Le premier entier qui marche est 101, et tous les suivants aussi car 1/n décroît.'},
+    {q:'b) Pour un ε > 0 quelconque, quel <i>N</i> convient&nbsp;?',opts:['N = ε','N = 1/ε','N = 100','N = un entier strictement plus grand que 1/ε'],ans:3,
+     hint:'N doit être un entier, et dépendre de ε.',why:'Si N > 1/ε et n ≥ N, alors 1/n ≤ 1/N < ε. N = 1/ε n’est pas toujours entier, et N = 100 ne marche que pour ε > 0,01.'},
+    {q:'c) Quelle est la négation de « (<i>v</i>ₙ) converge vers ℓ »&nbsp;?',opts:['∃ε > 0, ∀N ∈ ℕ*, ∃n ≥ N, |vₙ − ℓ| ≥ ε','∀ε > 0, ∀N ∈ ℕ*, ∃n ≥ N, |vₙ − ℓ| ≥ ε','∃ε > 0, ∃N ∈ ℕ*, ∀n ≥ N, |vₙ − ℓ| ≥ ε','∃ε > 0, ∀N ∈ ℕ*, ∀n ≥ N, |vₙ − ℓ| ≥ ε'],ans:0,
+     hint:'Trois quantificateurs à échanger, dans l’ordre, puis la propriété finale à nier.',why:'∀ε devient ∃ε, ∃N devient ∀N, ∀n ≥ N devient ∃n ≥ N, et |vₙ − ℓ| < ε devient |vₙ − ℓ| ≥ ε. Il suffit donc d’un écart qui revient au-delà de tout rang.'},
+    {q:'d) Pour tout réel ℓ, l’inégalité triangulaire donne |1 − ℓ| + |1 + ℓ| ≥ <i>k</i>. Quelle est la meilleure constante <i>k</i>&nbsp;?',lab:'k =',ans:2,
+     hint:'|1 − ℓ| + |1 + ℓ| ≥ |(1 − ℓ) + (1 + ℓ)|.',why:'La somme vaut au moins |2| = 2, avec égalité pour ℓ ∈ [−1 ; 1]. Donc l’un des deux écarts |1 − ℓ| ou |−1 − ℓ| est au moins 1.'},
+    {q:'e) Comment conclure que (<i>v</i>ₙ) ne converge vers aucun ℓ&nbsp;?',opts:['On calcule v₁₀₀ = 1, donc la suite tend vers 1','On prend ε = 3 : les deux écarts sont toujours au moins 3','On prend N = 1 et n = 2, et on vérifie l’écart','On prend ε = 1 : l’une des valeurs 1 ou −1 est à distance au moins 1 de ℓ, et elle revient pour des n aussi grands qu’on veut'],ans:3,
+     hint:'Utilise d) et le fait que vₙ vaut 1 pour n pair et −1 pour n impair.',why:'Avec ε = 1 : si |1 − ℓ| ≥ 1, pour tout N on prend n ≥ N pair ; sinon |−1 − ℓ| ≥ 1 et on prend n ≥ N impair. La négation de la convergence est vérifiée.'},
+   ],
+   sol:'<b>1/n → 0.</b> Soit ε > 0. On choisit un entier N > 1/ε. Pour n ≥ N : |1/n − 0| = 1/n ≤ 1/N < ε. Pour ε = 0,01, le plus petit N est 101.<br><b>(−1)ⁿ ne converge pas.</b> Il faut montrer, pour tout ℓ : ∃ε > 0, ∀N, ∃n ≥ N, |vₙ − ℓ| ≥ ε.<br>Soit ℓ ∈ ℝ. Comme |1 − ℓ| + |1 + ℓ| ≥ 2, l’un des deux termes est ≥ 1. On prend ε = 1.<br>Si |1 − ℓ| ≥ 1 : pour tout N, n = 2N ≥ N est pair et |vₙ − ℓ| = |1 − ℓ| ≥ 1.<br>Sinon |1 + ℓ| ≥ 1 : n = 2N + 1 est impair et |vₙ − ℓ| = |−1 − ℓ| ≥ 1.<br>Aucun ℓ ne convient : la suite <b>diverge</b>.'},
 ]},
 
 /* ===================== 3. APPLICATIONS ===================== */
-{subj:'al',sem:'all',id:'cms-al-applications',h:'Applications',p:'Image, antécédents, injections, surjections, bijections et composition.',steps:[
+{subj:'al',sem:'all',id:'al-applications',h:'Applications',p:'Image, antécédents, injections, surjections, bijections et composition.',steps:[
   {h:'Image et antécédents',p:`Une <b>application</b> <i>f</i> : <i>E</i> → <i>F</i> associe à chaque <i>x</i> ∈ <i>E</i> <b>exactement une</b> image <i>f</i>(<i>x</i>) ∈ <i>F</i>. Un <b>antécédent</b> de <i>y</i> est un <i>x</i> tel que <i>f</i>(<i>x</i>) = <i>y</i>. Un <i>y</i> peut en avoir zéro, un ou plusieurs. Ici <i>f</i>(<i>x</i>) = <i>x</i>² sur ℝ.`,
    params:[{id:'y',l:'y',min:-1,max:4,step:.5,v:2}],
    draw:v=>{ const P=plane({x:[-3,3],y:[-1.5,4.5],lab:1}); P.fn(x=>x*x).seg(-3,v.y,3,v.y,{c:'var(--spark)',w:2,dash:1});
@@ -172,10 +224,34 @@ CMS.push(
    why:'f(2) = 5, puis g(5) = 25. Attention, (f ∘ g)(2) = f(4) = 7 : l’ordre compte.'},
   {kind:'Défi',h:'Réciproque',p:'<i>f</i> : ℝ → ℝ, <i>f</i>(<i>x</i>) = 3<i>x</i> − 6 est bijective. Combien vaut <i>f</i>⁻¹(9)&nbsp;?',lab:'f⁻¹(9) =',ans:5,
    why:'On résout 3x − 6 = 9 : x = 5. Plus généralement f⁻¹(y) = (y + 6)/3.'},
+  {kind:'Problème',h:'Une fonction homographique',
+   p:`On considère <i>f</i>(<i>x</i>) = ${F('2<i>x</i> + 1','<i>x</i> − 3')}, définie sur <i>E</i> = ℝ \\ {3}. On cherche l’ensemble d’arrivée <i>F</i> qui rend <i>f</i> bijective, puis sa réciproque. La méthode : résoudre <i>f</i>(<i>x</i>) = <i>y</i> en fonction de <i>y</i>. Le graphe a deux asymptotes, en pointillé.`,
+   fig:(()=>{ const P=plane({x:[-4,10],y:[-6,10],w:320,lab:2}), f=x=>(2*x+1)/(x-3); P.seg(3,-6,3,10,{c:'var(--muted)',w:1.5,dash:1}).seg(-4,2,10,2,{c:'var(--muted)',w:1.5,dash:1}).fn(f,{to:2.85}).fn(f,{from:3.15}); P.text(9.8,2,'y = 2',{a:'end',dy:-6,s:12,c:'var(--muted)'}).text(3,9.5,'x = 3',{dx:6,s:12,c:'var(--muted)'}); return P.svg(); })(),
+   parts:[
+    {q:'a) Calcule <i>f</i>(4).',lab:'f(4) =',ans:9,hint:'Remplace x par 4 en haut et en bas.',why:'f(4) = (8 + 1)/(4 − 3) = 9.'},
+    {q:'b) Résous <i>f</i>(<i>x</i>) = 5. Tu peux répondre par une fraction.',lab:'x =',ans:16/3,tol:.01,hint:'Multiplie par x − 3 : 2x + 1 = 5(x − 3).',why:'2x + 1 = 5x − 15 donne 3x = 16, soit x = 16/3. Contrôle : f(16/3) = (35/3)/(7/3) = 5.'},
+    {q:'c) Pourquoi la valeur 2 n’a-t-elle <b>aucun</b> antécédent&nbsp;?',opts:['Car f(2) n’existe pas','Car 2 est une valeur interdite de E','Car f(x) = 2 donne 2x + 1 = 2x − 6, soit 1 = −6 : impossible','Car f est décroissante'],ans:2,
+     hint:'Écris l’équation f(x) = 2 et simplifie.',why:'2x + 1 = 2(x − 3) donne 1 = −6, ce qui est faux. f n’est donc pas surjective sur ℝ ; il faut prendre F = ℝ \\ {2}. f(2) = −5 existe bien, mais ce n’est pas la question.'},
+    {q:'d) Pour <i>y</i> ≠ 2, résous <i>f</i>(<i>x</i>) = <i>y</i>, puis calcule <i>f</i>⁻¹(−1).',lab:'f⁻¹(−1) =',ans:2/3,tol:.01,
+     hint:'2x + 1 = xy − 3y. Regroupe les termes en x d’un côté.',why:'x(y − 2) = 3y + 1, donc f⁻¹(y) = (3y + 1)/(y − 2) et f⁻¹(−1) = (−2)/(−3) = 2/3. Contrôle : f(2/3) = (7/3)/(−7/3) = −1.'},
+   ],
+   sol:'Soit y ∈ ℝ. On cherche x ≠ 3 tel que (2x + 1)/(x − 3) = y, soit 2x + 1 = xy − 3y, soit x(y − 2) = 3y + 1.<br>Si y = 2 : on obtient 0 = 7, aucune solution. La valeur 2 n’est jamais atteinte.<br>Si y ≠ 2 : il y a une unique solution x = (3y + 1)/(y − 2), et elle est bien ≠ 3 (sinon 3y − 6 = 3y + 1).<br>Donc <b>f : ℝ \\ {3} → ℝ \\ {2} est bijective</b>, de réciproque f⁻¹(y) = (3y + 1)/(y − 2).<br>Applications : f(4) = 9, f⁻¹(5) = 16/3, f⁻¹(−1) = 2/3.'},
+  {kind:'Problème',h:'Doubler puis diviser par deux',
+   p:'Sur ℕ, on pose <i>f</i>(<i>n</i>) = 2<i>n</i> et <i>g</i>(<i>n</i>) = ⌊<i>n</i>/2⌋, la partie entière de <i>n</i>/2 (par exemple <i>g</i>(7) = 3). On compare les composées <i>g</i> ∘ <i>f</i> et <i>f</i> ∘ <i>g</i>, puis on en tire un théorème général : quand une composée est injective, laquelle des deux applications l’est forcément&nbsp;?',
+   parts:[
+    {q:'a) Calcule (<i>g</i> ∘ <i>f</i>)(7).',lab:'(g ∘ f)(7) =',ans:7,hint:'On applique f d’abord, puis g.',why:'f(7) = 14 et g(14) = 7. Plus généralement g(f(n)) = ⌊2n/2⌋ = n : g ∘ f = id.'},
+    {q:'b) Calcule (<i>f</i> ∘ <i>g</i>)(7).',lab:'(f ∘ g)(7) =',ans:6,hint:'Cette fois, g d’abord.',why:'g(7) = 3 et f(3) = 6 ≠ 7 : f ∘ g n’est pas l’identité. Elle arrondit au nombre pair inférieur.'},
+    {q:'c) Quelles sont les propriétés de <i>f</i> et de <i>g</i>&nbsp;?',opts:['f et g sont bijectives','f est surjective, g est injective','f et g sont injectives','f est injective non surjective, g est surjective non injective'],ans:3,
+     hint:'Cherche un entier sans antécédent par f, et deux entiers de même image par g.',why:'2n = 2m ⇒ n = m, mais 1 n’est pas pair : f injective, pas surjective. g(2k) = k : g surjective, mais g(4) = g(5) = 2.'},
+    {q:'d) Combien d’antécédents le nombre 3 a-t-il par <i>g</i>&nbsp;?',lab:'antécédents :',ans:2,hint:'Quels entiers n vérifient ⌊n/2⌋ = 3 ?',why:'⌊n/2⌋ = 3 ⇔ 3 ≤ n/2 < 4 ⇔ n ∈ {6 ; 7}.'},
+    {q:'e) En général, si <i>g</i> ∘ <i>f</i> est injective, que peut-on affirmer à coup sûr&nbsp;?',opts:['g est injective','f est injective','f et g sont bijectives','g est surjective'],ans:1,
+     hint:'Suppose f(x) = f(x′) et applique g des deux côtés.',why:'Si f(x) = f(x′), alors g(f(x)) = g(f(x′)), donc x = x′ par injectivité de g ∘ f. L’exemple montre que g, elle, peut ne pas être injective.'},
+   ],
+   sol:'g ∘ f = id<sub>ℕ</sub> car ⌊2n/2⌋ = n, mais (f ∘ g)(7) = 6 : f ∘ g ≠ id.<br>f est injective (2n = 2m ⇒ n = m) mais pas surjective (1 est impair). g est surjective (g(2k) = k) mais pas injective (g(6) = g(7) = 3).<br><b>Théorème.</b> Si g ∘ f est injective, f est injective : f(x) = f(x′) ⇒ g(f(x)) = g(f(x′)) ⇒ x = x′.<br>De même, si g ∘ f est surjective, g est surjective : tout z s’écrit g(f(x)), donc z = g(y) avec y = f(x).<br>Ici g ∘ f = id est bijective, ce qui force f injective et g surjective, et rien de plus.'},
 ]},
 
 /* ===================== 4. MATRICES ===================== */
-{subj:'al',sem:'all',id:'cms-al-matrices',h:'Matrices 2×2',p:'Somme, produit, transposée, déterminant, inverse et systèmes linéaires.',steps:[
+{subj:'al',sem:'all',id:'al-matrices',h:'Matrices 2×2',p:'Somme, produit, transposée, déterminant, inverse et systèmes linéaires.',steps:[
   {h:'Somme et multiple',p:`Une matrice 2×2 est un tableau ${mat([['<i>a</i>','<i>b</i>'],['<i>c</i>','<i>d</i>']])}. On additionne deux matrices <b>terme à terme</b>, et λ<i>A</i> multiplie chaque coefficient par λ.<br>${mat([[1,2],[0,3]])} + ${M([[4,-1],[2,1]])} = ${mat([[5,1],[2,4]])}.`,
    note:'Le coefficient a<sub>ij</sub> est sur la ligne i et la colonne j. On lit toujours ligne puis colonne.'},
   {h:'Le produit ne commute pas',p:`Le produit se fait <b>ligne × colonne</b> : ${mat([['<i>a</i>','<i>b</i>'],['<i>c</i>','<i>d</i>']])}${mat([['<i>e</i>','<i>f</i>'],['<i>g</i>','<i>h</i>']])} = ${mat([['<i>ae</i> + <i>bg</i>','<i>af</i> + <i>bh</i>'],['<i>ce</i> + <i>dg</i>','<i>cf</i> + <i>dh</i>']])}.<br>Vu géométriquement, <i>AB</i> applique <i>B</i> puis <i>A</i>. Avec <i>A</i> un cisaillement et <i>B</i> une rotation de 90°, compare <i>AB</i> et <i>BA</i>.`,
@@ -206,10 +282,38 @@ CMS.push(
    note:'Si det A = 0, les droites sont parallèles (aucune solution) ou confondues (une infinité).'},
   {kind:'Défi',h:'Système par Cramer',p:'Résous 3<i>x</i> + 2<i>y</i> = 7 et <i>x</i> + 4<i>y</i> = 9. Combien vaut <i>y</i>&nbsp;?',lab:'y =',ans:2,
    why:'det = 3·4 − 2·1 = 10. Cramer : y = (3·9 − 7·1)/10 = 20/10 = 2, et x = (7·4 − 2·9)/10 = 1. Vérification : 3 + 4 = 7 et 1 + 8 = 9.'},
+  {kind:'Problème',h:'Ville et campagne',
+   p:`Une région compte 1 000 milliers d’habitants, répartis entre la ville et la campagne. Chaque année, 10 % des citadins partent à la campagne et 20 % des ruraux partent en ville. Avec <i>X</i>ₙ = (<i>v</i>ₙ ; <i>c</i>ₙ) en milliers, on a <i>X</i>ₙ₊₁ = <i>MX</i>ₙ, où <i>M</i> = ${mat([['0,9','0,2'],['0,1','0,8']])}. Au départ, <i>X</i>₀ = (300 ; 700). Fais défiler les années : la ville en bleu, la campagne en jaune.`,
+   params:[{id:'n',l:'année n',min:0,max:15,v:0}],
+   draw:v=>{ const P=plane({x:[-1,16],y:[-60,1100],h:220,grid:false,lx:5,ly:200}); let x=[300,700]; const pts=[x];
+     for(let k=1;k<=15;k++){ x=[.9*x[0]+.2*x[1],.1*x[0]+.8*x[1]]; pts.push(x); }
+     P.seg(-1,2000/3,16,2000/3,{c:'var(--muted)',w:1.5,dash:1});
+     pts.forEach((p,k)=>{ const on=k<=v.n; P.dot(k,p[0],{r:on?5:3,c:on?'var(--math)':'var(--line)'}).dot(k,p[1],{r:on?5:3,c:on?'var(--spark)':'var(--line)'}); }); return P.svg(); },
+   info:v=>{ let x=[300,700]; for(let k=1;k<=v.n;k++) x=[.9*x[0]+.2*x[1],.1*x[0]+.8*x[1]]; return `Année ${v.n} : v = ${fmt(x[0],1)}, c = ${fmt(x[1],1)}, total ${fmt(x[0]+x[1],1)}`; },
+   parts:[
+    {q:'a) Combien vaut <i>v</i>₁ (en milliers)&nbsp;?',lab:'v₁ =',ans:410,hint:'Première ligne de M fois X₀.',why:'v₁ = 0,9·300 + 0,2·700 = 270 + 140 = 410.'},
+    {q:'b) Combien vaut <i>v</i>₂&nbsp;?',lab:'v₂ =',ans:487,hint:'Calcule d’abord c₁ = 0,1·300 + 0,8·700.',why:'c₁ = 590, puis v₂ = 0,9·410 + 0,2·590 = 369 + 118 = 487.'},
+    {q:'c) Pourquoi le total <i>v</i>ₙ + <i>c</i>ₙ reste-t-il égal à 1 000&nbsp;?',opts:['Car det M = 0,7','Car M est inversible','Car chaque colonne de M a pour somme 1 : chaque habitant reste quelque part','Car M est symétrique'],ans:2,
+     hint:'Additionne les deux lignes de Xₙ₊₁ = MXₙ.',why:'vₙ₊₁ + cₙ₊₁ = (0,9 + 0,1)vₙ + (0,2 + 0,8)cₙ = vₙ + cₙ. Les colonnes de M somment à 1. M n’est d’ailleurs pas symétrique.'},
+    {q:'d) À l’équilibre, <i>MX</i> = <i>X</i> et <i>v</i> + <i>c</i> = 1 000. Combien vaut <i>v</i>&nbsp;? Arrondis à l’unité.',lab:'v ≈',ans:667,tol:.6,
+     hint:'(M − I)X = 0 donne −0,1v + 0,2c = 0.',why:'v = 2c et v + c = 1 000, donc c = 1 000/3 et v = 2 000/3 ≈ 667. det(M − I) = 0,02 − 0,02 = 0 : le système seul a une infinité de solutions, le total fixe la bonne.'},
+   ],
+   sol:'On itère X₁ = MX₀ = (410 ; 590), puis X₂ = (487 ; 513).<br>La somme des coefficients de chaque colonne vaut 1, donc vₙ₊₁ + cₙ₊₁ = vₙ + cₙ = 1 000 pour tout n.<br>L’équilibre vérifie (M − I)X = 0 : −0,1v + 0,2c = 0 et 0,1v − 0,2c = 0, deux équations proportionnelles (det(M − I) = 0).<br>Avec v + c = 1 000 : v = 2c, d’où c = 1 000/3 ≈ 333 et <b>v = 2 000/3 ≈ 667</b> milliers.<br>La figure montre que la suite s’en approche année après année.'},
+  {kind:'Problème',h:'Fibonacci par les matrices',
+   p:`La suite de Fibonacci vérifie <i>F</i>₀ = 0, <i>F</i>₁ = 1 et <i>F</i>ₙ₊₁ = <i>F</i>ₙ + <i>F</i>ₙ₋₁ : 0, 1, 1, 2, 3, 5, 8, 13, … Avec <i>Q</i> = ${mat([[1,1],[1,0]])}, on a ${mat([['<i>F</i>ₙ₊₁'],['<i>F</i>ₙ']])} = <i>Q</i> ${mat([['<i>F</i>ₙ'],['<i>F</i>ₙ₋₁']])}. On veut montrer que <i>Q</i>ⁿ = ${mat([['<i>F</i>ₙ₊₁','<i>F</i>ₙ'],['<i>F</i>ₙ','<i>F</i>ₙ₋₁']])} pour <i>n</i> ≥ 1, puis en tirer une identité grâce au déterminant.`,
+   parts:[
+    {q:'a) Quel est le coefficient en haut à gauche de <i>Q</i>⁵&nbsp;?',lab:'coefficient =',ans:8,hint:'Q² = (2 1 ; 1 1). Continue, ou lis la formule : en haut à gauche de Qⁿ se trouve Fₙ₊₁.',why:'Q⁵ = (8 5 ; 5 3) : on lit F₆ = 8, F₅ = 5 et F₄ = 3.'},
+    {q:'b) Comment prouver la formule de <i>Q</i>ⁿ pour tout <i>n</i> ≥ 1&nbsp;?',opts:['En la vérifiant pour n = 1, 2 et 3',`Par récurrence : Qⁿ⁺¹ = QⁿQ = ${mat([['<i>F</i>ₙ₊₁ + <i>F</i>ₙ','<i>F</i>ₙ₊₁'],['<i>F</i>ₙ + <i>F</i>ₙ₋₁','<i>F</i>ₙ']])}, qui est la formule au rang n + 1`,'Car Q est symétrique','En calculant det Qⁿ'],ans:1,
+     hint:'Suppose la formule vraie au rang n et multiplie à droite par Q.',why:'Pour n = 1, Q = (F₂ F₁ ; F₁ F₀). Si c’est vrai au rang n, QⁿQ a pour coefficients Fₙ₊₁ + Fₙ = Fₙ₊₂, Fₙ₊₁, Fₙ + Fₙ₋₁ = Fₙ₊₁ et Fₙ. Quelques exemples ne prouvent rien.'},
+    {q:'c) Combien vaut det <i>Q</i>&nbsp;?',lab:'det Q =',ans:-1,hint:'ad − bc.',why:'det Q = 1·0 − 1·1 = −1, donc det(Qⁿ) = (det Q)ⁿ = (−1)ⁿ.'},
+    {q:'d) Sans calculer de grands produits, que vaut <i>F</i>₁₁<i>F</i>₉ − <i>F</i>₁₀²&nbsp;?',lab:'valeur =',ans:1,hint:'C’est le déterminant d’une puissance de Q.',why:'C’est det(Q¹⁰) = (−1)¹⁰ = 1. Vérification : 89·34 − 55² = 3 026 − 3 025 = 1.'},
+    {q:'e) Quel est le coefficient en bas à droite de <i>Q</i>⁻¹&nbsp;?',lab:'coefficient =',ans:-1,hint:'Applique la formule de l’inverse avec det Q = −1.',why:'Q⁻¹ = (1/(−1))(0 −1 ; −1 1) = (0 1 ; 1 −1). Elle fait remonter la suite : (Fₙ ; Fₙ₋₁) = Q⁻¹(Fₙ₊₁ ; Fₙ).'},
+   ],
+   sol:'<b>Récurrence.</b> Pour n = 1, Q = (F₂ F₁ ; F₁ F₀) = (1 1 ; 1 0). Si Qⁿ = (Fₙ₊₁ Fₙ ; Fₙ Fₙ₋₁), alors Qⁿ⁺¹ = QⁿQ = (Fₙ₊₁ + Fₙ  Fₙ₊₁ ; Fₙ + Fₙ₋₁  Fₙ) = (Fₙ₊₂ Fₙ₊₁ ; Fₙ₊₁ Fₙ).<br>Par exemple Q⁵ = (8 5 ; 5 3).<br><b>Identité de Cassini.</b> det(Qⁿ) = (det Q)ⁿ = (−1)ⁿ, et det(Qⁿ) = Fₙ₊₁Fₙ₋₁ − Fₙ². Donc Fₙ₊₁Fₙ₋₁ − Fₙ² = (−1)ⁿ.<br>Pour n = 10 : 89·34 − 55² = <b>1</b>.<br>Enfin Q⁻¹ = (0 1 ; 1 −1) permet de reculer dans la suite.'},
 ]},
 
 /* ===================== 5. SOUS-ESPACES ET BASES ===================== */
-{subj:'al',sem:'all',id:'cms-al-bases',h:'Sous-espaces et bases de ℝ²',p:'Combinaisons linéaires, indépendance, droites vectorielles et coordonnées dans une base.',steps:[
+{subj:'al',sem:'all',id:'al-bases',h:'Sous-espaces et bases de ℝ²',p:'Combinaisons linéaires, indépendance, droites vectorielles et coordonnées dans une base.',steps:[
   {h:'Combinaisons linéaires',p:`Une <b>combinaison linéaire</b> de <b>u</b> et <b>v</b> est un vecteur α<b>u</b> + β<b>v</b> avec α, β ∈ ℝ. Ici <b>u</b> = (1 ; 2) en bleu et <b>v</b> = (1 ; −1) en jaune.`,
    params:[{id:'a',l:'α',min:-2,max:3,step:.5,v:1},{id:'b',l:'β',min:-2,max:3,step:.5,v:1}],
    draw:v=>{ const P=plane({x:[-5,6],y:[-5,6],lab:2}), ax=v.a, ay=2*v.a; P.arrow(0,0,ax,ay,{c:'var(--math)'}).arrow(ax,ay,ax+v.b,ay-v.b,{c:'var(--spark)'}).arrow(0,0,ax+v.b,ay-v.b,{w:4}); return P.svg(); },
@@ -243,10 +347,35 @@ CMS.push(
    why:'α + β = 5 et α − β = 1, donc 2α = 6 : α = 3 et β = 2. Vérification : 3(1 ; 1) + 2(1 ; −1) = (5 ; 1).'},
   {kind:'Défi',h:'Quand la famille devient liée',p:'Pour quelle valeur <b>positive</b> de <i>k</i> les vecteurs (1 ; <i>k</i>) et (<i>k</i> ; 4) sont-ils colinéaires&nbsp;?',lab:'k =',ans:2,
    why:'det = 1·4 − k·k = 4 − k² = 0 ⇔ k = ±2. Pour k = 2 : (2 ; 4) = 2·(1 ; 2).'},
+  {kind:'Problème',h:'Mélanger deux alliages',
+   p:'Une fonderie dispose de deux alliages. Un lingot de l’alliage <b>u</b> contient 2 kg de cuivre et 1 kg de zinc, un lingot de <b>v</b> contient 1 kg de cuivre et 3 kg de zinc. On décrit un mélange par le vecteur (cuivre ; zinc) : α lingots de <b>u</b> et β lingots de <b>v</b> donnent α<b>u</b> + β<b>v</b>. On veut obtenir exactement 7 kg de cuivre et 11 kg de zinc.',
+   fig:(()=>{ const P=plane({x:[-1,12],y:[-1,12],lab:2}); P.arrow(0,0,2,1,{c:'var(--math)'}).arrow(2,1,4,2,{c:'var(--math)',op:.5}).arrow(4,2,5,5,{c:'var(--spark)',op:.5}).arrow(5,5,6,8,{c:'var(--spark)',op:.5}).arrow(6,8,7,11,{c:'var(--spark)',op:.5}).arrow(0,0,1,3,{c:'var(--spark)'}).dot(7,11,{c:'var(--bad)',l:'(7 ; 11)',dx:-62}); P.text(2,1,'u',{dx:4,dy:16}).text(1,3,'v',{dx:-16}); return P.svg(); })(),
+   parts:[
+    {q:'a) Calcule det(<b>u</b>, <b>v</b>).',lab:'det =',ans:5,hint:'u = (2 ; 1) et v = (1 ; 3) sont les colonnes.',why:'2·3 − 1·1 = 5 ≠ 0 : (u, v) est une base de ℝ². Toute cible a des coordonnées uniques dans cette base.'},
+    {q:'b) Combien de lingots de <b>u</b> faut-il (α)&nbsp;?',lab:'α =',ans:2,hint:'Résous 2α + β = 7 et α + 3β = 11.',why:'β = 7 − 2α, puis α + 21 − 6α = 11, donc α = 2.'},
+    {q:'c) Et combien de lingots de <b>v</b> (β)&nbsp;?',lab:'β =',ans:3,hint:'Reporte α dans la première équation.',why:'β = 7 − 4 = 3. Contrôle : 2(2 ; 1) + 3(1 ; 3) = (7 ; 11).'},
+    {q:'d) Un client veut 8 kg de cuivre et 1 kg de zinc. Que se passe-t-il&nbsp;?',opts:['C’est possible avec α = 4 et β = 0','Aucune coordonnée n’existe, car la famille est liée','Les coordonnées existent, mais β = −1,2 < 0 : impossible avec de vrais lingots','C’est possible avec α = 3 et β = 2'],ans:2,
+     hint:'Calcule les coordonnées de (8 ; 1) dans la base (u, v), puis regarde leur signe.',why:'2α + β = 8 et α + 3β = 1 donnent α = 4,6 et β = −1,2. Les coordonnées existent toujours (c’est une base), mais un nombre négatif de lingots n’a pas de sens.'},
+   ],
+   sol:'det(u, v) = 2·3 − 1·1 = 5 ≠ 0, donc (u, v) est une base : chaque vecteur (cuivre ; zinc) s’écrit de façon unique αu + βv.<br>Pour (7 ; 11) : 2α + β = 7 et α + 3β = 11. On tire β = 7 − 2α, puis −5α = −10 : <b>α = 2</b> et <b>β = 3</b>.<br>Pour (8 ; 1) : on trouve α = 23/5 = 4,6 et β = −6/5 = −1,2.<br>Les mélanges réalisables sont les vecteurs à coordonnées positives : le secteur compris entre les directions de u et de v. (8 ; 1) est en dehors.'},
+  {kind:'Problème',h:'Une famille qui dépend d’un paramètre',
+   p:'Pour un réel <i>k</i>, on pose <b>u</b> = (1 ; <i>k</i>) en bleu et <b>v</b> = (<i>k</i> ; <i>k</i> + 2) en jaune. On cherche pour quelles valeurs (<b>u</b>, <b>v</b>) est une base de ℝ², ce que devient Vect(<b>u</b>, <b>v</b>) sinon, puis on calcule des coordonnées et on teste des sous-espaces. Fais varier <i>k</i> : la droite verte apparaît quand la famille est liée.',
+   params:[{id:'k',l:'k',min:-2,max:3,step:.5,v:0}],
+   draw:v=>{ const P=plane({x:[-5,5],y:[-5,5],lab:2}), D=v.k+2-v.k*v.k; if(D===0) ln(P,1,v.k,{c:'var(--ok)',w:6,op:.4});
+     P.arrow(0,0,1,v.k,{c:'var(--math)'}); if(v.k||v.k+2) P.arrow(0,0,v.k,v.k+2,{c:'var(--spark)'}); return P.svg(); },
+   info:v=>{ const D=v.k+2-v.k*v.k; return `det(u, v) = (k + 2) − k² = <b>${fmt(D)}</b> : ${D?'base de ℝ²':'famille liée'}`; },
+   parts:[
+    {q:'a) Pour quelles valeurs de <i>k</i> la famille est-elle liée&nbsp;? Donne la plus grande.',lab:'k =',ans:2,hint:'Calcule det(u, v) et factorise.',why:'det = 1·(k + 2) − k·k = −(k² − k − 2) = −(k − 2)(k + 1). Liée pour k = 2 ou k = −1.'},
+    {q:'b) Pour <i>k</i> = −1, que vaut Vect(<b>u</b>, <b>v</b>)&nbsp;?',opts:['ℝ² tout entier','La droite y = x','{0}','La droite y = −x'],ans:3,hint:'Écris u et v pour k = −1.',why:'u = (1 ; −1) et v = (−1 ; 1) = −u. Toutes les combinaisons sont sur la droite dirigée par (1 ; −1), soit y = −x.'},
+    {q:'c) Pour <i>k</i> = 1, <b>u</b> = (1 ; 1) et <b>v</b> = (1 ; 3). Quelle est la coordonnée α de <b>w</b> = (3 ; 5) dans la base (<b>u</b>, <b>v</b>)&nbsp;?',lab:'α =',ans:2,hint:'α + β = 3 et α + 3β = 5.',why:'En soustrayant : 2β = 2, donc β = 1 et α = 2. Contrôle : 2(1 ; 1) + (1 ; 3) = (3 ; 5).'},
+    {q:'d) Toujours pour <i>k</i> = 1, on note <i>D</i>₁ = Vect(<b>u</b>) et <i>D</i>₂ = Vect(<b>v</b>). Lequel est un sous-espace vectoriel&nbsp;?',opts:['D₁ ∪ D₂','D₁ ∩ D₂','{u ; v}','D₁ ∪ D₂ privé de 0'],ans:1,
+     hint:'Teste la stabilité par addition avec u + v.',why:'Une intersection de sous-espaces est un sous-espace : ici D₁ ∩ D₂ = {0}. L’union n’est pas stable : u + v = (2 ; 4) n’est ni sur y = x, ni sur y = 3x.'},
+   ],
+   sol:'det(u, v) = (k + 2) − k² = −(k − 2)(k + 1). La famille est une base si et seulement si <b>k ∉ {−1 ; 2}</b>.<br>Pour k = −1 : v = −u, Vect(u, v) est la droite y = −x. Pour k = 2 : v = (2 ; 4) = 2u, Vect(u, v) est la droite y = 2x.<br>Pour k = 1 : w = (3 ; 5) = 2u + v, coordonnées (2 ; 1).<br>D₁ ∩ D₂ = {0} est un sous-espace, mais D₁ ∪ D₂ n’en est pas un, car u + v = (2 ; 4) en sort. Une union de deux droites distinctes n’est jamais stable.'},
 ]},
 
 /* ===================== 6. APPLICATIONS LINÉAIRES ===================== */
-{subj:'al',sem:'all',id:'cms-al-applin',h:'Applications linéaires du plan',p:'Matrice, noyau, image, rang et changement de base.',steps:[
+{subj:'al',sem:'all',id:'al-applin',h:'Applications linéaires du plan',p:'Matrice, noyau, image, rang et changement de base.',steps:[
   {h:'Linéaire, et sa matrice',p:`<i>f</i> : ℝ² → ℝ² est <b>linéaire</b> si <i>f</i>(<b>u</b> + <b>v</b>) = <i>f</i>(<b>u</b>) + <i>f</i>(<b>v</b>) et <i>f</i>(λ<b>u</b>) = λ<i>f</i>(<b>u</b>). Elle est alors entièrement donnée par <i>f</i>(<b>e₁</b>) et <i>f</i>(<b>e₂</b>), qui sont les <b>colonnes</b> de sa matrice. Toute la grille suit.`,
    params:[{id:'a',l:'a',min:-2,max:2,step:.5,v:1},{id:'b',l:'b',min:-2,max:2,step:.5,v:.5},{id:'c',l:'c',min:-2,max:2,step:.5,v:0},{id:'d',l:'d',min:-2,max:2,step:.5,v:1}],
    draw:v=>grille(plane({x:[-4,4],y:[-4,4],grid:false}),v.a,v.b,v.c,v.d).svg(),
@@ -282,10 +411,34 @@ CMS.push(
    why:'det P = 1, P⁻¹ = (2 −1 ; −1 1). AP = (3 5 ; 3 6), puis P⁻¹(AP) = (3 4 ; 0 1). Contrôle : trace 4 et det 3, comme pour A.'},
   {kind:'Défi',h:'Rang 1',p:`Pour quelle valeur de <i>k</i> la matrice ${mat([['<i>k</i>','6'],['2','3']])} est-elle de rang 1&nbsp;?`,lab:'k =',ans:4,
    why:'Rang 1 ⇔ det = 0 (la matrice n’est jamais nulle) : 3k − 12 = 0, donc k = 4. Par le théorème du rang, le noyau est alors une droite.'},
+  {kind:'Problème',h:'Projeter sur une droite',
+   p:`On note <i>p</i> la <b>projection orthogonale</b> sur la droite <i>D</i> dirigée par <b>u</b> = (1 ; 2). Pour tout vecteur <b>w</b>, <i>p</i>(<b>w</b>) = ${F('<b>w</b> · <b>u</b>','<b>u</b> · <b>u</b>')} <b>u</b>, où · est le produit scalaire. On veut la matrice <i>A</i> de <i>p</i>, son noyau, son rang, et vérifier que projeter deux fois revient à projeter une fois. Sur la figure, <b>w</b> = (3 ; 1) et son projeté.`,
+   fig:(()=>{ const P=plane({x:[-2,4],y:[-1,4],lab:1}); ln(P,1,2,{c:'var(--math)',w:2}); ln(P,2,-1,{c:'var(--bad)',w:1.5,dash:1}); P.seg(3,1,1,2,{c:'var(--muted)',w:1.5,dash:1}).arrow(0,0,3,1,{c:'var(--spark)'}).arrow(0,0,1,2,{c:'var(--accent)',w:4}); P.text(3,1,'w',{dx:6}).text(1,2,'p(w)',{dx:8,dy:-4}).text(1.9,3.7,'D',{c:'var(--math)'}); return P.svg(); })(),
+   parts:[
+    {q:'a) Calcule <i>p</i>(<b>e₁</b>). Quelle est sa deuxième coordonnée&nbsp;?',lab:'2e coordonnée =',ans:.4,tol:.001,hint:'e₁ · u = 1 et u · u = 1 + 4 = 5.',why:'p(e₁) = (1/5)(1 ; 2) = (0,2 ; 0,4). De même p(e₂) = (2/5)(1 ; 2) = (0,4 ; 0,8), donc A = (1/5)(1 2 ; 2 4).'},
+    {q:'b) Combien vaut det <i>A</i>&nbsp;?',lab:'det A =',ans:0,hint:'Les deux colonnes de A sont-elles colinéaires ?',why:'det A = 0,2·0,8 − 0,4·0,4 = 0 : p n’est pas bijective. Son image est D, de dimension 1 : rang 1.'},
+    {q:'c) Quel est le noyau de <i>p</i>&nbsp;?',opts:['La droite D','{0}','La droite dirigée par (2 ; −1)','ℝ² tout entier'],ans:2,hint:'p(w) = 0 ⇔ w · u = 0.',why:'w · u = x + 2y = 0 : la droite perpendiculaire à D, dirigée par (2 ; −1). Théorème du rang : 1 + 1 = 2.'},
+    {q:'d) Pourquoi <i>A</i>² = <i>A</i>&nbsp;?',opts:['Car det A = 0','Car A est symétrique','Car A est inversible','Car p(w) est déjà sur D, et un vecteur de D est son propre projeté'],ans:3,
+     hint:'Que fait p sur un vecteur qui est déjà sur D ?',why:'p(u) = (5/5)u = u, donc p fixe D. Comme p(w) ∈ D, p(p(w)) = p(w) : p ∘ p = p, soit A² = A. Être symétrique ou de déterminant nul ne suffit pas.'},
+   ],
+   sol:'p(e₁) = (1/5)u et p(e₂) = (2/5)u, donc <b>A = (1/5)(1 2 ; 2 4)</b>.<br>det A = 0 : l’image est la droite D (rang 1) et le noyau la droite x + 2y = 0, dirigée par (2 ; −1). On a bien 1 + 1 = 2.<br>Pour w ∈ D, p(w) = w ; et p(w) ∈ D pour tout w. Donc p ∘ p = p, ce qui se vérifie : A² = (1/25)(5 10 ; 10 20) = A.<br>Exemple : w = (3 ; 1) donne w · u = 5, p(w) = (1 ; 2), et w − p(w) = (2 ; −1) est bien dans le noyau.'},
+  {kind:'Problème',h:'La symétrie par changement de base',
+   p:`On note <i>s</i> la <b>symétrie orthogonale</b> par rapport à la droite <i>D</i> : <i>y</i> = 2<i>x</i>. Elle fixe les vecteurs de <i>D</i> et retourne ceux de la droite perpendiculaire. Sa matrice dans la base canonique n’est pas évidente. On passe par la base adaptée <b>u</b> = (1 ; 2), <b>w</b> = (−2 ; 1), puis on revient avec <i>A</i> = <i>PA</i>′<i>P</i>⁻¹, où <i>P</i> = ${M([[1,-2],[2,1]])}.`,
+   fig:(()=>{ const P=plane({x:[-4,6],y:[-2,5],lab:1}); ln(P,1,2,{c:'var(--math)',w:2}); P.seg(5,0,-3,4,{c:'var(--muted)',w:1.5,dash:1}).arrow(0,0,5,0,{c:'var(--spark)'}).arrow(0,0,-3,4,{c:'var(--accent)'}).dot(1,2,{r:4,c:'var(--ink)'}); P.text(5,0,'(5 ; 0)',{a:'end',dy:18,s:12}).text(-3,4,'s(5 ; 0)',{dx:6,s:12}).text(2.4,4.6,'D',{c:'var(--math)'}); return P.svg(); })(),
+   parts:[
+    {q:'a) Quelle est la matrice <i>A</i>′ de <i>s</i> dans la base (<b>u</b>, <b>w</b>)&nbsp;?',opts:[mat([[1,0],[0,1]]),M([[-1,0],[0,1]]),M([[1,0],[0,-1]]),mat([[0,1],[1,0]])],ans:2,
+     hint:'Calcule s(u) et s(w), puis écris leurs coordonnées dans la base (u, w).',why:'s(u) = u et s(w) = −w : les colonnes de A′ sont (1 ; 0) et (0 ; −1).'},
+    {q:'b) Calcule det <i>P</i>.',lab:'det P =',ans:5,hint:'ad − bc avec P = (1 −2 ; 2 1).',why:'1·1 − (−2)·2 = 5 ≠ 0 : (u, w) est bien une base.'},
+    {q:'c) Calcule <i>A</i> = <i>PA</i>′<i>P</i>⁻¹. Quel est son coefficient en haut à gauche&nbsp;?',lab:'coefficient =',ans:-.6,tol:.001,
+     hint:'P⁻¹ = (1/5)(1 2 ; −2 1). PA′ change le signe de la 2e colonne de P.',why:'PA′ = (1 2 ; 2 −1), puis A = (1/5)(1 2 ; 2 −1)(1 2 ; −2 1) = (1/5)(−3 4 ; 4 3). Le coefficient vaut −3/5 = −0,6.'},
+    {q:'d) Quelle est la deuxième coordonnée de <i>s</i>(5 ; 0)&nbsp;?',lab:'2e coordonnée =',ans:4,hint:'Multiplie A par (5 ; 0).',why:'A(5 ; 0) = (−3 ; 4). Contrôle : le milieu (1 ; 2) est sur D, et (−3 ; 4) − (5 ; 0) = (−8 ; 4) est perpendiculaire à u.'},
+    {q:'e) Que vaut <i>A</i>²&nbsp;?',opts:['A','La matrice nulle','I','−I'],ans:2,hint:'Que donne la symétrie appliquée deux fois ?',why:'s ∘ s = id. En base adaptée, A′² = I, donc A² = PA′²P⁻¹ = PP⁻¹ = I. Contrôle : (−3 4 ; 4 3)² = (25 0 ; 0 25).'},
+   ],
+   sol:'Dans la base (u, w), s(u) = u et s(w) = −w, donc <b>A′ = diag(1, −1)</b>.<br>Avec P = (1 −2 ; 2 1), det P = 5 et P⁻¹ = (1/5)(1 2 ; −2 1).<br>A = PA′P⁻¹ = (1 2 ; 2 −1)·(1/5)(1 2 ; −2 1) = <b>(1/5)(−3 4 ; 4 3)</b>.<br>Ainsi s(5 ; 0) = (−3 ; 4) : le milieu (1 ; 2) est sur D et le déplacement (−8 ; 4) est perpendiculaire à D.<br>Enfin A² = PA′²P⁻¹ = I, ce qui traduit s ∘ s = id. On note aussi det A = −1 et tr A = 0, comme pour diag(1, −1).'},
 ]},
 
 /* ===================== 7. VALEURS PROPRES ===================== */
-{subj:'al',sem:'all',id:'cms-al-propres',h:'Valeurs et vecteurs propres',p:'Les directions qu’une matrice étire sans les tourner.',steps:[
+{subj:'al',sem:'all',id:'al-propres',h:'Valeurs et vecteurs propres',p:'Les directions qu’une matrice étire sans les tourner.',steps:[
   {h:'Une direction qui résiste',p:`Un <b>vecteur propre</b> de <i>A</i> est un vecteur <b>v ≠ 0</b> tel que <b><i>A</i>v = λv</b> : <i>A</i> l’étire d’un facteur λ, la <b>valeur propre</b>, sans changer sa direction. Ici <i>A</i> = ${mat([[3,1],[0,2]])}, <b>v</b> en bleu et <i>A</i><b>v</b> en jaune.`,
    params:[{id:'t',l:'Direction de v',min:0,max:345,step:15,v:30,u:'°'}],
    draw:v=>{ const x=Math.cos(rad(v.t))*1.2,y=Math.sin(rad(v.t))*1.2,P=plane({x:[-5,5],y:[-5,5],lab:2}); P.arrow(0,0,3*x+y,2*y,{c:'var(--spark)',w:4}).arrow(0,0,x,y,{c:'var(--math)'}); return P.svg(); },
@@ -314,10 +467,36 @@ CMS.push(
    why:'det(A − λI) = (2 − λ)(−3 − λ). Pour une matrice triangulaire, les valeurs propres sont les coefficients diagonaux. Contrôle : somme −1 = trace, produit −6 = det.'},
   {kind:'Défi',h:'Vecteur propre normalisé',p:`Soit <i>A</i> = ${M([[0,1],[-6,5]])}. Ses valeurs propres sont 2 et 3. Pour λ = 3, on cherche un vecteur propre de la forme (1 ; <i>k</i>). Combien vaut <i>k</i>&nbsp;?`,lab:'k =',ans:3,
    why:'A(1 ; k) = (k ; −6 + 5k). On veut (3 ; 3k) : k = 3, et −6 + 15 = 9 = 3·3 confirme.'},
+  {kind:'Problème',h:'Calculer A²x sans multiplier',
+   p:`Soit <i>A</i> = ${mat([[4,1],[2,3]])} et <b>x</b> = (3 ; 0). On veut les valeurs propres et les vecteurs propres de <i>A</i>, puis s’en servir pour calculer <i>A</i>²<b>x</b> sans aucun produit de matrices. C’est l’idée centrale de la réduction : dans une base de vecteurs propres, <i>A</i> agit coordonnée par coordonnée.`,
+   parts:[
+    {q:'a) Quelle est la plus grande valeur propre de <i>A</i>&nbsp;?',lab:'λ =',ans:5,hint:'tr A = 7 et det A = 10. Résous λ² − 7λ + 10 = 0.',why:'λ² − 7λ + 10 = (λ − 2)(λ − 5) : les valeurs propres sont 2 et 5.'},
+    {q:'b) Pour λ = 2, on cherche un vecteur propre de la forme (1 ; <i>k</i>). Combien vaut <i>k</i>&nbsp;?',lab:'k =',ans:-2,hint:'Écris A − 2I et garde une seule équation.',why:'A − 2I = (2 1 ; 2 1) donne 2x + y = 0 : (1 ; −2). Pour λ = 5, A − 5I = (−1 1 ; 2 −2) donne (1 ; 1).'},
+    {q:'c) Comment s’écrit <b>x</b> = (3 ; 0) dans la base <b>a</b> = (1 ; 1), <b>b</b> = (1 ; −2)&nbsp;?',opts:['x = 1·a + 2·b','x = 3·a + 0·b','x = 2·a + 1·b','x = 2·a − 1·b'],ans:2,hint:'Résous α + β = 3 et α − 2β = 0.',why:'α = 2β, puis 3β = 3 : β = 1 et α = 2. Contrôle : 2(1 ; 1) + (1 ; −2) = (3 ; 0).'},
+    {q:'d) En déduire la deuxième coordonnée de <i>A</i>²<b>x</b>.',lab:'2e coordonnée =',ans:42,hint:'A²a = 5²a et A²b = 2²b.',why:'A²x = 2·25a + 1·4b = (50 ; 50) + (4 ; −8) = (54 ; 42). Contrôle : Ax = (12 ; 6), puis A(12 ; 6) = (54 ; 42).'},
+   ],
+   sol:'tr A = 7, det A = 10 : λ² − 7λ + 10 = (λ − 2)(λ − 5), donc <b>λ = 2 et λ = 5</b>.<br>E₂ : 2x + y = 0, dirigé par b = (1 ; −2). E₅ : −x + y = 0, dirigé par a = (1 ; 1).<br>Dans la base (a, b) : x = (3 ; 0) = 2a + b.<br>Comme Aⁿa = 5ⁿa et Aⁿb = 2ⁿb, on a Aⁿx = 2·5ⁿa + 2ⁿb.<br>Pour n = 2 : A²x = 50(1 ; 1) + 4(1 ; −2) = <b>(54 ; 42)</b>, ce que confirme le calcul direct.'},
+  {kind:'Problème',h:'Matrice symétrique et maximum',
+   p:`Une matrice <b>symétrique</b> ${mat([['<i>a</i>','<i>b</i>'],['<i>b</i>','<i>d</i>']])} a toujours des valeurs propres réelles. On le prouve, puis on étudie <i>A</i> = ${mat([[3,2],[2,0]])} et la quantité <i>q</i>(<i>x</i> ; <i>y</i>) = 3<i>x</i>² + 4<i>xy</i>. On cherche le maximum et le minimum de <i>q</i> sur le cercle unité. Fais tourner le point : les pointillés sont les directions propres.`,
+   params:[{id:'t',l:'angle',min:0,max:345,step:15,v:90,u:'°'}],
+   draw:v=>{ const P=plane({x:[-1.6,1.6],y:[-1.6,1.6],grid:false}), c=Math.cos(rad(v.t)), s=Math.sin(rad(v.t));
+     P.circ(0,0,1,{c:'var(--muted)',w:1.5}); ln(P,2,1,{c:'var(--math)',w:1.5,dash:1}); ln(P,1,-2,{c:'var(--spark)',w:1.5,dash:1});
+     P.arrow(0,0,c,s,{c:'var(--accent)'}).dot(c,s,{r:5,c:'var(--bad)'}); return P.svg(); },
+   info:v=>{ const c=Math.cos(rad(v.t)), s=Math.sin(rad(v.t)); return `q(${fmt(c)} ; ${fmt(s)}) = <b>${fmt(3*c*c+4*c*s)}</b>`; },
+   parts:[
+    {q:'a) Pour une matrice symétrique, le discriminant Δ = (<i>a</i> + <i>d</i>)² − 4(<i>ad</i> − <i>b</i>²) s’écrit…',opts:['(a − d)² − 4b²','(a + d)² + 4b²','(a − d)² + 4b², donc Δ ≥ 0','a² + d² − 4b²'],ans:2,
+     hint:'Développe (a + d)² − 4ad.',why:'(a + d)² − 4ad = (a − d)², donc Δ = (a − d)² + 4b² ≥ 0 : les racines sont réelles.'},
+    {q:'b) Quelle est la plus grande valeur propre de <i>A</i>&nbsp;?',lab:'λ =',ans:4,hint:'tr A = 3 et det A = −4.',why:'λ² − 3λ − 4 = (λ − 4)(λ + 1) : les valeurs propres sont 4 et −1.'},
+    {q:'c) (2 ; 1) est propre pour λ = 4, et (1 ; −2) pour λ = −1. Calcule leur produit scalaire.',lab:'produit scalaire =',ans:0,hint:'x₁x₂ + y₁y₂.',why:'2·1 + 1·(−2) = 0 : les directions propres d’une matrice symétrique sont perpendiculaires.'},
+    {q:'d) Dans la base orthonormée des vecteurs propres, on admet que <i>q</i> = 4<i>s</i>² − <i>t</i>², avec <i>s</i>² + <i>t</i>² = 1 sur le cercle. Quel est le maximum de <i>q</i> sur le cercle unité&nbsp;?',lab:'max =',ans:4,
+     hint:'4s² − t² = 4 − 5t² quand s² + t² = 1.',why:'q = 4 − 5t² ≤ 4, atteint pour t = 0, c’est-à-dire en (2 ; 1)/√5. Contrôle : q = (3·4 + 4·2)/5 = 4.'},
+    {q:'e) Et quel est son minimum&nbsp;?',lab:'min =',ans:-1,hint:'Écris cette fois q = 5s² − 1.',why:'q = 5s² − 1 ≥ −1, atteint en (1 ; −2)/√5 : q = (3 − 8)/5 = −1. Max et min sont les valeurs propres.'},
+   ],
+   sol:'Pour (a b ; b d) : Δ = (a + d)² − 4(ad − b²) = (a − d)² + 4b² ≥ 0, donc <b>les valeurs propres sont réelles</b>.<br>Pour A = (3 2 ; 2 0) : λ² − 3λ − 4 = 0 donne 4 et −1, de vecteurs propres (2 ; 1) et (1 ; −2), orthogonaux.<br>On a q(X) = ᵗXAX. Dans la base orthonormée e = (2 ; 1)/√5, f = (1 ; −2)/√5, avec X = se + tf : q = 4s² − t².<br>Sur le cercle, s² + t² = 1, donc −1 ≤ q ≤ 4.<br>Le <b>maximum 4</b> est atteint en ±(2 ; 1)/√5, le <b>minimum −1</b> en ±(1 ; −2)/√5.'},
 ]},
 
 /* ===================== 8. DIAGONALISATION ===================== */
-{subj:'al',sem:'all',id:'cms-al-diag',h:'Diagonalisation et réduction',p:'A = PDP⁻¹, puissances de matrices, forme de Jordan et rotations-dilatations.',steps:[
+{subj:'al',sem:'all',id:'al-diag',h:'Diagonalisation et réduction',p:'A = PDP⁻¹, puissances de matrices, forme de Jordan et rotations-dilatations.',steps:[
   {h:'Diagonaliser',p:`<i>A</i> est <b>diagonalisable</b> s’il existe une base de vecteurs propres. Avec <i>P</i> = (<b>u</b> | <b>v</b>) ses colonnes et <i>D</i> = diag(λ₁, λ₂) :<br><b><i>A</i> = <i>PDP</i>⁻¹</b>.<br><b>Critère en dimension 2</b> : deux valeurs propres réelles distinctes ⇒ diagonalisable. Une valeur propre double λ : diagonalisable seulement si <i>A</i> = λ<i>I</i>. Valeurs propres non réelles : pas diagonalisable dans ℝ.`,
    note:'L’ordre compte : la 1re colonne de P doit être un vecteur propre pour λ₁, la 1re valeur de D.'},
   {h:'Suivre les puissances',p:`Si <b>x₀</b> = <b>u</b> + <b>v</b> avec <b>u</b>, <b>v</b> propres, alors <b><i>A</i>ⁿx₀ = λ₁ⁿ<b>u</b> + λ₂ⁿ<b>v</b></b>. Ici <b>u</b> = (2 ; 1) et <b>v</b> = (−1 ; 1). Fais varier les valeurs propres et le nombre de pas.`,
@@ -350,6 +529,32 @@ CMS.push(
    note:'r > 1 : les itérés s’éloignent ; r < 1 : ils tendent vers 0 ; r = 1 : rotation pure.'},
   {kind:'Défi',h:'Une puissance qui tourne',p:`Soit <i>A</i> = ${M([[1,-1],[1,1]])}. Quel est le coefficient en haut à gauche de <i>A</i>⁸&nbsp;?`,lab:'coefficient =',ans:16,
    why:'A = √2·R₄₅°, donc A⁸ = (√2)⁸·R₃₆₀° = 16·I. Contrôle : A² = (0 −2 ; 2 0), A⁴ = −4I, A⁸ = 16I.'},
+  {kind:'Problème',h:'Une suite récurrente linéaire',
+   p:`La suite (<i>u</i>ₙ) vérifie <i>u</i>₀ = 1, <i>u</i>₁ = 5 et <i>u</i>ₙ₊₂ = <i>u</i>ₙ₊₁ + 2<i>u</i>ₙ. Avec <i>X</i>ₙ = (<i>u</i>ₙ₊₁ ; <i>u</i>ₙ), on a <i>X</i>ₙ₊₁ = <i>AX</i>ₙ, où <i>A</i> = ${mat([[1,2],[1,0]])}. On diagonalise <i>A</i> pour obtenir une formule explicite de <i>u</i>ₙ, puis on calcule un terme lointain d’un seul coup.`,
+   parts:[
+    {q:'a) Calcule <i>u</i>₃ avec la relation de récurrence.',lab:'u₃ =',ans:17,hint:'Calcule d’abord u₂ = u₁ + 2u₀.',why:'u₂ = 5 + 2 = 7, puis u₃ = 7 + 2·5 = 17.'},
+    {q:'b) Quelle est la plus grande valeur propre de <i>A</i>&nbsp;?',lab:'λ =',ans:2,hint:'tr A = 1 et det A = −2.',why:'λ² − λ − 2 = (λ − 2)(λ + 1) : les valeurs propres sont 2 et −1, distinctes, donc A est diagonalisable.'},
+    {q:'c) On en déduit <i>u</i>ₙ = α·2ⁿ + β·(−1)ⁿ. Quelles conditions fixent α et β&nbsp;?',opts:['α + β = 5 et 2α − β = 1','α = 1 et β = 5','α + β = 1 et 2α − β = 5','α − β = 1 et 2α + β = 5'],ans:2,
+     hint:'Écris la formule pour n = 0 et pour n = 1.',why:'n = 0 : α + β = u₀ = 1. n = 1 : 2α − β = u₁ = 5.'},
+    {q:'d) Combien vaut α&nbsp;?',lab:'α =',ans:2,hint:'Additionne les deux équations.',why:'3α = 6, donc α = 2 et β = −1. Ainsi uₙ = 2ⁿ⁺¹ − (−1)ⁿ. Contrôle : u₃ = 16 + 1 = 17.'},
+    {q:'e) En déduire <i>u</i>₁₀.',lab:'u₁₀ =',ans:2047,hint:'2¹¹ = 2 048.',why:'u₁₀ = 2¹¹ − (−1)¹⁰ = 2 048 − 1 = 2 047.'},
+   ],
+   sol:'Avec Xₙ = (uₙ₊₁ ; uₙ), la récurrence s’écrit Xₙ₊₁ = AX<sub>n</sub>, A = (1 2 ; 1 0), donc Xₙ = AⁿX₀.<br>Polynôme caractéristique : λ² − λ − 2 = (λ − 2)(λ + 1). Deux valeurs propres distinctes : A = PDP⁻¹ avec D = diag(2, −1).<br>Chaque coordonnée de Aⁿ est donc une combinaison de 2ⁿ et (−1)ⁿ : uₙ = α2ⁿ + β(−1)ⁿ.<br>u₀ = 1 et u₁ = 5 donnent α + β = 1, 2α − β = 5, d’où α = 2, β = −1.<br><b>uₙ = 2ⁿ⁺¹ − (−1)ⁿ</b>, et u₁₀ = 2 047.'},
+  {kind:'Problème',h:'Deux opérateurs téléphoniques',
+   p:`Deux opérateurs se partagent les abonnés d’un pays. Chaque année, 20 % des clients de l’opérateur 1 passent chez l’opérateur 2, et 30 % des clients de 2 passent chez 1. Les parts de marché <i>X</i>ₙ = (<i>a</i>ₙ ; <i>b</i>ₙ) vérifient <i>X</i>ₙ₊₁ = <i>MX</i>ₙ, avec <i>M</i> = ${mat([['0,8','0,3'],['0,2','0,7']])}. Au départ, l’opérateur 1 a tous les clients : <i>X</i>₀ = (1 ; 0). On cherche la part limite et la vitesse d’approche.`,
+   params:[{id:'n',l:'année n',min:0,max:12,v:0}],
+   draw:v=>{ const P=plane({x:[-1,13],y:[-.1,1.1],h:200,grid:false,lx:2,ly:.2}); P.seg(-1,.6,13,.6,{c:'var(--muted)',w:1.5,dash:1});
+     for(let k=0;k<=12;k++){ const a=.6+.4*.5**k, on=k<=v.n; P.dot(k,a,{r:on?5:3,c:on?'var(--math)':'var(--line)'}); } return P.svg(); },
+   info:v=>`a<sub>${v.n}</sub> = ${fmt(.6+.4*.5**v.n,4)} (pointillé : 0,6)`,
+   parts:[
+    {q:'a) 1 est valeur propre de <i>M</i>, car ses colonnes ont pour somme 1. Quelle est l’autre valeur propre&nbsp;?',lab:'λ =',ans:.5,tol:.001,hint:'La somme des valeurs propres vaut la trace.',why:'tr M = 1,5, donc λ₂ = 0,5. Contrôle : 1·0,5 = det M = 0,56 − 0,06.'},
+    {q:'b) Quels vecteurs propres choisir&nbsp;?',opts:['(2 ; 3) pour 1 et (1 ; −1) pour 0,5','(1 ; 1) pour 1 et (3 ; −2) pour 0,5','(3 ; 2) pour 1 et (1 ; −1) pour 0,5','(3 ; 2) pour 0,5 et (1 ; −1) pour 1'],ans:2,
+     hint:'Pour λ = 1, M − I = (−0,2 0,3 ; 0,2 −0,3).',why:'−0,2x + 0,3y = 0 donne (3 ; 2). Pour 0,5 : M − 0,5I = (0,3 0,3 ; 0,2 0,2) donne (1 ; −1). Contrôle : M(3 ; 2) = (3 ; 2).'},
+    {q:'c) On écrit <i>X</i>₀ = α(3 ; 2) + β(1 ; −1). Quelle est la part limite lim <i>a</i>ₙ&nbsp;?',lab:'lim aₙ =',ans:.6,tol:.001,hint:'3α + β = 1 et 2α − β = 0. Puis Xₙ = α(3 ; 2) + β·0,5ⁿ(1 ; −1).',why:'α = 1/5 et β = 2/5. Donc aₙ = 3/5 + (2/5)·0,5ⁿ → 0,6.'},
+    {q:'d) Combien vaut <i>a</i>₃&nbsp;?',lab:'a₃ =',ans:.65,tol:.001,hint:'Utilise la formule de c) avec 0,5³ = 0,125.',why:'a₃ = 0,6 + 0,4·0,125 = 0,65. Contrôle direct : a₁ = 0,8, a₂ = 0,7, a₃ = 0,65.'},
+    {q:'e) À partir de quelle année <i>n</i> a-t-on <i>a</i>ₙ < 0,601&nbsp;?',lab:'n =',ans:9,hint:'0,4·0,5ⁿ < 0,001 ⇔ 2ⁿ > 400.',why:'2⁸ = 256 < 400 < 512 = 2⁹ : n = 9. On a a₈ ≈ 0,6016 et a₉ ≈ 0,6008.'},
+   ],
+   sol:'tr M = 1,5 et det M = 0,5 : les valeurs propres sont 1 et 0,5, de vecteurs propres (3 ; 2) et (1 ; −1).<br>X₀ = (1 ; 0) = (1/5)(3 ; 2) + (2/5)(1 ; −1), donc Xₙ = MⁿX₀ = (1/5)(3 ; 2) + (2/5)·0,5ⁿ(1 ; −1).<br>Ainsi <b>aₙ = 0,6 + 0,4·0,5ⁿ</b> et bₙ = 0,4 − 0,4·0,5ⁿ.<br>La part limite de l’opérateur 1 est <b>60 %</b>, quel que soit le départ (seul le terme en 0,5ⁿ dépend de X₀).<br>L’écart à la limite est divisé par 2 chaque année : il passe sous 0,001 à partir de n = 9.<br>Mⁿ tend vers la matrice dont les deux colonnes valent (0,6 ; 0,4).'},
 ]},
 );
 })();

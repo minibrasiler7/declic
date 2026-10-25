@@ -1,4 +1,4 @@
-/* Déclic — Analyse II automne (PREPA-005, fonctions spéciales) */
+/* Déclic — Analyse II, fonctions spéciales */
 (()=>{
 const PI=Math.PI;
 const sci=x=>{ const e=Math.floor(Math.log10(x)), m=x/10**e; return `${fmt(m,1)}·10<sup>${fmt(e,0)}</sup>`; };
@@ -13,9 +13,9 @@ const arc=(P,a,b,r,q)=>P.curve(t=>r*Math.cos(t),t=>r*Math.sin(t),a,b,q);
 const ray=(P,t,q={})=>P.seg(0,0,Math.cos(t),Math.sin(t),Object.assign({c:'var(--ink)',w:2.5},q));
 const ticksPi=(P,from,to,y=0,d=2)=>{ for(let k=Math.ceil(from*d/PI);k<=Math.floor(to*d/PI);k++) if(k) P.text(k*PI/d,y,pf(k,d),{a:'middle',dy:16,s:11,c:'var(--muted)'}); return P; };
 
-CMS.push(
+COURS.push(
 /* ===================== 1. L'angle et sa mesure ===================== */
-{subj:'an2', sem:'aut', id:'cms-an2-angle', h:'L’angle et sa mesure', p:'Degrés, radians, longueur d’arc et cercle trigonométrique.', steps:[
+{subj:'an2', sem:'aut', id:'an2-angle', h:'L’angle et sa mesure', p:'Degrés, radians, longueur d’arc et cercle trigonométrique.', steps:[
  {h:'Le radian, une mesure par la longueur',p:`Un angle au centre de <i>θ</i> <b>radians</b> intercepte, sur un cercle de rayon <i>r</i>, un arc de longueur <b><i>s</i> = <i>rθ</i></b>. Sur le cercle de rayon 1, la mesure en radians est donc exactement la longueur de l’arc. Un tour complet vaut 360° = 2π rad.`,
   params:[{id:'t',l:'Angle',min:0,max:360,step:15,v:60,u:'°'},{id:'r',l:'Rayon r',min:1,max:3,step:.5,v:2}],
   draw:v=>{ const th=rad(v.t), P=plane({x:[-3.4,3.4],y:[-3.4,3.4],lab:1});
@@ -50,10 +50,32 @@ CMS.push(
   why:'17π/6 = 12π/6 + 5π/6 = 2π + 5π/6. On retire un tour : la mesure principale est 5π/6, qui est bien dans ]−π ; π].'},
  {kind:'Défi',h:'L’aiguille des minutes',p:'L’aiguille des minutes d’une horloge mesure 12 cm. Quelle longueur d’arc parcourt sa pointe en 20 minutes&nbsp;? Arrondis au centième.',lab:'s =',unit:'cm',ans:25.13,tol:.01,
   why:'20 min = 1/3 de tour, soit θ = 2π/3 rad. s = 12 · 2π/3 = 8π ≈ 25,13 cm.'},
+ {kind:'Problème',h:'La roue de vélo',
+  p:'Un vélo roule en ligne droite sans glisser. Ses roues ont un diamètre de 70 cm, donc un rayon de 0,35 m. Quand la roue tourne d’un angle <i>θ</i> (en radians), le vélo avance de la longueur d’arc <i>s</i> = <i>rθ</i> déroulée au sol. On suit la valve, placée au départ tout à droite de la roue (angle 0).',
+  parts:[
+   {q:'a) De quel angle (en radians) la roue tourne-t-elle quand le vélo avance de 10 m&nbsp;? Arrondis au centième.',lab:'θ =',unit:'rad',ans:28.57,tol:.01,hint:'Inverse la formule de l’arc : θ = s / r, avec s et r dans la même unité.',why:'θ = 10 / 0,35 ≈ 28,57 rad.'},
+   {q:'b) Combien de tours complets la roue fait-elle sur 1 km&nbsp;?',lab:'tours =',ans:454,hint:'Un tour fait avancer le vélo d’une circonférence 2πr. Garde la partie entière.',why:'1000 / (2π · 0,35) ≈ 454,7 : la roue fait 454 tours complets.'},
+   {q:'c) Après 10 m, quelle est la mesure principale (dans ]−π ; π]) de l’angle de la valve&nbsp;? Arrondis au centième.',lab:'θ =',unit:'rad',ans:-2.84,tol:.01,hint:'Retire autant de fois 2π ≈ 6,283 qu’il faut pour tomber dans ]−π ; π]. Essaie 4 tours, puis 5.',why:'28,571 − 4 · 2π ≈ 3,44, qui dépasse π. 28,571 − 5 · 2π ≈ −2,84 est dans ]−π ; π].'},
+   {q:'d) À 18 km/h (5 m/s), quelle est la vitesse angulaire de la roue en rad/s&nbsp;? Arrondis au centième.',lab:'ω =',unit:'rad/s',ans:14.29,tol:.01,hint:'En une seconde, la roue déroule 5 m d’arc.',why:'ω = v / r = 5 / 0,35 ≈ 14,29 rad/s.'},
+  ],
+  sol:'<p>Le sol reçoit exactement l’arc déroulé : <i>s</i> = <i>rθ</i>, donc <i>θ</i> = <i>s</i>/<i>r</i>.</p><p>a) <i>θ</i> = 10/0,35 ≈ 28,57 rad. b) Un tour fait 2π · 0,35 ≈ 2,199 m, et 1000/2,199 ≈ 454,7 : 454 tours complets. c) 28,571 = 4 · 2π + 3,438 ; comme 3,438 &gt; π, on retire un tour de plus : 3,438 − 2π ≈ −2,84 rad. d) En une seconde, <i>θ</i> = 5/0,35 ≈ 14,29 rad, soit environ 2,3 tours par seconde.</p>'},
+ {kind:'Problème',h:'Ératosthène mesure la Terre',
+  p:'Vers 230 av. J.-C., Ératosthène remarque qu’à midi le jour du solstice, le soleil est à la verticale à Syène, alors qu’à Alexandrie, plus au nord sur le même méridien, ses rayons font un angle de 7,2° avec la verticale. Les rayons du soleil sont parallèles, donc 7,2° est aussi l’angle au centre de la Terre entre les deux villes. La distance Syène–Alexandrie est d’environ 800 km.',
+  fig:(()=>{ const P=plane({x:[-1.6,1.6],y:[-1.2,2],grid:false,axes:false}), b=rad(70), a=rad(95);
+    P.circ(0,0,1,{c:'var(--ink)',w:2}); arc(P,b,a,1,{c:'var(--spark)',w:5}); P.seg(0,0,Math.cos(a),Math.sin(a),{c:'var(--muted)',w:1.5,dash:true}).seg(0,0,Math.cos(b),Math.sin(b),{c:'var(--muted)',w:1.5,dash:true});
+    arc(P,b,a,.3,{c:'var(--math)',w:2}); [a,b].forEach(t=>{ const x=Math.cos(t), y=Math.sin(t); P.arrow(x+.8*Math.cos(b),y+.8*Math.sin(b),x,y,{c:'var(--accent)',w:1.5,hs:8}); });
+    P.dot(Math.cos(a),Math.sin(a),{c:'var(--ink)',r:4,l:'Alexandrie',dx:-78,dy:-4}).dot(Math.cos(b),Math.sin(b),{c:'var(--ink)',r:4,l:'Syène',dx:10,dy:6}).text(.05,.42,'7,2°',{s:11,c:'var(--math)'}).text(-1.5,-1.1,'angle exagéré sur la figure',{s:11,c:'var(--muted)'}).text(.75,1.85,'rayons du soleil',{s:11,c:'var(--accent)'}); return P.svg(); })(),
+  parts:[
+   {q:'a) Convertis 7,2° en radians. Arrondis au dix-millième.',lab:'θ =',unit:'rad',ans:.1257,tol:.00006,hint:'Multiplie par π/180. Remarque que 7,2 = 180/25.',why:'7,2 · π/180 = π/25 ≈ 0,1257 rad.'},
+   {q:'b) Quel rayon terrestre R en déduis-tu&nbsp;? Arrondis au kilomètre.',lab:'R =',unit:'km',ans:6366,tol:1,hint:'Les 800 km sont la longueur de l’arc intercepté par cet angle au centre.',why:'800 = R · π/25, donc R = 20 000/π ≈ 6366 km.'},
+   {q:'c) Avec ce rayon, quelle distance sépare deux villes du même méridien de latitudes 47,5° N et 43,3° N&nbsp;? Arrondis au kilomètre.',lab:'d =',unit:'km',ans:467,tol:1,hint:'L’écart de latitude est l’angle au centre. Tu peux aussi faire une règle de trois avec 7,2° ↔ 800 km.',why:'Δφ = 4,2°, d = R · 4,2π/180 = 800 · 4,2/7,2 ≈ 467 km.'},
+   {q:'d) Le mille marin est l’arc qui correspond à 1 minute d’angle (1/60 de degré) au centre. Combien de mètres mesure-t-il avec ce rayon&nbsp;?',lab:'1 mille =',unit:'m',ans:1852,tol:1,hint:'Convertis 1/60° en radians, puis multiplie par R exprimé en mètres.',why:'1′ = π/10 800 rad, donc s = 6 366 198 · π/10 800 ≈ 1852 m. C’est bien la valeur officielle du mille marin.'},
+  ],
+  sol:'<p>Les rayons étant parallèles, l’angle de 7,2° mesuré à Alexandrie est l’angle au centre <i>θ</i> entre les deux villes (angles alternes-internes).</p><p>a) <i>θ</i> = 7,2 · π/180 = π/25 ≈ 0,1257 rad. b) Avec <i>s</i> = <i>Rθ</i> : <i>R</i> = 800/(π/25) = 20 000/π ≈ 6366 km, et la circonférence vaut 2π<i>R</i> = 40 000 km. c) 4,2° donne <i>d</i> = <i>R</i> · 4,2π/180 ≈ 467 km. d) 1′ = π/10 800 rad, et <i>R</i> · π/10 800 ≈ 1852 m.</p><p>La longueur d’arc proportionnelle à l’angle en radians suffit à mesurer la planète.</p>'},
 ]},
 
 /* ===================== 2. Fonctions trigonométriques ===================== */
-{subj:'an2', sem:'aut', id:'cms-an2-fonctions', h:'Fonctions trigonométriques', p:'Sinus, cosinus, tangente et leurs réciproques, du cercle au graphe.', steps:[
+{subj:'an2', sem:'aut', id:'an2-fonctions', h:'Fonctions trigonométriques', p:'Sinus, cosinus, tangente et leurs réciproques, du cercle au graphe.', steps:[
  {h:'Du cercle au graphe',p:`Pour tout réel <i>x</i>, le point M d’angle <i>x</i> sur le cercle trigonométrique a pour coordonnées <b>(cos <i>x</i> ; sin <i>x</i>)</b>. En déroulant l’angle sur l’axe horizontal, on obtient les graphes. Fais tourner le point et regarde la courbe se tracer.`,
   params:[{id:'t',l:'x',min:0,max:360,step:15,v:60,u:'°'},{id:'f',l:'0 = sin, 1 = cos',min:0,max:1,step:1,v:0}],
   draw:v=>{ const x=rad(v.t), c=Math.cos(x), s=Math.sin(x), C=circle({R:1.3,w:150,lab:false});
@@ -98,10 +120,30 @@ CMS.push(
   why:'On cherche l’angle de [0 ; π] dont le cosinus vaut −1/2 : c’est 2π/3, car cos(2π/3) = −cos(π/3) = −1/2. 4π/3 a le même cosinus mais n’est pas dans [0 ; π].'},
  {kind:'Défi',h:'Attention à l’intervalle',p:'Combien vaut arcsin(sin(3π/4))&nbsp;?',opts:['3π/4','−π/4','π/4','5π/4'],ans:2,
   why:'sin(3π/4) = √2/2. L’angle de [−π/2 ; π/2] de sinus √2/2 est π/4. 3π/4 n’est pas dans l’intervalle image de arcsin.'},
+ {kind:'Problème',h:'La grande roue',
+  p:'Une grande roue a un diamètre de 60 m, son centre est à 32 m du sol et elle fait un tour en 15 minutes. Une nacelle part du point le plus bas à <i>t</i> = 0. Sa hauteur au-dessus du sol est alors <b><i>h</i>(<i>t</i>) = 32 − 30 cos(2π<i>t</i>/15)</b>, avec <i>t</i> en minutes.',
+  fig:(()=>{ const P=plane({x:[-1,16],y:[-4,66],w:320,h:180,grid:false,lx:5,ly:20}); [17,32,47,62].forEach(y=>P.seg(0,y,15,y,{c:'var(--line)',w:1}));
+    P.fn(t=>32-30*Math.cos(2*Math.PI*t/15),{from:0,to:15}).seg(0,47,15,47,{c:'var(--bad)',w:1.5,dash:true}).text(15.8,0,'t',{a:'end',dy:-6,c:'var(--muted)'}).text(.3,49,'47 m',{s:11,c:'var(--bad)'}); return P.svg(); })(),
+  parts:[
+   {q:'a) À quelle hauteur est la nacelle à <i>t</i> = 5 min&nbsp;?',lab:'h =',unit:'m',ans:47,hint:'2π · 5/15 = 2π/3. Quel est le cosinus de cet angle&nbsp;?',why:'cos(2π/3) = −1/2, donc h(5) = 32 + 15 = 47 m.'},
+   {q:'b) À quel instant la nacelle atteint-elle 17 m pour la première fois&nbsp;?',lab:'t =',unit:'min',ans:2.5,tol:.01,hint:'Il faut cos(2πt/15) = 1/2. Le plus petit angle positif de cosinus 1/2 est arccos(1/2).',why:'arccos(1/2) = π/3, donc 2πt/15 = π/3 et t = 15/6 = 2,5 min.'},
+   {q:'c) Pendant combien de minutes par tour la nacelle est-elle au-dessus de 47 m&nbsp;?',lab:'durée =',unit:'min',ans:5,hint:'h > 47 équivaut à cos(2πt/15) < −1/2. Sur un tour, l’angle 2πt/15 parcourt [0 ; 2π]. Où le cosinus est-il inférieur à −1/2&nbsp;?',why:'cos u < −1/2 pour u ∈ ]2π/3 ; 4π/3[, soit un tiers du tour : 15/3 = 5 min (de t = 5 à t = 10).'},
+  ],
+  sol:'<p><i>h</i>(<i>t</i>) = 32 − 30 cos <i>u</i> avec <i>u</i> = 2π<i>t</i>/15, qui parcourt [0 ; 2π] en un tour.</p><p>a) <i>u</i> = 2π/3, cos <i>u</i> = −1/2 : <i>h</i> = 32 + 15 = 47 m. b) <i>h</i> = 17 ⇔ cos <i>u</i> = 1/2 ; la première fois, <i>u</i> = arccos(1/2) = π/3, d’où <i>t</i> = 2,5 min. c) <i>h</i> &gt; 47 ⇔ cos <i>u</i> &lt; −1/2 ⇔ <i>u</i> ∈ ]2π/3 ; 4π/3[ sur un tour. Cet intervalle a une longueur 2π/3, le tiers de 2π : la nacelle reste 5 minutes au-dessus de 47 m, entre <i>t</i> = 5 et <i>t</i> = 10.</p>'},
+ {kind:'Problème',h:'Le graphe de arcsin(sin x)',
+  p:'On étudie <i>g</i>(<i>x</i>) = arcsin(sin <i>x</i>) sur ℝ. On sait que sin(arcsin <i>y</i>) = <i>y</i>, mais que arcsin(sin <i>x</i>) = <i>x</i> seulement si <i>x</i> ∈ [−π/2 ; π/2]. Il faut donc, pour chaque <i>x</i>, trouver l’angle de [−π/2 ; π/2] qui a le même sinus que <i>x</i>.',
+  fig:(()=>{ const P=plane({x:[-.5,13],y:[-2,2],step:Math.PI/2,h:130}); P.fn(Math.sin,{c:'var(--muted)',w:2,dash:true}).fn(x=>Math.asin(Math.max(-1,Math.min(1,Math.sin(x)))),{n:600}); ticksPi(P,.1,12.9,0,2); return P.svg(); })(),
+  parts:[
+   {q:'a) Calcule <i>g</i>(2), arrondi au millième.',lab:'g(2) =',ans:1.142,tol:.0006,hint:'2 est dans [π/2 ; π]. Quel angle de [−π/2 ; π/2] a le même sinus que 2&nbsp;? Pense à sin(π − x) = sin x.',why:'sin(π − 2) = sin 2 et π − 2 ≈ 1,142 est dans [−π/2 ; π/2], donc g(2) = π − 2 ≈ 1,142.'},
+   {q:'b) Calcule <i>g</i>(5), arrondi au millième.',lab:'g(5) =',ans:-1.283,tol:.0006,hint:'Utilise la 2π-périodicité de sin : retire 2π.',why:'5 − 2π ≈ −1,283 est dans [−π/2 ; π/2] et a le même sinus que 5. Donc g(5) = 5 − 2π.'},
+   {q:'c) Sur [π/2 ; 3π/2], quelle est l’expression de <i>g</i>(<i>x</i>)&nbsp;?',opts:['x − π','x','π − x','−x'],ans:2,hint:'Si x ∈ [π/2 ; 3π/2], dans quel intervalle tombe π − x&nbsp;?',why:'π − x ∈ [−π/2 ; π/2] et sin(π − x) = sin x, donc g(x) = π − x. Le graphe est un segment de pente −1 : g est en dents de scie.'},
+   {q:'d) Combien l’équation <i>g</i>(<i>x</i>) = 1 a-t-elle de solutions dans [0 ; 4π]&nbsp;?',lab:'nombre =',ans:4,hint:'g(x) = 1 ⇔ sin x = sin 1. Compte les solutions par tour.',why:'sin x = sin 1 donne x = 1 + 2kπ ou x = π − 1 + 2kπ. Dans [0 ; 4π] : 1, π − 1, 2π + 1, 3π − 1, soit 4 solutions.'},
+  ],
+  sol:'<p>Pour tout <i>x</i>, <i>g</i>(<i>x</i>) est l’unique angle de [−π/2 ; π/2] de même sinus que <i>x</i>. <i>g</i> est 2π-périodique comme sin.</p><p>Sur [−π/2 ; π/2], <i>g</i>(<i>x</i>) = <i>x</i>. Sur [π/2 ; 3π/2], π − <i>x</i> tombe dans [−π/2 ; π/2] et sin(π − <i>x</i>) = sin <i>x</i>, donc <i>g</i>(<i>x</i>) = π − <i>x</i>. Le graphe est une ligne brisée de pentes +1 et −1, entre −π/2 et π/2.</p><p>Ainsi <i>g</i>(2) = π − 2 ≈ 1,142 et <i>g</i>(5) = 5 − 2π ≈ −1,283. Enfin <i>g</i>(<i>x</i>) = 1 ⇔ sin <i>x</i> = sin 1, qui a deux solutions par période : 4 dans [0 ; 4π].</p>'},
 ]},
 
 /* ===================== 3. Formules trigonométriques ===================== */
-{subj:'an2', sem:'aut', id:'cms-an2-formules', h:'Formules trigonométriques', p:'Pythagore sur le cercle, formules d’addition, angle double et somme-produit.', steps:[
+{subj:'an2', sem:'aut', id:'an2-formules', h:'Formules trigonométriques', p:'Pythagore sur le cercle, formules d’addition, angle double et somme-produit.', steps:[
  {h:'La relation fondamentale',p:`Le point (cos <i>x</i> ; sin <i>x</i>) est sur le cercle de rayon 1, donc par Pythagore : <b>sin²<i>x</i> + cos²<i>x</i> = 1</b> pour tout <i>x</i> réel. En divisant par cos²<i>x</i>, on obtient aussi <b>1 + tan²<i>x</i> = ${F(1,'cos²<i>x</i>')}</b>.`,
   params:[{id:'t',l:'x',min:0,max:360,step:15,v:30,u:'°'}],
   draw:v=>{ const x=rad(v.t), c=Math.cos(x), s=Math.sin(x), P=circle({R:1.35});
@@ -136,10 +178,28 @@ CMS.push(
   note:'Les deux autres : sin p − sin q = 2 cos((p + q)/2) sin((p − q)/2) et cos p − cos q = −2 sin((p + q)/2) sin((p − q)/2).'},
  {kind:'Défi',h:'Factorise',p:'Écris cos 3<i>x</i> + cos <i>x</i> sous forme de produit.',opts:['2 cos 2x cos x','2 sin 2x sin x','−2 sin 2x sin x','2 cos 4x cos 2x'],ans:0,
   why:'Avec p = 3x et q = x : (p + q)/2 = 2x et (p − q)/2 = x, donc cos 3x + cos x = 2 cos 2x cos x.'},
+ {kind:'Problème',h:'Superposer deux vibrations',
+  p:'Deux vibrations de même fréquence se superposent : <i>f</i>(<i>t</i>) = 3 sin <i>t</i> + 4 cos <i>t</i>. On veut l’écrire comme une seule vibration <b><i>f</i>(<i>t</i>) = <i>R</i> sin(<i>t</i> + <i>φ</i>)</b> avec <i>R</i> &gt; 0, pour lire directement son amplitude et son décalage.',
+  parts:[
+   {q:'a) En développant <i>R</i> sin(<i>t</i> + <i>φ</i>), quelles conditions obtiens-tu&nbsp;?',opts:['R sin φ = 3 et R cos φ = 4','R cos φ = 3 et R sin φ = 4','R = 3 + 4 et φ = 0','R cos φ = 4 et R sin φ = 4'],ans:1,hint:'sin(t + φ) = sin t cos φ + cos t sin φ. Identifie le coefficient de sin t, puis celui de cos t.',why:'R sin(t + φ) = R cos φ · sin t + R sin φ · cos t. On identifie : R cos φ = 3 et R sin φ = 4.'},
+   {q:'b) Quelle est l’amplitude <i>R</i>&nbsp;?',lab:'R =',ans:5,hint:'Élève les deux conditions au carré et additionne : la relation fondamentale fait le reste.',why:'R²(cos² φ + sin² φ) = 9 + 16 = 25, donc R = 5.'},
+   {q:'c) Quel est le décalage <i>φ</i> en radians, arrondi au millième&nbsp;?',lab:'φ =',unit:'rad',ans:.927,tol:.0006,hint:'tan φ = 4/3, et φ est dans le 1er quadrant puisque cos φ et sin φ sont positifs.',why:'cos φ = 3/5 > 0 et sin φ = 4/5 > 0, donc φ = arctan(4/3) ≈ 0,927 rad.'},
+   {q:'d) À quel premier instant <i>t</i> &gt; 0 la vibration atteint-elle son maximum&nbsp;? Arrondis au millième.',lab:'t =',ans:.644,tol:.0006,hint:'Le sinus vaut 1 quand son argument vaut π/2.',why:'t + φ = π/2 donne t = π/2 − 0,927 ≈ 0,644. Alors f(t) = 5.'},
+  ],
+  sol:'<p>On développe : <i>R</i> sin(<i>t</i> + <i>φ</i>) = <i>R</i> cos <i>φ</i> sin <i>t</i> + <i>R</i> sin <i>φ</i> cos <i>t</i>. L’identification avec 3 sin <i>t</i> + 4 cos <i>t</i> donne <i>R</i> cos <i>φ</i> = 3 et <i>R</i> sin <i>φ</i> = 4.</p><p>En sommant les carrés, <i>R</i>² = 25, donc <i>R</i> = 5. Puis cos <i>φ</i> = 3/5 et sin <i>φ</i> = 4/5 : <i>φ</i> = arctan(4/3) ≈ 0,927 rad.</p><p>Donc <i>f</i>(<i>t</i>) = 5 sin(<i>t</i> + 0,927). Son maximum 5 est atteint quand <i>t</i> + <i>φ</i> = π/2, soit <i>t</i> ≈ 0,644. On vérifie : 3 sin(0,644) + 4 cos(0,644) ≈ 3 · 0,6 + 4 · 0,8 = 5.</p>'},
+ {kind:'Problème',h:'La valeur exacte de sin 18°',
+  p:'On veut une valeur exacte de sin 18°, utile pour construire le pentagone régulier. Pose <i>θ</i> = 18°. L’astuce : 5<i>θ</i> = 90°, donc 2<i>θ</i> = 90° − 3<i>θ</i>, et deux angles complémentaires vérifient sin <i>a</i> = cos(90° − <i>a</i>). On en tire une équation pour <i>s</i> = sin <i>θ</i>.',
+  parts:[
+   {q:'a) En écrivant 3<i>θ</i> = 2<i>θ</i> + <i>θ</i>, à quoi est égal cos 3<i>θ</i>&nbsp;?',opts:['3 cos θ − 4 cos³ θ','4 cos³ θ − 3 cos θ','cos³ θ − 3 cos θ','3 cos θ'],ans:1,hint:'cos(2θ + θ) = cos 2θ cos θ − sin 2θ sin θ, puis remplace sin² θ par 1 − cos² θ.',why:'cos 3θ = (2cos² θ − 1) cos θ − 2 sin² θ cos θ = 2cos³ θ − cos θ − 2(1 − cos² θ) cos θ = 4cos³ θ − 3cos θ.'},
+   {q:'b) De sin 2<i>θ</i> = cos 3<i>θ</i>, après division par cos <i>θ</i> ≠ 0, quelle équation vérifie <i>s</i> = sin <i>θ</i>&nbsp;?',opts:['4s² − 2s − 1 = 0','2s² + s − 1 = 0','s² + s − 1 = 0','4s² + 2s − 1 = 0'],ans:3,hint:'Le membre de gauche vaut 2 sin θ cos θ. À droite, mets cos θ en facteur et écris cos² θ = 1 − s².',why:'2s cos θ = cos θ(4cos² θ − 3) donne 2s = 4(1 − s²) − 3 = 1 − 4s², soit 4s² + 2s − 1 = 0.'},
+   {q:'c) Calcule sin 18° (la racine qui convient), arrondi au dix-millième.',lab:'sin 18° =',ans:.309,tol:.00006,hint:'Le trinôme a une racine positive et une négative. sin 18° est positif.',why:'s = (−2 + √20)/8 = (√5 − 1)/4 ≈ 0,3090. L’autre racine, −(1 + √5)/4, est négative.'},
+   {q:'d) Déduis-en cos 36°, arrondi au dix-millième.',lab:'cos 36° =',ans:.809,tol:.00006,hint:'cos 2θ = 1 − 2 sin² θ, avec 2θ = 36°.',why:'cos 36° = 1 − 2s² = 1 − 2(6 − 2√5)/16 = (1 + √5)/4 ≈ 0,8090, la moitié du nombre d’or.'},
+  ],
+  sol:'<p>Avec <i>θ</i> = 18°, 2<i>θ</i> et 3<i>θ</i> sont complémentaires, donc sin 2<i>θ</i> = cos 3<i>θ</i>.</p><p>La formule d’addition donne cos 3<i>θ</i> = 4cos³<i>θ</i> − 3cos <i>θ</i>. L’équation devient 2<i>s</i> cos <i>θ</i> = cos <i>θ</i>(4cos²<i>θ</i> − 3). On divise par cos <i>θ</i> ≠ 0 et on écrit cos²<i>θ</i> = 1 − <i>s</i>² : 2<i>s</i> = 1 − 4<i>s</i>², soit 4<i>s</i>² + 2<i>s</i> − 1 = 0.</p><p>Les racines sont (−1 ± √5)/4. Comme sin 18° &gt; 0, <b>sin 18° = (√5 − 1)/4 ≈ 0,3090</b>. Enfin cos 36° = 1 − 2 sin² 18° = <b>(1 + √5)/4 ≈ 0,8090</b>.</p>'},
 ]},
 
 /* ===================== 4. Équations trigonométriques ===================== */
-{subj:'an2', sem:'aut', id:'cms-an2-equations', h:'Équations trigonométriques', p:'Résoudre sin x = a, cos x = a, tan x = a et s’y ramener.', steps:[
+{subj:'an2', sem:'aut', id:'an2-equations', h:'Équations trigonométriques', p:'Résoudre sin x = a, cos x = a, tan x = a et s’y ramener.', steps:[
  {h:'sin x = a : deux familles',p:`Pour |<i>a</i>| ≤ 1, la droite <i>y</i> = <i>a</i> coupe le cercle en deux points, d’angles <i>α</i> = arcsin <i>a</i> et π − <i>α</i>. Avec les tours complets : <b><i>x</i> = <i>α</i> + 2<i>k</i>π ou <i>x</i> = π − <i>α</i> + 2<i>k</i>π</b>, <i>k</i> ∈ ℤ. Si |<i>a</i>| > 1, il n’y a aucune solution.`,
   params:[{id:'a',l:'a',min:-1,max:1,step:.1,v:.5}],
   draw:v=>{ const al=Math.asin(v.a), P=circle({R:1.4}); P.seg(-1.4,v.a,1.4,v.a,{c:'var(--bad)',w:1.5,dash:true});
@@ -168,10 +228,29 @@ CMS.push(
   why:'Avec t = cos x : 2t² + t − 1 = (2t − 1)(t + 1) = 0, donc t = ½ ou t = −1. cos x = ½ donne π/3 et 5π/3, cos x = −1 donne π.'},
  {kind:'Défi',h:'Avec un changement de fonction',p:'Résous 2 sin²<i>x</i> + 3 cos <i>x</i> = 0. Donne la plus petite solution de [0 ; 2π[ en radians, arrondie au centième.',lab:'x =',ans:2.09,tol:.006,
   why:'2(1 − cos² x) + 3 cos x = 0 ⇔ 2cos² x − 3 cos x − 2 = 0, racines t = 2 (rejetée, > 1) et t = −½. cos x = −½ donne 2π/3 ≈ 2,09 et 4π/3.'},
+ {kind:'Problème',h:'Entrer au port avec la marée',
+  p:'Dans un port, la hauteur d’eau suit à peu près <b><i>h</i>(<i>t</i>) = 4 + 2,5 cos(π<i>t</i>/6)</b>, en mètres, où <i>t</i> est le temps en heures depuis la pleine mer. Un voilier a besoin d’au moins 5 m d’eau pour entrer ou sortir.',
+  fig:(()=>{ const P=plane({x:[-.5,12.5],y:[0,7.5],w:320,h:170,grid:false,lx:2,ly:1}); [1,2,3,4,5,6,7].forEach(y=>P.seg(0,y,12,y,{c:'var(--line)',w:1}));
+    P.fn(t=>4+2.5*Math.cos(Math.PI*t/6),{from:0,to:12}).seg(0,5,12,5,{c:'var(--bad)',w:1.5,dash:true}).text(12.3,0,'t (h)',{a:'end',dy:-6,s:11,c:'var(--muted)'}).text(5.2,5.2,'5 m',{s:11,c:'var(--bad)'}); return P.svg(); })(),
+  parts:[
+   {q:'a) Quelle est la hauteur d’eau 2 heures après la pleine mer&nbsp;?',lab:'h =',unit:'m',ans:5.25,tol:.01,hint:'π · 2/6 = π/3.',why:'h(2) = 4 + 2,5 cos(π/3) = 4 + 1,25 = 5,25 m.'},
+   {q:'b) Combien de temps après la pleine mer la hauteur tombe-t-elle à 5 m&nbsp;? Arrondis au centième d’heure.',lab:'t =',unit:'h',ans:2.21,tol:.006,hint:'Résous cos(πt/6) = 0,4 et prends la plus petite solution positive.',why:'πt/6 = arccos(0,4) ≈ 1,159, donc t = 6 · 1,159/π ≈ 2,21 h.'},
+   {q:'c) Sur un cycle de 12 h, pendant combien d’heures le voilier peut-il passer&nbsp;? Arrondis au centième.',lab:'durée =',unit:'h',ans:4.43,tol:.006,hint:'h ≥ 5 ⇔ cos(πt/6) ≥ 0,4. Les solutions de cos u = 0,4 sont ±arccos(0,4) + 2kπ : la fenêtre est centrée sur la pleine mer.',why:'La fenêtre va de t ≈ −2,21 h à t ≈ 2,21 h autour de chaque pleine mer, soit 2 · 2,214 ≈ 4,43 h.'},
+  ],
+  sol:'<p>On pose <i>u</i> = π<i>t</i>/6. <i>h</i>(<i>t</i>) ≥ 5 ⇔ 2,5 cos <i>u</i> ≥ 1 ⇔ cos <i>u</i> ≥ 0,4.</p><p>Les solutions de cos <i>u</i> = 0,4 sont <i>u</i> = ± arccos(0,4) + 2<i>k</i>π, avec arccos(0,4) ≈ 1,159. Sur une période, cos <i>u</i> ≥ 0,4 pour <i>u</i> ∈ [−1,159 ; 1,159], soit <i>t</i> ∈ [−2,21 ; 2,21] heures autour de la pleine mer.</p><p>a) <i>h</i>(2) = 5,25 m. b) La hauteur passe sous 5 m à <i>t</i> ≈ 2,21 h. c) La fenêtre dure 2 · 6 · arccos(0,4)/π ≈ 4,43 h par marée, soit environ 4 h 26 min.</p>'},
+ {kind:'Problème',h:'Une équation qui cache un produit',
+  p:'On veut résoudre <b>sin <i>x</i> + sin 3<i>x</i> = sin 2<i>x</i></b> sur [0 ; 2π[. Développer sin 3<i>x</i> serait long. Les formules somme-produit permettent de faire apparaître un facteur commun et de se ramener à des équations simples.',
+  parts:[
+   {q:'a) Que vaut sin 3<i>x</i> + sin <i>x</i>&nbsp;?',opts:['2 sin 2x cos x','2 cos 2x sin x','sin 4x','2 sin 2x sin x'],ans:0,hint:'sin p + sin q = 2 sin((p + q)/2) cos((p − q)/2), avec p = 3x et q = x.',why:'(p + q)/2 = 2x et (p − q)/2 = x : sin 3x + sin x = 2 sin 2x cos x.'},
+   {q:'b) Comment continuer correctement&nbsp;?',opts:['Diviser par sin 2x : 2 cos x = 1','Écrire sin 2x(2 cos x − 1) = 0, puis sin 2x = 0 ou cos x = ½','Élever au carré les deux membres','Poser x = 0, seule solution évidente'],ans:1,hint:'Diviser par une expression qui peut être nulle fait perdre des solutions.',why:'2 sin 2x cos x − sin 2x = sin 2x(2 cos x − 1). Un produit est nul si l’un des facteurs l’est. Diviser par sin 2x ferait perdre les solutions de sin 2x = 0.'},
+   {q:'c) Combien de solutions l’équation a-t-elle dans [0 ; 2π[&nbsp;?',lab:'nombre =',ans:6,hint:'sin 2x = 0 donne x = kπ/2. cos x = ½ donne x = ±π/3 + 2kπ. Vérifie qu’aucune ne se répète.',why:'sin 2x = 0 : 0, π/2, π, 3π/2. cos x = ½ : π/3, 5π/3. Six solutions distinctes.'},
+   {q:'d) Calcule la somme de toutes ces solutions, arrondie au centième.',lab:'somme =',ans:15.71,tol:.006,hint:'Additionne les multiples de π, puis multiplie par π ≈ 3,1416.',why:'0 + π/2 + π + 3π/2 + π/3 + 5π/3 = 3π + 2π = 5π ≈ 15,71.'},
+  ],
+  sol:'<p>Somme-produit : sin 3<i>x</i> + sin <i>x</i> = 2 sin 2<i>x</i> cos <i>x</i>. L’équation devient 2 sin 2<i>x</i> cos <i>x</i> = sin 2<i>x</i>, soit <b>sin 2<i>x</i> (2 cos <i>x</i> − 1) = 0</b>.</p><p>Premier facteur : sin 2<i>x</i> = 0 ⇔ 2<i>x</i> = <i>k</i>π ⇔ <i>x</i> = <i>k</i>π/2, soit 0, π/2, π, 3π/2 dans [0 ; 2π[.</p><p>Second facteur : cos <i>x</i> = ½ ⇔ <i>x</i> = ±π/3 + 2<i>k</i>π, soit π/3 et 5π/3.</p><p>Solutions : {0 ; π/3 ; π/2 ; π ; 3π/2 ; 5π/3}, six valeurs de somme 5π. Diviser par sin 2<i>x</i> n’aurait laissé que π/3 et 5π/3.</p>'},
 ]},
 
 /* ===================== 5. Relations dans les triangles ===================== */
-{subj:'an2', sem:'aut', id:'cms-an2-triangles', h:'Relations dans les triangles', p:'Triangle rectangle, loi des sinus, loi du cosinus et résolution de triangles.', steps:[
+{subj:'an2', sem:'aut', id:'an2-triangles', h:'Relations dans les triangles', p:'Triangle rectangle, loi des sinus, loi du cosinus et résolution de triangles.', steps:[
  {h:'Le triangle rectangle',p:`Dans un triangle rectangle, pour un angle aigu <i>α</i> : <b>sin <i>α</i> = ${F('opposé','hypoténuse')}</b>, <b>cos <i>α</i> = ${F('adjacent','hypoténuse')}</b>, <b>tan <i>α</i> = ${F('opposé','adjacent')}</b>. Ici l’hypoténuse vaut 4.`,
   params:[{id:'a',l:'α',min:10,max:80,step:5,v:35,u:'°'}],
   draw:v=>{ const a=rad(v.a), c=4*Math.cos(a), s=4*Math.sin(a), P=plane({x:[-.6,4.6],y:[-.7,4.3],grid:false,axes:false});
@@ -208,10 +287,36 @@ CMS.push(
   note:'Avec la loi des sinus, sin β = k a deux solutions dans ]0° ; 180°[ : β et 180° − β. Vérifie si la seconde laisse une somme d’angles inférieure à 180°. Pour trouver un angle, préfère la loi du cosinus : arccos n’a pas cette ambiguïté.'},
  {kind:'Défi',h:'Le plus grand angle',p:'Un triangle a pour côtés 7, 8 et 9. Calcule son plus grand angle en degrés, arrondi au dixième.',lab:'γ =',unit:'°',ans:73.4,tol:.05,
   why:'Le plus grand angle est opposé au plus grand côté. cos γ = (7² + 8² − 9²)/(2 · 7 · 8) = 32/112 = 2/7, donc γ = arccos(2/7) ≈ 73,4°.'},
+ {kind:'Problème',h:'La hauteur d’une tour par deux visées',
+  p:'On ne peut pas atteindre le pied d’une tour. Depuis un point A du sol, on voit son sommet T sous un angle d’élévation de 30°. On avance de 40 m en ligne droite vers la tour jusqu’à un point B, d’où l’angle d’élévation vaut 45°. Le sol est horizontal et H désigne le pied de la tour.',
+  fig:(()=>{ const P=plane({x:[-8,104],y:[-10,64],grid:false,axes:false}), h=54.64, xh=94.64;
+    P.seg(-8,0,104,0,{c:'var(--muted)',w:1.5}).poly([[0,0],[40,0],[xh,h]],{fill:'var(--accent)',fo:.12,c:'var(--ink)',w:2}).seg(xh,0,xh,h,{c:'var(--spark)',w:4.5}).seg(40,0,xh,h,{c:'var(--ink)',w:2});
+    arc(P,0,rad(30),10,{c:'var(--math)',w:2}); arc(P,0,rad(45),10,{c:'var(--math)',w:2}); P.curve(t=>40+10*Math.cos(t),t=>10*Math.sin(t),0,rad(45),{c:'var(--math)',w:2});
+    P.dot(0,0,{c:'var(--ink)',r:4,l:'A',dx:-6,dy:16}).dot(40,0,{c:'var(--ink)',r:4,l:'B',dx:-4,dy:16}).dot(xh,0,{c:'var(--ink)',r:4,l:'H',dx:4,dy:16}).dot(xh,h,{c:'var(--ink)',r:4,l:'T',dx:6,dy:4});
+    P.text(12,2,'30°',{s:11,c:'var(--math)'}).text(52,3,'45°',{s:11,c:'var(--math)'}).text(20,0,'40 m',{a:'middle',dy:16,s:11}); return P.svg(); })(),
+  parts:[
+   {q:'a) Quel est l’angle <i>ATB</i> au sommet du triangle ABT, en degrés&nbsp;?',lab:'angle =',unit:'°',ans:15,hint:'L’angle en B du triangle ABT est le supplémentaire de 45°. Puis la somme des angles vaut 180°.',why:'Angle ABT = 180° − 45° = 135°, donc ATB = 180° − 30° − 135° = 15° (c’est aussi 45° − 30°).'},
+   {q:'b) Calcule la distance BT avec la loi des sinus, arrondie au centième.',lab:'BT =',unit:'m',ans:77.27,tol:.01,hint:'Dans ABT, BT est opposé à l’angle en A (30°) et AB = 40 m est opposé à l’angle en T.',why:'BT / sin 30° = 40 / sin 15°, donc BT = 40 · 0,5 / 0,2588 ≈ 77,27 m.'},
+   {q:'c) Quelle est la hauteur TH de la tour, arrondie au centième&nbsp;?',lab:'h =',unit:'m',ans:54.64,tol:.01,hint:'Le triangle BHT est rectangle en H, d’angle 45° en B.',why:'h = BT · sin 45° ≈ 77,27 · 0,7071 ≈ 54,64 m. (Formule directe : h = 40 tan 30° / (1 − tan 30°).)'},
+  ],
+  sol:'<p>Dans le triangle ABT : l’angle en A vaut 30°, l’angle en B vaut 180° − 45° = 135°, donc l’angle en T vaut 15°.</p><p>Loi des sinus : BT/sin 30° = AB/sin 15°, d’où BT = 40 · sin 30°/sin 15° ≈ 77,27 m.</p><p>Dans le triangle BHT rectangle en H : TH = BT · sin 45° ≈ 54,64 m (et BH = BT cos 45° ≈ 54,64 m aussi).</p><p>Contrôle : en posant BH = <i>x</i>, on a <i>h</i> = <i>x</i> tan 45° = (<i>x</i> + 40) tan 30°, d’où <i>h</i> = 40 tan 30°/(1 − tan 30°) = 20(√3 + 1) ≈ 54,64 m.</p>'},
+ {kind:'Problème',h:'Où est la bouée&nbsp;?',
+  p:'Un bateau en A se trouve à 8 km d’un phare B. Il suit un cap rectiligne qui fait un angle de 35° avec la direction du phare. Le radar du phare indique qu’une bouée posée sur ce cap se trouve à 5,5 km du phare. On cherche la distance AC entre le bateau et la bouée C : c’est le cas « deux côtés et un angle non compris ».',
+  fig:(()=>{ const P=plane({x:[-1,12],y:[-2.5,7.5],grid:false,axes:false}), B=[6.553,4.589];
+    P.seg(-1,0,12,0,{c:'var(--muted)',w:1.5,dash:true}).circ(B[0],B[1],5.5,{c:'var(--math)',w:1.5,dash:true}).seg(0,0,B[0],B[1],{c:'var(--ink)',w:2}).seg(B[0],B[1],3.521,0,{c:'var(--spark)',w:2}).seg(B[0],B[1],9.585,0,{c:'var(--spark)',w:2});
+    arc(P,0,rad(35),1.4,{c:'var(--ink)',w:2}); P.dot(0,0,{c:'var(--ink)',r:4,l:'A',dx:-6,dy:16}).dot(B[0],B[1],{c:'var(--ink)',r:4,l:'B (phare)'}).dot(3.521,0,{r:5,l:'C₂',dx:-8,dy:16}).dot(9.585,0,{r:5,l:'C₁',dx:-4,dy:16}).text(1.6,.2,'35°',{s:11}).text(3,2.6,'8',{s:12}); return P.svg(); })(),
+  parts:[
+   {q:'a) En appliquant la loi des sinus dans ABC, que vaut sin <i>γ</i> (angle en C)&nbsp;? Arrondis au millième.',lab:'sin γ =',ans:.834,tol:.0006,hint:'AB = 8 est opposé à l’angle en C, BC = 5,5 est opposé à l’angle en A.',why:'sin γ / 8 = sin 35° / 5,5, donc sin γ = 8 · 0,5736 / 5,5 ≈ 0,834.'},
+   {q:'b) Combien de triangles (donc de positions de la bouée) sont possibles&nbsp;?',lab:'nombre =',ans:2,hint:'sin γ = 0,834 a deux solutions dans ]0° ; 180°[. Vérifie pour chacune que 35° + γ reste inférieur à 180°.',why:'γ ≈ 56,5° ou γ ≈ 123,5°. Dans les deux cas 35° + γ < 180°, donc deux triangles existent : le cercle de rayon 5,5 autour du phare coupe le cap en deux points.'},
+   {q:'c) Dans le cas où <i>γ</i> est aigu, calcule AC, arrondi au centième.',lab:'AC =',unit:'km',ans:9.59,tol:.006,hint:'L’angle en B vaut 180° − 35° − γ. Puis AC / sin β = 5,5 / sin 35°.',why:'β = 180° − 35° − 56,54° = 88,46°, et AC = 5,5 · sin 88,46° / sin 35° ≈ 9,59 km.'},
+   {q:'d) Dans l’autre cas, calcule AC, arrondi au centième.',lab:'AC =',unit:'km',ans:3.52,tol:.006,hint:'Prends γ = 180° − 56,54°, recalcule β puis AC.',why:'γ ≈ 123,46°, β ≈ 21,54°, et AC = 5,5 · sin 21,54° / sin 35° ≈ 3,52 km.'},
+   {q:'e) Quelle distance sépare les deux positions possibles de la bouée&nbsp;? Arrondis au centième.',lab:'C₁C₂ =',unit:'km',ans:6.06,tol:.006,hint:'Soustrais, ou bien utilise le triangle rectangle formé par le phare et son projeté sur le cap.',why:'9,585 − 3,521 ≈ 6,06 km. Contrôle : le phare est à 8 sin 35° ≈ 4,589 km du cap, et C₁C₂ = 2√(5,5² − 4,589²) ≈ 6,06 km.'},
+  ],
+  sol:'<p>Loi des sinus dans ABC : sin <i>γ</i> = AB · sin 35°/BC = 8 · 0,5736/5,5 ≈ 0,8343.</p><p>Deux angles conviennent : <i>γ</i>₁ ≈ 56,54° et <i>γ</i>₂ = 180° − <i>γ</i>₁ ≈ 123,46°. Comme 35° + <i>γ</i>₂ &lt; 180°, les deux triangles existent : c’est le cas ambigu.</p><p>Cas 1 : <i>β</i> ≈ 88,46° et AC = 5,5 sin <i>β</i>/sin 35° ≈ 9,59 km. Cas 2 : <i>β</i> ≈ 21,54° et AC ≈ 3,52 km.</p><p>Géométriquement, le phare est à 8 sin 35° ≈ 4,59 km du cap (moins que 5,5 km), donc le cercle de rayon 5,5 km coupe le cap deux fois, en des points distants de 2√(5,5² − 4,59²) ≈ 6,06 km. Il faut une autre information (un relèvement depuis le bateau, par exemple) pour trancher.</p>'},
 ]},
 
 /* ===================== 6. Continuité et dérivabilité ===================== */
-{subj:'an2', sem:'aut', id:'cms-an2-derivees', h:'Dérivées des fonctions trigonométriques', p:'La limite de sin x / x, puis les dérivées de sin, cos, tan, arctan et arcsin.', steps:[
+{subj:'an2', sem:'aut', id:'an2-derivees', h:'Dérivées des fonctions trigonométriques', p:'La limite de sin x / x, puis les dérivées de sin, cos, tan, arctan et arcsin.', steps:[
  {h:'Pourquoi sin x / x tend vers 1',p:`Pour 0 < <i>x</i> < ${F('π',2)} (en radians), le cercle trigonométrique montre <b>sin <i>x</i> ≤ <i>x</i> ≤ tan <i>x</i></b> : la demi-corde, l’arc, puis le segment tangent. En divisant par sin <i>x</i> : 1 ≤ <i>x</i>/sin <i>x</i> ≤ 1/cos <i>x</i>. Le théorème des deux gendarmes donne <b>lim<sub><i>x</i>→0</sub> ${F('sin <i>x</i>','<i>x</i>')} = 1</b>.`,
   params:[{id:'x',l:'x (rad)',min:.05,max:1,step:.05,v:.8}],
   draw:v=>{ const x=v.x, c=Math.cos(x), s=Math.sin(x), T=Math.tan(x), P=plane({x:[-.15,1.3],y:[-.15,1.7],step:.5,w:250});
@@ -242,10 +347,31 @@ CMS.push(
   why:'g ′(x) = (1/2) · 1/√(1 − x²/4). En 1 : (1/2)/√(3/4) = (1/2)/(√3/2) = 1/√3 ≈ 0,577.'},
  {kind:'Défi',h:'Une limite classique',p:'En utilisant 1 − cos <i>x</i> = 2 sin²(<i>x</i>/2), calcule lim<sub><i>x</i>→0</sub> (1 − cos <i>x</i>) / <i>x</i>².',lab:'limite =',ans:.5,
   why:'(1 − cos x)/x² = 2 sin²(x/2)/x² = ½ · (sin(x/2)/(x/2))². Le carré tend vers 1, donc la limite vaut ½.'},
+ {kind:'Problème',h:'Le faisceau du phare',
+  p:'Un phare est situé à 2 km d’une côte rectiligne. Son faisceau tourne à vitesse constante et fait un tour par minute, soit <i>θ</i>′ = 2π rad/min. Quand le faisceau fait l’angle <i>θ</i> avec la perpendiculaire à la côte, la tache lumineuse est à la distance <b><i>x</i> = 2 tan <i>θ</i></b> du point de la côte le plus proche du phare.',
+  parts:[
+   {q:'a) Quelle est la vitesse de la tache, <i>dx</i>/<i>dt</i>, quand elle passe au point le plus proche (<i>θ</i> = 0)&nbsp;? Arrondis au centième.',lab:'v =',unit:'km/min',ans:12.57,tol:.01,hint:'Règle de chaîne : dx/dt = 2 (tan θ)′ · θ′, avec (tan θ)′ = 1 + tan² θ.',why:'dx/dt = 2(1 + tan² θ) · 2π. En θ = 0 : 4π ≈ 12,57 km/min.'},
+   {q:'b) Et quand la tache est à 2 km de ce point&nbsp;? Arrondis au centième.',lab:'v =',unit:'km/min',ans:25.13,tol:.01,hint:'x = 2 donne tan θ = 1.',why:'1 + tan² θ = 2, donc dx/dt = 2 · 2 · 2π = 8π ≈ 25,13 km/min.'},
+   {q:'c) À quelle distance du point le plus proche la tache va-t-elle 4 fois plus vite qu’en a)&nbsp;? Arrondis au millième.',lab:'x =',unit:'km',ans:3.464,tol:.0006,hint:'Il faut 1 + tan² θ = 4.',why:'tan² θ = 3, tan θ = √3, donc x = 2√3 ≈ 3,464 km.'},
+  ],
+  sol:'<p>On dérive <i>x</i>(<i>t</i>) = 2 tan <i>θ</i>(<i>t</i>) par la règle de chaîne : <b><i>dx</i>/<i>dt</i> = 2(1 + tan²<i>θ</i>) · <i>θ</i>′ = 4π(1 + tan²<i>θ</i>)</b>, en km/min.</p><p>En fonction de la position : tan <i>θ</i> = <i>x</i>/2, donc <i>dx</i>/<i>dt</i> = 4π(1 + <i>x</i>²/4) = π(4 + <i>x</i>²).</p><p>a) <i>x</i> = 0 : 4π ≈ 12,57 km/min. b) <i>x</i> = 2 : 8π ≈ 25,13 km/min. c) π(4 + <i>x</i>²) = 16π ⇔ <i>x</i>² = 12 ⇔ <i>x</i> = 2√3 ≈ 3,464 km.</p><p>La tache accélère sans limite quand <i>θ</i> → π/2 : le faisceau devient parallèle à la côte.</p>'},
+ {kind:'Problème',h:'La perche dans le couloir',
+  p:`Un couloir de 2 m de large débouche à angle droit sur un couloir de 3 m de large. On veut faire passer une perche horizontale, sans la plier, d’un couloir à l’autre. Une perche qui fait l’angle <i>θ</i> avec le mur du premier couloir et touche le coin intérieur a pour longueur, entre les deux murs extérieurs, <b><i>L</i>(<i>θ</i>) = ${F('2','sin <i>θ</i>')} + ${F('3','cos <i>θ</i>')}</b>, <i>θ</i> ∈ ]0 ; π/2[. La perche passe si et seulement si sa longueur ne dépasse aucune de ces valeurs.`,
+  fig:(()=>{ const P=plane({x:[-.5,9],y:[-.5,8],grid:false,axes:false}), t=Math.atan(Math.cbrt(2/3)), x0=3+2/Math.tan(t), y0=2+3*Math.tan(t);
+    P.poly([[0,8],[0,0],[9,0]],{open:true,c:'var(--ink)',w:2.5}).poly([[3,8],[3,2],[9,2]],{open:true,c:'var(--ink)',w:2.5}).seg(0,y0,x0,0,{c:'var(--spark)',w:4}).dot(3,2,{c:'var(--ink)',r:4,l:'coin',dx:6,dy:-6});
+    P.text(6,1,'2 m',{s:11,c:'var(--muted)'}).text(1.5,6.5,'3 m',{a:'middle',s:11,c:'var(--muted)'}).text(x0-1.6,.25,'θ',{s:12}); return P.svg(); })(),
+  parts:[
+   {q:'a) Calcule <i>L</i>(π/4), arrondi au millième.',lab:'L =',unit:'m',ans:7.071,tol:.0006,hint:'sin(π/4) = cos(π/4) = √2/2.',why:'L(π/4) = 2√2 + 3√2 = 5√2 ≈ 7,071 m.'},
+   {q:'b) Quelle est la dérivée <i>L</i>′(<i>θ</i>)&nbsp;?',opts:['−2 cos θ/sin² θ + 3 sin θ/cos² θ','2 cos θ/sin² θ − 3 sin θ/cos² θ','−2/cos θ + 3/sin θ','2 cos θ + 3 sin θ'],ans:0,hint:'(1/u)′ = −u′/u². Ici u = sin θ, puis u = cos θ.',why:'(2/sin θ)′ = −2 cos θ/sin² θ et (3/cos θ)′ = 3 sin θ/cos² θ.'},
+   {q:'c) <i>L</i>′ s’annule quand tan³<i>θ</i> = 2/3. Quel angle obtiens-tu, en degrés, arrondi au dixième&nbsp;?',lab:'θ =',unit:'°',ans:41.1,tol:.06,hint:'L′ = 0 ⇔ 3 sin³ θ = 2 cos³ θ. Prends la racine cubique de 2/3, puis arctan.',why:'tan θ = (2/3)^(1/3) ≈ 0,8736, donc θ ≈ 41,1°. L′ < 0 avant et L′ > 0 après : c’est un minimum.'},
+   {q:'d) Quelle est la longueur maximale d’une perche qui passe le coin&nbsp;? Arrondis au centième.',lab:'L =',unit:'m',ans:7.02,tol:.006,hint:'Calcule L en l’angle trouvé. Formule fermée possible : (2^(2/3) + 3^(2/3))^(3/2).',why:'L(41,14°) ≈ 7,02 m. Une perche plus longue resterait coincée dans la position la plus défavorable.'},
+   {q:'e) Pourquoi la réponse est-elle le <b>minimum</b> de <i>L</i> et non son maximum&nbsp;?',opts:['Parce qu’une fonction dérivable atteint toujours son minimum en 0','Parce que L tend vers +∞ en 0 et en π/2, donc L n’a pas de maximum','Parce que la perche doit passer par toutes les positions θ, donc tenir dans la plus étroite','Parce que L′(θ) est positive sur tout l’intervalle'],ans:2,hint:'Pendant le passage, la perche prend successivement toutes les inclinaisons de 0 à π/2.',why:'En tournant, la perche passe par chaque angle θ. Elle doit donc être plus courte que L(θ) pour tous les θ, c’est-à-dire plus courte que le minimum de L.'},
+  ],
+  sol:'<p>On cherche le minimum de <i>L</i>(<i>θ</i>) = 2/sin <i>θ</i> + 3/cos <i>θ</i> sur ]0 ; π/2[ (<i>L</i> → +∞ aux deux bornes).</p><p><i>L</i>′(<i>θ</i>) = −2 cos <i>θ</i>/sin²<i>θ</i> + 3 sin <i>θ</i>/cos²<i>θ</i> = (3 sin³<i>θ</i> − 2 cos³<i>θ</i>)/(sin²<i>θ</i> cos²<i>θ</i>). Elle s’annule pour tan³<i>θ</i> = 2/3, soit <i>θ</i> ≈ 41,1°, négative avant et positive après.</p><p>Le minimum vaut <i>L</i> ≈ 7,02 m = (2<sup>2/3</sup> + 3<sup>2/3</sup>)<sup>3/2</sup>. La perche passe toutes les positions <i>θ</i> : elle doit donc mesurer au plus 7,02 m. Le choix intuitif <i>θ</i> = 45° donne 7,07 m, un peu trop : la perche de 7,05 m resterait coincée.</p>'},
 ]},
 
 /* ===================== 7. Logarithmes et exponentielles ===================== */
-{subj:'an2', sem:'aut', id:'cms-an2-explog', h:'Logarithmes et exponentielles', p:'eˣ et ln comme réciproques, leurs règles de calcul, leurs dérivées et leurs croissances.', steps:[
+{subj:'an2', sem:'aut', id:'an2-explog', h:'Logarithmes et exponentielles', p:'eˣ et ln comme réciproques, leurs règles de calcul, leurs dérivées et leurs croissances.', steps:[
  {h:'Deux fonctions réciproques',p:`<b>exp</b> : ℝ → ]0 ; +∞[ est bijective et strictement croissante. Sa réciproque est <b>ln</b> : ]0 ; +∞[ → ℝ. Donc <b><i>y</i> = e<sup><i>x</i></sup> ⇔ <i>x</i> = ln <i>y</i></b>, et leurs graphes sont symétriques par rapport à la droite <i>y</i> = <i>x</i>.`,
   params:[{id:'a',l:'a',min:-2,max:1.5,step:.25,v:.5}],
   draw:v=>{ const ea=Math.exp(v.a), P=plane({x:[-3,5],y:[-3,5],lab:1});
@@ -281,6 +407,25 @@ CMS.push(
   why:'Avec x = e^t : (ln x)²/x = t²/e^t → 0 quand t → +∞. L’exponentielle l’emporte sur la puissance.'},
  {kind:'Défi',h:'Deux bases',p:'Résous 3<sup><i>x</i></sup> = 2<sup><i>x</i>+1</sup>. Arrondis au centième.',lab:'x =',ans:1.71,tol:.006,
   why:'On prend ln : x ln 3 = (x + 1) ln 2, donc x (ln 3 − ln 2) = ln 2 et x = ln 2 / ln(3/2) ≈ 0,693 / 0,405 ≈ 1,71.'},
+ {kind:'Problème',h:'Datation au carbone 14',
+  p:'Dans un organisme mort, la quantité de carbone 14 décroît selon <b><i>N</i>(<i>t</i>) = <i>N</i>₀ e<sup>−<i>λt</i></sup></b>, avec <i>t</i> en années. La demi-vie du carbone 14 est de 5730 ans : au bout de 5730 ans, il reste la moitié de la quantité initiale. Un os découvert lors d’une fouille contient encore 30 % du carbone 14 d’un os actuel.',
+  parts:[
+   {q:'a) La constante <i>λ</i> vérifie e<sup>−5730<i>λ</i></sup> = ½. Laquelle de ces expressions est correcte&nbsp;?',opts:['λ = 5730 / ln 2','λ = ln 2 / 5730','λ = e^(1/2) / 5730','λ = 1/(2 · 5730)'],ans:1,hint:'Applique ln aux deux membres : ln(1/2) = −ln 2.',why:'−5730 λ = −ln 2, donc λ = ln 2 / 5730 ≈ 1,21·10⁻⁴ par an.'},
+   {q:'b) Quel pourcentage de carbone 14 reste-t-il au bout de 1000 ans&nbsp;? Arrondis au dixième.',lab:'reste =',unit:'%',ans:88.6,tol:.06,hint:'Calcule e^(−1000λ), ou 2^(−1000/5730).',why:'e^(−1000 ln 2/5730) = 2^(−0,1745) ≈ 0,886, soit 88,6 %.'},
+   {q:'c) Quel est l’âge de l’os&nbsp;? Arrondis à la centaine d’années.',lab:'t =',unit:'ans',ans:9950,tol:50,hint:'Résous e^(−λt) = 0,3 avec ln.',why:'t = ln(1/0,3)/λ = 5730 · ln(10/3)/ln 2 ≈ 9953 ans, soit environ 9950 ans.'},
+   {q:'d) La méthode n’est plus fiable sous 1 % de carbone 14 restant. À partir de quel âge&nbsp;? Arrondis au millier d’années.',lab:'t =',unit:'ans',ans:38000,tol:500,hint:'e^(−λt) = 0,01 donne t = ln 100/λ = 5730 · log₂ 100.',why:'t = 5730 · ln 100/ln 2 ≈ 5730 · 6,64 ≈ 38 069 ans, soit environ 38 000 ans.'},
+  ],
+  sol:'<p>De e<sup>−5730<i>λ</i></sup> = ½ on tire <i>λ</i> = ln 2/5730 ≈ 1,21·10⁻⁴ an⁻¹. On peut aussi écrire <i>N</i>(<i>t</i>) = <i>N</i>₀ · 2<sup>−<i>t</i>/5730</sup>.</p><p>Après 1000 ans : 2<sup>−1000/5730</sup> ≈ 0,886, il reste 88,6 %.</p><p>Pour l’os : e<sup>−<i>λt</i></sup> = 0,3 ⇔ <i>t</i> = ln(1/0,3)/<i>λ</i> = 5730 · ln(10/3)/ln 2 ≈ 9950 ans.</p><p>Seuil de 1 % : <i>t</i> = 5730 · log₂ 100 ≈ 38 000 ans, soit un peu moins de 7 demi-vies (2⁻⁷ ≈ 0,8 %).</p>'},
+ {kind:'Problème',h:'e<sup>π</sup> ou π<sup>e</sup>&nbsp;?',
+  p:`Lequel est le plus grand, e<sup>π</sup> ou π<sup>e</sup>&nbsp;? Sans calculatrice, on compare leurs logarithmes : π et <i>e</i> ln π. En divisant par π<i>e</i>, la question devient : comparer ${F('ln e','e')} et ${F('ln π','π')}. On étudie donc <b><i>f</i>(<i>x</i>) = ${F('ln <i>x</i>','<i>x</i>')}</b> sur ]0 ; +∞[.`,
+  fig:(()=>{ const P=plane({x:[-.3,10],y:[-.6,.6],w:320,h:150,grid:false,lx:2}); P.fn(x=>Math.log(x)/x,{from:.55,to:10,n:300}).dot(Math.E,1/Math.E,{l:'x = e'}).dot(Math.PI,Math.log(Math.PI)/Math.PI,{c:'var(--math)',r:4,l:'π',dx:4,dy:16}); return P.svg(); })(),
+  parts:[
+   {q:'a) En quelle valeur de <i>x</i> la dérivée <i>f</i>′ s’annule-t-elle&nbsp;? Arrondis au millième.',lab:'x =',ans:2.718,tol:.0006,hint:'Règle du quotient : f′(x) = (1 − ln x)/x².',why:'f′(x) = (1 − ln x)/x² s’annule pour ln x = 1, soit x = e ≈ 2,718.'},
+   {q:'b) Quelle est la valeur maximale de <i>f</i>&nbsp;? Arrondis au millième.',lab:'f(e) =',ans:.368,tol:.0006,hint:'f′ > 0 avant e et f′ < 0 après.',why:'f(e) = 1/e ≈ 0,368 est le maximum global de f.'},
+   {q:'c) Que peux-tu conclure&nbsp;?',opts:['π^e > e^π, car π > e','e^π = π^e','e^π > π^e, car f(π) < f(e)','On ne peut pas conclure sans calculatrice'],ans:2,hint:'π ≠ e, donc f(π) est strictement inférieur au maximum f(e). Multiplie ensuite par πe > 0.',why:'ln π/π < 1/e donne e ln π < π, puis π^e < e^π par croissance de exp. (e^π ≈ 23,14 et π^e ≈ 22,46.)'},
+   {q:'d) La même fonction résout xʸ = yˣ. L’équation 2ˣ = x² a pour solutions positives x = 2 et une autre valeur entière. Laquelle&nbsp;?',lab:'x =',ans:4,hint:'2ˣ = x² ⇔ ln 2/2 = ln x/x : cherche un autre x avec f(x) = f(2). Il est plus grand que e.',why:'f(4) = ln 4/4 = 2 ln 2/4 = ln 2/2 = f(2). Et 2⁴ = 16 = 4².'},
+  ],
+  sol:'<p>Comme ln est croissante, e<sup>π</sup> &gt; π<sup>e</sup> ⇔ π &gt; <i>e</i> ln π ⇔ 1/<i>e</i> &gt; ln π/π ⇔ <i>f</i>(<i>e</i>) &gt; <i>f</i>(π).</p><p><i>f</i>′(<i>x</i>) = (1 − ln <i>x</i>)/<i>x</i>² est positive sur ]0 ; <i>e</i>[ et négative sur ]<i>e</i> ; +∞[ : <i>f</i> a un maximum strict en <i>e</i>, de valeur 1/<i>e</i>. Comme π ≠ <i>e</i>, <i>f</i>(π) &lt; <i>f</i>(<i>e</i>), donc <b>e<sup>π</sup> &gt; π<sup>e</sup></b>.</p><p>De même, <i>x</i><sup><i>y</i></sup> = <i>y</i><sup><i>x</i></sup> (<i>x</i>, <i>y</i> &gt; 0) ⇔ <i>f</i>(<i>x</i>) = <i>f</i>(<i>y</i>). Chaque valeur de ]0 ; 1/<i>e</i>[ est prise une fois avant <i>e</i> et une fois après : 2 et 4 forment une telle paire, d’où 2⁴ = 4².</p>'},
 ]},
 );
 })();

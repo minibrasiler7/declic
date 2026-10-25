@@ -5,7 +5,7 @@
    - rad(deg)           degrés → radians
    - py(src)            bloc de code Python coloré (<pre class="code">)
    - plane(o)           repère 2D → SVG (voir plus bas) ; space(o) repère 3D en perspective cavalière
-   - CMS                tableau où chaque fichier cms-*.js pousse ses chapitres */
+   - COURS              tableau où chaque fichier cours/*.js pousse ses chapitres */
 
 const F=(a,b)=>`<span class="fr"><span>${a}</span><span>${b}</span></span>`;
 const mat=m=>`<span class="mat" style="grid-template-columns:repeat(${m[0].length},auto)">${m.flat().map(v=>`<span>${v}</span>`).join('')}</span>`;
@@ -19,18 +19,18 @@ function py(src){
   return `<pre class="code">${out+esc(src.slice(last))}</pre>`;
 }
 
-/* Programme de l'année préparatoire (CMS). Les fichiers cms-*.js ajoutent des chapitres :
-   CMS.push({subj, sem, id, h, p, steps}) — subj et sem doivent exister ici. */
-const CMS_SUBJECTS=[
-  {id:'an1',h:'Analyse I',c:'var(--math)',sems:{aut:{h:'Automne',code:'PREPA-003',s:'Bases du calcul différentiel'},pri:{h:'Printemps',code:'PREPA-004',s:'Applications du calcul différentiel et calcul intégral'}}},
-  {id:'an2',h:'Analyse II',c:'var(--math)',sems:{aut:{h:'Automne',code:'PREPA-005',s:'Fonctions spéciales'},pri:{h:'Printemps',code:'PREPA-006',s:'Exponentielles, complexes, polynômes, DL, équations différentielles'}}},
-  {id:'al',h:'Algèbre linéaire',c:'var(--code)',sems:{all:{h:'Année',code:'PREPA-001 / 002',s:'Tout le programme se limite à la dimension 2'}}},
-  {id:'ga',h:'Géométrie analytique',c:'var(--sci)',sems:{all:{h:'Année',code:'PREPA-013 / 014',s:'Vecteurs, droites, plans, transformations, 3D'}}},
-  {id:'ics',h:'Informatique',c:'var(--code)',sems:{py:{h:'Programmation Python',code:'PREPA-025 / 026',s:'Syntaxe, fonctions, contrôle, structures de données'},algo:{h:'Algorithmique',code:'PREPA-025 / 026',s:'Correction, complexité, récursivité, recherche, tris, graphes'}}},
-  {id:'phy',h:'Physique',c:'var(--other)',sems:{all:{h:'Année',code:'PREPA-021 / 022',s:'Mécanique, énergie, gaz parfait, thermodynamique'}}},
-  {id:'chi',h:'Chimie',c:'var(--ok)',sems:{pri:{h:'Printemps',code:'PREPA-012',s:'De l’atome à la cinétique'}}},
+/* Les cours complets. Les fichiers cours/*.js ajoutent des chapitres :
+   COURS.push({subj, sem, id, h, p, steps}). subj et sem (la partie du cours) doivent exister ici. */
+const MATIERES=[
+  {id:'an1',h:'Analyse I',c:'var(--math)',sems:{aut:{h:'Calcul différentiel',s:'Nombres, suites, limites, continuité et dérivées'},pri:{h:'Applications et intégrales',s:'Étude de fonctions, arcs paramétrés, intégrale et ses applications'}}},
+  {id:'an2',h:'Analyse II',c:'var(--math)',sems:{aut:{h:'Fonctions spéciales',s:'Angles, trigonométrie, logarithmes et exponentielles'},pri:{h:'Complexes et équations différentielles',s:'Fonctions hyperboliques, nombres complexes, polynômes, développements limités, équations différentielles'}}},
+  {id:'al',h:'Algèbre linéaire',c:'var(--code)',sems:{all:{h:'Dans le plan',s:'Ensembles, logique, applications, matrices 2 × 2, réduction'},esp:{h:'En dimension 3',s:'Matrices 3 × 3, déterminants, systèmes et réduction'}}},
+  {id:'ga',h:'Géométrie analytique',c:'var(--sci)',sems:{all:{h:'Vecteurs, droites et plans',s:'Calcul vectoriel, produit scalaire et vectoriel, transformations, géométrie 3D'},con:{h:'Coniques',s:'Ellipse, hyperbole, parabole, géométrie projective et équations matricielles'}}},
+  {id:'ics',h:'Informatique',c:'var(--code)',sems:{py:{h:'Programmation Python',s:'Syntaxe, fonctions, contrôle, structures de données'},algo:{h:'Algorithmique',s:'Correction, complexité, récursivité, recherche, tris, graphes'}}},
+  {id:'phy',h:'Physique',c:'var(--other)',sems:{all:{h:'Mécanique et thermodynamique',s:'Mouvement, forces, énergie, fluides, gaz et chaleur'}}},
+  {id:'chi',h:'Chimie',c:'var(--ok)',sems:{pri:{h:'Chimie générale',s:'De l’atome à la cinétique'}}},
 ];
-const CMS=[];
+const COURS=[];
 
 /* Repère 3D : z vers le haut, x vers l'avant-gauche, y vers la droite.
    space({r:5, az:30, el:20, axes:true}) → méthodes seg/arrow/poly/dot/text prenant des points [x,y,z], puis .svg() */

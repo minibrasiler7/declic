@@ -1,49 +1,66 @@
-# Brief rédaction — Déclic, programme de l'année préparatoire (CMS)
+# Rédiger pour Déclic
 
-Déclic est un site d'apprentissage interactif en français, inspiré de Brilliant : chaque chapitre est une leçon courte qui alterne de petits morceaux de théorie, des figures qu'on manipule avec des curseurs, et des exercices corrigés immédiatement avec une explication.
+Déclic est un site d'apprentissage interactif en français, ouvert à tous. Un chapitre est une leçon courte qui alterne petits morceaux de théorie, figures qu'on manipule avec des curseurs et exercices corrigés tout de suite. Il se termine par des **problèmes** plus élaborés.
 
-Tu écris **un seul fichier** de contenu (indiqué dans ta mission), à la racine du dépôt. Ne modifie aucun autre fichier.
+Le site n'est rattaché à aucune école ni aucun programme officiel. N'écris jamais le nom d'une école, d'un cours ou d'un code de cours.
 
 ## À lire avant d'écrire
-- `lib.js` (racine du dépôt) : l'API de dessin (`plane`, `space` pour la 3D, `py` pour le code Python, `F`, `mat`, `fmt`, `rad`) et `CMS_SUBJECTS` (identifiants de matière et de semestre).
-- `maths.js` : 26 leçons existantes écrites dans le même format. Prends-les comme modèle de ton, de longueur et d'usage des figures.
+- `lib.js` (racine du dépôt) : l'API de dessin (`plane`, `space` pour la 3D, `py` pour le code Python, `F`, `mat`, `fmt`, `rad`) et `MATIERES` (matières et parties de cours).
+- Un fichier de `cours/` de la même matière, pour le ton, la longueur et l'usage des figures.
 
-## Format du fichier
+## Format d'un fichier de cours
 ```js
-/* Déclic — <matière> (<codes>) */
+/* Déclic — <matière> */
 (()=>{
-// helpers locaux éventuels ici (const/fonction) : TOUT doit rester dans cette IIFE
-CMS.push(
-{subj:'an1', sem:'aut', id:'cms-an1-suites', h:'Suites et limites', p:'Une phrase qui dit ce qu’on apprend.', steps:[ … ]},
-{ … chapitre suivant … },
+// helpers locaux éventuels ici : TOUT reste dans cette IIFE
+COURS.push(
+{subj:'an1', sem:'aut', id:'an1-suites', h:'Suites et limites', p:'Une phrase qui dit ce qu’on apprend.', steps:[ … ]},
 );
 })();
 ```
-- `id` : `cms-<matière>-<mot>`, minuscules, unique.
-- Ordre des `push` = ordre d'affichage.
-- Ne redéclare jamais au niveau global `F`, `mat`, `rad`, `fmt`, `plane`, `space`, `py`, `esc` ni rien d'autre : tout reste dans l'IIFE.
+- `id` : `<matière>-<mot>`, minuscules, unique sur tout le site.
+- L'ordre des `push` est l'ordre d'affichage. Les fichiers sont chargés dans l'ordre des `<script>` de `index.html`.
+- Ne redéclare jamais au niveau global `F`, `mat`, `rad`, `fmt`, `plane`, `space`, `py`, `esc`, ni aucun autre nom.
 
 ## Types d'étapes (déduits des champs, pas de `render`)
-- **Théorie / exploration** : `{h, p, params:[{id,l,min,max,step,v,u}], draw:v=>svgString, info:v=>html, note}`. `v` est l'objet des valeurs des curseurs (`v.a` …). `u` est l'unité affichée (ex. `'°'`).
-- **Théorie sans curseur** : `{h, p, fig:'<svg…>' ou html, note}`. `fig` doit être une **chaîne** (utilise une IIFE `(()=>{ const P=plane(…); …; return P.svg(); })()` pour la calculer).
-- **Pratique à curseurs** : comme l'exploration, plus `ok:v=>booléen` et `why`. La position initiale ne doit PAS être la solution. Compare des valeurs exactes de la grille (`v.x===2`) ou avec tolérance.
+- **Théorie / exploration** : `{h, p, params:[{id,l,min,max,step,v,u}], draw:v=>svgString, info:v=>html, note}`. `v` contient les valeurs des curseurs (`v.a` …).
+- **Théorie sans curseur** : `{h, p, fig, note}`. `fig` est une **chaîne** (calculée par une IIFE `(()=>{ const P=plane(…); …; return P.svg(); })()`).
+- **Pratique à curseurs** : comme l'exploration, plus `ok:v=>booléen` et `why`. La position initiale ne doit PAS être la solution.
 - **QCM** : `{h, p, fig?, opts:['…','…'], ans:indiceDeLaBonne, why}`. Varie la position de la bonne réponse.
-- **Réponse numérique** : `{h, p, fig?, lab:'x =', unit:'m', ans:nombre, tol:0.01, why}`. L'élève peut taper virgule, point ou fraction `1/3`. Mets une tolérance si un arrondi est demandé, et dis dans l'énoncé à quelle précision arrondir.
-- Champ optionnel `kind` pour le petit sur-titre (`'Théorie'`, `'Question'`, `'Pratique'`, `'Défi'`, `'Méthode'`…). Sinon il est déduit. Mets `kind:'Défi'` sur la dernière étape.
-- `why` s'affiche après une bonne réponse, ou après le 2e essai raté : c'est la correction rédigée. Montre le calcul, en une ou deux phrases.
+- **Réponse numérique** : `{h, p, fig?, lab:'x =', unit:'m', ans:nombre, tol:0.01, why}`. L'élève peut taper une virgule, un point ou une fraction `1/3`. S'il faut arrondir, l'énoncé le dit et `tol` l'accepte.
+- **Problème** (voir plus bas) : `{kind:'Problème', h, p, fig?, params?/draw?, parts:[…], sol}`.
+- `kind` règle le petit sur-titre (`'Théorie'`, `'Question'`, `'Pratique'`, `'Défi'`, `'Méthode'`, `'Problème'`…).
+- `why` s'affiche après une bonne réponse, ou après le 2e essai raté. C'est la correction rédigée, en une ou deux phrases avec le calcul.
+- `p` peut contenir des paragraphes `<p>`, des listes et des blocs `py(...)`.
+
+## Les problèmes de fin de chapitre
+Chaque chapitre se termine par **2 problèmes** (parfois 3), placés après toutes les autres étapes. Un problème vérifie qu'on sait **utiliser** la théorie, pas seulement la réciter.
+- Il combine plusieurs notions du chapitre (et des précédents si utile), dans une situation concrète ou un vrai raisonnement mathématique : modélisation, preuve guidée, étude complète, optimisation, cas limite.
+- **Énoncé `p`** : 3 à 6 phrases qui posent la situation et les données. Une figure (`fig` ou curseurs sans `ok`) aide souvent.
+- **`parts`** : 2 à 5 questions qui avancent pas à pas vers le résultat. Chaque question : `{q:'a) …', ans | opts+ans, tol?, unit?, lab?, hint:'indice qui débloque sans donner la réponse', why:'correction de cette question'}`. Chaque question se vérifie (nombre ou QCM). Une question de raisonnement passe par un QCM qui oppose le bon argument à des erreurs plausibles.
+- **`sol`** : la solution complète rédigée, comme dans un corrigé (HTML, 4 à 10 lignes). Elle s'affiche à la fin.
+- Le 2e problème est plus difficile que le 1er.
+- Le niveau monte : un élève qui a suivi le chapitre doit pouvoir réussir, mais en réfléchissant plusieurs minutes.
+
+Exemple :
+```js
+{kind:'Problème', h:'La boîte de volume maximal',
+ p:'Dans une feuille carrée de 30 cm de côté, on découpe un carré de côté <i>x</i> à chaque coin, puis on replie les bords pour former une boîte sans couvercle. On cherche <i>x</i> qui rend le volume maximal.',
+ parts:[
+  {q:'a) Quel est le volume V(x) pour x = 5 cm ?', unit:'cm³', ans:2000, hint:'La base est un carré de côté 30 − 2x, la hauteur vaut x.', why:'V(5) = (30 − 10)² · 5 = 2000 cm³.'},
+  {q:'b) Pour quelle valeur de x la dérivée V′(x) s’annule-t-elle dans ]0 ; 15[ ?', lab:'x =', unit:'cm', ans:5, hint:'V(x) = x(30 − 2x)². Dérive puis factorise.', why:'V′(x) = (30 − 2x)(30 − 6x) = 0 donne x = 5 (x = 15 annule la boîte).'},
+  {q:'c) Quel est le volume maximal ?', unit:'cm³', ans:2000, hint:'Vérifie le signe de V′ autour de 5.', why:'V′ > 0 avant 5 et V′ < 0 après : V(5) = 2000 cm³ est le maximum.'},
+ ],
+ sol:'On pose V(x) = x(30 − 2x)² sur ]0 ; 15[. …'}
+```
 
 ## Exigences de contenu
-- **Exactitude avant tout.** Vérifie chaque calcul et chaque réponse (fais le calcul dans `node -e` si besoin). Une erreur dans une correction ruine la confiance.
-- Niveau : année préparatoire (CMS) aux études d'ingénieur·e. C'est rigoureux mais on reste pédagogique. Définitions précises, notations standard francophones (ℝ, ℕ, ]a ; b[, ln, arctan…).
-- Chaque chapitre : **6 à 9 étapes**, au moins **3 exercices** et au moins **1 figure à curseurs** qui montre vraiment le concept (pas un décor). Alterne théorie → exercice → théorie → exercice, puis un défi final. Couvre tous les sous-points listés dans ta mission.
-- Théorie en petits morceaux : 2 à 4 phrases par étape, avec la formule clé en évidence. Utilise `note` pour les pièges classiques et les astuces.
-- Ton : tutoiement, phrases courtes et directes, voix active. Pas d'emoji. Évite les tirets cadratins en incise.
-- Notation HTML : `<i>` pour les variables, `<b>` pour les mots-clés, `<sup>`/`<sub>` ou les caractères Unicode (x², xₙ), `F(a,b)` pour les fractions, `mat([[…]])` pour les matrices, `py(\`…\`)` pour le code Python. Les apostrophes typographiques ’ évitent de casser les chaînes JS entre ''.
-- Figures : `plane()` pour la 2D, `space()` pour la 3D (voir les commentaires de `lib.js` (racine du dépôt)). Utilise les couleurs `var(--…)` listées dans `lib.js`, jamais de couleur en dur. Garde les figures lisibles (320 px de large) et étiquette ce qui compte avec `dot(…,{l:'A'})` ou `text`.
-- Les curseurs doivent avoir peu de positions (moins de ~60 par curseur), et `v` doit tomber sur la grille `min + k·step`.
+- **Exactitude avant tout.** Recalcule chaque réponse avec `node -e` ou `python3 -c`. Une erreur dans une correction ruine la confiance.
+- Chapitre : 6 à 10 étapes de cours, au moins **3 exercices** et au moins **1 figure à curseurs** utile, puis les **2 problèmes**.
+- Théorie en petits morceaux de 2 à 4 phrases, formule clé en évidence. `note` pour les pièges et astuces.
+- Ton : tutoiement, phrases courtes, voix active. Pas d'emoji. Évite les tirets cadratins en incise.
+- Notation : `<i>` pour les variables, `<b>` pour les mots-clés, Unicode (x², xₙ, ℝ, ∈, ≤) ou `<sup>`/`<sub>`, `F(a,b)` pour les fractions, `mat([[…]])` pour les matrices, `py(\`…\`)` pour le code. Utilise l'apostrophe typographique ’ dans les textes.
+- Figures : `plane()` en 2D, `space()` en 3D, couleurs `var(--…)` uniquement, 320 px de large, étiquettes avec `dot(…,{l:'A'})` ou `text`. Moins de ~60 positions par curseur, et chaque `v` doit tomber sur la grille `min + k·step`.
 
 ## Vérification (obligatoire)
-Lance `node tools/harness.js <ton-fichier>` depuis ce dossier et corrige jusqu'à `OK` (0 erreur, idéalement 0 avertissement). Le vérificateur teste toutes les positions des curseurs, contrôle que chaque exercice a une solution atteignable et que les balises HTML sont bien fermées. Il ne vérifie pas les maths : c'est ton travail.
-
-## Rendu final
-Réponds en une dizaine de lignes : nombre de chapitres et d'étapes, la sortie finale du vérificateur, et tout point de contenu dont tu n'es pas sûr·e.
+Lance `node tools/harness.js cours/<ton-fichier>.js` depuis la racine du dépôt et corrige jusqu'à `OK`. Le vérificateur exige les 2 problèmes en fin de chapitre (avec énoncé, questions, indices, corrections et `sol`), teste toutes les positions des curseurs et contrôle le HTML. Il ne vérifie pas les maths : ça, c'est ton travail.

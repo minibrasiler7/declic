@@ -1,4 +1,4 @@
-/* Déclic — Informatique, Programmation Python (PREPA-025 / 026) */
+/* Déclic — Informatique, Programmation Python */
 (()=>{
 // ---------- helpers locaux ----------
 const cd=s=>`<code>${esc(s)}</code>`;
@@ -15,10 +15,10 @@ const cells=(P,x,y,vals,c='var(--code)',cw=0.8)=>{ P.rect(x,y-0.4,cw*vals.length
   return vals.map((_,i)=>[x+(i+.5)*cw,y]); };
 const ref=(P,x1,y1,x2,y2,c='var(--ink)')=>P.arrow(x1,y1,x2,y2,{c,w:2,hs:9});
 
-CMS.push(
+COURS.push(
 
 /* ===================== 1. SYNTAXE, TYPES, VARIABLES ===================== */
-{subj:'ics',sem:'py',id:'cms-ics-syntaxe',h:'Syntaxe, types et variables',p:'Les types de base, les opérateurs et leurs priorités, les conversions et l’affectation.',steps:[
+{subj:'ics',sem:'py',id:'ics-syntaxe',h:'Syntaxe, types et variables',p:'Les types de base, les opérateurs et leurs priorités, les conversions et l’affectation.',steps:[
  {h:'Quatre types de base',p:`Chaque valeur a un <b>type</b>. Les entiers sont des ${cd('int')}, les nombres à virgule des ${cd('float')}, le texte des ${cd('str')} et les valeurs de vérité des ${cd('bool')}. La fonction ${cd('type()')} donne le type d’une valeur.`,
   fig:py(`n = 42          # int
 x = 3.14        # float (point, pas virgule)
@@ -77,10 +77,44 @@ c = a * 2
 print(b, c)`),
   opts:[cd('6 6'),cd('33 33'),cd('6 33'),cd('33 6')],ans:2,
   why:`${cd('int(a)')} vaut l’entier 3, donc b = 6. Mais <i>a</i> reste la chaîne '3', et une chaîne multipliée par 2 est répétée : c = '33'. print affiche 6 33.`},
+ {kind:'Problème',h:'Le rendu de monnaie',p:`Une caisse rend la monnaie avec des billets de 20 et de 10, puis des pièces de 2 et de 1 (en francs). Le programme ci-dessous compte combien il en faut de chaque sorte, en commençant par les plus grosses. Trace-le ligne par ligne.`+py(`prix = 37
+paye = 100
+rendu = paye - prix
+b20 = rendu // 20
+rendu = rendu % 20
+b10 = rendu // 10
+rendu = rendu % 10
+p2 = rendu // 2
+p1 = rendu % 2
+print(b20, b10, p2, p1)`),
+  parts:[
+   {q:'a) Que vaut <i>b20</i> après la ligne 4&nbsp;?',lab:'b20 =',ans:3,hint:'Calcule d’abord rendu = 100 − 37, puis le quotient entier par 20.',why:'rendu = 63 et 63 // 20 = 3 : trois billets de 20 font 60.'},
+   {q:'b) Que vaut <i>rendu</i> juste après la ligne 5&nbsp;?',lab:'rendu =',ans:3,hint:'La ligne 5 garde ce qui reste une fois les billets de 20 donnés.',why:'63 % 20 = 3, car 63 = 20 · 3 + 3.'},
+   {q:'c) Combien de billets et de pièces la caisse rend-elle au total&nbsp;?',lab:'total =',ans:5,hint:'Termine la trace : 3 // 10, puis 3 // 2 et 3 % 2.',why:'b10 = 3 // 10 = 0 et rendu reste 3. Puis p2 = 3 // 2 = 1 et p1 = 3 % 2 = 1. Total : 3 + 0 + 1 + 1 = 5.'},
+   {q:`d) On change seulement la ligne 1. Quelle valeur de <i>prix</i> (entier entre 1 et 99) fait afficher ${cd('2 1 1 1')}&nbsp;?`,lab:'prix =',ans:47,hint:'Reconstruis le rendu à partir de l’affichage : deux billets de 20, un de 10, une pièce de 2 et une de 1.',why:'Le rendu vaut 2 · 20 + 10 + 2 + 1 = 53, donc prix = 100 − 53 = 47. Le programme découpe chaque rendu d’une seule façon, donc 47 est la seule valeur.'},
+  ],
+  sol:`<p>Avec prix = 37, rendu = 63. Ligne 4 : b20 = 63 // 20 = 3. Ligne 5 : rendu = 63 % 20 = 3.</p><p>Ligne 6 : b10 = 3 // 10 = 0. Ligne 7 : rendu = 3 % 10 = 3. Lignes 8 et 9 : p2 = 1 et p1 = 1. Le programme affiche 3 0 1 1, soit 5 billets et pièces.</p><p>Pour obtenir 2 1 1 1, il faut rendu = 2 · 20 + 1 · 10 + 1 · 2 + 1 = 53. Comme 53 = 100 − prix, on trouve prix = 47. On vérifie : 53 // 20 = 2, 53 % 20 = 13, 13 // 10 = 1, 13 % 10 = 3, 3 // 2 = 1, 3 % 2 = 1.</p>`},
+ {kind:'Problème',h:'Heures, minutes et temps négatif',p:`Un chronomètre compte <i>t</i> secondes. Le programme convertit <i>t</i> en heures, minutes et secondes, puis fait deux calculs avec −<i>t</i>. Rappel : ${cd('%')} et ${cd('//')} ont la même priorité et se lisent de gauche à droite, et le moins unaire passe avant eux.`+py(`t = 7384
+h = t // 3600
+m = t % 3600 // 60
+s = t % 60
+texte = str(h) + ':' + str(m) + ':' + str(s)
+moy = t / 4
+print(texte)
+print(type(moy), int(moy) // 60)
+print(-t // 3600, -t % 3600)`),
+  parts:[
+   {q:'a) Que vaut <i>m</i> après la ligne 3&nbsp;?',lab:'m =',ans:3,hint:'De gauche à droite : calcule d’abord t % 3600, puis divise par 60.',why:'7384 % 3600 = 184 (car 2 · 3600 = 7200), puis 184 // 60 = 3.'},
+   {q:'b) Qu’affiche la ligne 7&nbsp;?',opts:[cd('2:3:4'),cd('2:03:04'),cd('7384'),`Une erreur ${cd('TypeError')}`],ans:0,hint:'h = 2 et s = 7384 % 60. Que fait str() d’un petit entier&nbsp;?',why:'h = 2, m = 3 et s = 4. str() ne complète pas avec des zéros. Les trois morceaux sont des chaînes, donc + les colle sans erreur : 2:3:4.'},
+   {q:'c) Qu’affiche la ligne 8&nbsp;?',opts:[cd("<class 'int'> 30"),cd("<class 'float'> 30.0"),cd("<class 'float'> 30"),cd("<class 'int'> 1846")],ans:2,hint:'Quel type rend toujours la division / ? Et int() change le type avant //.',why:'t / 4 = 1846.0 est un float. int(1846.0) = 1846 est un int, et 1846 // 60 = 30 reste un int.'},
+   {q:'d) Quelle est la première valeur affichée par la ligne 9, ' + cd('-t // 3600') + '&nbsp;?',lab:'valeur =',ans:-3,hint:'−7384 / 3600 ≈ −2,05. Dans quel sens // arrondit-il&nbsp;?',why:'// arrondit vers le bas, donc vers −∞ : −2,05 devient −3, pas −2.'},
+   {q:'e) Et la seconde, ' + cd('-t % 3600') + '&nbsp;?',lab:'valeur =',ans:3416,hint:'Utilise a = b·q + r avec le q de la question d).',why:'−7384 = 3600 · (−3) + r, donc r = −7384 + 10 800 = 3416. Le reste est bien entre 0 et 3599.'},
+  ],
+  sol:`<p>h = 7384 // 3600 = 2. Pour m, on lit (t % 3600) // 60 = 184 // 60 = 3, et s = 7384 % 60 = 4. La ligne 7 affiche 2:3:4 : str() ne met pas de zéro devant un chiffre.</p><p>moy = 7384 / 4 = 1846.0 est un float, même si la division tombe juste. int(moy) // 60 = 1846 // 60 = 30.</p><p>Le moins unaire s’applique d’abord : on calcule (−7384) // 3600. Le quotient exact vaut environ −2,05 et // arrondit vers le bas : −3. Le reste vérifie −7384 = 3600 · (−3) + r, d’où r = 3416, compris entre 0 et 3599.</p><p>La ligne 9 affiche donc −3 3416. Retiens : pour un diviseur positif, le reste Python est toujours positif ou nul.</p>`},
 ]},
 
 /* ===================== 2. RÉFÉRENCES ET MUTABILITÉ ===================== */
-{subj:'ics',sem:'py',id:'cms-ics-references',h:'Références et mutabilité',p:'Un nom n’est qu’une étiquette sur un objet : aliasing, objets mutables, is contre ==, copies.',steps:[
+{subj:'ics',sem:'py',id:'ics-references',h:'Références et mutabilité',p:'Un nom n’est qu’une étiquette sur un objet : aliasing, objets mutables, is contre ==, copies.',steps:[
  {h:'Des noms et des objets',p:`En Python, une variable est un <b>nom</b> qui <b>référence</b> un objet en mémoire. ${cd('x = [1, 2]')} crée un objet liste, puis attache le nom <i>x</i> à cet objet. Chaque objet a une identité, donnée par ${cd('id(x)')}.`,
   fig:memFig(2.6,P=>{ nameAt(P,1.4,1.9,'x'); cells(P,4.5,1.9,[1,2]); ref(P,1.75,1.9,4.45,1.9);
     nameAt(P,1.4,0.6,'n'); box(P,4.5,0.6,0.9,'5','var(--math)'); ref(P,1.75,0.6,4.45,0.6); P.text(6.6,1.9,'objet list',{s:12,c:'var(--muted)'}); P.text(6.6,0.6,'objet int',{s:12,c:'var(--muted)'}); }),
@@ -148,10 +182,50 @@ b = b + [4]
 print(a, b)`),
   opts:[cd('[1, 2] [1, 2, 3, 4]'),cd('[1, 2, 3] [1, 2, 3, 4]'),cd('[1, 2, 3, 4] [1, 2, 3, 4]'),cd('[1, 2, 3] [1, 2, 3]')],ans:1,
   why:`${cd('b += [3]')} modifie sur place la liste partagée : a et b valent [1, 2, 3]. Puis ${cd('b + [4]')} crée une nouvelle liste, attachée à b seul. a reste [1, 2, 3].`},
+ {kind:'Problème',h:'Trois noms, combien de listes&nbsp;?',p:`Suis l’état de la mémoire ligne par ligne. Pour chaque instruction, demande-toi si elle <b>modifie un objet</b> sur place ou si elle <b>attache un nom</b> à un nouvel objet. Dessine les flèches si besoin.`+py(`a = [1, 2, 3]
+b = a
+c = a[:]
+b.append(4)
+c.append(5)
+a = a + [6]
+b[0] = 0
+print(a)
+print(b)
+print(c)`),
+  parts:[
+   {q:'a) Qu’affiche ' + cd('print(a)') + '&nbsp;?',opts:[cd('[0, 2, 3, 4, 6]'),cd('[1, 2, 3, 4, 6]'),cd('[1, 2, 3, 6]'),cd('[0, 2, 3, 4]')],ans:1,hint:'Au moment de la ligne 6, que contient la liste partagée par a et b&nbsp;? Et la ligne 6 crée-t-elle un nouvel objet&nbsp;?',why:'La ligne 4 modifie la liste partagée : [1, 2, 3, 4]. La ligne 6 crée une nouvelle liste [1, 2, 3, 4, 6] et y attache a seul. La ligne 7 ne la touche donc pas.'},
+   {q:'b) Que vaut ' + cd('sum(b)') + ' à la fin&nbsp;?',lab:'somme =',ans:9,hint:'b référence toujours l’ancienne liste, celle que a a quittée à la ligne 6.',why:'b référence [1, 2, 3, 4], et b[0] = 0 la change en [0, 2, 3, 4]. Somme : 9.'},
+   {q:'c) Qu’affiche ' + cd('print(c)') + '&nbsp;?',opts:[cd('[1, 2, 3, 4, 5]'),cd('[1, 2, 3]'),cd('[0, 2, 3, 4, 5]'),cd('[1, 2, 3, 5]')],ans:3,hint:'a[:] fait une copie au moment de la ligne 3. Que contenait la liste à ce moment&nbsp;?',why:'c est une copie de [1, 2, 3], faite avant le append(4). Seul append(5) la touche : [1, 2, 3, 5].'},
+   {q:'d) À la fin, que valent ' + cd('a is b') + ' et ' + cd('a == b') + '&nbsp;?',opts:[cd('True True'),cd('False True'),cd('False False'),cd('True False')],ans:2,hint:'Compare les deux contenus trouvés en a) et b).',why:'a et b référencent deux objets différents depuis la ligne 6, donc a is b vaut False. Leurs contenus [1, 2, 3, 4, 6] et [0, 2, 3, 4] diffèrent aussi : a == b vaut False.'},
+  ],
+  sol:`<p>Ligne 1 : une liste L₁ = [1, 2, 3], référencée par a. Ligne 2 : b référence aussi L₁. Ligne 3 : c référence une copie L₂ = [1, 2, 3].</p><p>Ligne 4 : L₁ devient [1, 2, 3, 4], visible par a et b. Ligne 5 : L₂ devient [1, 2, 3, 5].</p><p>Ligne 6 : a + [6] construit une <b>nouvelle</b> liste L₃ = [1, 2, 3, 4, 6], et a s’y attache. b garde L₁. Ligne 7 : L₁ devient [0, 2, 3, 4].</p><p>Affichage : [1, 2, 3, 4, 6], puis [0, 2, 3, 4], puis [1, 2, 3, 5]. Trois noms, trois objets distincts, et a is b vaut False.</p>`},
+ {kind:'Problème',h:'Grilles, copies et tuple',p:`Trois petits programmes indépendants. Le premier veut une grille 3 × 3 de zéros et changer une seule case. Le deuxième copie une liste de listes. Le troisième modifie ce qu’il y a dans un tuple.`+py(`# Programme 1
+grille = [[0] * 3] * 3
+grille[0][1] = 5
+print(grille)
+
+# Programme 2
+m = [[1, 2], [3, 4]]
+n = m[:]
+n[0] = [9, 9]
+n[1][0] = 7
+print(m)
+
+# Programme 3
+t = (1, [2])
+t[1].append(3)
+print(t)`),
+  parts:[
+   {q:'a) Combien de 5 le programme 1 affiche-t-il&nbsp;?',lab:'nombre de 5 =',ans:3,hint:'[L] * 3 répète trois fois la même référence L, sans copier L.',why:'[[0] * 3] * 3 contient trois fois la même sous-liste. Changer grille[0][1] change cette sous-liste unique : [[0, 5, 0], [0, 5, 0], [0, 5, 0]].'},
+   {q:'b) Par quelle ligne faut-il remplacer la ligne 2 pour qu’un seul 5 apparaisse&nbsp;?',opts:[cd('grille = [[0, 0, 0]] * 3'),cd('grille = list([[0] * 3] * 3)'),cd('grille = [[0] * 3, [0] * 3, [0] * 3]'),cd('grille = ([0] * 3) * 3')],ans:2,hint:'Il faut que l’expression [0] * 3 soit évaluée trois fois, et pas recopiée.',why:'Chaque [0] * 3 crée une nouvelle liste : trois sous-listes distinctes. [[0, 0, 0]] * 3 répète encore la même. list(...) ne copie que la liste extérieure. ([0] * 3) * 3 donne une liste plate de 9 entiers, et grille[0][1] = 5 lève TypeError.'},
+   {q:'c) Programme 2 : quelle est la somme de tous les nombres affichés par ' + cd('print(m)') + '&nbsp;?',lab:'somme =',ans:14,hint:'m[:] copie la liste extérieure seulement. Que fait n[0] = …, et que fait n[1][0] = …&nbsp;?',why:'n[0] = [9, 9] réaffecte une case de n seulement. Mais n[1] et m[1] sont la même sous-liste, donc n[1][0] = 7 se voit dans m : [[1, 2], [7, 4]]. Somme : 14.'},
+   {q:'d) Que fait le programme 3&nbsp;?',opts:[`Il lève ${cd('TypeError')} : un tuple est immuable`,`Il affiche ${cd('(1, [2])')}`,`Il affiche ${cd('(1, [2, 3])')}`,`Il affiche ${cd('(1, 2, 3)')}`],ans:2,hint:'Le tuple change-t-il de références, ou est-ce l’objet référencé qui change&nbsp;?',why:'Le tuple garde les mêmes références : l’entier 1 et une liste. append modifie cette liste sur place, ce qui est permis. Le tuple affiche donc (1, [2, 3]).'},
+  ],
+  sol:`<p><b>Programme 1.</b> [0] * 3 crée une liste L, et [L] * 3 donne [L, L, L]. Écrire dans grille[0] écrit dans L, donc dans les trois lignes : trois 5. La correction évalue [0] * 3 trois fois : [[0] * 3, [0] * 3, [0] * 3].</p><p><b>Programme 2.</b> n = m[:] crée une nouvelle liste extérieure qui contient les mêmes sous-listes. n[0] = [9, 9] change seulement la case 0 de n. n[1][0] = 7 modifie la sous-liste partagée. m vaut [[1, 2], [7, 4]], de somme 14.</p><p><b>Programme 3.</b> L’immuabilité du tuple porte sur ses références, pas sur les objets qu’elles désignent. La liste [2] devient [2, 3] et t affiche (1, [2, 3]).</p>`},
 ]},
 
 /* ===================== 3. FONCTIONS ===================== */
-{subj:'ics',sem:'py',id:'cms-ics-fonctions',h:'Fonctions',p:'Définir une fonction, passer des arguments, renvoyer un résultat, comprendre la portée et importer des bibliothèques.',steps:[
+{subj:'ics',sem:'py',id:'ics-fonctions',h:'Fonctions',p:'Définir une fonction, passer des arguments, renvoyer un résultat, comprendre la portée et importer des bibliothèques.',steps:[
  {h:'Définir et appeler',p:`${cd('def')} définit une fonction : un nom, des <b>paramètres</b> entre parenthèses, puis un bloc indenté. ${cd('return')} renvoie une valeur et termine la fonction. À l’appel, on passe des <b>arguments</b>.`,
   fig:py(`def aire_rectangle(l, h):
     return l * h
@@ -220,10 +294,45 @@ random.choice(['a', 'b', 'c'])`),
 
 print(f(1, c=5) + f(c=1, a=2, b=0))`),lab:'affichage :',ans:326,
   why:'f(1, c=5) : a = 1, b = 2, c = 5, soit 100 + 20 + 5 = 125. f(c=1, a=2, b=0) : 200 + 0 + 1 = 201. Somme : 326.'},
+ {kind:'Problème',h:'Un x peut en cacher un autre',p:`Deux fonctions utilisent un nom <i>x</i> qui existe aussi au niveau global. Suis chaque appel en séparant bien les variables locales de la variable globale. N’oublie pas que le paramètre de <i>g</i> s’appelle lui aussi <i>x</i>.`+py(`x = 3
+
+def f(y):
+    x = y * 2
+    return x + 1
+
+def g(x):
+    return f(x) + x
+
+a = f(x)
+b = g(a)
+print(x, a, b)`),
+  parts:[
+   {q:'a) Que vaut <i>a</i>&nbsp;?',lab:'a =',ans:7,hint:'f reçoit y = 3. Le x de la ligne 4 est local à f.',why:'f(3) : le x local vaut 6 et f renvoie 6 + 1 = 7.'},
+   {q:'b) Que vaut <i>b</i>&nbsp;?',lab:'b =',ans:22,hint:'Dans g, x est le paramètre, qui vaut a. Calcule f(x), puis ajoute x.',why:'g(7) : f(7) renvoie 7 · 2 + 1 = 15, puis 15 + 7 = 22.'},
+   {q:'c) Quelle est la première valeur affichée par ' + cd('print') + '&nbsp;?',opts:[cd('6'),cd('3'),cd('14'),cd('7')],ans:1,hint:'Une ligne de f ou de g a-t-elle réaffecté le x global&nbsp;?',why:'x = y * 2 crée un x local à f, et le x de g est un paramètre local. Le x global n’a jamais été réaffecté : il vaut toujours 3.'},
+   {q:'d) On ajoute ' + cd('global x') + ' comme première ligne du corps de <i>f</i>. Quelle est alors la première valeur affichée&nbsp;?',lab:'x =',ans:14,hint:'f modifie maintenant le x global à chaque appel. Combien de fois f est-elle appelée, et avec quel argument la dernière fois&nbsp;?',why:'f(3) met le x global à 6 et renvoie 7. Puis g(7) appelle f(7), qui met le x global à 14 et renvoie 15. Le x de g reste son paramètre local (7), donc b = 22. On affiche 14 7 22.'},
+  ],
+  sol:`<p>Sans global : f(3) crée un x local égal à 6 et renvoie 7, donc a = 7. g(7) a un paramètre local x = 7. Elle calcule f(7) = 15, puis 15 + 7 = 22. Le x global n’a pas bougé : on affiche 3 7 22.</p><p>Avec global x dans f : la ligne x = y * 2 réaffecte cette fois la variable globale. f(3) la met à 6 et renvoie 7. Dans g(7), le nom x désigne le paramètre local, qui vaut 7. L’appel f(7) met le x global à 14 et renvoie 15, donc b = 15 + 7 = 22.</p><p>On affiche 14 7 22. Seule la première valeur change : c’est tout l’effet de global.</p>`},
+ {kind:'Problème',h:'Le piège de la liste par défaut',p:`Cette fonction veut ajouter <i>x</i> à la liste <i>L</i>, et partir d’une liste vide si on n’en donne pas. Mais la valeur par défaut d’un paramètre est évaluée <b>une seule fois</b>, quand Python exécute la ligne ${cd('def')}. Tous les appels sans second argument partagent donc le même objet.`+py(`def ajoute(x, L=[]):
+    L.append(x)
+    return L
+
+a = ajoute(1)
+b = ajoute(2)
+c = ajoute(3, [])
+d = ajoute(4)
+print(a, len(b), c, len(d))`),
+  parts:[
+   {q:'a) Que vaut ' + cd('len(d)') + '&nbsp;?',lab:'len(d) =',ans:3,hint:'Quels appels utilisent la liste par défaut&nbsp;? L’appel avec c en utilise-t-il une autre&nbsp;?',why:'Les appels de a, b et d utilisent la même liste par défaut, qui reçoit 1, 2 puis 4. L’appel de c reçoit sa propre liste neuve. d vaut [1, 2, 4], de longueur 3.'},
+   {q:'b) Quelle est la première chose affichée, la valeur de <i>a</i>&nbsp;?',opts:[cd('[1]'),cd('[1, 2, 4]'),cd('[1, 2, 3, 4]'),cd('[4]')],ans:1,hint:'a référence-t-il un objet à part, ou la liste par défaut&nbsp;? print lit l’objet à la fin.',why:'a référence la liste par défaut elle-même. Au moment du print, elle contient [1, 2, 4]. Le 3 est allé dans la liste passée par l’appel de c.'},
+   {q:'c) Quelle modification corrige la fonction (chaque appel sans second argument part d’une liste vide)&nbsp;?',opts:[`Remplacer ${cd('return L')} par ${cd('return L[:]')}`,`Ajouter ${cd('global L')} au début du corps`,`Écrire ${cd('def ajoute(x, L=None):')}, puis commencer le corps par ${cd('if L is None:')} ${cd('L = []')}`,`Écrire ${cd('L = []')} après la ligne ${cd('def')}, au niveau global`],ans:2,hint:'Il faut une expression [] évaluée à chaque appel, pas une seule fois.',why:'Avec None, la liste vide est créée dans le corps, donc à chaque appel. return L[:] renvoie une copie, mais la liste par défaut grossit toujours. global L avec un paramètre L est une SyntaxError. Une variable globale L ne change rien au paramètre.'},
+   {q:'d) Avec la version corrigée, que vaut ' + cd('len(a) + len(b) + len(c) + len(d)') + '&nbsp;?',lab:'total =',ans:4,hint:'Chaque appel part maintenant d’une liste neuve.',why:'a = [1], b = [2], c = [3] et d = [4] : chaque liste a un seul élément. Total : 4.'},
+  ],
+  sol:`<p>Python évalue [] une seule fois, à la définition. Appelons D cette liste. ajoute(1) ajoute 1 à D et renvoie D : a référence D. ajoute(2) renvoie encore D, qui vaut [1, 2]. ajoute(3, []) travaille sur une liste neuve et renvoie [3]. ajoute(4) renvoie D = [1, 2, 4].</p><p>a, b et d sont trois noms pour D. Le print affiche [1, 2, 4] 3 [3] 3.</p><p>La correction classique utilise une sentinelle immuable : L=None dans l’en-tête, puis if L is None: L = [] dans le corps. La liste vide est alors créée à chaque appel. On obtient a = [1], b = [2], c = [3], d = [4].</p>`},
 ]},
 
 /* ===================== 4. STRUCTURES DE CONTRÔLE ===================== */
-{subj:'ics',sem:'py',id:'cms-ics-controle',h:'Structures de contrôle',p:'Choisir avec if, répéter avec while et for, sortir d’une boucle, imbriquer des boucles.',steps:[
+{subj:'ics',sem:'py',id:'ics-controle',h:'Structures de contrôle',p:'Choisir avec if, répéter avec while et for, sortir d’une boucle, imbriquer des boucles.',steps:[
  {h:'if, elif, else',p:`Python teste les conditions <b>dans l’ordre</b> et exécute le premier bloc dont la condition est vraie, puis saute les autres. Les blocs sont délimités par l’<b>indentation</b> (4 espaces). On combine les conditions avec ${cd('and')}, ${cd('or')} et ${cd('not')}.`,
   fig:py(`note = 4.5
 if note >= 5.5:
@@ -308,10 +417,45 @@ for i in range(1, 4):
         s += i * j
 print(s)`),lab:'s =',ans:11,
   why:'i = 1 : j = 0, on ajoute 0. i = 2 : j = 0, 1, on ajoute 0 + 2. i = 3 : j = 0, 1, 2, on ajoute 0 + 3 + 6. Total : 2 + 9 = 11.'},
+ {kind:'Problème',h:'Quand la somme dépasse 100',p:`On additionne les carrés 1², 2², 3²… tant que la somme ne dépasse pas 100. Il faut trouver la valeur qui fait sortir de la boucle, puis voir ce que change une petite modification de la condition.`+py(`n = 0
+s = 0
+while s <= 100:
+    n += 1
+    s += n * n
+print(n, s)`),
+  parts:[
+   {q:'a) Quelle valeur de <i>n</i> est affichée&nbsp;?',lab:'n =',ans:7,hint:'Écris les sommes successives : 1, 5, 14, 30… et arrête-toi à la première qui dépasse 100.',why:'s prend les valeurs 1, 5, 14, 30, 55, 91, 140. La première somme qui dépasse 100 est atteinte pour n = 7.'},
+   {q:'b) Quelle valeur de <i>s</i> est affichée&nbsp;?',lab:'s =',ans:140,hint:'La condition est testée au début de chaque tour, après l’ajout de n².',why:'Après le tour n = 6, s = 91 ≤ 100 : on refait un tour. n = 7 et s = 91 + 49 = 140 &gt; 100 : on sort.'},
+   {q:'c) Combien de fois la condition ' + cd('s <= 100') + ' est-elle évaluée en tout&nbsp;?',lab:'évaluations =',ans:8,hint:'Elle est vraie une fois par tour, puis fausse une dernière fois.',why:'7 tours, donc 7 évaluations vraies, plus 1 évaluation fausse qui fait sortir : 8.'},
+   {q:'d) On remplace la condition par ' + cd('s < 91') + '. Quelle valeur de <i>n</i> est alors affichée&nbsp;?',lab:'n =',ans:6,hint:'Que se passe-t-il quand s vaut exactement 91&nbsp;?',why:'Après le tour n = 6, s = 91. La condition 91 &lt; 91 est fausse, donc on sort avec n = 6 et s = 91.'},
+  ],
+  sol:`<p>Les sommes successives sont 1, 5, 14, 30, 55, 91, 140, pour n = 1 à 7. La boucle continue tant que s ≤ 100.</p><p>Après n = 6, s = 91 ≤ 100 : un tour de plus. n = 7, s = 140 : la condition devient fausse et on affiche 7 140. La condition a été évaluée 8 fois (7 fois vraie, 1 fois fausse).</p><p>Avec s &lt; 91, la boucle s’arrête dès que s atteint 91, c’est-à-dire pour n = 6. Entre ≤ et &lt;, le cas d’égalité décide du nombre de tours : c’est une source classique d’erreur d’une unité.</p>`},
+ {kind:'Problème',h:'Un test de primalité presque juste',p:`Un entier <i>n</i> ≥ 2 est premier s’il n’a aucun diviseur entre 2 et <i>n</i> − 1. Il suffit de tester les diviseurs <i>d</i> tels que <i>d</i>² ≤ <i>n</i> : si <i>n</i> = <i>d</i>·<i>e</i> avec 2 ≤ <i>d</i> ≤ <i>e</i>, alors <i>d</i>² ≤ <i>n</i>. Le programme compte les nombres premiers de 1 à 49.`+py(`def est_premier(n):
+    if n < 2:
+        return False
+    d = 2
+    while d * d <= n:
+        if n % d == 0:
+            return False
+        d += 1
+    return True
+
+compte = 0
+for k in range(1, 50):
+    if est_premier(k):
+        compte += 1
+print(compte)`),
+  parts:[
+   {q:'a) Quelle valeur de <i>compte</i> est affichée&nbsp;?',lab:'compte =',ans:15,hint:'Liste les nombres premiers inférieurs à 50 : 2, 3, 5, 7, 11…',why:'2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47 : il y en a 15.'},
+   {q:'b) Pour l’appel ' + cd('est_premier(97)') + ', combien de fois le test ' + cd('n % d == 0') + ' est-il évalué&nbsp;?',lab:'tests =',ans:8,hint:'97 est premier, donc on ne sort jamais par return False. Jusqu’à quel d a-t-on d² ≤ 97&nbsp;?',why:'9² = 81 ≤ 97 et 10² = 100 &gt; 97. On teste d = 2, 3, …, 9 : 8 tests, puis on renvoie True.'},
+   {q:'c) Un élève écrit ' + cd('while d * d < n:') + ' à la ligne 5. Quel est le plus petit entier <i>n</i> ≥ 2 alors déclaré premier à tort&nbsp;?',lab:'n =',ans:4,hint:'Cherche un nombre dont le seul petit diviseur d vérifie exactement d² = n.',why:'Pour n = 4, le premier test est 2 · 2 &lt; 4, faux : la boucle ne tourne pas et la fonction renvoie True. 2 et 3 restent bien premiers.'},
+   {q:'d) Avec cette version fautive, quelle valeur de <i>compte</i> est affichée&nbsp;?',lab:'compte =',ans:19,hint:'Quels nombres non premiers ont pour seul diviseur testable d avec d² = n&nbsp;? Ce sont les carrés de nombres premiers.',why:'La version fautive ne teste jamais d = √n. Elle se trompe sur les carrés de nombres premiers : 4, 9, 25 et 49. Les autres composés ont un diviseur d avec d² &lt; n. Le compte passe de 15 à 19.'},
+  ],
+  sol:`<p>La boucle while teste d = 2, 3, … tant que d² ≤ n et sort par return False au premier diviseur trouvé. Pour un premier comme 97, elle va jusqu’à d = 9 (81 ≤ 97 &lt; 100) : 8 tests.</p><p>De 1 à 49, on trouve 15 nombres premiers.</p><p>Avec d * d &lt; n, le diviseur d = √n n’est jamais testé. Un composé n = d·e avec d &lt; e a un diviseur d tel que d² &lt; n : il est toujours détecté. Seuls les carrés p² de nombres premiers échappent au test, car leur unique diviseur propre p vérifie p² = n. Sous 50 : 4, 9, 25, 49.</p><p>La version fautive affiche donc 15 + 4 = 19. Le plus petit faux positif est 4.</p>`},
 ]},
 
 /* ===================== 5. CHAÎNES ET LISTES ===================== */
-{subj:'ics',sem:'py',id:'cms-ics-listes',h:'Chaînes et listes',p:'Accéder par indice, découper en tranches, utiliser les méthodes courantes, parcourir et modifier une liste.',steps:[
+{subj:'ics',sem:'py',id:'ics-listes',h:'Chaînes et listes',p:'Accéder par indice, découper en tranches, utiliser les méthodes courantes, parcourir et modifier une liste.',steps:[
  {h:'Indices',p:`Une chaîne ou une liste de longueur <i>n</i> a des indices de 0 à <i>n</i> − 1. ${cd('s[0]')} est le premier élément. Les indices <b>négatifs</b> partent de la fin : ${cd('s[-1]')} est le dernier. ${cd('len(s)')} donne la longueur.`,
   fig:(()=>{ const s='PYTHON', P=plane({x:[0,7],y:[0,2.6],grid:false,axes:false}); const c=cells(P,0.5,1.3,s.split(''),'var(--code)',1);
     c.forEach((p,i)=>{ P.text(p[0],2.2,String(i),{a:'middle',s:12,c:'var(--accent)'}); P.text(p[0],0.4,String(i-6).replace('-','−'),{a:'middle',s:12,c:'var(--spark)'}); }); return P.svg(); })(),
@@ -373,10 +517,39 @@ for m in mots:
 print(sorted(res))`),
   opts:[cd("['Ane', 'Ours']"),cd("['ours', 'ane']"),cd("['ane', 'ours']"),cd('None')],ans:2,
   why:`Seuls 'Ours' et 'Ane' commencent par une majuscule. On ajoute 'ours' puis 'ane'. sorted renvoie une nouvelle liste triée : ['ane', 'ours'].`},
+ {kind:'Problème',h:'Transformer une phrase',p:`Ce programme découpe une phrase en mots. Il met une majuscule aux mots de plus de 3 lettres et renverse les autres, puis recolle le tout. Trace-le mot par mot.`+py(`phrase = 'le chat dort sur le tapis'
+mots = phrase.split()
+res = []
+for m in mots:
+    if len(m) > 3:
+        res.append(m[0].upper() + m[1:])
+    else:
+        res.append(m[::-1])
+sortie = ' '.join(res)
+print(sortie)
+print(len(mots), len(sortie), sortie.count('el'))`),
+  parts:[
+   {q:'a) Que vaut ' + cd('len(mots)') + '&nbsp;?',lab:'len(mots) =',ans:6,hint:'split() sans argument coupe aux espaces.',why:'mots = [\'le\', \'chat\', \'dort\', \'sur\', \'le\', \'tapis\'] : 6 mots.'},
+   {q:'b) Qu’affiche ' + cd('print(sortie)') + '&nbsp;?',opts:[cd('el Chat Dort sur el Tapis'),cd('El Chat Dort Rus El Tapis'),cd('el Chat Dort rus el Tapis'),cd('le tahc trod rus le sipat')],ans:2,hint:'« sur » a exactement 3 lettres : quelle branche prend-il&nbsp;?',why:'chat, dort et tapis ont plus de 3 lettres : majuscule initiale. le et sur en ont au plus 3 : renversés en el et rus.'},
+   {q:'c) Que vaut ' + cd('len(sortie)') + '&nbsp;?',lab:'len(sortie) =',ans:25,hint:'Aucune transformation ne change la longueur d’un mot. Compte les lettres, puis les espaces ajoutés par join.',why:'Les mots ont 2 + 4 + 4 + 3 + 2 + 5 = 20 lettres. join ajoute un espace entre deux mots voisins, soit 5 espaces : 25.'},
+   {q:'d) Que vaut ' + cd("sortie.count('el')") + '&nbsp;?',lab:'compte =',ans:2,hint:'Cherche la suite de lettres « el » dans la sortie, y compris à l’intérieur des mots.',why:'On la trouve dans les deux « el » issus de « le », et nulle part ailleurs : 2.'},
+  ],
+  sol:`<p>split() donne 6 mots. On parcourt : le (2 lettres) → el ; chat → Chat ; dort → Dort ; sur (3 lettres, pas plus de 3) → rus ; le → el ; tapis → Tapis.</p><p>m[0].upper() + m[1:] fabrique une nouvelle chaîne, car une chaîne est immuable. m[::-1] renverse.</p><p>' '.join(res) donne 'el Chat Dort rus el Tapis'. Sa longueur : 20 lettres et 5 espaces, soit 25. La sous-chaîne 'el' apparaît 2 fois.</p><p>La deuxième ligne affichée est donc 6 25 2.</p>`},
+ {kind:'Problème',h:'Supprimer pendant qu’on parcourt',p:`On veut retirer tous les nombres pairs d’une liste. Ce programme semble naturel, mais il modifie la liste <b>pendant</b> qu’il la parcourt. La boucle for avance avec un indice caché 0, 1, 2… et s’arrête quand cet indice atteint la longueur <b>actuelle</b> de la liste.`+py(`L = [2, 4, 4, 5, 6, 8]
+for x in L:
+    if x % 2 == 0:
+        L.remove(x)
+print(L)`),
+  parts:[
+   {q:'a) Qu’affiche ce programme&nbsp;?',opts:[cd('[5]'),cd('[4, 5, 8]'),cd('[4, 4, 5, 8]'),cd('[5, 8]')],ans:1,hint:'Au tour d’indice 0, on retire 2 et tout se décale à gauche. Quel élément est à l’indice 1 au tour suivant&nbsp;?',why:'Indice 0 : x = 2, retiré → [4, 4, 5, 6, 8]. Indice 1 : x = 4, on retire le premier 4 → [4, 5, 6, 8]. Indice 2 : x = 6, retiré → [4, 5, 8]. L’indice 3 atteint la longueur : fin. On affiche [4, 5, 8].'},
+   {q:'b) Combien de tours fait la boucle for&nbsp;?',lab:'tours =',ans:3,hint:'Reprends la trace de a) et compte les valeurs prises par x.',why:'x prend les valeurs 2, 4 et 6 : 3 tours, alors que la liste de départ a 6 éléments.'},
+   {q:'c) Laquelle de ces versions ne donne <b>pas</b> ' + cd('[5]') + '&nbsp;?',opts:[`Parcourir une copie : ${cd('for x in L[:]:')}`,`Parcourir une copie triée : ${cd('for x in sorted(L):')}`,`Parcourir les indices avec ${cd('for i in range(len(L)):')} et faire ${cd('L.pop(i)')} quand ${cd('L[i]')} est pair`,`Parcourir une copie : ${cd('for x in list(L):')}`],ans:2,hint:'range(len(L)) est calculé une seule fois, au début. Que devient L[i] quand la liste raccourcit&nbsp;?',why:'Les trois copies parcourent des valeurs qui ne bougent pas, et remove retire bien chaque pair de L. Avec les indices, la liste se décale comme en a), puis L[3] n’existe plus : IndexError.'},
+  ],
+  sol:`<p>La boucle for lit L[0], L[1], L[2]… dans la liste <b>actuelle</b>. Chaque remove décale vers la gauche tout ce qui suit, si bien que l’élément suivant est sauté.</p><p>Trace : indice 0, x = 2, L devient [4, 4, 5, 6, 8]. Indice 1, x = 4 : c’est le second 4, car le premier a glissé à l’indice 0 et ne sera jamais lu. remove retire la première occurrence, et L devient [4, 5, 6, 8]. Indice 2, x = 6, L devient [4, 5, 8]. Indice 3 = len(L) : fin après 3 tours. On affiche [4, 5, 8].</p><p>Règle : ne modifie jamais la longueur d’une liste pendant que tu la parcours. Parcours une copie (L[:], list(L), sorted(L)), ou construis une nouvelle liste qui ne garde que les impairs. La version par indices échoue : range(6) a été fixé au départ et L[3] finit par lever IndexError.</p>`},
 ]},
 
 /* ===================== 6. TUPLES, DICTIONNAIRES, COMPRÉHENSIONS ===================== */
-{subj:'ics',sem:'py',id:'cms-ics-dicos',h:'Tuples, dictionnaires et compréhensions',p:'Regrouper avec les tuples, associer clés et valeurs avec les dictionnaires, construire en une ligne avec les compréhensions.',steps:[
+{subj:'ics',sem:'py',id:'ics-dicos',h:'Tuples, dictionnaires et compréhensions',p:'Regrouper avec les tuples, associer clés et valeurs avec les dictionnaires, construire en une ligne avec les compréhensions.',steps:[
  {h:'Tuples et déballage',p:`Un <b>tuple</b> ${cd('(3, 4)')} est une séquence <b>immuable</b>. On le <b>déballe</b> en plusieurs noms : ${cd('x, y = t')}. C’est ainsi qu’une fonction renvoie plusieurs valeurs, et qu’on échange deux variables.`,
   fig:py(`t = (3, 4)
 x, y = t          # x = 3, y = 4
@@ -446,6 +619,45 @@ longueurs = {m: len(m) for m in ['le', 'chat']}
  {kind:'Défi',h:'Dictionnaire de listes',p:'Qu’affiche ce code&nbsp;?',fig:py(`notes = {'Ana': [5, 6, 4], 'Ben': [3, 4], 'Léo': [6, 6, 5, 5]}
 print(sum([len(L) for n, L in notes.items() if sum(L) / len(L) >= 5]))`),lab:'affichage :',ans:7,
   why:'Moyennes : Ana 5, Ben 3,5, Léo 5,5. On garde Ana et Léo, et on additionne leurs nombres de notes : 3 + 4 = 7.'},
+ {kind:'Problème',h:'Le mot le plus fréquent',p:`On compte les mots d’un texte avec un dictionnaire, puis on cherche le mot le plus fréquent et les mots qui n’apparaissent qu’une fois. Deux mots sont à égalité : regarde bien quel test les départage.`+py(`texte = 'pomme kiwi pomme poire kiwi figue'
+freq = {}
+for m in texte.split():
+    freq[m] = freq.get(m, 0) + 1
+
+meilleur, nb = '', 0
+for m, c in freq.items():
+    if c > nb:
+        meilleur, nb = m, c
+
+rares = [m for m in freq if freq[m] == 1]
+print(len(freq), meilleur, rares)`),
+  parts:[
+   {q:'a) Que vaut ' + cd('len(freq)') + '&nbsp;?',lab:'len(freq) =',ans:4,hint:'Une clé n’apparaît qu’une fois dans un dictionnaire, même si le mot revient.',why:"freq = {'pomme': 2, 'kiwi': 2, 'poire': 1, 'figue': 1} : 4 clés."},
+   {q:'b) Que vaut <i>meilleur</i>&nbsp;?',opts:[cd("'kiwi'"),cd("'pomme'"),cd("'figue'"),cd("'poire'")],ans:1,hint:'items() suit l’ordre d’insertion. Le test c &gt; nb est-il vrai quand c = nb&nbsp;?',why:'pomme arrive en premier avec 2 : meilleur = pomme, nb = 2. Pour kiwi, 2 &gt; 2 est faux, donc pomme reste.'},
+   {q:'c) Et si on écrit ' + cd('c >= nb') + ' à la place de ' + cd('c > nb') + '&nbsp;?',opts:[cd("'pomme'"),cd("'figue'"),cd("'kiwi'"),cd("'poire'")],ans:2,hint:'Avec ≥, une égalité remplace l’ancien meilleur. Après kiwi, nb vaut encore 2 : poire et figue passent-elles le test&nbsp;?',why:'kiwi : 2 ≥ 2 est vrai, meilleur devient kiwi. poire et figue : 1 ≥ 2 est faux. Le dernier mot à égalité gagne : kiwi.'},
+   {q:'d) Que vaut <i>rares</i>&nbsp;?',opts:[cd("['figue', 'poire']"),cd("['poire', 'figue']"),cd("['poire']"),cd("[1, 1]")],ans:1,hint:'for m in freq parcourt les clés, dans l’ordre où elles ont été ajoutées.',why:'Les clés de valeur 1 sont poire et figue, dans l’ordre d’insertion : [\'poire\', \'figue\'].'},
+  ],
+  sol:`<p>Le motif freq[m] = freq.get(m, 0) + 1 donne {'pomme': 2, 'kiwi': 2, 'poire': 1, 'figue': 1}, avec les clés dans l’ordre de première apparition.</p><p>Recherche du maximum : on part de nb = 0. pomme (2 &gt; 0) devient le meilleur. kiwi : 2 &gt; 2 est faux. poire et figue : 1 &gt; 2 est faux. meilleur vaut pomme : avec &gt;, le premier ex æquo gagne.</p><p>Avec ≥, kiwi remplace pomme (2 ≥ 2), puis poire et figue échouent : le dernier ex æquo gagne.</p><p>La compréhension garde les clés de valeur 1, dans l’ordre d’insertion. Le programme affiche 4 pomme ['poire', 'figue'].</p>`},
+ {kind:'Problème',h:'Inverser un dictionnaire',p:`On range des élèves par note de trois façons. On regroupe les noms par note dans un dictionnaire de listes. On inverse le dictionnaire avec une compréhension. Enfin on liste les paires d’élèves ex æquo. Attention : deux élèves peuvent avoir la même note, mais une clé est unique.`+py(`notes = {'Ana': 5, 'Ben': 4, 'Léo': 5, 'Zoé': 6, 'Max': 4}
+
+par_note = {}
+for nom, n in notes.items():
+    if n not in par_note:
+        par_note[n] = []
+    par_note[n].append(nom)
+
+inv = {n: nom for nom, n in notes.items()}
+
+paires = [(a, b) for a in notes for b in notes
+          if a < b and notes[a] == notes[b]]
+print(par_note[5], inv[4], len(inv), len(paires))`),
+  parts:[
+   {q:'a) Que vaut ' + cd('par_note[5]') + '&nbsp;?',opts:[cd("'Léo'"),cd("['Léo', 'Ana']"),cd("['Ana', 'Léo']"),cd("['Ana']")],ans:2,hint:'Chaque nom est ajouté à la fin de la liste de sa note, dans l’ordre du parcours.',why:'Ana (5) crée la liste [\'Ana\'], puis Léo (5) s’y ajoute : [\'Ana\', \'Léo\'].'},
+   {q:'b) Que vaut ' + cd('inv[4]') + '&nbsp;?',opts:[cd("'Ben'"),cd("'Max'"),cd("['Ben', 'Max']"),`Une erreur ${cd('KeyError')}`],ans:1,hint:'Dans une compréhension de dictionnaire, que se passe-t-il quand la même clé revient&nbsp;?',why:'La clé 4 est d’abord associée à Ben, puis Max l’écrase, car il vient plus tard. inv[4] vaut \'Max\'.'},
+   {q:'c) Que vaut ' + cd('len(inv)') + '&nbsp;?',lab:'len(inv) =',ans:3,hint:'Combien de notes différentes&nbsp;?',why:'Les clés de inv sont les notes distinctes 5, 4 et 6 : 3 clés. Deux noms ont été perdus.'},
+   {q:'d) Que vaut ' + cd('len(paires)') + '&nbsp;?',lab:'len(paires) =',ans:2,hint:'Le test a &lt; b compare les noms par ordre alphabétique : il évite (a, a) et compte chaque paire une seule fois.',why:'Les ex æquo sont Ana et Léo (5), puis Ben et Max (4). Avec a &lt; b, on garde (\'Ana\', \'Léo\') et (\'Ben\', \'Max\') : 2 paires.'},
+  ],
+  sol:`<p><b>Regroupement.</b> On crée une liste vide la première fois qu’une note apparaît, puis on y ajoute chaque nom : par_note = {5: ['Ana', 'Léo'], 4: ['Ben', 'Max'], 6: ['Zoé']}.</p><p><b>Inversion.</b> {n: nom for nom, n in notes.items()} écrit les couples dans l’ordre. Quand une note revient, la nouvelle valeur écrase l’ancienne : 5 → 'Léo', 4 → 'Max', 6 → 'Zoé'. Il ne reste que 3 clés. Inverser n’est sans perte que si les valeurs sont toutes différentes.</p><p><b>Paires.</b> La double compréhension parcourt les 25 couples (a, b). La condition a &lt; b retire (a, a) et l’un des deux ordres. Il reste les paires d’égalité ('Ana', 'Léo') et ('Ben', 'Max').</p><p>Affichage : ['Ana', 'Léo'] Max 3 2.</p>`},
 ]},
 
 );
