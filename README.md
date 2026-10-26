@@ -18,6 +18,7 @@ Un brouillon de calcul pour travailler sans papier ni crayon (`ardoise.js`). Cha
 - une équation, avec les boutons « Résoudre » et « Des deux côtés… » ;
 - une fonction, avec les boutons « Dériver » et « Tracer » ;
 - une phrase de raisonnement.
+- un tableau de données (bouton « ⊞ Tableau » ou `tableau`) : coller depuis un tableur, colonnes calculées (`z = x*y`), somme et moyenne, graphique, droite ajustée. Chaque colonne se réutilise ensuite comme une liste : `mean(y)`, `sum(x)`.
 
 La formule s'affiche comme écrite à la main. Un clavier de symboles évite de chercher les touches, et « → Réponse » envoie un résultat dans la case de l'exercice. Il y a une ardoise par leçon, enregistrée avec la progression.
 
