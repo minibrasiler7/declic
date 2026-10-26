@@ -70,6 +70,15 @@ window.Ardoise = (()=>{
   .ard-table tfoot td.lab{text-align:left;color:var(--muted);font:700 12px var(--f-body);text-transform:uppercase;letter-spacing:.06em}
   .ard-table tfoot td.send{cursor:pointer;color:var(--accent)}
   .ard-tabnote{font-size:12px;color:var(--muted)}
+  .ard-table td.sel,.ard-table th.sel{box-shadow:inset 0 0 0 2px var(--accent)}
+  .ard-table td.selrow,.ard-table th.selcol{background:color-mix(in srgb,var(--accent) 7%,var(--surface))}
+  .ard-table td.calc{cursor:pointer}
+  .ard-tools{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:6px 8px;border-radius:12px;background:var(--bg);border:1px dashed var(--line)}
+  .ard-tools .where{font-size:12px;color:var(--muted);font-weight:700;margin-right:4px;width:100%}
+  .ard-tools button{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:4px 9px;font:700 13px var(--f-body);color:var(--ink);cursor:pointer}
+  .ard-tools button:hover{border-color:var(--accent)}
+  .ard-tools button.danger{color:var(--bad)}
+  .ard-tools button:disabled{opacity:.4;cursor:default}
   `}));
 
   /* ---------- chargement des bibliothèques (à la première ouverture) ---------- */
@@ -187,6 +196,7 @@ window.Ardoise = (()=>{
      Un en-tête « nom = formule » est une colonne calculée ligne par ligne. Chaque colonne nommée
      devient une liste utilisable dans les lignes suivantes (mean(y), sum(x), max(x)…). */
   const TAB='⊞';
+  const tabSel={};   // case sélectionnée de chaque tableau (index de ligne d'ardoise → {r, c} ; r = −1 pour les en-têtes)
   const newTable=()=>TAB+JSON.stringify({cols:['x','y'],rows:[['',''],['',''],['','']],stats:false});
   function insertTable(){ const at=Math.min(focusIdx,lines.length-1), i=lines[at]===''?at:at+1; if(lines[at]==='') lines[at]=newTable(); else lines.splice(i,0,newTable()); if(lines[lines.length-1]!=='') lines.push(''); persist(); draw(); document.getElementById(`ard-t-${i}-h-0`)?.focus(); }
   const cellNum=v=>{ const t=String(v).trim().replace(/[\s']/g,'').replace(/,/g,'.').replace(/−/g,'-'); if(t===''||!/^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?$/i.test(t)) return NaN; return Number(t); };
@@ -229,19 +239,20 @@ window.Ardoise = (()=>{
     const save=()=>{ lines[i]=TAB+JSON.stringify(T); persist(); };
     const later=()=>{ clearTimeout(draw.t); draw.t=setTimeout(()=>{ const a=document.activeElement, id=a?.id, p=a?.selectionStart; draw(); const n=id&&document.getElementById(id); if(n){ n.focus(); try{ n.setSelectionRange(p,p); }catch(e){} } },400); };
     const C=computeTable(T,scope);
+    const sel=()=>{ const p=tabSel[i]||{r:T.rows.length-1,c:0}; return {r:Math.min(p.r,T.rows.length-1),c:Math.min(Math.max(p.c,0),T.cols.length-1)}; };
     const el=$(`<div class="ard-line ard-tab"><div class="ard-row"><span class="ard-n">${i+1}</span><b style="flex:1">Tableau</b><button class="ard-del" title="Supprimer le tableau" aria-label="Supprimer le tableau ligne ${i+1}">×</button></div><div class="ard-tabwrap"><table class="ard-table"><thead></thead><tbody></tbody><tfoot></tfoot></table></div><div class="ard-out"></div><div class="ard-acts"></div><div class="ard-extra"></div></div>`);
     el.querySelector('.ard-del').onclick=()=>{ lines.splice(i,1); if(!lines.length||lines[lines.length-1]!=='') lines.push(''); persist(); draw(); };
     const thead=el.querySelector('thead'), tbody=el.querySelector('tbody'), tfoot=el.querySelector('tfoot');
     const hr=document.createElement('tr');
-    T.cols.forEach((h,c)=>{ const th=document.createElement('th'); const inp=document.createElement('input'); inp.id=`ard-t-${i}-h-${c}`; inp.value=h; inp.setAttribute('aria-label',`Nom de la colonne ${c+1}`); inp.spellcheck=false; inp.autocomplete='off';
-      inp.onfocus=()=>{ focusIdx=i; lastInput=inp; }; inp.oninput=()=>{ T.cols[c]=inp.value; save(); later(); }; th.append(inp); hr.append(th); });
+    T.cols.forEach((h,c)=>{ const th=document.createElement('th'); th.dataset.c=c; const inp=document.createElement('input'); inp.id=`ard-t-${i}-h-${c}`; inp.value=h; inp.setAttribute('aria-label',`Nom de la colonne ${c+1}`); inp.spellcheck=false; inp.autocomplete='off';
+      inp.onfocus=inp.onclick=()=>{ focusIdx=i; lastInput=inp; select(-1,c); }; inp.oninput=()=>{ T.cols[c]=inp.value; save(); later(); }; th.append(inp); hr.append(th); });
     const thc=document.createElement('th'); thc.className='ctl'; hr.append(thc); thead.append(hr);
     T.rows.forEach((row,r)=>{
       const tr=document.createElement('tr');
-      T.cols.forEach((h,c)=>{ const td=document.createElement('td');
-        if(C.heads[c].formula){ td.className='calc'; const v=C.vals[c][r]; const anyData=row.some((x,k)=>!C.heads[k].formula&&String(x).trim()!==''); td.textContent=anyData&&isFinite(v)?fnum(v):''; }
+      T.cols.forEach((h,c)=>{ const td=document.createElement('td'); td.dataset.t=i; td.dataset.r=r; td.dataset.c=c;
+        if(C.heads[c].formula){ td.className='calc'; td.tabIndex=0; td.title='Colonne calculée : modifie la formule dans l’en-tête'; td.onclick=td.onfocus=()=>{ focusIdx=i; select(r,c); }; const v=C.vals[c][r]; const anyData=row.some((x,k)=>!C.heads[k].formula&&String(x).trim()!==''); td.textContent=anyData&&isFinite(v)?fnum(v):''; }
         else { const inp=document.createElement('input'); inp.id=`ard-t-${i}-${r}-${c}`; inp.value=row[c]??''; inp.inputMode='decimal'; inp.autocomplete='off'; inp.spellcheck=false; inp.setAttribute('aria-label',`${C.heads[c].name||'colonne '+(c+1)}, ligne ${r+1}`);
-          inp.onfocus=()=>{ focusIdx=i; lastInput=inp; };
+          inp.onfocus=inp.onclick=()=>{ focusIdx=i; lastInput=inp; select(r,c); };
           inp.oninput=()=>{ T.rows[r][c]=inp.value; save(); later(); };
           inp.onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); if(r===T.rows.length-1){ T.rows.push(T.cols.map(()=>'')); save(); draw(); } document.getElementById(`ard-t-${i}-${r+1}-${c}`)?.focus(); } };
           inp.onpaste=e=>{ const t=(e.clipboardData||window.clipboardData)?.getData('text')||''; if(!/[\t\n]/.test(t)) return; e.preventDefault();
@@ -267,10 +278,27 @@ window.Ardoise = (()=>{
     const msgs=Object.entries(C.errs).map(([c,m])=>`<span class="err">Colonne ${esc(C.heads[c].name||+c+1)} : ${esc(m)}</span>`);
     out.innerHTML=msgs.join('')+(exported.length?`<span class="tag">utilisables ensuite : ${exported.map(esc).join(', ')}</span>`:'');
     const chip=(label,fn,main)=>{ const b=$(`<button class="ard-chip${main?' main':''}" type="button">${label}</button>`); b.onclick=fn; acts.append(b); };
-    chip('+ Ligne',()=>{ T.rows.push(T.cols.map(()=>'')); save(); draw(); document.getElementById(`ard-t-${i}-${T.rows.length-1}-0`)?.focus(); });
-    chip('+ Colonne',()=>{ T.cols.push(['y','z','u','v','w'].find(n=>!T.cols.map(headInfo).some(h=>h.name===n))||'c'+(T.cols.length+1)); T.rows.forEach(r=>r.push('')); save(); draw(); document.getElementById(`ard-t-${i}-h-${T.cols.length-1}`)?.select(); });
-    chip('+ Colonne calculée',()=>{ const a=C.heads[0]?.name||'x'; T.cols.push(`z = 2*${ident(a)?a:'x'}`); T.rows.forEach(r=>r.push('')); save(); draw(); const n=document.getElementById(`ard-t-${i}-h-${T.cols.length-1}`); n?.focus(); n?.select(); });
-    if(T.cols.length>1&&!C.heads[T.cols.length-1].formula) chip('− Colonne',()=>{ T.cols.pop(); T.rows.forEach(r=>r.pop()); save(); draw(); });
+    /* Insérer ou supprimer par rapport à la case sélectionnée, comme dans un tableur */
+    const newName=()=>['y','z','u','v','w','a','b','c'].find(n=>!T.cols.map(headInfo).some(h=>h.name===n))||'c'+(T.cols.length+1);
+    const focusCell=(r,c)=>{ const id=r<0?`ard-t-${i}-h-${c}`:`ard-t-${i}-${r}-${c}`; const n=document.getElementById(id); if(n){ n.focus(); if(r<0) n.select?.(); } else document.querySelector(`#ardoise td[data-t="${i}"][data-r="${r}"][data-c="${c}"]`)?.focus(); };
+    const act=(fn)=>{ fn(); save(); draw(); const s0=tabSel[i]; if(s0) focusCell(s0.r,s0.c); };
+    const tools=$(`<div class="ard-tools" role="toolbar" aria-label="Modifier le tableau"><span class="where"></span></div>`);
+    const tbtn=(label,title,fn,cls)=>{ const b=$(`<button type="button" class="${cls||''}" title="${title}">${label}</button>`); b.onmousedown=e=>e.preventDefault(); b.onclick=()=>act(fn); tools.append(b); return b; };
+    tbtn('↑ Ligne au-dessus','Insérer une ligne au-dessus de la case sélectionnée',()=>{ const r=Math.max(0,sel().r); T.rows.splice(r,0,T.cols.map(()=>'')); tabSel[i]={r,c:Math.max(0,sel().c)}; });
+    tbtn('↓ Ligne en dessous','Insérer une ligne sous la case sélectionnée',()=>{ const r=sel().r+1; T.rows.splice(r,0,T.cols.map(()=>'')); tabSel[i]={r,c:Math.max(0,sel().c)}; });
+    tbtn('← Colonne à gauche','Insérer une colonne à gauche de la case sélectionnée',()=>{ const c=sel().c; T.cols.splice(c,0,newName()); T.rows.forEach(rw=>rw.splice(c,0,'')); tabSel[i]={r:-1,c}; });
+    tbtn('→ Colonne à droite','Insérer une colonne à droite de la case sélectionnée',()=>{ const c=sel().c+1; T.cols.splice(c,0,newName()); T.rows.forEach(rw=>rw.splice(c,0,'')); tabSel[i]={r:-1,c}; });
+    tbtn('ƒ Colonne calculée','Insérer une colonne calculée à droite de la case sélectionnée',()=>{ const c=sel().c+1, hs=C.heads[sel().c], a=(hs&&!hs.formula&&ident(hs.name))?hs.name:(C.heads.find((h,k)=>!h.formula&&ident(h.name)&&C.vals[k].some(isFinite))?.name||'x'); T.cols.splice(c,0,`${newName()} = 2*${a}`); T.rows.forEach(rw=>rw.splice(c,0,'')); tabSel[i]={r:-1,c}; });
+    const delR=tbtn('Supprimer la ligne','Supprimer la ligne sélectionnée',()=>{ const r=sel().r; if(r<0||T.rows.length<2) return; T.rows.splice(r,1); tabSel[i]={r:Math.min(r,T.rows.length-1),c:sel().c}; },'danger');
+    const delC=tbtn('Supprimer la colonne','Supprimer la colonne sélectionnée',()=>{ const c=sel().c; if(T.cols.length<2) return; T.cols.splice(c,1); T.rows.forEach(rw=>rw.splice(c,1)); tabSel[i]={r:sel().r,c:Math.min(c,T.cols.length-1)}; },'danger');
+    function paintSel(){ const p=sel(); el.querySelectorAll('.sel,.selrow,.selcol').forEach(n=>n.classList.remove('sel','selrow','selcol'));
+      el.querySelectorAll(`th[data-c="${p.c}"]`).forEach(n=>n.classList.add(p.r<0?'sel':'selcol'));
+      if(p.r>=0){ el.querySelectorAll(`td[data-r="${p.r}"]`).forEach(n=>n.classList.add('selrow')); el.querySelector(`td[data-r="${p.r}"][data-c="${p.c}"]`)?.classList.add('sel'); }
+      const name=C.heads[p.c]?.name||String(p.c+1);
+      tools.querySelector('.where').textContent=p.r<0?`Sélection : en-tête de la colonne ${name}`:`Sélection : ligne ${p.r+1}, colonne ${name}`;
+      delR.disabled=p.r<0||T.rows.length<2; delC.disabled=T.cols.length<2; }
+    function select(r,c){ tabSel[i]={r,c}; paintSel(); }
+    el.querySelector('.ard-tabwrap').after(tools); paintSel();
     chip(T.stats?'Masquer somme et moyenne':'Somme et moyenne',()=>{ T.stats=!T.stats; save(); draw(); });
     const numCols=C.heads.map((h,c)=>c).filter(c=>C.vals[c].some(isFinite));
     if(numCols.length>=2){
