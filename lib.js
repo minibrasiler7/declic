@@ -28,6 +28,7 @@ const MATIERES=[
   {id:'ga',h:'Géométrie analytique',c:'var(--sci)',sems:{all:{h:'Vecteurs, droites et plans',s:'Calcul vectoriel, produit scalaire et vectoriel, transformations, géométrie 3D'},con:{h:'Coniques',s:'Ellipse, hyperbole, parabole, géométrie projective et équations matricielles'}}},
   {id:'ics',h:'Informatique',c:'var(--code)',sems:{py:{h:'Programmation Python',s:'Syntaxe, fonctions, contrôle, structures de données'},algo:{h:'Algorithmique',s:'Correction, complexité, récursivité, recherche, tris, graphes'}}},
   {id:'phy',h:'Physique',c:'var(--other)',sems:{all:{h:'Mécanique et thermodynamique',s:'Mouvement, forces, énergie, fluides, gaz et chaleur'}}},
+  {id:'gred',h:'Notions fondamentales',c:'var(--math)',sems:{ens:{h:'Le langage des ensembles',s:'Logique, démonstration, ensembles, relations, applications. D’après le plan du tome 1 de « Notions fondamentales de la mathématique élémentaire » de Louis Gred'},grp:{h:'Les groupes',s:'Lois de composition, groupes, sous-groupes, homomorphismes, groupe quotient, permutations'},ann:{h:'Anneaux et corps',s:'ℤ et la divisibilité, polynômes, matrices 2 × 2, anneaux, corps, fractions'}}},
   {id:'chi',h:'Chimie',c:'var(--ok)',sems:{pri:{h:'Chimie générale',s:'De l’atome à la cinétique'}}},
 ];
 const COURS=[];
