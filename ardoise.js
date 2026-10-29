@@ -14,11 +14,11 @@ window.Ardoise = (()=>{
 
   /* ---------- styles ---------- */
   document.head.append(Object.assign(document.createElement('style'),{textContent:`
-  .ard{position:fixed;z-index:30;background:var(--surface);border-left:1px solid var(--line);display:flex;flex-direction:column;top:0;right:0;bottom:0;width:430px;max-width:100%;box-shadow:-10px 0 30px rgba(0,0,0,.08);padding-top:env(safe-area-inset-top,0px)}
+  aside.ard{position:fixed;z-index:30;background:var(--surface);border-left:1px solid var(--line);display:flex;flex-direction:column;top:0;right:0;bottom:0;width:430px;max-width:100%;box-shadow:-10px 0 30px rgba(0,0,0,.08);padding-top:env(safe-area-inset-top,0px)}
   body.ard-open #player{right:430px}
   body.ard-open main,body.ard-open header.top .wrap{margin-right:430px}
   @media (max-width:900px){
-    .ard{top:auto;left:0;width:auto;height:50vh;border-left:0;border-top:1px solid var(--line);box-shadow:0 -10px 30px rgba(0,0,0,.12);border-radius:18px 18px 0 0;padding-bottom:env(safe-area-inset-bottom,0px)}
+    aside.ard{top:auto;left:0;width:auto;height:50vh;border-left:0;border-top:1px solid var(--line);box-shadow:0 -10px 30px rgba(0,0,0,.12);border-radius:18px 18px 0 0;padding-bottom:env(safe-area-inset-bottom,0px)}
     body.ard-open #player{right:0;bottom:50vh} body.ard-open main,body.ard-open header.top .wrap{margin-right:auto}
   }
   .ard-head{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line)}
@@ -40,6 +40,7 @@ window.Ardoise = (()=>{
   .ard-out .tex{color:var(--ink)}
   .ard-out .res{font:700 16px var(--f-mono);color:var(--accent)}
   .ard-out .note{background:none;padding:0;color:var(--ink);font-style:italic}
+  .ard-out .note.mth{font:500 19px 'Cambria Math','STIX Two Math','Times New Roman',serif;font-style:normal;letter-spacing:.01em}
   .ard-out .err{color:var(--muted);font-size:13px}
   .ard-out .tag{font-size:12px;color:var(--muted);border:1px dashed var(--line);border-radius:8px;padding:1px 6px}
   .ard-out .ok{color:var(--ok);font-weight:700}.ard-out .ko{color:var(--bad);font-weight:700}
@@ -56,6 +57,20 @@ window.Ardoise = (()=>{
   .ard-keys button:active{background:var(--accent-soft)}
   .ard-keys button.w2{grid-column:span 2}
   .ard-loading{padding:24px;color:var(--muted)}
+  .ard-ink .ink-box{width:100%;border-radius:10px;border:1px solid var(--line);background-color:var(--surface);background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:28px 28px;background-position:-1px -1px;overflow:hidden}
+  .ard-ink .ink-bar .grp{background:var(--bg)}
+  aside.ard.full{left:0;width:auto;top:0;bottom:0;height:auto;border-radius:0;border:0;box-shadow:none}
+  aside.ard.full .ard-body{max-width:980px;width:100%;margin:0 auto}
+  .ard-ib.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+  .ard-pal{border-top:1px solid var(--line);background:var(--surface);display:grid;gap:6px;padding:8px 10px 0}
+  .ard-pal .tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+  .ard-pal .tabs button{flex:none;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:4px 11px;font:700 13px var(--f-body);color:var(--muted);cursor:pointer}
+  .ard-pal .tabs button.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+  .ard-pal .syms{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:5px;max-height:150px;overflow-y:auto;padding-bottom:4px}
+  .ard-pal .syms button{height:40px;border-radius:9px;border:1px solid var(--line);background:var(--bg);font:500 19px 'Cambria Math','STIX Two Math','Times New Roman',serif;color:var(--ink);cursor:pointer;padding:0 4px;white-space:nowrap}
+  .ard-pal .syms button.t{font:600 13px var(--f-mono);grid-column:span 2}
+  .ard-pal .syms button:active{background:var(--accent-soft)}
+  .ard-keys button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
   .ard-tabwrap{overflow-x:auto;max-width:100%}
   .ard-table{border-collapse:collapse;font:500 15px var(--f-mono);font-variant-numeric:tabular-nums}
   .ard-table th,.ard-table td{border:1px solid var(--line);padding:0;min-width:64px;height:32px}
@@ -93,8 +108,15 @@ window.Ardoise = (()=>{
 
   /* ---------- interprétation d'une ligne ---------- */
   const KNOWN=new Set(['pi','e','i','deg','Infinity','ans']);
+  const SUP={'⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9','⁺':'+','⁻':'-','ⁿ':'n','ˣ':'x','⁽':'(','⁾':')'};
+  const SUB={'₀':'0','₁':'1','₂':'2','₃':'3','₄':'4','₅':'5','₆':'6','₇':'7','₈':'8','₉':'9','ₙ':'n','ₖ':'k','ᵢ':'i','ⱼ':'j','ₘ':'m','ₚ':'p'};
+  // symboles qu'on écrit pour raisonner mais que la calculatrice ne calcule pas : la ligne devient une phrase mathématique
+  const PROSE=/[∀∃∄∈∉∋⊂⊄⊆⊇⊃⊊∪∩∖∅⇒⇐⇔∧∨¬↦∑∏∫∬∮∂∇ℕℤℚℝℂ𝒫⊕⊗∘≅≃∼∝∥∠△⊤∴∵→←↔⟶±∓≡≢ᶜ]/;
   function prep(s){
-    return s.replace(/#.*$/,'').replace(/[×·]/g,'*').replace(/÷/g,'/').replace(/−/g,'-').replace(/π/g,'pi').replace(/√/g,'sqrt')
+    return s.replace(/#.*$/,'').replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻ⁿˣ⁽⁾]+/g,m=>{ const t=[...m].map(c=>SUP[c]).join(''); return /^[-+]?[\dnx]+$/.test(t)?'^'+t:'^('+t+')'; })
+      .replace(/([a-zA-Zα-ωΑ-Ω])([₀₁₂₃₄₅₆₇₈₉ₙₖᵢⱼₘₚ]+)/g,(m,a,b)=>a+'_'+[...b].map(c=>SUB[c]).join(''))
+      .replace(/∛\s*([\d.,]+|[a-zA-Zπ]\w*)/g,'cbrt($1)').replace(/∛/g,'cbrt').replace(/√\s*([\d.,]+|[a-zA-Zπ]\w*)/g,'sqrt($1)')
+      .replace(/∞/g,'Infinity').replace(/≠/g,'!=').replace(/⋅/g,'*').replace(/[×·]/g,'*').replace(/÷/g,'/').replace(/−/g,'-').replace(/π/g,'pi').replace(/√/g,'sqrt')
       .replace(/²/g,'^2').replace(/³/g,'^3').replace(/(\d),(\d)/g,'$1.$2').replace(/\bln\s*\(/g,'log(').replace(/°/g,' deg').replace(/≤/g,'<=').replace(/≥/g,'>=').trim();
   }
   const comment=s=>{ const m=s.match(/#\s*(.*)$/); return m?m[1]:''; };
@@ -105,7 +127,7 @@ window.Ardoise = (()=>{
     return [...new Set(node.filter(n=>n.isSymbolNode).map(n=>n.name))].filter(n=>!fns.has(n)&&!KNOWN.has(n)&&(!(n in scope)||(Array.isArray(scope[n])&&!inFn.has(n))));
   }
   const looksLikeWords=syms=>syms.some(n=>n.length>2&&!/^[a-zA-Z]\d*$/.test(n));
-  function tex(node){ try{ return node.toTex({parenthesis:'keep',implicit:'hide'}).replace(/(\d)\.(\d)/g,'$1{,}$2'); }catch(e){ return ''; } }
+  function tex(node){ try{ return node.toTex({parenthesis:'keep',implicit:'hide'}).replace(/(\d)\.(\d)/g,'$1{,}$2').replace(/\\_(\w+)/g,'_{$1}'); }catch(e){ return ''; } }
   function katexHTML(t){ try{ return window.katex.renderToString(t,{throwOnError:false,displayMode:false}); }catch(e){ return esc(t); } }
   function pretty(node){ return node.toString({implicit:'hide',parenthesis:'auto'}).replace(/(\d) \* ([a-zA-Z(])/g,'$1$2').replace(/ \* /g,' · '); }
   /* fraction exacte si le nombre en est une (dénominateur ≤ 1000) */
@@ -127,6 +149,7 @@ window.Ardoise = (()=>{
   function analyse(raw,scope){
     const M=window.math, s=prep(raw), info={raw, cmt:comment(raw)};
     if(!s) return {...info,type:'empty'};
+    if(PROSE.test(raw.replace(/#.*$/,''))) return {...info,type:'note',math:true};
     const eq=s.split(/(?<![<>=!])=(?!=)/);
     try{
       // définition de fonction : f(x) = …
@@ -315,6 +338,27 @@ window.Ardoise = (()=>{
     return el;
   }
 
+  /* ---------- dessins au stylet ----------
+     Une ligne qui commence par ✎ contient un dessin en JSON : {h: hauteur rapportée à une largeur de 1000, s: traits} (voir ink.js). */
+  const INK='✎';
+  let inkSurfs=[];
+  const newDrawing=()=>INK+JSON.stringify({h:620,s:[]});
+  function insertDrawing(){ const at=Math.min(focusIdx,lines.length-1), i=lines[at]===''?at:at+1; if(lines[at]==='') lines[at]=newDrawing(); else lines.splice(i,0,newDrawing()); if(lines[lines.length-1]!=='') lines.push(''); persist(); draw(); panel.querySelectorAll('.ard-ink')[0]&&document.getElementById('ard-ink-'+i)?.scrollIntoView({block:'nearest'}); }
+  function inkLine(i,raw){
+    let D; try{ D=JSON.parse(raw.slice(1)); }catch(e){ D={h:620,s:[]}; }
+    const el=$(`<div class="ard-line ard-ink" id="ard-ink-${i}"><div class="ard-row"><span class="ard-n">${i+1}</span><b style="flex:1">Dessin</b><button class="ard-chip" type="button" data-d="-1" title="Rendre la feuille moins haute">Réduire</button><button class="ard-chip" type="button" data-d="1" title="Ajouter de la place en dessous">Agrandir</button><button class="ard-del" title="Supprimer le dessin" aria-label="Supprimer le dessin ligne ${i+1}">×</button></div><div class="ink-box"></div></div>`);
+    const box=el.querySelector('.ink-box'), fit=()=>{ box.style.aspectRatio=`1000 / ${D.h}`; };
+    const keep=()=>{ lines[i]=INK+JSON.stringify(D); persist(); };
+    const surf=Ink.surface({strokes:D.s, scroller:()=>panel.querySelector('.ard-body'), onChange:st=>{ D.s=st; keep(); }});
+    inkSurfs.push(surf); fit(); box.append(surf.el);
+    el.querySelector('.ard-row').after(Ink.toolbar(()=>surf));
+    el.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{ const low=Math.max(300,...D.s.flatMap(t=>t.p.filter((v,k)=>k%3===1)).map(y=>y+40));
+      D.h=Math.min(4000,Math.max(low,D.h+(+b.dataset.d)*250)); fit(); keep(); });
+    el.onpointerdown=()=>{ focusIdx=i; };
+    el.querySelector('.ard-del').onclick=()=>{ lines.splice(i,1); if(!lines.length||lines[lines.length-1]!=='') lines.push(''); persist(); draw(); };
+    return el;
+  }
+
   /* ---------- rendu ---------- */
   const target=()=>document.querySelector('#card input.cible:not([disabled])');
   function sendToAnswer(val){
@@ -328,11 +372,12 @@ window.Ardoise = (()=>{
 
   function draw(focusAt){
     if(!panel) return;
-    const body=panel.querySelector('.ard-body'), M=window.math; body.innerHTML='';
+    const body=panel.querySelector('.ard-body'), M=window.math; body.innerHTML=''; inkSurfs.forEach(x=>x.destroy()); inkSurfs=[];
     if(lines.length===1&&!lines[0]) body.append(helpBox());
     const scope={};
     lines.forEach((raw,i)=>{
       if(raw.startsWith(TAB)){ body.append(tableLine(i,raw,scope)); return; }
+      if(raw.startsWith(INK)){ body.append(inkLine(i,raw)); return; }
       const A=analyse(raw,scope);
       const el=$(`<div class="ard-line"><div class="ard-row"><span class="ard-n">${i+1}</span><input class="ard-in" id="ard-in-${i}" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Ligne ${i+1} de l’ardoise"><button class="ard-del" title="Supprimer la ligne" aria-label="Supprimer la ligne ${i+1}">×</button></div><div class="ard-out"></div><div class="ard-acts"></div><div class="ard-extra"></div></div>`);
       const inp=el.querySelector('input'), out=el.querySelector('.ard-out'), acts=el.querySelector('.ard-acts'), extra=el.querySelector('.ard-extra');
@@ -340,7 +385,7 @@ window.Ardoise = (()=>{
       inp.onfocus=()=>{ focusIdx=i; lastInput=inp; body.querySelectorAll('.ard-line').forEach(x=>x.classList.remove('focus')); el.classList.add('focus'); };
       inp.oninput=()=>{ lines[i]=inp.value; if(i===lines.length-1&&inp.value) lines.push(''); persist(); clearTimeout(draw.t); draw.t=setTimeout(()=>{ const p=inp.selectionStart; draw(i); const ni=document.getElementById('ard-in-'+i); if(ni){ ni.setSelectionRange(p,p); } },350); };
       inp.onkeydown=e=>{
-        if(e.key==='Enter'){ e.preventDefault(); if(/^\s*tableau\s*$/i.test(inp.value)){ lines[i]=newTable(); if(i===lines.length-1) lines.push(''); persist(); draw(); document.getElementById(`ard-t-${i}-h-0`)?.focus(); return; } if(i===lines.length-1) lines.push(''); draw(i+1); }
+        if(e.key==='Enter'){ e.preventDefault(); if(/^\s*dessin\s*$/i.test(inp.value)){ lines[i]=newDrawing(); if(i===lines.length-1) lines.push(''); persist(); draw(); return; } if(/^\s*tableau\s*$/i.test(inp.value)){ lines[i]=newTable(); if(i===lines.length-1) lines.push(''); persist(); draw(); document.getElementById(`ard-t-${i}-h-0`)?.focus(); return; } if(i===lines.length-1) lines.push(''); draw(i+1); }
         else if(e.key==='ArrowUp'&&i>0){ e.preventDefault(); document.getElementById('ard-in-'+(i-1))?.focus(); }
         else if(e.key==='ArrowDown'){ e.preventDefault(); document.getElementById('ard-in-'+(i+1))?.focus(); }
         else if(e.key==='Backspace'&&!inp.value&&lines.length>1){ e.preventDefault(); lines.splice(i,1); persist(); draw(Math.max(0,i-1)); }
@@ -352,7 +397,7 @@ window.Ardoise = (()=>{
       try{
       switch(A.type){
         case 'empty': break;
-        case 'note': out.innerHTML=`<span class="note">${esc(raw.replace(/#.*$/,''))}</span>${cmt}`; break;
+        case 'note': out.innerHTML=`<span class="note${A.math?' mth':''}">${esc(raw.replace(/#.*$/,''))}</span>${cmt}`; break;
         case 'error': out.innerHTML=`<span class="err">Pas encore lisible. Vérifie les parenthèses et les opérations (exemple : 2*(x+1)/3).</span>`; break;
         case 'value': {
           const v=A.val, fr=typeof v==='number'?asFrac(v):null;
@@ -405,6 +450,8 @@ window.Ardoise = (()=>{
         <li>une équation : <code>2x + 3 = 11</code>, puis « Résoudre » ou « Des deux côtés… »</li>
         <li>une fonction : <code>f(x) = x^2 − 4x</code>, puis « Tracer » ou « Dériver »</li>
         <li>une phrase pour ton raisonnement : <code>donc le triangle est rectangle</code></li>
+        <li>un dessin ou une écriture à la main : bouton « ✎ Dessin » ou <code>dessin</code>. Avec un Apple Pencil, le doigt fait défiler et la paume ne laisse pas de trace.</li>
+        <li>des symboles (∀, ∈, ⇒, ℝ, α, ∑, x₁…) : touche « ∑ Symboles ». Une ligne qui en contient s’affiche comme une phrase mathématique.</li>
         <li>un tableau de données : bouton « ⊞ Tableau » ou <code>tableau</code>. Un en-tête comme <i>y = 2x + 1</i> calcule la colonne, et chaque colonne se réutilise ensuite : <i>mean(y)</i>, <i>sum(x)</i>.</li>
       </ul>
       Les touches du bas tapent les symboles. « → Réponse » envoie un résultat dans la case de l’exercice.</div>`);
@@ -413,24 +460,47 @@ window.Ardoise = (()=>{
   }
 
   /* ---------- clavier de symboles ---------- */
-  const KEYS=[['x','x'],['y','y'],['(',')','()'],['^','^'],['x²','^2'],['√','sqrt()',-1],['π','pi'],['/','/'],
+  // insère du texte à l'endroit du curseur, dans la dernière case utilisée (ligne ou case de tableau)
+  function insertText(ins,mv){
+    const ae=document.activeElement, inp=(ae&&ae.tagName==='INPUT'&&panel.contains(ae))?ae:(lastInput&&panel.contains(lastInput))?lastInput:(document.getElementById('ard-in-'+focusIdx)||document.getElementById('ard-in-'+(lines.length-1))); if(!inp) return;
+    inp.focus(); const s=inp.selectionStart??inp.value.length, en=inp.selectionEnd??s;
+    if(mv==='N'){ if(focusIdx===lines.length-1) lines.push(''); draw(focusIdx+1); return; }
+    if(mv==='L'){ inp.setSelectionRange(Math.max(0,s-1),Math.max(0,s-1)); return; }
+    if(mv==='R'){ inp.setSelectionRange(s+1,s+1); return; }
+    if(mv==='B'){ if(s===en&&s>0){ inp.value=inp.value.slice(0,s-1)+inp.value.slice(en); inp.setSelectionRange(s-1,s-1); } else { inp.value=inp.value.slice(0,s)+inp.value.slice(en); inp.setSelectionRange(s,s); } inp.dispatchEvent(new Event('input')); return; }
+    inp.value=inp.value.slice(0,s)+ins+inp.value.slice(en); const p=s+ins.length+(typeof mv==='number'?mv:0); inp.setSelectionRange(p,p); inp.dispatchEvent(new Event('input'));
+  }
+  const KEYS=[['x','x'],['y','y'],['(','()',-1],['^','^'],['x²','^2'],['√','sqrt()',-1],['π','pi'],['/','/'],
               ['×','*'],['=','='],['sin','sin()',-1],['cos','cos()',-1],['tan','tan()',-1],['ln','ln()',-1],['eˣ','e^'],['|x|','abs()',-1],
-              ['°','°'],['←',null,'L'],['→',null,'R'],['⌫',null,'B'],['Texte','# ',0,'w2'],['Ligne ↵',null,'N','w2']];
+              ['←',null,'L'],['→',null,'R'],['⌫',null,'B'],['Texte','# '],['∑ Symboles',null,'S','w2'],['Ligne ↵',null,'N','w2']];
+  /* Menu des symboles, rangés par familles. Chaque entrée : symbole, ou [étiquette, texte inséré, déplacement du curseur] */
+  const PAL=[
+    ['Courants',['²','³','ⁿ','√','∛','π','∞','±','×','÷','·','≠','≈','≤','≥','°','%','′','!','|']],
+    ['Grec',['α','β','γ','δ','ε','ζ','η','θ','ι','κ','λ','μ','ν','ξ','ρ','σ','τ','φ','χ','ψ','ω','Γ','Δ','Θ','Λ','Ξ','Π','Σ','Φ','Ψ','Ω']],
+    ['Ensembles',['∈','∉','∋','⊂','⊄','⊆','⊇','⊃','∪','∩','∖','Δ','∅','ᶜ',['{ }','{}',-1],['[ ; ]','[ ; ]',-3],['] ; [','] ; [',-3],'ℕ','ℤ','ℚ','ℝ','ℂ','𝒫','×','card']],
+    ['Logique',['∀','∃','∄','¬','∧','∨','⇒','⇐','⇔','≡','∴','∵','⊤','⊥',['tel que',' tel que '],['donc',' donc '],['si et seulement si',' si et seulement si ']]],
+    ['Analyse',['∑','∏','∫','∬','∮','∂','∇','lim','→','↦','′','″','∞','⌊','⌋','⌈','⌉',['dx',' dx'],['f(x)','f(x)'],['x → a','x → ']]],
+    ['Exposants',['⁰','¹','²','³','⁴','⁵','⁶','⁷','⁸','⁹','⁺','⁻','ⁿ','ˣ','⁽','⁾','₀','₁','₂','₃','₄','₅','₆','₇','₈','₉','ₙ','ₖ','ᵢ','ⱼ']],
+    ['Relations',['=','≠','≈','≡','≢','<','>','≤','≥','∼','≅','≃','∝','⊥','∥','∠','△','∘','⊕','⊗','←','↔','⟶','↑','↓']],
+    ['Fonctions',[['sin','sin()',-1],['cos','cos()',-1],['tan','tan()',-1],['arcsin','asin()',-1],['arccos','acos()',-1],['arctan','atan()',-1],['exp','exp()',-1],['ln','ln()',-1],['log₁₀','log10()',-1],['|x|','abs()',-1],['√x','sqrt()',-1],['ⁿ√x','nthRoot(, n)',-4],['n!','!'],['C(n, k)','combinations(n, k)'],['pgcd','gcd(, )',-3],['ppcm','lcm(, )',-3],['mod','mod(, )',-3],['moyenne','mean()',-1],['somme','sum()',-1]]],
+  ];
+  let palTab=0;
+  function palette(){
+    const p=$(`<div class="ard-pal" hidden role="dialog" aria-label="Symboles mathématiques"><div class="tabs" role="tablist"></div><div class="syms"></div></div>`);
+    const tabs=p.querySelector('.tabs'), syms=p.querySelector('.syms');
+    const show=()=>{ tabs.querySelectorAll('button').forEach((b,k)=>{ b.classList.toggle('on',k===palTab); b.setAttribute('aria-selected',k===palTab); }); syms.innerHTML='';
+      PAL[palTab][1].forEach(e=>{ const [lab,ins,mv]=Array.isArray(e)?e:[e,e,0]; const b=document.createElement('button'); b.type='button'; b.textContent=lab; if(lab.length>2) b.className='t'; b.title=ins.trim()||lab;
+        b.onmousedown=ev=>ev.preventDefault(); b.onclick=()=>insertText(ins,mv); syms.append(b); }); };
+    PAL.forEach(([name],k)=>{ const b=document.createElement('button'); b.type='button'; b.role='tab'; b.textContent=name; b.onmousedown=e=>e.preventDefault(); b.onclick=()=>{ palTab=k; show(); }; tabs.append(b); });
+    show(); return p;
+  }
   function keypad(){
     const k=$(`<div class="ard-keys" role="group" aria-label="Symboles mathématiques"></div>`);
     KEYS.forEach(([label,ins,mv,cls])=>{
       const b=$(`<button type="button" class="${typeof cls==='string'?cls:''}">${label}</button>`);
-      if(label==='(') { ins='()'; mv=-1; }
       b.onmousedown=e=>e.preventDefault();
-      b.onclick=()=>{
-        const inp=(lastInput&&panel.contains(lastInput))?lastInput:(document.getElementById('ard-in-'+focusIdx)||document.getElementById('ard-in-'+(lines.length-1))); if(!inp) return;
-        inp.focus(); const s=inp.selectionStart??inp.value.length, en=inp.selectionEnd??s;
-        if(mv==='N'){ if(focusIdx===lines.length-1) lines.push(''); draw(focusIdx+1); return; }
-        if(mv==='L'){ inp.setSelectionRange(Math.max(0,s-1),Math.max(0,s-1)); return; }
-        if(mv==='R'){ inp.setSelectionRange(s+1,s+1); return; }
-        if(mv==='B'){ if(s===en&&s>0){ inp.value=inp.value.slice(0,s-1)+inp.value.slice(en); inp.setSelectionRange(s-1,s-1); } else { inp.value=inp.value.slice(0,s)+inp.value.slice(en); inp.setSelectionRange(s,s); } inp.dispatchEvent(new Event('input')); return; }
-        inp.value=inp.value.slice(0,s)+ins+inp.value.slice(en); const p=s+ins.length+(typeof mv==='number'?mv:0); inp.setSelectionRange(p,p); inp.dispatchEvent(new Event('input'));
-      };
+      if(mv==='S'){ b.setAttribute('aria-expanded','false'); b.onclick=()=>{ const p=panel.querySelector('.ard-pal'); p.hidden=!p.hidden; b.classList.toggle('on',!p.hidden); b.setAttribute('aria-expanded',!p.hidden); }; }
+      else b.onclick=()=>insertText(ins,mv);
       k.append(b);
     });
     return k;
@@ -443,9 +513,12 @@ window.Ardoise = (()=>{
   async function open(){
     if(!panel){
       panel=$(`<aside class="ard" id="ardoise" aria-label="Ardoise de calcul" hidden><div class="ard-head"><b>Ardoise</b><span class="sub"></span>
-        <button class="ard-ib" id="ard-table" title="Insérer un tableau de données">⊞ Tableau</button><button class="ard-ib" id="ard-help" title="Aide">?</button><button class="ard-ib" id="ard-clear" title="Effacer l’ardoise">Effacer</button><button class="ard-ib" id="ard-close" aria-label="Fermer l’ardoise">×</button></div>
+        <button class="ard-ib" id="ard-table" title="Insérer un tableau de données">⊞ Tableau</button><button class="ard-ib" id="ard-draw" title="Insérer une feuille pour dessiner ou écrire au stylet">✎ Dessin</button><button class="ard-ib" id="ard-full" title="Ardoise en plein écran" aria-label="Ardoise en plein écran" aria-pressed="false"></button><button class="ard-ib" id="ard-help" title="Aide">?</button><button class="ard-ib" id="ard-clear" title="Effacer l’ardoise">Effacer</button><button class="ard-ib" id="ard-close" aria-label="Fermer l’ardoise">×</button></div>
         <div class="ard-body"><div class="ard-loading">Préparation de l’ardoise…</div></div></aside>`);
-      panel.append(keypad()); document.body.append(panel);
+      panel.append(palette(),keypad()); document.body.append(panel);
+      panel.querySelector('#ard-draw').onclick=()=>insertDrawing();
+      const fb=panel.querySelector('#ard-full'), ico=on=>`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:block">${on?'<path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/>':'<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>'}</svg>`;
+      fb.innerHTML=ico(false); fb.onclick=()=>{ const on=!panel.classList.contains('full'); panel.classList.toggle('full',on); fb.classList.toggle('on',on); fb.setAttribute('aria-pressed',on); fb.innerHTML=ico(on); fb.title=on?'Revenir à côté de la leçon':'Ardoise en plein écran'; fb.setAttribute('aria-label',fb.title); };
       panel.querySelector('#ard-close').onclick=close;
       panel.querySelector('#ard-table').onclick=()=>insertTable();
       panel.querySelector('#ard-help').onclick=()=>{ const b=panel.querySelector('.ard-body'); const ex=b.querySelector('.ard-help'); if(ex) ex.remove(); else b.prepend(helpBox()); };
@@ -455,11 +528,13 @@ window.Ardoise = (()=>{
     }
     panel.hidden=false; document.body.classList.add('ard-open'); panel.querySelector('.sub').textContent=subtitle();
     try{ await load(); }catch(e){ panel.querySelector('.ard-body').innerHTML='<div class="ard-loading">Impossible de charger l’ardoise. Vérifie ta connexion puis réessaie.</div>'; loading=null; return; }
-    loadLines(); draw(lines.length-1);
+    loadLines(); draw(touchy()?undefined:lines.length-1);
   }
   function close(){ if(panel){ panel.hidden=true; } document.body.classList.remove('ard-open'); }
   function toggle(){ isOpen()?close():open(); }
-  function onLesson(id){ key=id||'_libre'; if(isOpen()){ panel.querySelector('.sub').textContent=subtitle(); loadLines(); draw(lines.length-1); } }
+  // sur tablette, ne pas ouvrir le clavier tout seul : on peut vouloir dessiner
+  const touchy=()=>matchMedia('(pointer:coarse)').matches;
+  function onLesson(id){ key=id||'_libre'; if(isOpen()){ panel.querySelector('.sub').textContent=subtitle(); loadLines(); draw(touchy()?undefined:lines.length-1); } }
 
   document.getElementById('ardoise-open').onclick=toggle;
   document.getElementById('ardoise-btn').onclick=toggle;

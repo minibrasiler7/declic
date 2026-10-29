@@ -21,7 +21,17 @@ Un brouillon de calcul pour travailler sans papier ni crayon (`ardoise.js`). Cha
 - une phrase de raisonnement ;
 - un tableau de données (bouton « ⊞ Tableau » ou `tableau`) : coller depuis un tableur, colonnes calculées (`z = x*y`), somme et moyenne, graphique, droite ajustée. Chaque colonne se réutilise ensuite comme une liste : `mean(y)`, `sum(x)`.
 
-La formule s'affiche comme écrite à la main. Un clavier de symboles évite de chercher les touches, et « → Réponse » envoie un résultat dans la case de l'exercice. Il y a une ardoise par leçon, enregistrée avec la progression.
+- un dessin à main levée (bouton « ✎ Dessin » ou `dessin`), au stylet, au doigt ou à la souris : stylo sensible à la pression, surligneur, gomme, six couleurs, annuler et rétablir.
+
+La formule s'affiche comme écrite à la main. Un clavier et un menu de symboles rangés par familles (courants, grec, ensembles, logique, analyse, exposants et indices, relations, fonctions) évitent de chercher les touches. Une ligne qui contient des symboles de raisonnement (∀, ∈, ⇒, ℝ…) s'affiche comme une phrase mathématique, et « → Réponse » envoie un résultat dans la case de l'exercice. Il y a une ardoise par leçon, enregistrée avec la progression.
+
+## Annotations
+
+Le bouton « Annoter » d'une leçon pose une couche transparente sur l'étape : on y souligne, entoure et écrit au stylet. Les annotations sont rangées par étape (`S.notes`) et synchronisées avec le compte.
+
+## Sur iPad
+
+Déclic s'installe comme une app : dans Safari, Partager puis « Sur l'écran d'accueil ». L'app s'ouvre en plein écran et marche hors connexion grâce au service worker (`sw.js`). Avec un Apple Pencil, le stylet dessine et le doigt fait défiler, donc la paume posée ne laisse pas de trace. Le bouton « Doigt » change ce réglage, et l'ardoise passe en plein écran pour écrire à l'aise.
 
 ## Comptes
 
@@ -34,6 +44,8 @@ Les comptes (e-mail et mot de passe) synchronisent la progression, les séries e
 | `index.html` | Structure de la page et styles |
 | `app.js` | Moteur de leçons, accueil, pages de cours |
 | `ardoise.js` | L'ardoise de calcul (charge math.js et KaTeX à la première ouverture) |
+| `ink.js` | L'encre : dessin au stylet, barre d'outils, annotations des leçons |
+| `sw.js` | Service worker : installation comme app et mode hors connexion |
 | `compte.js` | Comptes et synchronisation |
 | `lib.js` | Outils partagés : repères 2D (`plane`) et 3D (`space`), code Python coloré (`py`), fractions, matrices, liste des matières |
 | `cours/*.js` | Le contenu, décrit comme des données |

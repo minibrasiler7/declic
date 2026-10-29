@@ -4,7 +4,7 @@ const store = {
   get(){ try{ return JSON.parse(localStorage.getItem('declic')||'{}') }catch(e){ return {} } },
   set(v){ try{ localStorage.setItem('declic',JSON.stringify(v)) }catch(e){} }
 };
-const blankState=()=>({xp:0, streak:0, lastDay:null, done:{}, pos:{}, ardoise:{}, last:null, updated:0});
+const blankState=()=>({xp:0, streak:0, lastDay:null, done:{}, pos:{}, ardoise:{}, notes:{}, last:null, updated:0});
 let S = Object.assign(blankState(), store.get());
 const dayStr=d=>d.toLocaleDateString('sv');               // AAAA-MM-JJ, heure locale
 const today=()=>dayStr(new Date()), yesterday=()=>dayStr(new Date(Date.now()-864e5));
@@ -22,6 +22,7 @@ function mergeState(r){
   const latest=r.updated>S.updated ? r : S, other=latest===r ? S : r;
   m.pos=Object.assign({}, other.pos, latest.pos);
   m.ardoise=Object.assign({}, other.ardoise, latest.ardoise);
+  m.notes=Object.assign({}, other.notes, latest.notes);
   m.last=latest.last||other.last; m.updated=Math.max(S.updated, r.updated);
   S=m; store.set(S); renderStats();
 }
@@ -405,6 +406,17 @@ function renderCourse(id){
   h.append(page);
 }
 
+/* Sur iPad et iPhone : proposer d'installer Déclic comme une app (plein écran, icône, hors connexion) */
+function installTip(h){
+  const ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  const installed=navigator.standalone||matchMedia('(display-mode: standalone)').matches;
+  let seen=false; try{ seen=!!localStorage.getItem('declic-tip-install'); }catch(e){}
+  if(!ios||installed||seen) return;
+  const share='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>';
+  const t=$(`<div class="wrap"><div class="install-tip"><p><b>Installe Déclic comme une app.</b> Dans Safari, touche ${share} Partager puis « Sur l’écran d’accueil ». Tu l’ouvres ensuite en plein écran, avec ton Apple Pencil pour l’ardoise et les annotations, même sans connexion.</p><button aria-label="Masquer ce conseil">×</button></div></div>`);
+  t.querySelector('button').onclick=()=>{ try{ localStorage.setItem('declic-tip-install','1'); }catch(e){} t.remove(); };
+  h.append(t);
+}
 function renderHome(){
   const order=[...COURS.map(c=>c.id),...[...MATHS.filter(c=>c.lv===LV),...MATHS.filter(c=>c.lv!==LV)].map(c=>c.lid),'boucles','intervalles'];
   const total=Object.keys(LESSONS).length, done=Object.keys(S.done).filter(k=>LESSONS[k]).length;
@@ -422,6 +434,7 @@ function renderHome(){
   </section>`);
   hero.querySelector('#go').onclick=()=>openLesson(next);
   h.append(hero);
+  installTip(h);
   renderCours(h);
   renderMath(h);
   CATALOG.forEach(d=>{
@@ -448,7 +461,7 @@ function openLesson(id){
   document.getElementById('player').hidden=false; document.body.style.overflow='hidden'; document.body.classList.add('in-lesson');
   showStep(); window.Ardoise?.onLesson(id);
 }
-function closeLesson(){ document.getElementById('player').hidden=true; document.body.style.overflow=''; document.body.classList.remove('in-lesson'); window.Ardoise?.onLesson(null); render(); }
+function closeLesson(){ window.Ink?.onLessonClosed(); document.getElementById('player').hidden=true; document.body.style.overflow=''; document.body.classList.remove('in-lesson'); window.Ardoise?.onLesson(null); render(); }
 
 /* Étape décrite par des données (format : docs/BRIEF.md) */
 function parseNum(s){ s=s.replace(/[\s']/g,'').replace(/,/g,'.').replace(/−/g,'-'); if(!s) return NaN; if(s.includes('/')){ const [a,b]=s.split('/').map(Number); return a/b; } return Number(s); }
@@ -550,6 +563,7 @@ function showStep(){
   ctx={answer:null, tries:0, uid:L.id+idx, ready:(r)=>{ if(phase==='ask') act.disabled=!r; }};
   phase='build';
   if(st.render) st.render(card,ctx); else buildStep(st,card,ctx);
+  window.Ink?.attachCard(card, L.id+':'+idx);
   document.querySelector('.p-body').scrollTop=0;
   S.last=L.id; if(idx>0) S.pos[L.id]=idx; save();
   if(ctx.check){ phase='ask'; setFoot('', '', '', 'Vérifier', ctx.answer!==null); }
