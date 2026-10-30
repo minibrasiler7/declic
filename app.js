@@ -4,7 +4,7 @@ const store = {
   get(){ try{ return JSON.parse(localStorage.getItem('declic')||'{}') }catch(e){ return {} } },
   set(v){ try{ localStorage.setItem('declic',JSON.stringify(v)) }catch(e){} }
 };
-const blankState=()=>({xp:0, streak:0, lastDay:null, done:{}, pos:{}, ardoise:{}, notes:{}, last:null, updated:0});
+const blankState=()=>({xp:0, streak:0, lastDay:null, done:{}, pos:{}, exams:{}, ardoise:{}, notes:{}, last:null, updated:0});
 let S = Object.assign(blankState(), store.get());
 const dayStr=d=>d.toLocaleDateString('sv');               // AAAA-MM-JJ, heure locale
 const today=()=>dayStr(new Date()), yesterday=()=>dayStr(new Date(Date.now()-864e5));
@@ -23,6 +23,8 @@ function mergeState(r){
   m.pos=Object.assign({}, other.pos, latest.pos);
   m.ardoise=Object.assign({}, other.ardoise, latest.ardoise);
   m.notes=Object.assign({}, other.notes, latest.notes);
+  m.exams=Object.assign({}, other.exams, latest.exams);   // garde le meilleur score des deux côtés
+  for(const k in r.exams) if(S.exams?.[k]) m.exams[k].best=Math.max(r.exams[k].best, S.exams[k].best);
   m.last=latest.last||other.last; m.updated=Math.max(S.updated, r.updated);
   S=m; store.set(S); renderStats();
 }
@@ -362,12 +364,16 @@ function renderSubject(id){
       const li=$(`<li class="${st.cls}"><span class="n">${st.cls==='fin'?'✓':n}</span><div><b>${c.h}</b><div class="s">${st.s?st.s+' · ':''}${c.steps.length-np} étapes${np?` + ${np} problèmes`:''} · ${c.p}</div></div><button class="btn">${st.label}</button></li>`);
       li.querySelector('button').onclick=()=>openLesson(c.id);
       const nm=methodSteps(c.steps).length; if(nm){ const f=$(`<button class="linkish fm-link" type="button">Fiche méthodes (${nm})</button>`); f.onclick=()=>openMethods(c.id); li.querySelector('div').append(f); }
+      li.querySelector('div').append(examLink(c.id));
       box.querySelector('ol').append(li); });
     page.querySelector('#sems').append(box);
   });
   page.querySelector('#back').onclick=()=>{ go('home'); requestAnimationFrame(()=>document.getElementById('cours')?.scrollIntoView()); };
   h.append(page);
 }
+
+/* Lien « Examen de compétence » d'un chapitre, avec le meilleur score */
+function examLink(id){ const ex=S.exams[id], f=$(`<button class="linkish fm-link" type="button">Examen de compétence${ex?` · meilleur score ${ex.best} / ${ex.n}`:''}</button>`); f.onclick=()=>startExam(id); return f; }
 
 function renderMath(h){
   const sec=$(`<section class="wrap domain" id="maths">
@@ -403,6 +409,7 @@ function renderCourse(id){
   page.querySelector('#back').onclick=()=>{ go('home'); requestAnimationFrame(()=>document.getElementById('maths')?.scrollIntoView()); };
   page.querySelector('#start').onclick=()=>openLesson(c.lid);
   const nm=methodSteps(steps).length; if(nm){ const f=$(`<button class="linkish fm-link" type="button">Fiche méthodes (${nm})</button>`); f.onclick=()=>openMethods(c.lid); page.querySelector('.lessons li div').append(f); }
+  page.querySelector('.lessons li div').append(examLink(c.lid));
   h.append(page);
 }
 
@@ -455,13 +462,15 @@ function renderHome(){
 /* ---------- lecteur de leçon ---------- */
 let L=null, idx=0, ctx=null, phase='idle';
 const foot=document.getElementById('foot'), fb=document.getElementById('fb'), act=document.getElementById('action');
-function openLesson(id){
-  L=LESSONS[id]; L.id=id; const p=S.pos[id];
-  idx=(p>0&&p<L.steps.length)?p:0;
+function openLesson(id,at){
+  X=null; L=LESSONS[id]; L.id=id; const p=S.pos[id];
+  // far : étape la plus avancée déjà atteinte ; toutes les étapes d'avant se revoient en touchant la barre
+  L.far=S.done[id]?L.steps.length-1:(p>0&&p<L.steps.length)?p:0;
+  idx=at??L.far; if(S.done[id]&&at==null) idx=0;
   document.getElementById('player').hidden=false; document.body.style.overflow='hidden'; document.body.classList.add('in-lesson');
   showStep(); window.Ardoise?.onLesson(id);
 }
-function closeLesson(){ window.Ink?.onLessonClosed(); document.getElementById('player').hidden=true; document.body.style.overflow=''; document.body.classList.remove('in-lesson'); window.Ardoise?.onLesson(null); render(); }
+function closeLesson(){ X=null; window.Ink?.onLessonClosed(); document.getElementById('player').hidden=true; document.body.style.overflow=''; document.body.classList.remove('in-lesson'); window.Ardoise?.onLesson(null); render(); }
 
 /* Étape décrite par des données (format : docs/BRIEF.md) */
 function parseNum(s){ s=s.replace(/[\s']/g,'').replace(/,/g,'.').replace(/−/g,'-'); if(!s) return NaN; if(s.includes('/')){ const [a,b]=s.split('/').map(Number); return a/b; } return Number(s); }
@@ -551,32 +560,46 @@ function buildProblem(st,c,ctx){
 }
 
 const kindOf=st=>st.kind||(st.demo?'Méthode':st.parts?'Problème':st.ok?'Pratique':(st.opts||'ans' in st)?'Question':'Théorie');
-function segs(){ document.getElementById('segs').innerHTML=L.steps.map((s,i)=>`<span class="${i<idx?'done':i===idx?'cur':''}${s.parts?' prob':''}"></span>`).join(''); }
+function segs(){
+  const el=document.getElementById('segs');
+  if(X){ el.innerHTML=X.items.map((_,i)=>`<span class="${i<X.res.length?(X.res[i]?'done':'miss'):i===X.i?'cur':''}"></span>`).join(''); return; }
+  el.innerHTML=L.steps.map((s,i)=>{ const cls=`${i<idx||i<=L.far&&i!==idx?'done':i===idx?'cur':''}${s.parts?' prob':''}`;
+    return i<=L.far&&i!==idx&&idx<L.steps.length
+      ? `<button type="button" class="${cls}" data-i="${i}" title="${(s.h||'').replace(/<[^>]+>/g,'').replace(/"/g,'&quot;')}" aria-label="Revoir l’étape ${i+1}"></button>`
+      : `<span class="${cls}"></span>`; }).join('');
+  el.querySelectorAll('button').forEach(b=>b.onclick=()=>goStep(+b.dataset.i));
+}
+/* Revenir sur une étape déjà vue (barre de progression ou bouton Précédent) */
+function goStep(i){ if(X||i<0||i>L.far) return; idx=i; showStep(); }
+const back=document.getElementById('prev');
+back.onclick=()=>goStep(idx-1);
 function setFoot(state,title,txt,label,enabled=true){
   foot.className='p-foot'+(state?' '+state:''); fb.innerHTML=title?`<strong>${title}</strong><span>${txt||''}</span>`:''; act.textContent=label; act.disabled=!enabled;
 }
 function showStep(){
   segs(); const card=document.getElementById('card'); card.innerHTML=''; card.style.animation='none'; card.offsetHeight; card.style.animation='';
-  const st=L.steps[idx];
+  const st=L.steps[idx]; back.hidden=idx===0;
   const course=COURSE_OF[L.id], co=COURS_OF[L.id];
   card.append($(`<div class="kicker">${L.domain}${course?' · '+LEVELS[course.lv].h:''}${co?' · '+co.sem.h:''} · ${kindOf(st)}${st.parts?` ${L.steps.slice(0,idx+1).filter(s=>s.parts).length}`:''}</div>`));
-  ctx={answer:null, tries:0, uid:L.id+idx, ready:(r)=>{ if(phase==='ask') act.disabled=!r; }};
+  ctx={answer:null, tries:0, uid:L.id+idx, review:idx<L.far, ready:(r)=>{ if(phase==='ask') act.disabled=!r; }};
   phase='build';
   if(st.render) st.render(card,ctx); else buildStep(st,card,ctx);
   window.Ink?.attachCard(card, L.id+':'+idx);
   document.querySelector('.p-body').scrollTop=0;
-  S.last=L.id; if(idx>0) S.pos[L.id]=idx; save();
+  if(idx>L.far) L.far=idx;
+  S.last=L.id; if(L.far>0&&!S.done[L.id]) S.pos[L.id]=L.far; save();
   if(ctx.check){ phase='ask'; setFoot('', '', '', 'Vérifier', ctx.answer!==null); }
   else { phase='next'; setFoot('', '', '', 'Continuer'); }
 }
 async function onAction(){
+  if(X) return examAction();
   if(phase==='ask'){
     act.disabled=true; phase='checking';
     const r=await ctx.check(); ctx.tries++;
     ctx.mark&&ctx.mark(r.ok);
     const prob=!!L.steps[idx].parts;
     if(r.ok){
-      S.xp+=prob?(ctx.tries===1&&!ctx.hinted?15:8):(ctx.tries===1?10:5); bumpStreak(); save();
+      if(!ctx.review) S.xp+=prob?(ctx.tries===1&&!ctx.hinted?15:8):(ctx.tries===1?10:5); bumpStreak(); save();
       const title=ctx.tries===1?'Bravo !':'C’est ça !';
       if(r.more){ phase='nextpart'; setFoot('ok', title, r.why, 'Question suivante'); }
       else { if(prob) ctx.finishProblem(); phase='next'; setFoot('ok', title, prob?'Problème résolu. La solution rédigée est ouverte ci-dessus.':r.why, 'Continuer'); }
@@ -589,14 +612,102 @@ async function onAction(){
     if(idx<L.steps.length-1){ idx++; showStep(); }
     else finish();
   } else if(phase==='end') closeLesson();
+  else if(phase==='exam') startExam(L.id);
 }
 function finish(){
-  idx=L.steps.length; segs();
+  idx=L.steps.length; L.far=L.steps.length-1; segs(); back.hidden=true;
   const first=!S.done[L.id]; S.done[L.id]=true; delete S.pos[L.id]; if(first) S.xp+=20; bumpStreak(); save();
   const card=document.getElementById('card');
   card.innerHTML=`<div class="done-wrap"><svg width="120" height="120" viewBox="0 0 120 120"><circle cx="60" cy="60" r="54" fill="var(--spark-soft)"/><path d="m60 22 10.6 23.4 25.4 2.4-19.2 16.8 5.6 25L60 76.8 37.6 89.6l5.6-25L24 47.8l25.4-2.4Z" fill="var(--spark)"/></svg>
     <h2>Leçon terminée</h2><div class="big-xp">${S.xp} XP</div><p style="color:var(--muted)">${first?'+20 XP de bonus pour ta première fois.':'Révision faite.'} Série en cours : ${liveStreak()} jour${liveStreak()>1?'s':''}.</p></div>`;
   phase='end'; setFoot('', '', '', (COURSE_OF[L.id]||COURS_OF[L.id])?'Retour au cours':'Retour au catalogue');
+  if(hasExam(L.id)){ // l'examen de compétence prend la suite du chapitre
+    const ex=S.exams[L.id], b=$(`<div class="exam-cta"><div><b>Examen de compétence</b><span>Une trentaine d’exercices techniques sur tout le chapitre, un score et un bilan de ce qui est acquis.${ex?` Meilleur score : ${ex.best} / ${ex.n}.`:''}</span></div></div>`);
+    card.querySelector('.done-wrap').append(b); phase='exam'; setFoot('', '', '', 'Passer l’examen');
+    const r=$(`<button class="linkish" type="button">${(COURSE_OF[L.id]||COURS_OF[L.id])?'Plus tard, retour au cours':'Plus tard'}</button>`); r.onclick=closeLesson; b.append(r);
+  }
+}
+
+/* ---------- examen de compétence : ~30 questions techniques, une seule tentative, puis un bilan par notion ---------- */
+let X=null;
+const hasExam=id=>!!(COURS_OF[id]||COURSE_OF[id]&&!COURSE_OF[id].use);
+const examFile={};
+function loadExam(id){
+  if(EXAMS[id]) return Promise.resolve(EXAMS[id]);
+  return examFile[id]??=new Promise((ok,ko)=>{ const sc=document.createElement('script'); sc.src=`examens/${id}.js`;
+    sc.onload=()=>EXAMS[id]?ok(EXAMS[id]):ko(); sc.onerror=()=>{ delete examFile[id]; sc.remove(); ko(); }; document.head.append(sc); });
+}
+const shuffle=a=>{ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+async function startExam(id){
+  if(!LESSONS[id]) return;
+  let ex; try{ ex=await loadExam(id); }catch(e){
+    if(document.getElementById('player').hidden) alert('Examen indisponible. Vérifie ta connexion puis réessaie.');
+    else { phase='exam'; setFoot('bad','Examen indisponible','Vérifie ta connexion puis réessaie.','Passer l’examen'); }
+    return; }
+  L=LESSONS[id]; L.id=id;
+  // Les questions d'une même notion ne se suivent pas : on mélange tout
+  X={id, notions:ex, items:shuffle(ex.flatMap((g,k)=>g.qs.map(q=>({q,k})))), i:0, res:[]};
+  document.getElementById('player').hidden=false; document.body.style.overflow='hidden'; document.body.classList.add('in-lesson');
+  window.Ardoise?.onLesson(id); back.hidden=true; examQ();
+}
+function examQ(){
+  segs(); const card=document.getElementById('card'); card.innerHTML=''; card.style.animation='none'; card.offsetHeight; card.style.animation='';
+  const it=X.items[X.i], q=it.q, g=X.notions[it.k];
+  card.append($(`<div class="kicker">Examen de compétence · ${X.i+1} / ${X.items.length} · ${g.n}</div>`));
+  ctx={answer:null, tries:0, uid:'x'+X.i, ready:(r)=>{ if(phase==='ask') act.disabled=!r; }};
+  card.append($(`<div class="ptext exam-q">${q.q}</div>`));
+  if(q.fig) card.append($(`<div class="fig">${q.fig}</div>`));
+  if(q.opts) card.append(choices(q.opts,ctx,q.opts.every(o=>o.replace(/<[^>]+>/g,'').length<14)));
+  else { const w=numInput(q,ctx,ctx.uid); card.append(w); setTimeout(()=>w.querySelector('input').focus({preventScroll:true}),50); }
+  window.Ink?.attachCard(card, 'examen:'+X.id+':'+X.i);
+  document.querySelector('.p-body').scrollTop=0;
+  phase='ask'; setFoot('','','','Vérifier',false);
+}
+function examAction(){
+  if(phase==='ask'){
+    const q=X.items[X.i].q, ok=isRight(q,ctx.answer);
+    ctx.mark&&ctx.mark(ok); X.res.push(ok);
+    document.querySelectorAll('#card button, #card input').forEach(e=>e.disabled=true);
+    if(!ok&&q.opts) document.querySelectorAll('#card .choice')[q.ans]?.classList.add('right');
+    if(ok){ S.xp+=2; bumpStreak(); save(); }
+    const v=q.ans, good=q.opts?'':`Réponse : <b>${q.show??(v===0||Math.abs(v)>=.01?fmt(v,4):v.toExponential(3).replace('.',','))}${q.unit?' '+q.unit:''}</b>. `;
+    phase='next'; segs(); setFoot(ok?'ok':'bad', ok?'Juste':'Pas juste', (ok?'':good)+q.why, X.i<X.items.length-1?'Question suivante':'Voir mon score');
+    return;
+  }
+  if(phase==='next'){ if(++X.i<X.items.length) examQ(); else examEnd(); return; }
+  if(phase==='end') closeLesson();
+}
+function examEnd(){
+  segs();
+  const n=X.items.length, sc=X.res.filter(Boolean).length, pc=Math.round(sc/n*100);
+  const per=X.notions.map((g,k)=>{ const r=X.items.map((it,i)=>it.k===k?X.res[i]:null).filter(v=>v!==null); return {g, ok:r.filter(Boolean).length, n:r.length}; });
+  const acq=per.filter(p=>p.ok/p.n>=.75), rev=per.filter(p=>p.ok/p.n<.75);
+  const prev=S.exams[X.id]; S.exams[X.id]={best:Math.max(sc,prev?.best||0), last:sc, n, day:today()}; save();
+  const level=pc>=90?['Maîtrisé','Tout le chapitre est en place.']:pc>=75?['Bien acquis','L’essentiel est solide.']:pc>=50?['En bonne voie','La base est là, quelques notions demandent encore de l’entraînement.']:['À retravailler','Reprends les notions ci-dessous puis repasse l’examen.'];
+  const list=ps=>ps.map(p=>`<li><div class="row"><span>${p.g.n}</span><b>${p.ok} / ${p.n}</b></div><div class="bar"><span style="width:${p.ok/p.n*100}%"></span></div></li>`).join('');
+  const names=ps=>ps.map(p=>/^.[a-zà-ÿ ]/.test(p.g.n)?p.g.n.charAt(0).toLowerCase()+p.g.n.slice(1):p.g.n).join(', ').replace(/, ([^,]*)$/,' et $1');
+  const mot=!rev.length?`Bravo : tu maîtrises ${names(acq)}. Tu peux passer au chapitre suivant l’esprit tranquille.`
+    :!acq.length?`Ce chapitre mérite d’être repris. Commence par ${names(rev.slice(0,2))} : relis l’étape indiquée, refais ses exercices, puis repasse l’examen.`
+    :`Tu as bien compris ${names(acq)}. Entraîne-toi encore sur ${names(rev)} : relis l’étape de cours indiquée, refais ses exercices, puis repasse l’examen.`;
+  const card=document.getElementById('card'); card.innerHTML='';
+  const box=$(`<div class="exam-end">
+    <div class="kicker">Examen de compétence · ${LESSONS[X.id].title}</div>
+    <div class="score-ring" style="--p:${pc}"><div><b>${sc}</b><span>sur ${n}</span></div></div>
+    <h2>${level[0]}</h2><p class="lead">${pc} %. ${level[1]}${prev&&sc>prev.best?' Nouveau record.':prev?` Meilleur score : ${Math.max(sc,prev.best)} / ${n}.`:''}</p>
+    <div class="mot">${mot}</div>
+    ${acq.length?`<h3 class="ok">Bien compris</h3><ul class="notions ok">${list(acq)}</ul>`:''}
+    ${rev.length?`<h3 class="bad">À entraîner</h3><ul class="notions bad">${list(rev)}</ul>`:''}
+    <div class="row exam-btns"><button class="btn ghost" type="button" id="ex-again">Repasser l’examen</button></div>
+  </div>`);
+  // Pour chaque notion à entraîner : un lien vers l'étape du cours qui l'enseigne
+  const steps=LESSONS[X.id].steps;
+  box.querySelectorAll('ul.bad li').forEach((li,k)=>{ const g=rev[k].g, at=steps.findIndex(s=>s.h===g.r);
+    if(at<0) return; const b=$(`<button class="linkish" type="button">Revoir « ${g.r.replace(/<[^>]+>/g,'')} »</button>`);
+    const id=X.id; b.onclick=()=>openLesson(id,at); li.append(b); });
+  box.querySelector('#ex-again').onclick=()=>startExam(X.id);
+  card.append(box); window.Ink?.attachCard(card, 'examen:'+X.id+':fin');
+  document.querySelector('.p-body').scrollTop=0;
+  phase='end'; setFoot('', '', '', (COURSE_OF[X.id]||COURS_OF[X.id])?'Retour au cours':'Retour au catalogue');
 }
 act.onclick=onAction;
 document.getElementById('quit').onclick=closeLesson;

@@ -1,0 +1,49 @@
+/* Déclic — examen de compétence : Exponentielle, logarithme et puissances */
+(()=>{
+EXAMS['an2-puissances']=[
+ {n:'Écrire aˣ avec e', r:'aˣ, c’est e déguisé', qs:[
+   {q:'Laquelle de ces écritures est égale à 7<sup>2<i>x</i></sup> pour tout réel <i>x</i>&nbsp;?', opts:['e<sup>14<i>x</i></sup>','2<i>x</i> ln 7','e<sup>2<i>x</i> ln 7</sup>','e<sup>ln(14<i>x</i>)</sup>'], ans:2, why:'Par définition a<sup>y</sup> = e<sup>y ln a</sup> avec ici y = 2<i>x</i> : 7<sup>2<i>x</i></sup> = e<sup>2<i>x</i> ln 7</sup>.'},
+   {q:'Trouve le réel <i>k</i> tel que 6<sup><i>x</i></sup> = e<sup><i>kx</i></sup> pour tout <i>x</i>. Arrondis au millième.', lab:'k =', ans:1.792, tol:.0006, why:'6<sup><i>x</i></sup> = e<sup><i>x</i> ln 6</sup>, donc <i>k</i> = ln 6 ≈ 1,792.'},
+   {q:'Calcule 3<sup>√2</sup>, arrondi au centième.', lab:'3^√2 ≈', ans:4.73, tol:.006, why:'3<sup>√2</sup> = e<sup>√2 · ln 3</sup> ≈ e<sup>1,4142 × 1,0986</sup> = e<sup>1,5537</sup> ≈ 4,73.'},
+   {q:'La fonction <i>x</i> ↦ 0,8<sup><i>x</i></sup> est…', opts:['croissante sur ℝ, car 0,8 &gt; 0','décroissante sur ℝ, car ln 0,8 &lt; 0','croissante pour <i>x</i> &lt; 0 et décroissante pour <i>x</i> &gt; 0','constante, car 0,8 &lt; 1'], ans:1, why:'0,8<sup><i>x</i></sup> = e<sup><i>x</i> ln 0,8</sup> avec ln 0,8 ≈ −0,223 &lt; 0 : l’exposant décroît quand <i>x</i> croît, donc la fonction décroît sur tout ℝ.'},
+ ]},
+ {n:'Résoudre aˣ = b', r:'Résoudre aˣ = b', qs:[
+   {q:'Résous 3<sup><i>x</i></sup> = 20. Arrondis au centième.', lab:'x =', ans:2.73, tol:.006, why:'On prend ln : <i>x</i> ln 3 = ln 20, donc <i>x</i> = ln 20/ln 3 ≈ 2,9957/1,0986 ≈ 2,73. Contrôle : 3² = 9 &lt; 20 &lt; 27 = 3³.'},
+   {q:'Résous 0,5<sup><i>x</i></sup> = 0,1. Arrondis au centième.', lab:'x =', ans:3.32, tol:.006, why:'<i>x</i> = ln 0,1/ln 0,5 ≈ (−2,3026)/(−0,6931) ≈ 3,32 : les deux logarithmes sont négatifs, le quotient est positif.'},
+   {q:'Une substance perd 3 % de sa masse chaque année : la masse est multipliée par 0,97<sup><i>t</i></sup> en <i>t</i> années. Au bout de combien d’années reste-t-il la moitié&nbsp;? Arrondis au centième.', lab:'t =', unit:'ans', ans:22.76, tol:.006, why:'0,97<sup><i>t</i></sup> = 0,5 donne <i>t</i> = ln 0,5/ln 0,97 ≈ (−0,6931)/(−0,03046) ≈ 22,76 ans.'},
+   {q:'Quel est l’ensemble des solutions de 0,8<sup><i>x</i></sup> &lt; 0,5&nbsp;?', opts:['<i>x</i> &lt; ln 0,5/ln 0,8','<i>x</i> &gt; ln 0,8/ln 0,5','<i>x</i> &gt; ln 0,5/ln 0,8','aucun réel, car 0,8 &lt; 1'], ans:2, why:'On prend ln : <i>x</i> ln 0,8 &lt; ln 0,5. On divise par ln 0,8 &lt; 0, ce qui change le sens : <i>x</i> &gt; ln 0,5/ln 0,8 ≈ 3,11.'},
+   {q:'Combien de solutions réelles l’équation 5<sup><i>x</i></sup> = −4 a-t-elle&nbsp;?', opts:['Une seule, <i>x</i> = ln 4/ln 5','Une seule, <i>x</i> = −ln 4/ln 5','Deux, opposées','Aucune'], ans:3, why:'5<sup><i>x</i></sup> = e<sup><i>x</i> ln 5</sup> &gt; 0 pour tout <i>x</i> : il ne peut jamais valoir −4, et ln(−4) n’existe pas.'},
+ ]},
+ {n:'Dériver aˣ et x^α', r:'Puissance généralisée x^α', qs:[
+   {q:'Soit <i>f</i>(<i>x</i>) = <i>x</i><sup>2,5</sup>. Calcule <i>f</i>′(4).', lab:'f′(4) =', ans:20, tol:.001, why:'<i>f</i>′(<i>x</i>) = 2,5 <i>x</i><sup>1,5</sup>, et 4<sup>1,5</sup> = (√4)³ = 8, donc <i>f</i>′(4) = 2,5 × 8 = 20.'},
+   {q:'Soit <i>f</i>(<i>x</i>) = 3<sup><i>x</i></sup>. Calcule <i>f</i>′(2), arrondi au centième.', lab:'f′(2) =', ans:9.89, tol:.006, why:'(a<sup><i>x</i></sup>)′ = ln a · a<sup><i>x</i></sup>, donc <i>f</i>′(2) = ln 3 · 9 ≈ 1,0986 × 9 ≈ 9,89.'},
+   {q:'Soit <i>f</i>(<i>x</i>) = <i>x</i><sup>−0,5</sup>. Calcule <i>f</i>′(9), arrondi au millième.', lab:'f′(9) =', ans:-0.019, tol:.0006, why:'<i>f</i>′(<i>x</i>) = −0,5 <i>x</i><sup>−1,5</sup>, et 9<sup>1,5</sup> = 3³ = 27, donc <i>f</i>′(9) = −0,5/27 ≈ −0,019.'},
+   {q:'Quelle est la dérivée de 5<sup><i>x</i></sup>&nbsp;?', opts:['<i>x</i> · 5<sup><i>x</i>−1</sup>','5<sup><i>x</i></sup>','ln 5 · 5<sup><i>x</i></sup>','5<sup><i>x</i></sup>/ln 5'], ans:2, why:'5<sup><i>x</i></sup> = e<sup><i>x</i> ln 5</sup>, dont la dérivée est ln 5 · e<sup><i>x</i> ln 5</sup> = ln 5 · 5<sup><i>x</i></sup>. La règle <i>x</i> · 5<sup><i>x</i>−1</sup> est celle d’un exposant fixe.'},
+ ]},
+ {n:'Dériver une base fixe et un exposant variable', r:'Dériver a^u(x) : passer à la forme e^(u ln a)', qs:[
+   {q:'Soit <i>f</i>(<i>x</i>) = 2<sup>3<i>x</i></sup>. Calcule <i>f</i>′(1), arrondi au centième.', lab:'f′(1) =', ans:16.64, tol:.006, why:'(a<sup><i>u</i></sup>)′ = <i>u</i>′ ln a · a<sup><i>u</i></sup> avec <i>u</i> = 3<i>x</i> : <i>f</i>′(1) = 3 ln 2 · 2³ = 24 ln 2 ≈ 16,64.'},
+   {q:'Soit <i>f</i>(<i>x</i>) = 10<sup><i>x</i>²</sup>. Calcule <i>f</i>′(0,5), arrondi au centième.', lab:'f′(0,5) =', ans:4.09, tol:.006, why:'<i>f</i>′(<i>x</i>) = 2<i>x</i> ln 10 · 10<sup><i>x</i>²</sup>, donc <i>f</i>′(0,5) = ln 10 · 10<sup>0,25</sup> ≈ 2,3026 × 1,7783 ≈ 4,09.'},
+   {q:'Soit <i>f</i>(<i>x</i>) = 4<sup>√<i>x</i></sup>. Calcule <i>f</i>′(9), arrondi au centième.', lab:'f′(9) =', ans:14.79, tol:.006, why:'<i>f</i>′(<i>x</i>) = ln 4/(2√<i>x</i>) · 4<sup>√<i>x</i></sup>. En <i>x</i> = 9 : ln 4/6 · 4³ = 64 ln 4/6 ≈ 14,79.'},
+   {q:'Quelle est la dérivée de 7<sup><i>x</i>²</sup>&nbsp;?', opts:['<i>x</i>² · 7<sup><i>x</i>²−1</sup>','2<i>x</i> ln 7 · 7<sup><i>x</i>²</sup>','2<i>x</i> · 7<sup><i>x</i>²</sup>','ln 7 · 7<sup><i>x</i>²</sup>'], ans:1, why:'7<sup><i>x</i>²</sup> = e<sup><i>x</i>² ln 7</sup>, on dérive l’exposant : (<i>x</i>² ln 7)′ = 2<i>x</i> ln 7. Donc la dérivée vaut 2<i>x</i> ln 7 · 7<sup><i>x</i>²</sup>.'},
+ ]},
+ {n:'Résoudre x^α = c', r:'Résoudre x^α = c', qs:[
+   {q:'Résous <i>x</i><sup>2/3</sup> = 16 pour <i>x</i> &gt; 0.', lab:'x =', ans:64, tol:.001, why:'On élève à la puissance 3/2 : <i>x</i> = 16<sup>3/2</sup> = (√16)³ = 4³ = 64.'},
+   {q:'Résous <i>x</i><sup>0,4</sup> = 4 pour <i>x</i> &gt; 0.', lab:'x =', ans:32, tol:.001, why:'0,4 = 2/5, donc <i>x</i> = 4<sup>5/2</sup> = (√4)⁵ = 2⁵ = 32. Contrôle : 32<sup>0,4</sup> = (32<sup>1/5</sup>)² = 2² = 4.'},
+   {q:'Résous <i>x</i><sup>−2</sup> = 0,25 pour <i>x</i> &gt; 0.', lab:'x =', ans:2, tol:.001, why:'On élève à la puissance −1/2 : <i>x</i> = 0,25<sup>−1/2</sup> = 1/√0,25 = 1/0,5 = 2. Contrôle : 2<sup>−2</sup> = 1/4.'},
+   {q:'Une grandeur suit la loi <i>y</i> = <i>k</i> <i>x</i><sup>1,5</sup>. Par quel facteur <i>y</i> est-il multiplié quand <i>x</i> est multiplié par 4&nbsp;?', lab:'facteur =', ans:8, tol:.001, why:'<i>k</i>(4<i>x</i>)<sup>1,5</sup>/(<i>k</i> <i>x</i><sup>1,5</sup>) = 4<sup>1,5</sup> = (√4)³ = 8, quel que soit <i>x</i>.'},
+ ]},
+ {n:'Base et exposant variables', r:'Le cas xˣ', qs:[
+   {q:'Soit <i>f</i>(<i>x</i>) = <i>x</i><sup><i>x</i></sup>. Calcule <i>f</i>′(3), arrondi au centième.', lab:'f′(3) =', ans:56.66, tol:.006, why:'<i>f</i>′(<i>x</i>) = <i>x</i><sup><i>x</i></sup>(ln <i>x</i> + 1), donc <i>f</i>′(3) = 27(ln 3 + 1) ≈ 27 × 2,0986 ≈ 56,66.'},
+   {q:'Quelle est la dérivée de <i>x</i><sup><i>x</i></sup> pour <i>x</i> &gt; 0&nbsp;?', opts:['<i>x</i> · <i>x</i><sup><i>x</i>−1</sup>','<i>x</i><sup><i>x</i></sup> ln <i>x</i>','ln <i>x</i> + 1','<i>x</i><sup><i>x</i></sup>(ln <i>x</i> + 1)'], ans:3, why:'<i>x</i><sup><i>x</i></sup> = e<sup><i>x</i> ln <i>x</i></sup> et (<i>x</i> ln <i>x</i>)′ = ln <i>x</i> + 1, donc (<i>x</i><sup><i>x</i></sup>)′ = <i>x</i><sup><i>x</i></sup>(ln <i>x</i> + 1). Les deux premières réponses n’appliquent qu’une des deux règles.'},
+   {q:'Quelle est la valeur minimale de <i>x</i><sup><i>x</i></sup> sur ]0 ; +∞[&nbsp;? Arrondis au centième.', lab:'minimum =', ans:.69, tol:.006, why:'La dérivée <i>x</i><sup><i>x</i></sup>(ln <i>x</i> + 1) s’annule en ln <i>x</i> = −1, soit <i>x</i> = 1/e, et change de signe de − à +. Le minimum vaut (1/e)<sup>1/e</sup> = e<sup>−1/e</sup> ≈ 0,69.'},
+   {q:'Soit <i>f</i>(<i>x</i>) = <i>x</i><sup><i>x</i>²</sup> pour <i>x</i> &gt; 0. Calcule <i>f</i>′(2), arrondi au centième.', lab:'f′(2) =', ans:76.36, tol:.006, why:'<i>f</i>(<i>x</i>) = e<sup><i>x</i>² ln <i>x</i></sup>, donc <i>f</i>′(<i>x</i>) = (2<i>x</i> ln <i>x</i> + <i>x</i>) · <i>f</i>(<i>x</i>). En 2 : (4 ln 2 + 2) · 2⁴ ≈ 4,7726 × 16 ≈ 76,36.'},
+ ]},
+ {n:'Limites de la forme 1^∞', r:'Limite d’une puissance variable : la forme 1^∞', qs:[
+   {q:'Calcule la limite de (1 + 2/<i>x</i>)<sup><i>x</i></sup> quand <i>x</i> → +∞. Arrondis au centième.', lab:'limite =', ans:7.39, tol:.006, why:'(1 + 2/<i>x</i>)<sup><i>x</i></sup> = e<sup><i>x</i> ln(1 + 2/<i>x</i>)</sup> et ln(1 + 2/<i>x</i>) ~ 2/<i>x</i>, donc l’exposant tend vers 2 : la limite vaut e² ≈ 7,39.'},
+   {q:'Calcule la limite de (1 − 1/(2<i>x</i>))<sup><i>x</i></sup> quand <i>x</i> → +∞. Arrondis au centième.', lab:'limite =', ans:.61, tol:.006, why:'ln(1 − 1/(2<i>x</i>)) ~ −1/(2<i>x</i>), donc l’exposant <i>x</i> ln(1 − 1/(2<i>x</i>)) tend vers −1/2. La limite vaut e<sup>−1/2</sup> ≈ 0,61.'},
+   {q:'Calcule la limite de (1 + 1/(3<i>x</i>))<sup><i>x</i></sup> quand <i>x</i> → +∞. Arrondis au centième.', lab:'limite =', ans:1.40, tol:.006, why:'L’exposant vaut <i>x</i> ln(1 + 1/(3<i>x</i>)) ~ <i>x</i> · 1/(3<i>x</i>) = 1/3. La limite vaut e<sup>1/3</sup> ≈ 1,40.'},
+   {q:'Que vaut la limite de (1 + 1/<i>x</i>)<sup><i>x</i>²</sup> quand <i>x</i> → +∞&nbsp;?', opts:['1','e','+∞','e²'], ans:2, why:'L’exposant vaut <i>x</i>² ln(1 + 1/<i>x</i>) ~ <i>x</i>² · 1/<i>x</i> = <i>x</i> → +∞. Comme e<sup><i>y</i></sup> → +∞ quand <i>y</i> → +∞, la limite est +∞.'},
+   {q:'On place 1000 CHF à 6 % par an, en <i>n</i> versements d’intérêts par an : le capital après un an vaut 1000(1 + 0,06/<i>n</i>)<sup><i>n</i></sup>. Vers quelle valeur tend-il quand <i>n</i> → +∞&nbsp;? Arrondis au centime.', lab:'capital =', unit:'CHF', ans:1061.84, tol:.006, why:'(1 + 0,06/<i>n</i>)<sup><i>n</i></sup> = e<sup><i>n</i> ln(1 + 0,06/<i>n</i>)</sup> et l’exposant tend vers 0,06. Le capital tend vers 1000 e<sup>0,06</sup> ≈ 1061,84 CHF.'},
+ ]},
+];
+})();

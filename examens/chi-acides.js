@@ -1,0 +1,46 @@
+/* Déclic — examen de compétence : Acides et bases */
+(()=>{
+EXAMS['chi-acides']=[
+ {n:'Couples, acides forts et bases fortes', r:'pH d’un acide fort ou d’une base forte', qs:[
+   {q:'Quelle est la base conjuguée de l’ion dihydrogénophosphate H₂PO₄⁻&nbsp;?', opts:['H₃PO₄','HPO₄²⁻','PO₄³⁻','H₂PO₄²⁻'], ans:1, why:'Une base conjuguée a un proton H⁺ de moins : H₂PO₄⁻ → HPO₄²⁻ + H⁺. Le couple est H₂PO₄⁻/HPO₄²⁻.'},
+   {q:'Quel est le pH d’une solution d’acide nitrique HNO₃ (acide fort) à 0,0030 mol/L&nbsp;? Au centième.', lab:'pH =', ans:2.52, tol:0.005, why:'[H₃O⁺] = c = 3,0·10⁻³ mol/L, donc pH = −log(3,0·10⁻³) ≈ 2,52.'},
+   {q:'Quel est le pH d’une solution de soude NaOH à 0,040 mol/L&nbsp;? Au centième.', lab:'pH =', ans:12.6, tol:0.005, why:'[OH⁻] = 0,040 mol/L, donc pH = 14 + log 0,040 = 14 − 1,40 = 12,60.'},
+   {q:'Une solution a un pH de 3,7. Quelle est sa concentration en H₃O⁺&nbsp;? En 10⁻⁴ mol/L, au dixième.', unit:'·10⁻⁴ mol/L', ans:2, tol:0.05, why:'[H₃O⁺] = 10<sup>−3,7</sup> ≈ 2,0·10⁻⁴ mol/L.'},
+   {q:'Quel est le pH d’une solution d’hydroxyde de baryum Ba(OH)₂, base forte totalement dissociée, à 0,0050 mol/L&nbsp;?', lab:'pH =', ans:12, tol:0.005, why:'Chaque Ba(OH)₂ libère 2 OH⁻ : [OH⁻] = 2 × 0,0050 = 0,010 mol/L, donc pH = 14 + log 0,010 = 12,0.'},
+   {q:'On dilue 100 fois une solution d’acide chlorhydrique de pH 2,0. Quel est le nouveau pH&nbsp;?', lab:'pH =', ans:4, tol:0.005, why:'[H₃O⁺] passe de 10⁻² à 10⁻⁴ mol/L : pH = 4,0. Chaque dilution par 10 d’un acide fort augmente le pH de 1.'},
+ ]},
+ {n:'pH d’un acide faible', r:'pH d’un acide faible', qs:[
+   {q:'Calcule le pH d’une solution d’acide méthanoïque HCOOH à 0,20 mol/L (pK<sub>a</sub> = 3,75). Au centième.', lab:'pH =', ans:2.22, tol:0.005, why:'pH ≈ ½(pK<sub>a</sub> − log c) = ½(3,75 + 0,70) ≈ 2,22. Vérification : x ≈ 6,0·10⁻³ mol/L, soit 3 % de c &lt; 5 %.'},
+   {q:'Calcule le pH d’une solution d’acide benzoïque à 0,040 mol/L (pK<sub>a</sub> = 4,20). Au centième.', lab:'pH =', ans:2.8, tol:0.005, why:'pH ≈ ½(4,20 − log 0,040) = ½(4,20 + 1,40) = 2,80. x = 10<sup>−2,80</sup> ≈ 1,6·10⁻³ mol/L, 4 % de c : l’approximation tient.'},
+   {q:'Calcule le pH d’une solution d’acide fluorhydrique HF à 0,10 mol/L (pK<sub>a</sub> = 3,17) en vérifiant l’approximation. Au centième.', lab:'pH =', ans:2.1, tol:0.005, why:'K<sub>a</sub> = 10<sup>−3,17</sup> ≈ 6,76·10⁻⁴. L’approximation donne x ≈ 8,2·10⁻³, soit 8 % &gt; 5 % : refusée. On résout x² + K<sub>a</sub>x − K<sub>a</sub>c = 0 : x ≈ 7,89·10⁻³ mol/L, pH ≈ 2,10.'},
+   {q:'Une solution d’un acide faible à 0,10 mol/L a un pH de 3,00. Que vaut le pK<sub>a</sub> de cet acide, au dixième&nbsp;?', lab:'pK<sub>a</sub> =', ans:5, tol:0.05, why:'x = [H₃O⁺] = [A⁻] = 1,0·10⁻³ mol/L. K<sub>a</sub> = x²/(c − x) ≈ 10⁻⁶ / 0,10 = 10⁻⁵, donc pK<sub>a</sub> ≈ 5,0.'},
+   {q:'On dilue 100 fois une solution d’acide faible peu dissocié. De combien son pH augmente-t-il&nbsp;?', lab:'ΔpH =', ans:1, tol:0.005, why:'pH ≈ ½(pK<sub>a</sub> − log c) : log c diminue de 2, donc le pH augmente de ½ × 2 = 1, et non de 2 comme pour un acide fort.'},
+ ]},
+ {n:'pH d’une base faible', r:'pH d’une base faible', qs:[
+   {q:'Que vaut la constante K<sub>b</sub> de l’ion acétate CH₃COO⁻ (pK<sub>a</sub> du couple = 4,76)&nbsp;? En 10⁻¹⁰, au centième.', unit:'·10⁻¹⁰', ans:5.75, tol:0.01, why:'pK<sub>b</sub> = 14 − 4,76 = 9,24, donc K<sub>b</sub> = 10<sup>−9,24</sup> ≈ 5,75·10⁻¹⁰.'},
+   {q:'Calcule le pH d’une solution d’ammoniac à 0,050 mol/L (pK<sub>a</sub>(NH₄⁺/NH₃) = 9,25). Au centième.', lab:'pH =', ans:10.97, tol:0.005, why:'pH ≈ 7 + ½(pK<sub>a</sub> + log c) = 7 + ½(9,25 − 1,30) ≈ 10,97. [OH⁻] ≈ 9,3·10⁻⁴ mol/L, 1,9 % de c ✓.'},
+   {q:'Calcule le pH d’une solution de carbonate de sodium à 0,10 mol/L (pK<sub>a</sub>(HCO₃⁻/CO₃²⁻) = 10,33). Au centième.', lab:'pH =', ans:11.67, tol:0.005, why:'CO₃²⁻ est une base faible : pH ≈ 7 + ½(10,33 + log 0,10) = 7 + ½ × 9,33 ≈ 11,67. [OH⁻] ≈ 4,6·10⁻³ mol/L, 4,6 % &lt; 5 % ✓.'},
+   {q:'Calcule le pH d’une solution de benzoate de sodium à 0,10 mol/L (pK<sub>a</sub> de l’acide benzoïque = 4,20). Au centième.', lab:'pH =', ans:8.6, tol:0.005, why:'Le benzoate est la base conjuguée d’un acide faible : pH ≈ 7 + ½(4,20 − 1) = 8,60.'},
+ ]},
+ {n:'Exploiter l’équivalence d’un titrage', r:'Exploiter l’équivalence d’un titrage', qs:[
+   {q:'On titre 10,0 mL d’un acide par de la soude à 0,100 mol/L (réaction 1 : 1). L’équivalence est atteinte à 12,4 mL. Quelle est la concentration de l’acide&nbsp;? Au millième.', unit:'mol/L', ans:0.124, tol:0.0005, why:'n(OH⁻) = 0,100 × 0,0124 = 1,24·10⁻³ mol = n(acide), donc c = 1,24·10⁻³ / 0,0100 = 0,124 mol/L.'},
+   {q:'On titre 20,0 mL d’acide sulfurique par de la soude à 0,100 mol/L : H₂SO₄ + 2 OH⁻ → SO₄²⁻ + 2 H₂O. L’équivalence est atteinte à 15,0 mL. Quelle est la concentration de l’acide sulfurique&nbsp;? Au dix-millième.', unit:'mol/L', ans:0.0375, tol:0.00005, why:'n(OH⁻) = 0,100 × 0,0150 = 1,50·10⁻³ mol. Il faut 2 OH⁻ par H₂SO₄ : n(acide) = 7,5·10⁻⁴ mol, c = 7,5·10⁻⁴ / 0,0200 = 0,0375 mol/L.'},
+   {q:'Un produit ménager à l’ammoniac est dilué 20 fois. On titre 10,0 mL de la solution diluée par HCl à 0,050 mol/L (réaction 1 : 1) : l’équivalence est à 8,0 mL. Quelle est la concentration du produit d’origine&nbsp;?', unit:'mol/L', ans:0.8, tol:0.005, why:'Solution diluée : c = 0,050 × 8,0 / 10,0 = 0,040 mol/L. On multiplie par le facteur de dilution : 0,040 × 20 = 0,80 mol/L.'},
+   {q:'Lors du titrage d’un acide faible par la soude, l’équivalence est à 18,0 mL et on lit pH = 4,20 après 9,0 mL versés. Que vaut le pK<sub>a</sub> du couple&nbsp;?', lab:'pK<sub>a</sub> =', ans:4.2, tol:0.005, why:'9,0 mL = V<sub>éq</sub>/2 : c’est la demi-équivalence, où [HA] = [A⁻] et pH = pK<sub>a</sub> = 4,20.'},
+ ]},
+ {n:'pH à l’équivalence et indicateur', r:'pH à l’équivalence et choix de l’indicateur', qs:[
+   {q:'On titre 20,0 mL d’acide méthanoïque à 0,10 mol/L (pK<sub>a</sub> = 3,75) par de la soude à 0,10 mol/L. Quel est le pH à l’équivalence&nbsp;? Au centième.', lab:'pH =', ans:8.22, tol:0.005, why:'À l’équivalence (20,0 mL), il reste 2,0·10⁻³ mol de HCOO⁻ dans 40,0 mL : c = 0,050 mol/L. pH ≈ 7 + ½(3,75 + log 0,050) = 7 + ½(3,75 − 1,30) ≈ 8,22.'},
+   {q:'On titre 10,0 mL de méthylamine CH₃NH₂ à 0,20 mol/L (pK<sub>a</sub>(CH₃NH₃⁺/CH₃NH₂) = 10,64) par HCl à 0,20 mol/L. Quel est le pH à l’équivalence&nbsp;? Au centième.', lab:'pH =', ans:5.82, tol:0.005, why:'À l’équivalence (10,0 mL), il reste 2,0·10⁻³ mol de CH₃NH₃⁺ dans 20,0 mL : 0,10 mol/L. Acide faible : pH ≈ ½(10,64 − log 0,10) = ½ × 11,64 = 5,82.'},
+   {q:'Quel est le pH à l’équivalence du titrage d’acide nitrique par de la potasse KOH&nbsp;?', opts:['Inférieur à 7','Égal à 7','Supérieur à 7','Il dépend du pK<sub>a</sub> de HNO₃'], ans:1, why:'Acide fort et base forte : à l’équivalence il ne reste que de l’eau et des ions spectateurs (K⁺, NO₃⁻), pH = 7.'},
+   {q:'Pour titrer de l’ammoniac par HCl (pH à l’équivalence ≈ 5,3), quel indicateur choisir&nbsp;?', opts:['Phénolphtaléine (virage 8,2 à 10)','Bleu de bromothymol (virage 6,0 à 7,6)','Rouge de méthyle (virage 4,2 à 6,2)'], ans:2, why:'Base faible + acide fort : il reste NH₄⁺, un acide faible, donc pH &lt; 7. Seule la zone du rouge de méthyle contient 5,3.'},
+   {q:'Pourquoi le pH à l’équivalence du titrage de l’acide acétique par la soude est-il supérieur à 7&nbsp;?', opts:['Parce qu’on a versé trop de soude','Parce qu’il reste l’ion acétate, base faible','Parce que l’acide acétique est un acide fort','Parce que l’eau formée est basique'], ans:1, why:'À l’équivalence, tout l’acide est devenu CH₃COO⁻ sans excès de soude. Cette base faible capte un peu de H⁺ à l’eau et donne pH &gt; 7.'},
+ ]},
+ {n:'Solutions tampons', r:'pH d’un tampon, avant et après un ajout', qs:[
+   {q:'Quel est le pH d’un mélange de 0,20 mol de NH₄⁺ et 0,050 mol de NH₃ (pK<sub>a</sub> = 9,25)&nbsp;? Au centième.', lab:'pH =', ans:8.65, tol:0.005, why:'pH = pK<sub>a</sub> + log(n(A⁻)/n(HA)) = 9,25 + log(0,050/0,20) = 9,25 − 0,60 = 8,65.'},
+   {q:'On veut un tampon acide acétique / acétate (pK<sub>a</sub> = 4,76) à pH 4,46. Quel rapport [CH₃COO⁻]/[CH₃COOH] faut-il&nbsp;? Au centième.', lab:'rapport =', ans:0.5, tol:0.005, why:'[A⁻]/[HA] = 10<sup>pH − pKa</sup> = 10<sup>−0,30</sup> ≈ 0,50 : deux fois plus d’acide que de base.'},
+   {q:'Un tampon contient 0,10 mol d’acide acétique et 0,10 mol d’acétate (pK<sub>a</sub> = 4,76). On ajoute 0,015 mol de NaOH. Quel est le nouveau pH&nbsp;? Au centième.', lab:'pH =', ans:4.89, tol:0.005, why:'OH⁻ + CH₃COOH → CH₃COO⁻ + H₂O : n(HA) = 0,085 et n(A⁻) = 0,115 mol. pH = 4,76 + log(0,115/0,085) ≈ 4,76 + 0,13 = 4,89.'},
+   {q:'Un tampon contient 0,15 mol de NH₄⁺ et 0,15 mol de NH₃ (pK<sub>a</sub> = 9,25). On ajoute 0,020 mol de HCl. Quel est le nouveau pH&nbsp;? Au centième.', lab:'pH =', ans:9.13, tol:0.005, why:'H₃O⁺ + NH₃ → NH₄⁺ + H₂O : n(NH₃) = 0,13 et n(NH₄⁺) = 0,17 mol. pH = 9,25 + log(0,13/0,17) ≈ 9,25 − 0,12 = 9,13.'},
+   {q:'On mélange 0,20 mol d’acide acétique et 0,050 mol de NaOH dans 1 L d’eau (pK<sub>a</sub> = 4,76). Quel est le pH&nbsp;? Au centième.', lab:'pH =', ans:4.28, tol:0.005, why:'La soude transforme 0,050 mol de HA en A⁻ : il reste 0,15 mol de HA et 0,050 mol de A⁻, un tampon. pH = 4,76 + log(0,050/0,15) ≈ 4,76 − 0,48 = 4,28.'},
+ ]},
+];
+})();

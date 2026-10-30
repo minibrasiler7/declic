@@ -32,6 +32,8 @@ const MATIERES=[
   {id:'chi',h:'Chimie',c:'var(--ok)',sems:{pri:{h:'Chimie générale',s:'De l’atome à la cinétique'}}},
 ];
 const COURS=[];
+/* Examens de compétence : un fichier examens/<id du chapitre>.js par chapitre, chargé à la demande (format : docs/EXAMENS.md) */
+const EXAMS={};
 
 /* Repère 3D : z vers le haut, x vers l'avant-gauche, y vers la droite.
    space({r:5, az:30, el:20, axes:true}) → méthodes seg/arrow/poly/dot/text prenant des points [x,y,z], puis .svg() */

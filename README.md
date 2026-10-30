@@ -10,6 +10,9 @@ Site : https://minibrasiler7.github.io/declic/
 - **Notions fondamentales** (`cours/gred-*.js`) : 25 chapitres de mathématique « structurelle » sur le plan du tome 1 de *Notions fondamentales de la mathématique élémentaire* (Louis Gred) : logique, ensembles, relations, applications, groupes, anneaux et corps.
 - **Mathématiques par niveau** (`cours/maths.js`) : 26 cours, de l'école obligatoire à l'université.
 - **Découvertes** : leçons courtes de code et de musique (dans `app.js`).
+- **Examens de compétence** (`examens/<id>.js`) : à la fin de chaque chapitre, une trentaine d’exercices techniques, une seule tentative par question, puis un score et un bilan par notion (bien compris, à entraîner, avec un lien vers l’étape à revoir). Format : `docs/EXAMENS.md`.
+
+Dans une leçon, on revient sur une étape déjà vue en touchant la barre de progression ou le bouton ‹ en bas. La leçon reprend ensuite là où on s’était arrêté le plus loin.
 
 ## L'ardoise
 
@@ -49,8 +52,10 @@ Les comptes (e-mail et mot de passe) synchronisent la progression, les séries e
 | `compte.js` | Comptes et synchronisation |
 | `lib.js` | Outils partagés : repères 2D (`plane`) et 3D (`space`), code Python coloré (`py`), fractions, matrices, liste des matières |
 | `cours/*.js` | Le contenu, décrit comme des données |
+| `examens/*.js` | Les examens de compétence, un fichier par chapitre, chargé à la demande |
 | `tools/harness.js` | Vérificateur du contenu |
 | `docs/BRIEF.md` | Consignes pour rédiger chapitres et problèmes |
+| `docs/EXAMENS.md` | Consignes pour rédiger un examen de compétence |
 
 Site statique, sans étape de build :
 
@@ -68,4 +73,6 @@ python3 -m http.server 8000
 node tools/harness.js
 ```
 
-Le vérificateur teste toutes les positions des curseurs, exige les problèmes de fin de chapitre et contrôle le HTML. Il ne vérifie pas l'exactitude des maths.
+4. Écrire l’examen du chapitre dans `examens/<id>.js` (lire `docs/EXAMENS.md`).
+
+Le vérificateur teste toutes les positions des curseurs, exige les problèmes de fin de chapitre et l’examen, et contrôle le HTML. Il ne vérifie pas l'exactitude des maths.

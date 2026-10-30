@@ -99,6 +99,35 @@ footer{padding-block:30px 50px;color:var(--muted);font-size:14px}
 .segs span{flex:1;height:8px;border-radius:99px;background:var(--line);transition:background .3s}
 .segs span.done{background:var(--accent)}
 .segs span.cur{background:color-mix(in srgb,var(--accent) 45%,var(--line))}
+.segs span.miss{background:var(--bad)}
+/* Étapes déjà vues : on touche la barre pour y revenir (zone de toucher plus haute que le trait) */
+.segs button{flex:1;height:24px;margin-block:-8px;padding:8px 0;border:0;border-radius:99px;background:var(--accent);background-clip:content-box;cursor:pointer;transition:transform .15s}
+.segs button:hover,.segs button:focus-visible{transform:scaleY(1.5)}
+.segs button.prob{outline:none}
+.x[hidden]{display:none}
+/* Examen de compétence */
+.exam-cta{display:grid;gap:10px;justify-items:center;max-width:440px;padding:16px 18px;border:2px solid var(--accent);border-radius:16px;background:color-mix(in srgb,var(--accent) 7%,var(--surface))}
+.exam-cta b{display:block;font:800 18px var(--f-display)}
+.exam-cta span{color:var(--muted)}
+.exam-q{font-size:18px}
+.exam-end{display:grid;gap:14px;justify-items:center;text-align:center;padding-block:16px}
+.exam-end h2{margin:0}
+.exam-end .lead{margin:0;color:var(--muted)}
+.score-ring{--p:0;width:150px;height:150px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--accent) calc(var(--p)*1%),var(--line) 0)}
+.score-ring>div{width:118px;height:118px;border-radius:50%;background:var(--bg);display:grid;place-content:center}
+.score-ring b{font:800 46px/1 var(--f-display)}
+.score-ring span{color:var(--muted);font-size:14px}
+.exam-end .mot{max-width:520px;text-align:left;padding:14px 16px;border-radius:14px;background:var(--surface);border:1px solid var(--line)}
+.exam-end h3{margin:8px 0 0;justify-self:stretch;text-align:left;font-size:15px}
+.exam-end h3.ok{color:var(--ok)} .exam-end h3.bad{color:var(--bad)}
+.notions{list-style:none;margin:0;padding:0;justify-self:stretch;display:grid;gap:10px;text-align:left}
+.notions li{padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:grid;gap:6px}
+.notions .row{display:flex;justify-content:space-between;gap:10px}
+.notions .bar{height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.notions .bar span{display:block;height:100%;background:var(--ok)}
+.notions.bad .bar span{background:var(--bad)}
+.notions .linkish{justify-self:start}
+.exam-btns{justify-content:center}
 .p-body{flex:1;overflow-y:auto}
 .card{position:relative;max-width:680px;margin:0 auto;padding-block:10px 40px;display:grid;gap:18px;animation:in .35s ease-out}
 @keyframes in{from{transform:translateY(8px);opacity:.4}to{transform:none;opacity:1}}
@@ -297,6 +326,7 @@ body.annot-on .card{outline:2px dashed color-mix(in srgb,var(--accent) 45%,trans
   </div>
   <div class="p-body"><div class="wrap"><div class="card" id="card"></div></div></div>
   <div class="p-foot" id="foot"><div class="wrap">
+    <button class="x prev" id="prev" type="button" aria-label="Revenir à l’étape précédente" title="Étape précédente" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
     <div class="fb" id="fb"></div>
     <button class="btn" id="action">Continuer</button>
   </div></div>

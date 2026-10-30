@@ -1,0 +1,49 @@
+/* Déclic — examen de compétence : Cinétique chimique */
+(()=>{
+EXAMS['chi-cinetique']=[
+ {n:'Vitesses des différentes espèces', r:'Relier les vitesses des différentes espèces', qs:[
+   {q:'Pour 2 NO + O₂ → 2 NO₂, NO disparaît à 0,060 mol/(L·s). Que vaut la vitesse de réaction <i>v</i>&nbsp;?', unit:'mol/(L·s)', ans:0.03, tol:0.0005, why:'<i>v</i> = −(1/2)·d[NO]/d<i>t</i> = 0,060/2 = 0,030 mol/(L·s).'},
+   {q:'Pour 4 NH₃ + 5 O₂ → 4 NO + 6 H₂O, O₂ disparaît à 0,25 mol/(L·s). À quelle vitesse H₂O se forme-t-elle&nbsp;?', unit:'mol/(L·s)', ans:0.3, tol:0.001, why:'<i>v</i> = 0,25/5 = 0,050 mol/(L·s), puis d[H₂O]/d<i>t</i> = 6 × 0,050 = 0,30 mol/(L·s).'},
+   {q:'Pour 2 H₂O₂ → 2 H₂O + O₂, O₂ se forme à 2,0·10⁻⁴ mol/(L·s). À quelle vitesse H₂O₂ disparaît-elle&nbsp;? En 10⁻⁴ mol/(L·s).', unit:'·10⁻⁴ mol/(L·s)', ans:4, tol:0.01, why:'<i>v</i> = d[O₂]/d<i>t</i> = 2,0·10⁻⁴ mol/(L·s), et −d[H₂O₂]/d<i>t</i> = 2 × <i>v</i> = 4,0·10⁻⁴ mol/(L·s).'},
+   {q:'Pour 3 A → 2 B, quelle expression donne la vitesse de réaction&nbsp;?', opts:['<i>v</i> = −3·d[A]/d<i>t</i>','<i>v</i> = −(1/3)·d[A]/d<i>t</i> = (1/2)·d[B]/d<i>t</i>','<i>v</i> = d[A]/d<i>t</i> + d[B]/d<i>t</i>','<i>v</i> = (1/3)·d[A]/d<i>t</i> = −(1/2)·d[B]/d<i>t</i>'], ans:1, why:'On divise chaque variation par son coefficient, avec un signe − pour le réactif (sa concentration diminue) : <i>v</i> = −(1/3)·d[A]/d<i>t</i> = (1/2)·d[B]/d<i>t</i>.'},
+ ]},
+ {n:'Loi intégrée d’ordre 1', r:'Utiliser la loi intégrée d’ordre 1', qs:[
+   {q:'Une réaction d’ordre 1 a <i>k</i> = 0,0040 s⁻¹ et [A]₀ = 0,50 mol/L. Que vaut [A] après 300 s&nbsp;? Au millième.', unit:'mol/L', ans:0.151, tol:0.001, why:'<i>kt</i> = 0,0040 × 300 = 1,2, donc [A] = 0,50 × e<sup>−1,2</sup> ≈ 0,50 × 0,301 ≈ 0,151 mol/L.'},
+   {q:'Une réaction d’ordre 1 a une demi-vie de 12 min. Que vaut <i>k</i>, au millième de min⁻¹&nbsp;?', unit:'min⁻¹', ans:0.058, tol:0.0005, why:'<i>k</i> = ln 2 / t½ = 0,693 / 12 ≈ 0,058 min⁻¹.'},
+   {q:'Une réaction d’ordre 1 a <i>k</i> = 0,020 s⁻¹. En combien de temps [A] passe-t-elle de 0,90 à 0,30 mol/L&nbsp;? Au dixième de seconde.', unit:'s', ans:54.9, tol:0.05, why:'<i>t</i> = ln([A]₀/[A]) / <i>k</i> = ln 3 / 0,020 ≈ 1,0986 / 0,020 ≈ 54,9 s.'},
+   {q:'L’iode 131, utilisé en médecine, a une demi-vie de 8 jours. Quelle masse reste-t-il de 80 mg au bout de 24 jours&nbsp;?', unit:'mg', ans:10, tol:0.05, why:'24 jours = 3 demi-vies : 80 → 40 → 20 → 10 mg, soit (1/2)³ = 1/8 de la masse initiale.'},
+   {q:'Une réaction d’ordre 1 a une demi-vie de 20 min. Combien de temps faut-il pour que 90 % du réactif soit consommé&nbsp;? Au dixième de minute.', unit:'min', ans:66.4, tol:0.1, why:'Il reste 10 % : [A]₀/[A] = 10. <i>k</i> = 0,693/20 ≈ 0,03466 min⁻¹, donc <i>t</i> = ln 10 / <i>k</i> ≈ 2,303 / 0,03466 ≈ 66,4 min.'},
+ ]},
+ {n:'Lois d’ordre 0 et d’ordre 2', r:'Utiliser les lois d’ordre 0 et d’ordre 2', qs:[
+   {q:'Une réaction d’ordre 0 a <i>k</i> = 2,0·10⁻³ mol/(L·s) et [A]₀ = 0,30 mol/L. Que vaut [A] après 100 s&nbsp;?', unit:'mol/L', ans:0.1, tol:0.001, why:'[A] = [A]₀ − <i>kt</i> = 0,30 − 2,0·10⁻³ × 100 = 0,30 − 0,20 = 0,10 mol/L.'},
+   {q:'Une réaction d’ordre 0 a <i>k</i> = 2,0·10⁻³ mol/(L·s) et [A]₀ = 0,30 mol/L. Au bout de combien de temps le réactif est-il entièrement consommé&nbsp;?', unit:'s', ans:150, tol:0.5, why:'[A] = 0 quand <i>t</i> = [A]₀/<i>k</i> = 0,30 / 2,0·10⁻³ = 150 s : à l’ordre 0, la concentration baisse à vitesse constante jusqu’à zéro.'},
+   {q:'Une réaction d’ordre 2 a <i>k</i> = 0,25 L/(mol·s) et [A]₀ = 0,80 mol/L. Que vaut [A] après 20 s&nbsp;?', unit:'mol/L', ans:0.16, tol:0.001, why:'1/[A] = 1/0,80 + 0,25 × 20 = 1,25 + 5,0 = 6,25 L/mol, donc [A] = 1/6,25 = 0,16 mol/L.'},
+   {q:'Une réaction d’ordre 2 a <i>k</i> = 0,040 L/(mol·s) et [A]₀ = 0,50 mol/L. Quelle est sa demi-vie&nbsp;?', unit:'s', ans:50, tol:0.5, why:'t½ = 1/(<i>k</i>[A]₀) = 1/(0,040 × 0,50) = 1/0,020 = 50 s.'},
+   {q:'Une réaction d’ordre 2 a <i>k</i> = 0,50 L/(mol·s) et [A]₀ = 0,20 mol/L, donc t½ = 10 s. Que vaut [A] après 20 s&nbsp;?', opts:['0,050 mol/L','0,067 mol/L','0,10 mol/L','0,033 mol/L'], ans:1, why:'1/[A] = 1/0,20 + 0,50 × 20 = 5 + 10 = 15 L/mol, donc [A] ≈ 0,067 mol/L. Le piège 0,050 (deux demi-vies) ne vaut qu’à l’ordre 1 : à l’ordre 2, la deuxième demi-vie dure 20 s.'},
+ ]},
+ {n:'Trouver l’ordre par linéarisation', r:'Déterminer l’ordre par linéarisation', qs:[
+   {q:'On mesure [A] = 0,80 ; 0,60 ; 0,40 ; 0,20 mol/L à <i>t</i> = 0, 50, 100, 150 s. Quel est l’ordre de la réaction&nbsp;?', opts:['Ordre 0','Ordre 1','Ordre 2'], ans:0, why:'[A] baisse de 0,20 mol/L à chaque intervalle de 50 s : [A] est une droite en fonction de <i>t</i>, c’est l’ordre 0 (<i>k</i> = 0,20/50 = 0,0040 mol/(L·s)).'},
+   {q:'On mesure [A] = 0,40 ; 0,20 ; 0,133 ; 0,100 mol/L à <i>t</i> = 0, 25, 50, 75 s. Trouve l’ordre par linéarisation, puis donne <i>k</i> dans l’unité de cet ordre, au centième.', lab:'<i>k</i> =', ans:0.1, tol:0.005, why:'1/[A] = 2,5 ; 5,0 ; 7,5 ; 10 L/mol augmente de 2,5 toutes les 25 s : ordre 2, <i>k</i> = 2,5/25 = 0,10 L/(mol·s).'},
+   {q:'On mesure [A] = 0,60 ; 0,30 ; 0,15 mol/L à <i>t</i> = 0, 15, 30 min. Trouve l’ordre, puis donne <i>k</i> dans l’unité de cet ordre, au millième.', lab:'<i>k</i> =', ans:0.046, tol:0.0005, why:'[A] est divisée par 2 toutes les 15 min : ln[A] baisse de 0,693 à chaque intervalle, ordre 1. <i>k</i> = 0,693/15 ≈ 0,046 min⁻¹.'},
+   {q:'Pour une réaction d’ordre 1, quel graphique donne une droite, et quelle est sa pente&nbsp;?', opts:['[A] en fonction de <i>t</i>, pente −<i>k</i>','ln[A] en fonction de <i>t</i>, pente −<i>k</i>','1/[A] en fonction de <i>t</i>, pente +<i>k</i>','ln[A] en fonction de <i>t</i>, pente +<i>k</i>'], ans:1, why:'[A] = [A]₀e<sup>−<i>kt</i></sup> donne ln[A] = ln[A]₀ − <i>kt</i> : une droite de pente −<i>k</i>.'},
+ ]},
+ {n:'Ordre par les vitesses initiales', r:'L’ordre par les vitesses initiales', qs:[
+   {q:'Quand on triple [A]₀, la vitesse initiale est multipliée par 9. Quel est l’ordre de la réaction par rapport à A&nbsp;?', lab:'ordre =', ans:2, why:'3<sup><i>n</i></sup> = 9, donc <i>n</i> = 2.'},
+   {q:'Quand on double [A]₀, la vitesse initiale ne change pas. Quel est l’ordre par rapport à A&nbsp;?', lab:'ordre =', ans:0, why:'2<sup><i>n</i></sup> = 1, donc <i>n</i> = 0 : la vitesse ne dépend pas de [A].'},
+   {q:'Avec [A]₀ = 0,020 mol/L, <i>v</i>₀ = 3,0·10⁻⁵ mol/(L·s) ; avec [A]₀ = 0,050 mol/L, <i>v</i>₀ = 7,5·10⁻⁵ mol/(L·s). Trouve l’ordre, puis <i>k</i> en 10⁻³ dans l’unité de cet ordre, au dixième.', unit:'·10⁻³', ans:1.5, tol:0.05, why:'[A]₀ × 2,5 et <i>v</i>₀ × 2,5 : ordre 1. <i>k</i> = <i>v</i>₀/[A]₀ = 3,0·10⁻⁵ / 0,020 = 1,5·10⁻³ s⁻¹.'},
+   {q:'Une réaction est d’ordre 2 en A. Avec [A]₀ = 0,050 mol/L, <i>v</i>₀ = 7,5·10⁻⁵ mol/(L·s). Que vaut <i>k</i>, en L/(mol·s), au millième&nbsp;?', unit:'L/(mol·s)', ans:0.03, tol:0.0005, why:'<i>k</i> = <i>v</i>₀ / [A]₀² = 7,5·10⁻⁵ / 0,0025 = 0,030 L/(mol·s).'},
+ ]},
+ {n:'Arrhenius entre deux températures', r:'Arrhenius avec deux températures', qs:[
+   {q:'Une réaction a E<sub>a</sub> = 60 kJ/mol. Par combien <i>k</i> est-elle multipliée de 300 K à 310 K&nbsp;? Au centième (R = 8,314 J/(mol·K)).', lab:'<i>k</i>₂/<i>k</i>₁ =', ans:2.17, tol:0.01, why:'E<sub>a</sub>/R = 60 000 / 8,314 ≈ 7217 K et 1/300 − 1/310 ≈ 1,075·10⁻⁴ K⁻¹. ln(<i>k</i>₂/<i>k</i>₁) ≈ 0,776, donc <i>k</i>₂/<i>k</i>₁ ≈ 2,17.'},
+   {q:'Une réaction a E<sub>a</sub> = 100 kJ/mol. Par combien <i>k</i> est-elle multipliée de 298 K à 318 K&nbsp;? Au centième (R = 8,314 J/(mol·K)).', lab:'<i>k</i>₂/<i>k</i>₁ =', ans:12.66, tol:0.02, why:'E<sub>a</sub>/R ≈ 12 028 K et 1/298 − 1/318 ≈ 2,111·10⁻⁴ K⁻¹. ln(<i>k</i>₂/<i>k</i>₁) ≈ 2,539, donc <i>k</i>₂/<i>k</i>₁ ≈ 12,66.'},
+   {q:'Une réaction a <i>k</i> = 2,0·10⁻³ s⁻¹ à 300 K et E<sub>a</sub> = 40 kJ/mol. Que vaut <i>k</i> à 350 K&nbsp;? En 10⁻² s⁻¹, au centième (R = 8,314 J/(mol·K)).', unit:'·10⁻² s⁻¹', ans:1.98, tol:0.01, why:'ln(<i>k</i>₂/<i>k</i>₁) = (40 000/8,314)(1/300 − 1/350) ≈ 4811 × 4,762·10⁻⁴ ≈ 2,291, donc <i>k</i>₂/<i>k</i>₁ ≈ 9,89 et <i>k</i>₂ ≈ 1,98·10⁻² s⁻¹.'},
+   {q:'Quatre réactions ont des énergies d’activation différentes. Laquelle est la plus accélérée quand on chauffe de 20 °C à 40 °C&nbsp;?', opts:['E<sub>a</sub> = 25 kJ/mol','E<sub>a</sub> = 50 kJ/mol','E<sub>a</sub> = 80 kJ/mol','E<sub>a</sub> = 120 kJ/mol'], ans:3, why:'ln(<i>k</i>₂/<i>k</i>₁) = (E<sub>a</sub>/R)(1/T₁ − 1/T₂) est proportionnel à E<sub>a</sub> : la plus grande énergie d’activation donne la plus forte accélération.'},
+ ]},
+ {n:'Trouver l’énergie d’activation', r:'Trouver l’énergie d’activation', qs:[
+   {q:'La constante de vitesse est multipliée par 5 quand la température passe de 300 K à 320 K. Calcule E<sub>a</sub>, au dixième de kJ/mol (R = 8,314 J/(mol·K)).', unit:'kJ/mol', ans:64.2, tol:0.1, why:'E<sub>a</sub> = R ln 5 / (1/300 − 1/320) = 8,314 × 1,609 / 2,083·10⁻⁴ ≈ 64 200 J/mol = 64,2 kJ/mol.'},
+   {q:'Une réaction dure 40 min à 20 °C et 10 min à 35 °C. Calcule E<sub>a</sub>, au dixième de kJ/mol (R = 8,314 J/(mol·K)).', unit:'kJ/mol', ans:69.3, tol:0.1, why:'La durée varie comme 1/<i>k</i> : <i>k</i>₂/<i>k</i>₁ = 40/10 = 4. T₁ = 293 K, T₂ = 308 K. E<sub>a</sub> = 8,314 × ln 4 / (1/293 − 1/308) ≈ 11,53 / 1,662·10⁻⁴ ≈ 69 300 J/mol.'},
+   {q:'On mesure <i>k</i> = 1,2·10⁻³ s⁻¹ à 310 K et <i>k</i> = 3,6·10⁻³ s⁻¹ à 330 K. Calcule E<sub>a</sub>, au dixième de kJ/mol (R = 8,314 J/(mol·K)).', unit:'kJ/mol', ans:46.7, tol:0.1, why:'<i>k</i>₂/<i>k</i>₁ = 3. E<sub>a</sub> = 8,314 × ln 3 / (1/310 − 1/330) ≈ 9,134 / 1,955·10⁻⁴ ≈ 46 700 J/mol = 46,7 kJ/mol.'},
+   {q:'Le graphe de ln <i>k</i> en fonction de 1/T est une droite de pente −7500 K. Que vaut E<sub>a</sub>, au dixième de kJ/mol (R = 8,314 J/(mol·K))&nbsp;?', unit:'kJ/mol', ans:62.4, tol:0.1, why:'La pente vaut −E<sub>a</sub>/R, donc E<sub>a</sub> = 7500 × 8,314 ≈ 62 355 J/mol ≈ 62,4 kJ/mol.'},
+ ]},
+];
+})();

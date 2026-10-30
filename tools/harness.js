@@ -97,6 +97,36 @@ for(const ch of COURS){
 }
 for(const c of MATHS){ if(c.use) continue; if(ids.has(c.id)) errs.push(`[${c.id}] id en double`); ids.add(c.id); checkSteps(c.id,c.steps,{min:4,maths:true}); }
 
-console.log(`${COURS.length} chapitres${MATHS.length?` + ${MATHS.filter(c=>!c.use).length} cours de maths`:''}, ${steps} étapes, ${demos} méthodes, ${probs} problèmes`);
+// Examens de compétence : examens/<id>.js pour chaque chapitre vérifié
+const EX=vm.runInContext('EXAMS',ctx); let nex=0, nq=0;
+const chaps=[...COURS.map(c=>({id:c.id,steps:c.steps})),...MATHS.filter(c=>!c.use).map(c=>({id:c.id,steps:c.steps}))];
+for(const ch of chaps){
+  const f=`examens/${ch.id}.js`, W=`[examen ${ch.id}]`;
+  if(!fs.existsSync(path.join(ROOT,f))){ errs.push(`${W} fichier ${f} manquant`); continue; }
+  try{ run(f); }catch(e){ errs.push(`${W} exception ${e.message}`); continue; }
+  const ex=EX[ch.id]; if(!Array.isArray(ex)){ errs.push(`${W} EXAMS['${ch.id}'] doit être un tableau de notions`); continue; }
+  nex++; const heads=new Set(ch.steps.filter(s=>!s.parts).map(s=>s.h)), seen=new Set(); let n=0;
+  if(ex.length<4||ex.length>8) errs.push(`${W} 4 à 8 notions (il y en a ${ex.length})`);
+  ex.forEach((g,k)=>{ const w=`${W} notion ${k+1}`;
+    if(!g.n) errs.push(`${w}: n (nom de la notion) manquant`);
+    if(!heads.has(g.r)) errs.push(`${w}: r « ${g.r} » ne correspond au titre h d’aucune étape du chapitre (hors problèmes)`);
+    if(!Array.isArray(g.qs)||g.qs.length<3) errs.push(`${w}: au moins 3 questions (qs)`);
+    (g.qs||[]).forEach((q,j)=>{ const ww=`${w} question ${j+1}`; n++;
+      try{
+        if(!q.q) errs.push(`${ww}: q manquant`); else if(seen.has(q.q)) errs.push(`${ww}: question en double`); else seen.add(q.q);
+        if(q.hint||q.parts||q.params) errs.push(`${ww}: une question d’examen n’a ni indice, ni parts, ni curseurs`);
+        const h=checkAnswer(q,ww); if(h===null) errs.push(`${ww}: ans (ou opts + ans) requis`);
+        const html=(q.q||'')+(h||'')+(q.why||'')+(q.fig||'');
+        if(q.fig!==undefined&&typeof q.fig!=='string') errs.push(`${ww}: fig doit être une chaîne`);
+        if(bad(html)) errs.push(`${ww}: texte contient NaN/undefined`);
+        tagsBalanced(html,ww);
+      }catch(e){ errs.push(`${ww}: exception ${e.message}`); }
+    });
+  });
+  if(n<28||n>32) errs.push(`${W} 28 à 32 questions (il y en a ${n})`);
+  nq+=n;
+}
+
+console.log(`${COURS.length} chapitres${MATHS.length?` + ${MATHS.filter(c=>!c.use).length} cours de maths`:''}, ${steps} étapes, ${demos} méthodes, ${probs} problèmes, ${nex} examens (${nq} questions)`);
 warn.forEach(w=>console.log('  avertissement : '+w));
 if(errs.length){ console.log(`${errs.length} erreur(s) :`); errs.slice(0,80).forEach(e=>console.log('  ✗ '+e)); if(errs.length>80) console.log(`  … et ${errs.length-80} autres`); process.exit(1); } else console.log('OK');
