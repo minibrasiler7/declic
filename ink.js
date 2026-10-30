@@ -8,16 +8,20 @@ window.Ink = (()=>{
   const COLORS=[['ink','Encre','--ink'],['blue','Bleu','#2F6FE0'],['red','Rouge','#D93B3B'],['green','Vert','#1E9E55'],['orange','Orange','#E58A00'],['violet','Violet','#8250DF']];
   const SIZES=[[2,'Fin'],[3.5,'Moyen'],[6,'Épais']];
   const ls={ get(k,d){ try{ const v=localStorage.getItem(k); return v===null?d:JSON.parse(v); }catch(e){ return d; } }, set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} } };
-  const pref=Object.assign({tool:'p',c:'ink',w:3.5,finger:false},ls.get('declic-ink',{}));
+  const pref=Object.assign({tool:'p',c:'ink',w:3.5,finger:'off'},ls.get('declic-ink',{}));
+  // Le doigt quand on écrit au stylet : 'off' bloqué (défile seulement), 'scroll' défile (main ignorée près du stylet), 'draw' dessine
+  if(typeof pref.finger==='boolean') pref.finger=pref.finger?'draw':'off';
+  const fingerCls=()=>document.body.classList.toggle('ink-finger-off',penSeen&&pref.finger==='off');
   let penSeen=!!ls.get('declic-pen',false);
   const bars=new Set();
   const repaintBars=()=>bars.forEach(b=>{ if(b.el.isConnected) b.paint(); else bars.delete(b); });
-  const setPref=o=>{ Object.assign(pref,o); ls.set('declic-ink',pref); repaintBars(); };
+  const setPref=o=>{ Object.assign(pref,o); ls.set('declic-ink',pref); repaintBars(); fingerCls(); };
 
   document.head.append(Object.assign(document.createElement('style'),{textContent:`
   .ink-cv{position:relative;display:block;width:100%;height:100%;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
   .ink-cv canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-  body.annot-on #player .p-body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+  body.annot-on #player .p-body,body.ink-finger-off #player .p-body,body.ink-finger-off aside.ard .ard-ink{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+  .ink-bar .seg button{padding:0 8px}
   .ink-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
   .ink-bar .grp{display:flex;gap:3px;align-items:center;padding:3px;border:1px solid var(--line);border-radius:11px;background:var(--surface)}
   .ink-bar button{height:32px;min-width:32px;border:0;border-radius:8px;background:none;color:var(--ink);cursor:pointer;display:grid;place-items:center;padding:0 7px;font:700 13px var(--f-body)}
@@ -39,40 +43,57 @@ window.Ink = (()=>{
   // pression 0…1 d'un point (format 2 : 0…100 ; ancien format : 0…9)
   const prOf=(s,i)=>s.v?s.p[3*i+2]/100:s.p[3*i+2]/9;
   // épaisseur selon la pression : un appui léger au Pencil donne ~0,2, un appui fort ~0,8
-  const thick=pr=>.32+1.5*Math.pow(Math.max(0,pr),.62);
-  function points(s,k){
-    const P=s.p, n=P.length/3, pts=[];
-    for(let i=0;i<n;i++) pts.push([P[3*i]*k,P[3*i+1]*k,prOf(s,i)]);
-    for(let pass=0;pass<2;pass++) for(let i=1;i<n-1;i++){ const a=pts[i-1], b=pts[i], c=pts[i+1]; // lissage (le premier et le dernier point restent en place)
-      pts[i]=[(a[0]+2*b[0]+c[0])/4,(a[1]+2*b[1]+c[1])/4,b[2]]; }
-    let e=pts[0]?.[2]??.5; for(const q of pts){ e+=(q[2]-e)*.35; q[2]=e; } // pression lissée
-    return pts;
+  const thick=pr=>.42+1.45*Math.pow(Math.max(0,pr),.6);
+  // Points du trait en pixels : stabilisés (la main tremble, la pointe aussi), pression lissée,
+  // puis rééchantillonnés tous les ~1,2 px le long d'une spline de Catmull-Rom : le contour reste rond même en écrivant vite.
+  function points(s,k,dense=true){
+    const P=s.p, n=P.length/3, raw=[];
+    let x=P[0]*k, y=P[1]*k, e=prOf(s,0);
+    for(let i=0;i<n;i++){ const px=P[3*i]*k, py=P[3*i+1]*k, last=i===n-1;
+      const a=last?1:.62; x+=(px-x)*a; y+=(py-y)*a; e+=(prOf(s,i)-e)*.4; raw.push([x,y,e]); }
+    if(!dense||n<3) return raw;
+    const out=[raw[0]];
+    for(let i=0;i<n-1;i++){
+      const p0=raw[Math.max(0,i-1)], p1=raw[i], p2=raw[i+1], p3=raw[Math.min(n-1,i+2)];
+      const m=Math.min(24,Math.max(1,Math.ceil(Math.hypot(p2[0]-p1[0],p2[1]-p1[1])/1.2)));
+      for(let j=1;j<=m;j++){ const t=j/m, t2=t*t, t3=t2*t;
+        const c=(a,b,c2,d)=>.5*(2*b+(-a+c2)*t+(2*a-5*b+4*c2-d)*t2+(-a+3*b-3*c2+d)*t3);
+        out.push([c(p0[0],p1[0],p2[0],p3[0]),c(p0[1],p1[1],p2[1],p3[1]),p1[2]+(p2[2]-p1[2])*t]); }
+    }
+    return out;
   }
   const cache=new WeakMap();
   function shape(s,k){
     const c=cache.get(s); if(c&&c.k===k&&c.n===s.p.length) return c.path;
-    const pts=points(s,k), n=pts.length, base=s.w*k/2, path=new Path2D();
-    const r=pts.map((q,i)=>{ let t=1; const m=Math.min(i,n-1-i); if(n>6&&m<3) t=.55+.15*m; return Math.max(.35,base*thick(q[2])*t); });
-    if(n===1){ path.arc(pts[0][0],pts[0][1],r[0],0,7); }
+    const pts=points(s,k), n=pts.length, base=s.w*k/2, path=new Path2D(), caps=new Path2D(); // les disques à part : même sens de rotation, pas de trou
+    // longueur parcourue : le trait s'affine sur ses premiers et derniers pixels (moins au Pencil, dont la pression le fait déjà)
+    const len=[0]; for(let i=1;i<n;i++) len.push(len[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]));
+    const L0=len[n-1], tl=Math.min(10*k+4,L0*.18), lo=s.v&&s.pen0?.75:.5;
+    const r=pts.map((q,i)=>{ let t=1; if(tl>0){ const d=Math.min(len[i],L0-len[i]); if(d<tl) t=lo+(1-lo)*Math.sin(d/tl*Math.PI/2); }
+      return Math.max(.4,base*thick(q[2])*t); });
+    if(n===1||L0<1){ path.arc(pts[0][0],pts[0][1],Math.max(...r)*1.25,0,7); } // un point (celui d'un i) un peu plus rond
     else {
-      const L=[], R=[]; let nx=0, ny=-1;
+      const Lf=[], Rt=[]; let nx=0, ny=-1;
       for(let i=0;i<n;i++){
-        const a=pts[Math.max(0,i-1)], b=pts[Math.min(n-1,i+1)], dx=b[0]-a[0], dy=b[1]-a[1], d=Math.hypot(dx,dy);
+        const a=pts[Math.max(0,i-2)], b=pts[Math.min(n-1,i+2)], dx=b[0]-a[0], dy=b[1]-a[1], d=Math.hypot(dx,dy);
         if(d>.01){ nx=-dy/d; ny=dx/d; }
-        L.push([pts[i][0]+nx*r[i],pts[i][1]+ny*r[i]]); R.push([pts[i][0]-nx*r[i],pts[i][1]-ny*r[i]]);
+        Lf.push([pts[i][0]+nx*r[i],pts[i][1]+ny*r[i]]); Rt.push([pts[i][0]-nx*r[i],pts[i][1]-ny*r[i]]);
       }
       const side=(Q,fwd)=>{ const idx=fwd?[...Q.keys()]:[...Q.keys()].reverse(); // contour lisse : courbes passant par les milieux
         path.lineTo(Q[idx[0]][0],Q[idx[0]][1]);
         for(let j=1;j<idx.length-1;j++){ const p=Q[idx[j]], q=Q[idx[j+1]]; path.quadraticCurveTo(p[0],p[1],(p[0]+q[0])/2,(p[1]+q[1])/2); }
         const z=Q[idx[idx.length-1]]; path.lineTo(z[0],z[1]); };
-      path.moveTo(L[0][0],L[0][1]); side(L,true); side(R,false); path.closePath();
-      // bouts arrondis, et un disque aux virages serrés pour que le trait ne se pince pas
-      path.moveTo(pts[0][0]+r[0],pts[0][1]); path.arc(pts[0][0],pts[0][1],r[0],0,7);
-      path.moveTo(pts[n-1][0]+r[n-1],pts[n-1][1]); path.arc(pts[n-1][0],pts[n-1][1],r[n-1],0,7);
-      for(let i=1;i<n-1;i++){ const a=pts[i-1], b=pts[i], c=pts[i+1], u=[b[0]-a[0],b[1]-a[1]], v=[c[0]-b[0],c[1]-b[1]];
-        const cos=(u[0]*v[0]+u[1]*v[1])/((Math.hypot(...u)*Math.hypot(...v))||1); if(cos<.3){ path.moveTo(b[0]+r[i],b[1]); path.arc(b[0],b[1],r[i],0,7); } }
+      path.moveTo(Lf[0][0],Lf[0][1]); side(Lf,true); side(Rt,false); path.closePath();
+      // bouts arrondis, et un disque aux virages serrés (points d'origine) pour que le trait ne se pince pas
+      caps.moveTo(pts[0][0]+r[0],pts[0][1]); caps.arc(pts[0][0],pts[0][1],r[0],0,7);
+      caps.moveTo(pts[n-1][0]+r[n-1],pts[n-1][1]); caps.arc(pts[n-1][0],pts[n-1][1],r[n-1],0,7);
+      const raw=points(s,k,false);
+      for(let i=1;i<raw.length-1;i++){ const a=raw[i-1], b=raw[i], c2=raw[i+1], u=[b[0]-a[0],b[1]-a[1]], v=[c2[0]-b[0],c2[1]-b[1]];
+        const cos=(u[0]*v[0]+u[1]*v[1])/((Math.hypot(...u)*Math.hypot(...v))||1);
+        if(cos<.2){ const rr=Math.max(.4,base*thick(b[2])); caps.moveTo(b[0]+rr,b[1]); caps.arc(b[0],b[1],rr,0,7); } }
     }
-    cache.set(s,{k,n:s.p.length,path}); return path;
+    const out=[path,caps]; // remplis séparément : en un seul chemin, la règle nonzero creusait les bouts
+    cache.set(s,{k,n:s.p.length,path:out}); return out;
   }
   function paint(g,s,k){
     const n=s.p.length/3; if(!n) return;
@@ -82,7 +103,7 @@ window.Ink = (()=>{
       g.beginPath(); g.moveTo(pts[0][0],pts[0][1]);
       for(let i=1;i<n-1;i++) g.quadraticCurveTo(pts[i][0],pts[i][1],(pts[i][0]+pts[i+1][0])/2,(pts[i][1]+pts[i+1][1])/2);
       g.lineTo(pts[n-1][0]+(n===1?.01:0),pts[n-1][1]); g.stroke();
-    } else { g.fillStyle=col(s.c); g.fill(shape(s,k),'nonzero'); }
+    } else { g.fillStyle=col(s.c); for(const p of shape(s,k)) g.fill(p,'nonzero'); }
     g.restore();
   }
 
@@ -92,8 +113,9 @@ window.Ink = (()=>{
      un défilement fait à la main, coupé dès que le stylet touche l'écran. */
   let penDown=0, lastPen=0, force=0, fdrag=null;
   const palmZone=t=>!!t?.closest&&(!!t.closest('.ink-cv')||document.body.classList.contains('annot-on')&&!!t.closest('#player .p-body')
+    ||pref.finger==='off'&&!!t.closest('#player .p-body, aside.ard .ard-ink')
     ||Date.now()-lastPen<1500&&!!t.closest('#player .p-body, aside.ard .ard-body'));
-  const guard=()=>penSeen&&!pref.finger;
+  const guard=()=>penSeen&&pref.finger!=='draw';
   // Sur la toile, aucun toucher (Pencil compris) ne déclenche les gestes d'iOS : après un point (le point d'un i),
   // iOS attendait un éventuel double-toucher et retenait le trait suivant.
   const onInk=e=>!!e.target?.closest?.('.ink-cv');
@@ -109,7 +131,10 @@ window.Ink = (()=>{
     if(guard()&&(penDown||fdrag)&&e.cancelable&&[...e.changedTouches].some(t=>t.touchType!=='stylus')) e.preventDefault(); },{capture:true,passive:false});
   const scrollerOf=el=>{ for(;el&&el!==document.body;el=el.parentElement){ const o=getComputedStyle(el).overflowY; if((o==='auto'||o==='scroll')&&el.scrollHeight>el.clientHeight) return el; } return null; };
   document.addEventListener('pointerdown',e=>{
-    if(e.pointerType==='pen'){ lastPen=Date.now(); fdrag=null; return; }
+    if(e.pointerType==='pen'){ lastPen=Date.now(); fdrag=null;
+      // une sélection de texte restée ouverte capterait le Pencil : on l'efface dès qu'il écrit
+      if(e.target?.closest?.('.ink-cv')){ const sel=getSelection(); if(sel&&!sel.isCollapsed) sel.removeAllRanges(); }
+      return; }
     if(e.pointerType==='touch'&&guard()&&!penDown&&!fdrag&&palmZone(e.target)){ const sc=scrollerOf(e.target); if(sc) fdrag={id:e.pointerId,y:e.clientY,top:sc.scrollTop,sc}; }
   },true);
   document.addEventListener('pointermove',e=>{
@@ -154,7 +179,7 @@ window.Ink = (()=>{
     }
     el.addEventListener('pointerdown',e=>{
       if(o.enabled&&!o.enabled()) return;
-      if(e.pointerType==='pen'&&!penSeen){ penSeen=true; ls.set('declic-pen',true); repaintBars(); }
+      if(e.pointerType==='pen'&&!penSeen){ penSeen=true; ls.set('declic-pen',true); repaintBars(); fingerCls(); }
       if(e.pointerType==='touch'&&guard()) return; // la main : défilement géré plus haut, jamais de trait
       if(cur&&cur.pen&&e.pointerType==='pen') end({pointerId:cur.id}); // un Pencil ne touche qu'en un point : un trait resté ouvert (fin perdue) se termine ici
       if(cur||(e.pointerType==='mouse'&&e.button!==0)) return;
@@ -162,7 +187,7 @@ window.Ink = (()=>{
       const [x,y]=pt(e);
       if(e.pointerType==='pen') penDown++;
       if(pref.tool==='e'){ cur={erase:true,id:e.pointerId,pen:e.pointerType==='pen',before:strokes,hit:false}; eraseAt(x,y); return; }
-      cur={k:pref.tool,c:pref.c,w:pref.w,v:2,p:[],id:e.pointerId,pen:e.pointerType==='pen'};
+      cur={k:pref.tool,c:pref.c,w:pref.w,v:2,p:[],id:e.pointerId,pen:e.pointerType==='pen'}; if(cur.pen) cur.pen0=1;
       cur.p.push(x,y,press(e,e)); liveSoon();
     });
     el.addEventListener('pointermove',e=>{
@@ -213,14 +238,17 @@ window.Ink = (()=>{
     const g4=grp(), bu=btn(ICON.u,'Annuler',()=>surf()?.undo()), br=btn(ICON.r,'Rétablir',()=>surf()?.redo());
     const bc=btn('Effacer','Effacer tout le dessin',()=>{ if(bc.dataset.sure){ surf()?.clear(); delete bc.dataset.sure; bc.textContent='Effacer'; } else { bc.dataset.sure=1; bc.textContent='Sûr ?'; setTimeout(()=>{ delete bc.dataset.sure; bc.textContent='Effacer'; },2500); } });
     g4.append(bu,br,bc);
-    const bf=btn('','Ce que fait le doigt quand tu dessines au stylet',()=>setPref({finger:!pref.finger})); const g5=grp(); g5.append(bf);
+    const g5=grp(); g5.classList.add('seg'); g5.innerHTML='<span class="lab">Doigt :</span>';
+    const fbs=[['off','Bloqué','Le doigt et la paume ne sélectionnent rien et n’appuient sur rien dans la page : seul le stylet écrit et touche. Le doigt fait seulement défiler.'],
+      ['scroll','Défile','Le doigt fait défiler ; la main posée est ignorée pendant qu’on écrit'],['draw','Dessine','Le doigt dessine comme le stylet']]
+      .map(([v,l,t])=>{ const b=btn(l,t,()=>setPref({finger:v})); b.dataset.f=v; g5.append(b); return b; });
     if(opts.done){ const d=btn('Terminer','Terminer l’annotation',opts.done); d.style.cssText='background:var(--accent);color:var(--accent-ink)'; el.append(d); }
     const bar={el,paint(){
       tools.forEach(b=>b.classList.toggle('on',b.dataset.t===pref.tool));
       sws.forEach(b=>b.classList.toggle('on',b.dataset.c===pref.c&&pref.tool!=='e'));
       szs.forEach(b=>b.classList.toggle('on',+b.dataset.w===pref.w));
       const s=surf(); bu.disabled=!s?.canUndo(); br.disabled=!s?.canRedo(); bc.disabled=!s||s.isEmpty();
-      g5.hidden=!penSeen; bf.innerHTML=`<span class="lab">Doigt :</span>${pref.finger?'dessine':'défile'}`;
+      g5.hidden=!penSeen; fbs.forEach(b=>b.classList.toggle('on',b.dataset.f===pref.finger));
     }};
     bars.add(bar); bar.paint(); return el;
   }
@@ -250,5 +278,6 @@ window.Ink = (()=>{
   function onLessonClosed(){ if(annotOn) setAnnot(false); annot?.surf.destroy(); annot=null; }
   document.getElementById('annot-btn')?.addEventListener('click',()=>setAnnot(!annotOn));
 
+  fingerCls();
   return {surface, toolbar, attachCard, setAnnot, onLessonClosed};
 })();
