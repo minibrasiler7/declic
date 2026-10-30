@@ -94,12 +94,18 @@ window.Ink = (()=>{
   const palmZone=t=>!!t?.closest&&(!!t.closest('.ink-cv')||document.body.classList.contains('annot-on')&&!!t.closest('#player .p-body')
     ||Date.now()-lastPen<1500&&!!t.closest('#player .p-body, aside.ard .ard-body'));
   const guard=()=>penSeen&&!pref.finger;
+  // Sur la toile, aucun toucher (Pencil compris) ne déclenche les gestes d'iOS : après un point (le point d'un i),
+  // iOS attendait un éventuel double-toucher et retenait le trait suivant.
+  const onInk=e=>!!e.target?.closest?.('.ink-cv');
+  for(const t of ['touchend','touchcancel']) document.addEventListener(t,e=>{ if(onInk(e)&&e.cancelable) e.preventDefault(); },{capture:true,passive:false});
   document.addEventListener('touchstart',e=>{
     for(const t of e.touches) if(t.touchType==='stylus') force=t.force;
+    if(onInk(e)){ if(e.cancelable) e.preventDefault(); return; }
     if(!guard()||![...e.changedTouches].some(t=>t.touchType!=='stylus')) return;
     if((penDown||palmZone(e.target))&&e.cancelable) e.preventDefault();
   },{capture:true,passive:false});
   document.addEventListener('touchmove',e=>{ for(const t of e.touches) if(t.touchType==='stylus') force=t.force;
+    if(onInk(e)){ if(e.cancelable) e.preventDefault(); return; }
     if(guard()&&(penDown||fdrag)&&e.cancelable&&[...e.changedTouches].some(t=>t.touchType!=='stylus')) e.preventDefault(); },{capture:true,passive:false});
   const scrollerOf=el=>{ for(;el&&el!==document.body;el=el.parentElement){ const o=getComputedStyle(el).overflowY; if((o==='auto'||o==='scroll')&&el.scrollHeight>el.clientHeight) return el; } return null; };
   document.addEventListener('pointerdown',e=>{
@@ -150,6 +156,7 @@ window.Ink = (()=>{
       if(o.enabled&&!o.enabled()) return;
       if(e.pointerType==='pen'&&!penSeen){ penSeen=true; ls.set('declic-pen',true); repaintBars(); }
       if(e.pointerType==='touch'&&guard()) return; // la main : défilement géré plus haut, jamais de trait
+      if(cur&&cur.pen&&e.pointerType==='pen') end({pointerId:cur.id}); // un Pencil ne touche qu'en un point : un trait resté ouvert (fin perdue) se termine ici
       if(cur||(e.pointerType==='mouse'&&e.button!==0)) return;
       e.preventDefault(); cap(e);
       const [x,y]=pt(e);
@@ -170,13 +177,13 @@ window.Ink = (()=>{
       pred=[]; if(e.getPredictedEvents) for(const ev of e.getPredictedEvents().slice(0,2)){ const [x,y]=pt(ev); pred.push(x,y,cur.p[cur.p.length-1]); }
       liveSoon();
     });
-    const end=e=>{
+    function end(e){
       if(!cur||e.pointerId!==cur.id) return; const c=cur; cur=null; pred=[];
       if(c.pen) penDown=Math.max(0,penDown-1);
       if(c.erase){ if(c.hit){ undo.push(c.before); redo=[]; changed(); } return; }
       ['id','pen','t','sp'].forEach(f=>delete c[f]);
       commit([...strokes,c]); renderLive();
-    };
+    }
     el.addEventListener('pointerup',end); el.addEventListener('pointercancel',end);
     const S={el, get:()=>strokes,
       set(st){ strokes=(st||[]).slice(); undo=[]; redo=[]; render(); },
