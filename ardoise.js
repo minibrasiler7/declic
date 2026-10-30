@@ -349,7 +349,7 @@ window.Ardoise = (()=>{
     const el=$(`<div class="ard-line ard-ink" id="ard-ink-${i}"><div class="ard-row"><span class="ard-n">${i+1}</span><b style="flex:1">Dessin</b><button class="ard-chip" type="button" data-d="-1" title="Rendre la feuille moins haute">Réduire</button><button class="ard-chip" type="button" data-d="1" title="Ajouter de la place en dessous">Agrandir</button><button class="ard-del" title="Supprimer le dessin" aria-label="Supprimer le dessin ligne ${i+1}">×</button></div><div class="ink-box"></div></div>`);
     const box=el.querySelector('.ink-box'), fit=()=>{ box.style.aspectRatio=`1000 / ${D.h}`; };
     const keep=()=>{ lines[i]=INK+JSON.stringify(D); persist(); };
-    const surf=Ink.surface({strokes:D.s, scroller:()=>panel.querySelector('.ard-body'), onChange:st=>{ D.s=st; keep(); }});
+    const surf=Ink.surface({strokes:D.s, onChange:st=>{ D.s=st; keep(); }});
     inkSurfs.push(surf); fit(); box.append(surf.el);
     el.querySelector('.ard-row').after(Ink.toolbar(()=>surf));
     el.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{ const low=Math.max(300,...D.s.flatMap(t=>t.p.filter((v,k)=>k%3===1)).map(y=>y+40));

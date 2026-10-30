@@ -2,7 +2,7 @@
    Sert aux blocs « Dessin » de l'ardoise et aux annotations posées sur les leçons.
    Un trait = {k:'p'|'h' (stylo, surligneur), c:couleur, w:taille, p:[x, y, pression, x, y, pression, …]}.
    Les coordonnées sont rapportées à une largeur de 1000 : le dessin garde sa forme sur tous les écrans.
-   Dès qu'un stylet a servi, le doigt fait défiler au lieu de dessiner (la paume posée ne laisse pas de trace). */
+   Dès qu'un stylet a servi, le doigt fait défiler au lieu de dessiner, et la paume posée ne laisse pas de trace ni n'appuie sur rien. */
 window.Ink = (()=>{
   const W=1000;
   const COLORS=[['ink','Encre','--ink'],['blue','Bleu','#2F6FE0'],['red','Rouge','#D93B3B'],['green','Vert','#1E9E55'],['orange','Orange','#E58A00'],['violet','Violet','#8250DF']];
@@ -15,7 +15,9 @@ window.Ink = (()=>{
   const setPref=o=>{ Object.assign(pref,o); ls.set('declic-ink',pref); repaintBars(); };
 
   document.head.append(Object.assign(document.createElement('style'),{textContent:`
-  .ink-cv{display:block;width:100%;height:100%;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+  .ink-cv{position:relative;display:block;width:100%;height:100%;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+  .ink-cv canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+  body.annot-on #player .p-body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
   .ink-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
   .ink-bar .grp{display:flex;gap:3px;align-items:center;padding:3px;border:1px solid var(--line);border-radius:11px;background:var(--surface)}
   .ink-bar button{height:32px;min-width:32px;border:0;border-radius:8px;background:none;color:var(--ink);cursor:pointer;display:grid;place-items:center;padding:0 7px;font:700 13px var(--f-body)}
@@ -30,84 +32,159 @@ window.Ink = (()=>{
   body.annot-on .ink-layer{pointer-events:auto}
   `}));
 
-  /* ---------- rendu ---------- */
+  /* ---------- rendu ----------
+     Comme dans Freeform : chaque trait est une forme pleine dont le contour suit la pression.
+     Les points sont lissés, la pression aussi, et le trait s'affine au début et à la fin. */
   function col(c){ const d=COLORS.find(x=>x[0]===c); const v=d?d[2]:c; return v.startsWith('--')?(getComputedStyle(document.documentElement).getPropertyValue(v).trim()||'#13233A'):v; }
-  const wid=(s,pr)=>s.w*(0.45+pr/9*1.1);
-  // segment i : du milieu (i−1, i) au milieu (i, i+1), en passant par le point i (courbe lisse)
-  function seg(g,s,i,k){
-    const p=s.p, n=p.length/3, X=j=>p[3*j]*k, Y=j=>p[3*j+1]*k;
-    const ax=i?(X(i-1)+X(i))/2:X(0), ay=i?(Y(i-1)+Y(i))/2:Y(0);
-    const bx=i<n-1?(X(i)+X(i+1))/2:X(i), by=i<n-1?(Y(i)+Y(i+1))/2:Y(i);
-    if(s.k!=='h') g.lineWidth=Math.max(.6,wid(s,p[3*i+2])*k);
-    g.beginPath(); g.moveTo(ax,ay); g.quadraticCurveTo(X(i),Y(i),bx+(n===1?.01:0),by); g.stroke();
+  // pression 0…1 d'un point (format 2 : 0…100 ; ancien format : 0…9)
+  const prOf=(s,i)=>s.v?s.p[3*i+2]/100:s.p[3*i+2]/9;
+  // épaisseur selon la pression : un appui léger au Pencil donne ~0,2, un appui fort ~0,8
+  const thick=pr=>.32+1.5*Math.pow(Math.max(0,pr),.62);
+  function points(s,k){
+    const P=s.p, n=P.length/3, pts=[];
+    for(let i=0;i<n;i++) pts.push([P[3*i]*k,P[3*i+1]*k,prOf(s,i)]);
+    for(let pass=0;pass<2;pass++) for(let i=1;i<n-1;i++){ const a=pts[i-1], b=pts[i], c=pts[i+1]; // lissage (le premier et le dernier point restent en place)
+      pts[i]=[(a[0]+2*b[0]+c[0])/4,(a[1]+2*b[1]+c[1])/4,b[2]]; }
+    let e=pts[0]?.[2]??.5; for(const q of pts){ e+=(q[2]-e)*.35; q[2]=e; } // pression lissée
+    return pts;
+  }
+  const cache=new WeakMap();
+  function shape(s,k){
+    const c=cache.get(s); if(c&&c.k===k&&c.n===s.p.length) return c.path;
+    const pts=points(s,k), n=pts.length, base=s.w*k/2, path=new Path2D();
+    const r=pts.map((q,i)=>{ let t=1; const m=Math.min(i,n-1-i); if(n>6&&m<3) t=.55+.15*m; return Math.max(.35,base*thick(q[2])*t); });
+    if(n===1){ path.arc(pts[0][0],pts[0][1],r[0],0,7); }
+    else {
+      const L=[], R=[]; let nx=0, ny=-1;
+      for(let i=0;i<n;i++){
+        const a=pts[Math.max(0,i-1)], b=pts[Math.min(n-1,i+1)], dx=b[0]-a[0], dy=b[1]-a[1], d=Math.hypot(dx,dy);
+        if(d>.01){ nx=-dy/d; ny=dx/d; }
+        L.push([pts[i][0]+nx*r[i],pts[i][1]+ny*r[i]]); R.push([pts[i][0]-nx*r[i],pts[i][1]-ny*r[i]]);
+      }
+      const side=(Q,fwd)=>{ const idx=fwd?[...Q.keys()]:[...Q.keys()].reverse(); // contour lisse : courbes passant par les milieux
+        path.lineTo(Q[idx[0]][0],Q[idx[0]][1]);
+        for(let j=1;j<idx.length-1;j++){ const p=Q[idx[j]], q=Q[idx[j+1]]; path.quadraticCurveTo(p[0],p[1],(p[0]+q[0])/2,(p[1]+q[1])/2); }
+        const z=Q[idx[idx.length-1]]; path.lineTo(z[0],z[1]); };
+      path.moveTo(L[0][0],L[0][1]); side(L,true); side(R,false); path.closePath();
+      // bouts arrondis, et un disque aux virages serrés pour que le trait ne se pince pas
+      path.moveTo(pts[0][0]+r[0],pts[0][1]); path.arc(pts[0][0],pts[0][1],r[0],0,7);
+      path.moveTo(pts[n-1][0]+r[n-1],pts[n-1][1]); path.arc(pts[n-1][0],pts[n-1][1],r[n-1],0,7);
+      for(let i=1;i<n-1;i++){ const a=pts[i-1], b=pts[i], c=pts[i+1], u=[b[0]-a[0],b[1]-a[1]], v=[c[0]-b[0],c[1]-b[1]];
+        const cos=(u[0]*v[0]+u[1]*v[1])/((Math.hypot(...u)*Math.hypot(...v))||1); if(cos<.3){ path.moveTo(b[0]+r[i],b[1]); path.arc(b[0],b[1],r[i],0,7); } }
+    }
+    cache.set(s,{k,n:s.p.length,path}); return path;
   }
   function paint(g,s,k){
     const n=s.p.length/3; if(!n) return;
-    g.save(); g.lineCap='round'; g.lineJoin='round'; g.strokeStyle=col(s.c);
-    if(s.k==='h'){ // surligneur : un seul chemin, transparent, pour ne pas foncer aux recouvrements
-      g.globalAlpha=.3; g.lineWidth=s.w*4.5*k; const p=s.p; g.beginPath(); g.moveTo(p[0]*k,p[1]*k);
-      for(let i=1;i<n;i++){ const mx=(p[3*i-3]+p[3*i])/2*k, my=(p[3*i-2]+p[3*i+1])/2*k; g.quadraticCurveTo(p[3*i-3]*k,p[3*i-2]*k,mx,my); }
-      g.lineTo(p[3*n-3]*k+(n===1?.01:0),p[3*n-2]*k); g.stroke();
-    } else for(let i=0;i<n;i++) seg(g,s,i,k);
+    g.save();
+    if(s.k==='h'){ // surligneur : un seul chemin large et transparent, pour ne pas foncer aux recouvrements
+      const pts=points(s,k); g.globalAlpha=.3; g.strokeStyle=col(s.c); g.lineCap='round'; g.lineJoin='round'; g.lineWidth=s.w*4.5*k;
+      g.beginPath(); g.moveTo(pts[0][0],pts[0][1]);
+      for(let i=1;i<n-1;i++) g.quadraticCurveTo(pts[i][0],pts[i][1],(pts[i][0]+pts[i+1][0])/2,(pts[i][1]+pts[i+1][1])/2);
+      g.lineTo(pts[n-1][0]+(n===1?.01:0),pts[n-1][1]); g.stroke();
+    } else { g.fillStyle=col(s.c); g.fill(shape(s,k),'nonzero'); }
     g.restore();
   }
 
+  /* ---------- la main posée pendant qu'on écrit ----------
+     Dès qu'un stylet a servi (et sauf si « Doigt : dessine »), un doigt ou la paume ne sélectionne rien, n'appuie sur
+     rien et ne fait pas défiler la page tout seul dans les zones d'écriture ; pendant un trait, nulle part. Le doigt garde
+     un défilement fait à la main, coupé dès que le stylet touche l'écran. */
+  let penDown=0, lastPen=0, force=0, fdrag=null;
+  const palmZone=t=>!!t?.closest&&(!!t.closest('.ink-cv')||document.body.classList.contains('annot-on')&&!!t.closest('#player .p-body')
+    ||Date.now()-lastPen<1500&&!!t.closest('#player .p-body, aside.ard .ard-body'));
+  const guard=()=>penSeen&&!pref.finger;
+  document.addEventListener('touchstart',e=>{
+    for(const t of e.touches) if(t.touchType==='stylus') force=t.force;
+    if(!guard()||![...e.changedTouches].some(t=>t.touchType!=='stylus')) return;
+    if((penDown||palmZone(e.target))&&e.cancelable) e.preventDefault();
+  },{capture:true,passive:false});
+  document.addEventListener('touchmove',e=>{ for(const t of e.touches) if(t.touchType==='stylus') force=t.force;
+    if(guard()&&(penDown||fdrag)&&e.cancelable&&[...e.changedTouches].some(t=>t.touchType!=='stylus')) e.preventDefault(); },{capture:true,passive:false});
+  const scrollerOf=el=>{ for(;el&&el!==document.body;el=el.parentElement){ const o=getComputedStyle(el).overflowY; if((o==='auto'||o==='scroll')&&el.scrollHeight>el.clientHeight) return el; } return null; };
+  document.addEventListener('pointerdown',e=>{
+    if(e.pointerType==='pen'){ lastPen=Date.now(); fdrag=null; return; }
+    if(e.pointerType==='touch'&&guard()&&!penDown&&!fdrag&&palmZone(e.target)){ const sc=scrollerOf(e.target); if(sc) fdrag={id:e.pointerId,y:e.clientY,top:sc.scrollTop,sc}; }
+  },true);
+  document.addEventListener('pointermove',e=>{
+    if(e.pointerType==='pen'){ lastPen=Date.now(); return; } // le Pencil qui survole l'écran compte aussi
+    if(fdrag&&e.pointerId===fdrag.id&&!penDown) fdrag.sc.scrollTop=fdrag.top-(e.clientY-fdrag.y);
+  },true);
+  const fend=e=>{ if(fdrag&&e.pointerId===fdrag.id) fdrag=null; };
+  document.addEventListener('pointerup',fend,true); document.addEventListener('pointercancel',fend,true);
+
   /* ---------- surface de dessin ----------
-     o = {strokes, onChange(strokes), scroller() → élément qui défile sous le doigt, enabled() → bool} */
+     o = {strokes, onChange(strokes), enabled() → bool}. Deux toiles : les traits finis, et par-dessus le trait en cours. */
   function surface(o){
-    const cv=document.createElement('canvas'); cv.className='ink-cv'; const g=cv.getContext('2d');
-    let strokes=(o.strokes||[]).slice(), undo=[], redo=[], cur=null, k=1, dpr=1, drag=null;
-    function render(){ g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,cv.width,cv.height); strokes.forEach(s=>paint(g,s,k)); if(cur&&!cur.erase) paint(g,cur,k); }
-    function size(){ const r=cv.getBoundingClientRect(); if(!r.width) return; dpr=window.devicePixelRatio||1; k=r.width/W;
-      const w=Math.round(r.width*dpr), h=Math.round(r.height*dpr); if(cv.width!==w||cv.height!==h){ cv.width=w; cv.height=h; } render(); }
-    const ro=new ResizeObserver(size); ro.observe(cv);
-    const cap=e=>{ try{ cv.setPointerCapture(e.pointerId); }catch(_){} };
-    const pt=e=>{ const r=cv.getBoundingClientRect(); return [Math.round((e.clientX-r.left)/k),Math.round((e.clientY-r.top)/k)]; };
-    const press=e=>e.pointerType==='pen'?Math.round(Math.min(1,Math.max(0,e.pressure||.5))*9):4;
+    const el=document.createElement('div'); el.className='ink-cv';
+    const cv=document.createElement('canvas'), live=document.createElement('canvas'); el.append(cv,live);
+    const g=cv.getContext('2d'), gl=live.getContext('2d');
+    let strokes=(o.strokes||[]).slice(), undo=[], redo=[], cur=null, k=1, dpr=1, raf=0, pred=[];
+    function render(){ g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,cv.width,cv.height); strokes.forEach(s=>paint(g,s,k)); }
+    function renderLive(){ raf=0; gl.setTransform(dpr,0,0,dpr,0,0); gl.clearRect(0,0,live.width,live.height);
+      if(!cur||cur.erase) return;
+      const s=pred.length?{...cur,p:cur.p.concat(pred)}:cur; cache.delete(s); paint(gl,s,k); }
+    const liveSoon=()=>{ if(!raf) raf=requestAnimationFrame(renderLive); };
+    function size(){ const r=el.getBoundingClientRect(); if(!r.width) return; dpr=window.devicePixelRatio||1; k=r.width/W;
+      const w=Math.round(r.width*dpr), h=Math.round(r.height*dpr);
+      for(const c of [cv,live]) if(c.width!==w||c.height!==h){ c.width=w; c.height=h; }
+      render(); renderLive(); }
+    const ro=new ResizeObserver(size); ro.observe(el);
+    const cap=e=>{ try{ el.setPointerCapture(e.pointerId); }catch(_){} };
+    const pt=e=>{ const r=el.getBoundingClientRect(); return [Math.round((e.clientX-r.left)/k*10)/10,Math.round((e.clientY-r.top)/k*10)/10]; };
+    // Pression du Pencil : celle de l'évènement, sinon celle de l'évènement principal, sinon la force du toucher (Safari)
+    function press(ev,main){
+      if(cur.pen){ const v=ev.pressure||main?.pressure||force||.5; return Math.round(Math.min(1,Math.max(.02,v))*100); }
+      // doigt ou souris : pas de pression, on l'imite avec la vitesse (plus vite = plus fin)
+      const p=cur.p, n=p.length, t=ev.timeStamp||performance.now();
+      const sp=n>=3&&cur.t?Math.hypot(pt(ev)[0]-p[n-3],pt(ev)[1]-p[n-2])/Math.max(1,t-cur.t):0; cur.t=t;
+      cur.sp=(cur.sp??sp)*.7+sp*.3; return Math.round((.62-Math.min(.32,cur.sp*.18))*100);
+    }
     const changed=()=>{ o.onChange?.(strokes); repaintBars(); };
     function commit(next,before=strokes){ undo.push(before); if(undo.length>80) undo.shift(); redo=[]; strokes=next; render(); changed(); }
     function eraseAt(x,y){
       const keep=strokes.filter(s=>{ const p=s.p, r=12+s.w*(s.k==='h'?2.3:.8); for(let i=0;i<p.length;i+=3){ const dx=p[i]-x, dy=p[i+1]-y; if(dx*dx+dy*dy<r*r) return false; } return true; });
       if(keep.length!==strokes.length){ strokes=keep; cur.hit=true; render(); }
     }
-    cv.addEventListener('pointerdown',e=>{
+    el.addEventListener('pointerdown',e=>{
       if(o.enabled&&!o.enabled()) return;
       if(e.pointerType==='pen'&&!penSeen){ penSeen=true; ls.set('declic-pen',true); repaintBars(); }
-      if(e.pointerType==='touch'&&penSeen&&!pref.finger){ // la main : on fait défiler, on ne dessine pas
-        const sc=o.scroller?.(); if(sc&&!drag){ drag={id:e.pointerId,y:e.clientY,top:sc.scrollTop,sc}; cap(e); } return; }
+      if(e.pointerType==='touch'&&guard()) return; // la main : défilement géré plus haut, jamais de trait
       if(cur||(e.pointerType==='mouse'&&e.button!==0)) return;
       e.preventDefault(); cap(e);
       const [x,y]=pt(e);
-      if(pref.tool==='e'){ cur={erase:true,id:e.pointerId,before:strokes,hit:false}; eraseAt(x,y); return; }
-      cur={k:pref.tool,c:pref.c,w:pref.w,p:[x,y,press(e)],id:e.pointerId}; render();
+      if(e.pointerType==='pen') penDown++;
+      if(pref.tool==='e'){ cur={erase:true,id:e.pointerId,pen:e.pointerType==='pen',before:strokes,hit:false}; eraseAt(x,y); return; }
+      cur={k:pref.tool,c:pref.c,w:pref.w,v:2,p:[],id:e.pointerId,pen:e.pointerType==='pen'};
+      cur.p.push(x,y,press(e,e)); liveSoon();
     });
-    cv.addEventListener('pointermove',e=>{
-      if(drag&&e.pointerId===drag.id){ drag.sc.scrollTop=drag.top-(e.clientY-drag.y); return; }
+    el.addEventListener('pointermove',e=>{
       if(!cur||e.pointerId!==cur.id) return; e.preventDefault();
       const evs=(e.getCoalescedEvents&&e.getCoalescedEvents().length)?e.getCoalescedEvents():[e];
-      const n0=cur.p?cur.p.length/3:0;
       for(const ev of evs){ const [x,y]=pt(ev);
         if(cur.erase){ eraseAt(x,y); continue; }
-        const p=cur.p, n=p.length; if((x-p[n-3])**2+(y-p[n-2])**2<2) continue;
-        p.push(x,y,press(ev)); }
+        const p=cur.p, n=p.length; if((x-p[n-3])**2+(y-p[n-2])**2<1) continue;
+        p.push(x,y,press(ev,e)); }
       if(cur.erase) return;
-      if(cur.k==='h') render();
-      else { const n=cur.p.length/3; g.save(); g.setTransform(dpr,0,0,dpr,0,0); g.lineCap='round'; g.strokeStyle=col(cur.c); for(let i=Math.max(0,n0-1);i<n-1;i++) seg(g,cur,i,k); g.restore(); }
+      // points prédits (Chrome, Safari récent) : le trait suit la pointe sans retard ; ils ne sont pas gardés
+      pred=[]; if(e.getPredictedEvents) for(const ev of e.getPredictedEvents().slice(0,2)){ const [x,y]=pt(ev); pred.push(x,y,cur.p[cur.p.length-1]); }
+      liveSoon();
     });
     const end=e=>{
-      if(drag&&e.pointerId===drag.id){ drag=null; return; }
-      if(!cur||e.pointerId!==cur.id) return; const c=cur; cur=null;
+      if(!cur||e.pointerId!==cur.id) return; const c=cur; cur=null; pred=[];
+      if(c.pen) penDown=Math.max(0,penDown-1);
       if(c.erase){ if(c.hit){ undo.push(c.before); redo=[]; changed(); } return; }
-      delete c.id; commit([...strokes,c]);
+      ['id','pen','t','sp'].forEach(f=>delete c[f]);
+      commit([...strokes,c]); renderLive();
     };
-    cv.addEventListener('pointerup',end); cv.addEventListener('pointercancel',end);
-    const S={el:cv, get:()=>strokes,
+    el.addEventListener('pointerup',end); el.addEventListener('pointercancel',end);
+    const S={el, get:()=>strokes,
       set(st){ strokes=(st||[]).slice(); undo=[]; redo=[]; render(); },
       undo(){ if(!undo.length) return; redo.push(strokes); strokes=undo.pop(); render(); changed(); },
       redo(){ if(!redo.length) return; undo.push(strokes); strokes=redo.pop(); render(); changed(); },
       clear(){ if(strokes.length) commit([]); },
       canUndo:()=>undo.length>0, canRedo:()=>redo.length>0, isEmpty:()=>!strokes.length,
-      resize:size, destroy(){ ro.disconnect(); }};
+      resize:size, destroy(){ ro.disconnect(); if(cur?.pen) penDown=Math.max(0,penDown-1); cur=null; }};
     return S;
   }
 
@@ -148,7 +225,7 @@ window.Ink = (()=>{
   function attachCard(card,key){
     annot?.surf.destroy();
     const layer=document.createElement('div'); layer.className='ink-layer';
-    const surf=surface({strokes:(S.notes||{})[key]||[], scroller:()=>document.querySelector('.p-body'), enabled:()=>annotOn,
+    const surf=surface({strokes:(S.notes||{})[key]||[], enabled:()=>annotOn,
       onChange:st=>{ S.notes=S.notes||{}; if(st.length) S.notes[key]=st; else delete S.notes[key]; save(); }});
     layer.append(surf.el); card.append(layer); annot={surf,key};
     repaintBars(); paintBtn();

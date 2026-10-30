@@ -34,7 +34,7 @@ Le bouton « Annoter » d'une leçon pose une couche transparente sur l'étape :
 
 ## Sur iPad
 
-Déclic s'installe comme une app : dans Safari, Partager puis « Sur l'écran d'accueil ». L'app s'ouvre en plein écran et marche hors connexion grâce au service worker (`sw.js`). Avec un Apple Pencil, le stylet dessine et le doigt fait défiler, donc la paume posée ne laisse pas de trace. Le bouton « Doigt » change ce réglage, et l'ardoise passe en plein écran pour écrire à l'aise.
+Déclic s'installe comme une app : dans Safari, Partager puis « Sur l'écran d'accueil ». L'app s'ouvre en plein écran et marche hors connexion grâce au service worker (`sw.js`). Avec un Apple Pencil, le trait suit la pression (forme pleine lissée qui s’affine aux extrémités, comme dans Freeform) et le doigt fait défiler : la paume posée ne laisse pas de trace, ne sélectionne rien et n’appuie sur aucun bouton pendant qu’on écrit. Le bouton « Doigt » change ce réglage, et l'ardoise passe en plein écran pour écrire à l'aise.
 
 ## Comptes
 
