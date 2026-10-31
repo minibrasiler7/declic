@@ -3,9 +3,26 @@ MATHS.push(
 {id:'fractions',br:'alg',lv:'ecole',h:'Fractions',p:'Partager, comparer et calculer avec des parts.',
  lessons:['Fractions équivalentes','Additionner des fractions','Multiplier et diviser','Fractions et nombres décimaux'],
  steps:[
-  {h:'Une fraction, c’est un partage',p:`Le <b>dénominateur</b> (en bas) dit en combien de parts égales on coupe. Le <b>numérateur</b> (en haut) dit combien de parts on prend.`,
+  {h:'Une fraction, c’est un partage',p:`<p>Tu partages une tablette de chocolat : comment écrire « trois morceaux sur quatre » avec un seul nombre&nbsp;? C’est le rôle d’une <b>fraction</b>.</p>
+<div class="def"><p>Dans la fraction ${F('a','b')}, le <b>dénominateur</b> <i>b</i> (en bas) dit en combien de parts <b>égales</b> on coupe l’unité. Le <b>numérateur</b> <i>a</i> (en haut) dit combien de ces parts on prend. On lit ${F(3,4)} « trois quarts » et ${F(2,5)} « deux cinquièmes ».</p></div>
+<div class="idea"><p>Ici, l’unité est la barre entière. Plus le dénominateur est grand, plus chaque part est petite : un huitième est plus petit qu’un quart. Plus le numérateur est grand, plus on colorie de parts.</p></div>
+<div class="ex"><p>Numérateur 3 et dénominateur 4 : la barre est coupée en 4 et on colorie 3 parts, c’est ${F(3,4)}. Numérateur 5 et dénominateur 4 : on remplit une barre entière, puis encore une part d’une deuxième barre. Donc ${F(5,4)} = 1 + ${F(1,4)}.</p></div>
+<div class="warn"><p>Les parts doivent être égales. Une barre coupée en un gros morceau et trois petits n’est pas coupée en quarts.</p></div>
+<p>Bouge les curseurs. Mets le numérateur à 0 : la fraction vaut 0. Mets-le égal au dénominateur : elle vaut 1.</p>`,
    params:[{id:'n',l:'Numérateur',min:0,max:12,v:3},{id:'d',l:'Dénominateur',min:1,max:12,v:4}],
    draw:v=>fracBar(v.n,v.d), info:v=>`${F(v.n,v.d)} = ${fmt(v.n/v.d,3)}${v.n>v.d?' : plus d’une barre entière':''}`},
+  {kind:'Théorie',h:'Une fraction est aussi une division',p:`<p>Trois pizzas pour quatre amis : combien chacun en reçoit-il&nbsp;? On doit calculer 3 ÷ 4, qui ne tombe pas juste. La fraction donne la réponse exacte.</p>
+<div class="def"><p>Pour deux nombres <i>a</i> et <i>b</i>, avec <i>b</i> ≠ 0 : ${F('a','b')} = <i>a</i> ÷ <i>b</i>. La barre de fraction est un signe de division.</p></div>
+<div class="idea"><p>Coupe chaque pizza en 4. Chaque ami prend un quart de chaque pizza, donc 3 quarts en tout : 3 ÷ 4 = ${F(3,4)}. Partager 3 entre 4 ou prendre 3 parts d’une unité coupée en 4, c’est la même chose.</p></div>
+<div class="ex"><p>${F(3,4)} = 3 ÷ 4 = 0,75. ${F(1,8)} = 0,125. ${F(7,4)} = 1,75 : plus de 1, car le numérateur dépasse le dénominateur. ${F(2,3)} = 0,666… : la division ne s’arrête jamais, la fraction est l’écriture exacte et 0,67 n’en est qu’un arrondi.</p></div>
+<div class="warn"><p>Le dénominateur n’est jamais 0. Partager entre zéro personne n’a pas de sens : ${F(5,0)} n’existe pas. En revanche ${F(0,5)} = 0.</p></div>`,
+   fig:fracBar(7,4)},
+  {kind:'Théorie',h:'Fractions équivalentes : une même part, plusieurs noms',p:`<p>Regarde les trois barres : une moitié, deux quarts, quatre huitièmes. La longueur colorée est la même. Ces fractions ont l’air différentes, mais elles désignent le même nombre.</p>
+<div class="def"><p>Deux fractions sont <b>équivalentes</b> si elles représentent la même part. On passe de l’une à l’autre en multipliant (ou en divisant) le numérateur <b>et</b> le dénominateur par un même nombre <i>k</i> non nul : ${F('a','b')} = ${F('a × k','b × k')}.</p></div>
+<div class="why"><p>Multiplier par <i>k</i>, c’est couper chaque part en <i>k</i> morceaux. On a <i>k</i> fois plus de parts coloriées, mais chacune est <i>k</i> fois plus petite : la quantité ne change pas.</p></div>
+<div class="ex"><p>${F(1,2)} = ${F(2,4)} = ${F(4,8)} = 0,5. Dans l’autre sens : ${F(6,9)} = ${F('6 ÷ 3','9 ÷ 3')} = ${F(2,3)}. Quand le haut et le bas n’ont plus de diviseur commun, comme 2 et 3, la fraction est <b>irréductible</b> : c’est son écriture la plus simple.</p></div>
+<div class="warn"><p>Seules la multiplication et la division conservent la part. Ajouter 1 en haut et en bas change le nombre : ${F(1,2)} = 0,5 mais ${F(2,3)} ≈ 0,67.</p></div>`,
+   fig:fracBar(1,2)+fracBar(2,4,'var(--spark)')+fracBar(4,8,'var(--accent)')},
   {kind:'Méthode',h:'Simplifier et amplifier une fraction',
    p:`Une même part s’écrit de plusieurs façons. <b>Amplifier</b>, c’est multiplier le numérateur et le dénominateur par le même nombre. <b>Simplifier</b>, c’est les diviser par un même diviseur commun. La part ne change pas : on coupe chaque morceau en morceaux plus petits, ou on les regroupe, sans rien ajouter ni enlever. On s’en sert pour comparer, pour additionner et pour donner un résultat simple.`,
    demo:{enonce:`Simplifier ${F(18,24)}, puis écrire ${F(3,4)} en huitièmes.`,
@@ -20,6 +37,12 @@ MATHS.push(
   {h:'Colorie trois quarts',p:`La barre est coupée en 8. Combien de huitièmes faut-il colorier pour obtenir ${F(3,4)}&nbsp;?`,
    params:[{id:'n',l:'Parts coloriées',min:0,max:8,v:1}],draw:v=>fracBar(v.n,8)+fracBar(3,4,'var(--line)'),
    ok:v=>v.n===6,why:`${F(3,4)} = ${F(6,8)} : on multiplie haut et bas par 2.`},
+  {kind:'Théorie',h:'Comparer deux fractions',p:`<p>Qui a mangé le plus de gâteau : celui qui a pris ${F(3,4)} ou celui qui a pris ${F(5,8)}&nbsp;? Les parts n’ont pas la même taille, on ne peut pas comparer 3 et 5 directement.</p>
+<div class="prop"><p><b>Même dénominateur :</b> les parts ont la même taille, la plus grande fraction a le plus grand numérateur. <b>Même numérateur :</b> la plus grande fraction a le plus <b>petit</b> dénominateur, car ses parts sont plus grosses. <b>Sinon</b>, on écrit les deux fractions avec un même dénominateur, puis on compare les numérateurs.</p></div>
+<div class="ex"><p>${F(3,4)} = ${F(6,8)}, et 6 > 5, donc ${F(3,4)} > ${F(5,8)}. Autre cas : ${F(2,3)} et ${F(3,5)}. Le dénominateur 15 convient aux deux : ${F(2,3)} = ${F(10,15)} et ${F(3,5)} = ${F(9,15)}. Donc ${F(2,3)} > ${F(3,5)}, de justesse. En décimal : 0,666… contre 0,6.</p></div>
+<div class="idea"><p>Comparer avec 1 est souvent immédiat : une fraction est plus grande que 1 quand son numérateur dépasse son dénominateur, comme ${F(9,8)}.</p></div>
+<div class="warn"><p>${F(1,3)} n’est pas plus grand que ${F(1,2)} sous prétexte que 3 > 2 : un tiers est une part plus petite qu’une moitié.</p></div>`,
+   fig:fracBar(6,8)+fracBar(5,8,'var(--spark)')},
   {kind:'Méthode',h:'Additionner : réduire au même dénominateur',
    p:`On n’additionne que des parts de même taille. Si les dénominateurs diffèrent, on cherche un <b>dénominateur commun</b> : un multiple des deux, le plus petit si possible. On amplifie chaque fraction pour l’y amener, puis on additionne les numérateurs et on garde le dénominateur. Pour soustraire, c’est pareil. Pour <b>comparer</b> deux fractions, on les met aussi au même dénominateur : la plus grande a le plus grand numérateur.`,
    demo:{enonce:`Calculer ${F(2,3)} + ${F(1,4)}, puis ce qu’il reste de 1.`,
@@ -43,6 +66,19 @@ MATHS.push(
     conclusion:`Tu bois ${F(3,10)} L, soit 30 cL.`},
    note:'Pour savoir qui a reçu la plus grande part d’un même tout, mets toutes les fractions au même dénominateur, puis compare les numérateurs.'},
   {h:'Une fraction d’un nombre',p:`Combien valent les ${F(3,5)} de 40 bonbons&nbsp;?`,ans:24,why:`40 × ${F(3,5)} = ${F(120,5)} = 24. Autrement dit : un cinquième de 40 vaut 8, donc trois cinquièmes valent 24.`},
+  {kind:'Théorie',h:'Diviser par une fraction',p:`<p>Combien de quarts d’heure y a-t-il dans 3 heures&nbsp;? Chaque heure en contient 4, donc 12. On vient de calculer 3 ÷ ${F(1,4)} = 12 = 3 × 4 : diviser par un quart revient à multiplier par 4.</p>
+<div class="def"><p>L’<b>inverse</b> de ${F('a','b')} (avec <i>a</i> et <i>b</i> non nuls) est ${F('b','a')} : on retourne la fraction. Leur produit vaut 1. <b>Diviser par une fraction, c’est multiplier par son inverse</b> : ${F('a','b')} ÷ ${F('c','d')} = ${F('a','b')} × ${F('d','c')}.</p></div>
+<div class="idea"><p>Diviser, c’est se demander « combien de fois ça rentre ». Un huitième rentre 8 fois dans 1, donc diviser par ${F(1,8)} multiplie par 8.</p></div>
+<div class="ex"><p>${F(3,4)} ÷ ${F(1,8)} = ${F(3,4)} × 8 = ${F(24,4)} = 6. Contrôle avec les barres : ${F(3,4)} = ${F(6,8)}, il y a bien 6 huitièmes dans trois quarts. Autre exemple : ${F(2,3)} ÷ ${F(4,5)} = ${F(2,3)} × ${F(5,4)} = ${F(10,12)} = ${F(5,6)}.</p></div>
+<div class="warn"><p>On retourne la fraction par laquelle on divise, pas la première. Et 0 n’a pas d’inverse : on ne divise jamais par 0.</p></div>`},
+  {kind:'Récapitulatif',h:'Ce qu’il faut retenir',p:`<div class="keep"><ul>
+<li>${F('a','b')} : on coupe l’unité en <i>b</i> parts égales et on en prend <i>a</i>. C’est aussi <i>a</i> ÷ <i>b</i>, avec <i>b</i> ≠ 0.</li>
+<li>Multiplier ou diviser le haut et le bas par un même nombre non nul donne une fraction équivalente. Simplifier jusqu’à l’écriture irréductible.</li>
+<li>Pour comparer, additionner ou soustraire : même dénominateur d’abord, puis on travaille sur les numérateurs. On n’additionne jamais les dénominateurs.</li>
+<li>Multiplier : haut par haut, bas par bas. « Les ${F(2,3)} de » se traduit par « × ${F(2,3)} ».</li>
+<li>Diviser par ${F('c','d')}, c’est multiplier par ${F('d','c')}.</li>
+<li>Piège : ajouter le même nombre en haut et en bas change la fraction.</li></ul></div>
+<p>Les deux problèmes qui suivent mélangent ces règles : lis bien de quelle quantité on prend une fraction.</p>`},
   {kind:'Problème',h:'La recette pour quatre',
    p:`Une recette de gâteau pour 6 personnes demande ${F(3,4)} de litre de lait et ${F(2,3)} de tasse de sucre. Ce soir, vous n’êtes que 4. Tu veux garder exactement le même goût, donc réduire chaque ingrédient dans la même proportion.`,
    fig:fracBar(3,4)+fracBar(2,3,'var(--spark)'),
@@ -66,13 +102,36 @@ MATHS.push(
 {id:'litteral',br:'alg',lv:'ecole',h:'Calcul littéral',p:'Développer, factoriser, et voir les formules comme des aires.',
  lessons:['Développer avec des rectangles','Factoriser','Identités remarquables','Réduire une expression'],
  steps:[
-  {h:'Développer, c’est découper un rectangle',p:`Un rectangle de largeur <i>a</i> et de longueur <i>b + c</i> a une aire <i>a(b + c)</i>. Coupé en deux, il donne <i>ab + ac</i>.`,
+  {kind:'Théorie',h:'Une lettre pour un nombre qui varie',p:`<p>Le périmètre d’un carré de côté 3 cm vaut 4 × 3 = 12 cm, celui d’un carré de côté 5 cm vaut 4 × 5 = 20 cm. Le calcul est toujours le même, seul le côté change. Plutôt que de le refaire, on l’écrit une fois pour toutes avec une lettre : <i>P</i> = 4 × <i>c</i>.</p>
+<div class="def"><p>Une <b>expression littérale</b> est un calcul dans lequel des lettres remplacent des nombres. Conventions d’écriture : 4 × <i>c</i> s’écrit <b>4<i>c</i></b>, 1<i>x</i> s’écrit <i>x</i>, et <i>x</i> × <i>x</i> s’écrit <b><i>x</i>²</b> (« <i>x</i> au carré »).</p></div>
+<div class="idea"><p>Une lettre est une boîte vide : on peut y mettre n’importe quel nombre. L’expression est une recette qui dit quoi faire de ce nombre.</p></div>
+<div class="ex"><p>Pour <i>c</i> = 7 : <i>P</i> = 4<i>c</i> = 4 × 7 = 28 cm et l’aire <i>A</i> = <i>c</i>² = 7 × 7 = 49 cm². Pour <i>x</i> = 5 : 2<i>x</i> + 3 = 2 × 5 + 3 = 13.</p></div>
+<div class="warn"><p>4<i>c</i> veut dire 4 × <i>c</i> : si <i>c</i> = 2, alors 4<i>c</i> = 8, et non 42. Et <i>x</i>² n’est pas 2<i>x</i> : pour <i>x</i> = 5, <i>x</i>² = 25 alors que 2<i>x</i> = 10.</p></div>`},
+  {h:'Développer, c’est découper un rectangle',p:`<p>Calcule 7 × 23 de tête. Astuce : 7 × 20 = 140 et 7 × 3 = 21, donc 7 × 23 = 161. Tu viens d’utiliser la <b>distributivité</b>, la règle qui permet de casser un produit en morceaux.</p>
+<div class="def"><p><b>Distributivité</b> : pour tous nombres <i>a</i>, <i>b</i>, <i>c</i>, on a <i>a</i>(<i>b</i> + <i>c</i>) = <i>ab</i> + <i>ac</i>. Passer de gauche à droite, c’est <b>développer</b> : un produit devient une somme.</p></div>
+<div class="idea"><p>Un rectangle de largeur <i>a</i> et de longueur <i>b</i> + <i>c</i> a pour aire <i>a</i>(<i>b</i> + <i>c</i>). Coupe-le en deux : un rectangle d’aire <i>ab</i> et un rectangle d’aire <i>ac</i>. L’aire totale n’a pas changé.</p></div>
+<div class="ex"><p>3(<i>x</i> + 5) = 3<i>x</i> + 3 × 5 = 3<i>x</i> + 15. Contrôle pour <i>x</i> = 2 : 3 × 7 = 21 et 6 + 15 = 21.</p></div>
+<div class="warn"><p>Le facteur multiplie <b>chaque</b> terme de la parenthèse : 3(<i>x</i> + 5) n’est pas 3<i>x</i> + 5. Sur la figure, ce serait oublier une partie du deuxième rectangle. Avec un moins, le signe suit : 2(<i>x</i> − 4) = 2<i>x</i> − 8.</p></div>`,
    params:[{id:'a',l:'a',min:1,max:4,v:2},{id:'b',l:'b',min:1,max:5,v:3},{id:'c',l:'c',min:1,max:4,v:2}],
    draw:v=>{ const P=plane({x:[-0.5,9.5],y:[-0.8,4.8],grid:false,axes:false});
      P.rect(0,0,v.b,v.a,{fill:'var(--math)',fo:.3,c:'var(--ink)',w:2}).rect(v.b,0,v.c,v.a,{fill:'var(--spark)',fo:.45,c:'var(--ink)',w:2});
      P.text(v.b/2,v.a/2,'ab',{a:'middle',dy:5,s:16}).text(v.b+v.c/2,v.a/2,'ac',{a:'middle',dy:5,s:16});
      P.text(v.b/2,0,'b',{a:'middle',dy:18}).text(v.b+v.c/2,0,'c',{a:'middle',dy:18}).text(0,v.a/2,'a',{a:'end',dx:-6,dy:5}); return P.svg(); },
    info:v=>`${v.a}(${v.b} + ${v.c}) = ${v.a*v.b} + ${v.a*v.c} = ${v.a*(v.b+v.c)}`},
+  {kind:'Théorie',h:'Termes semblables : réduire une expression',p:`<p>Après un développement, on obtient souvent une longue somme comme 4<i>x</i> + 3 + 2<i>x</i> − 7. On veut l’écrire plus court, sans changer sa valeur.</p>
+<div class="def"><p>Des <b>termes semblables</b> ont la même partie en lettres : 4<i>x</i> et 2<i>x</i>, ou 3<i>x</i>² et −<i>x</i>², ou deux nombres seuls. <b>Réduire</b>, c’est additionner les termes semblables en additionnant leurs coefficients (le nombre devant la lettre).</p></div>
+<div class="idea"><p>3 pommes + 2 pommes = 5 pommes, mais 3 pommes + 2 poires restent 3 pommes + 2 poires. De même 3<i>x</i> + 2<i>x</i> = 5<i>x</i>, car c’est (3 + 2)<i>x</i> par distributivité, mais 3<i>x</i> + 2 reste tel quel.</p></div>
+<div class="ex"><p>4<i>x</i> + 3 + 2<i>x</i> − 7 = (4<i>x</i> + 2<i>x</i>) + (3 − 7) = 6<i>x</i> − 4. Contrôle pour <i>x</i> = 1 : 4 + 3 + 2 − 7 = 2 et 6 − 4 = 2. Autre exemple : <i>x</i>² + 3<i>x</i> + 2<i>x</i>² = 3<i>x</i>² + 3<i>x</i>.</p></div>
+<div class="warn"><p>2<i>x</i> + 3 n’est pas 5<i>x</i>. Et ne confonds pas <i>x</i> + <i>x</i> = 2<i>x</i> avec <i>x</i> × <i>x</i> = <i>x</i>². Les termes en <i>x</i> et en <i>x</i>² ne se regroupent pas.</p></div>`},
+  {kind:'Théorie',h:'Double distributivité : un rectangle en quatre',p:`<p>Comment développer (<i>x</i> + 2)(<i>x</i> + 3), où les deux facteurs sont des sommes&nbsp;? On applique deux fois la distributivité.</p>
+<div class="prop"><p>(<i>a</i> + <i>b</i>)(<i>c</i> + <i>d</i>) = <i>ac</i> + <i>ad</i> + <i>bc</i> + <i>bd</i>. Chaque terme de la première parenthèse multiplie chaque terme de la seconde : 2 × 2 = 4 produits.</p></div>
+<div class="why"><p>On traite (<i>a</i> + <i>b</i>) comme un seul nombre : (<i>a</i> + <i>b</i>)<i>c</i> + (<i>a</i> + <i>b</i>)<i>d</i>, puis on développe encore chaque morceau. Sur la figure, un rectangle de côtés <i>x</i> + 3 et <i>x</i> + 2 se coupe en quatre rectangles : <i>x</i>², 3<i>x</i>, 2<i>x</i> et 6.</p></div>
+<div class="ex"><p>(<i>x</i> + 2)(<i>x</i> + 3) = <i>x</i>² + 3<i>x</i> + 2<i>x</i> + 6 = <i>x</i>² + 5<i>x</i> + 6. Contrôle pour <i>x</i> = 1 : 3 × 4 = 12 et 1 + 5 + 6 = 12. Avec un signe : (<i>x</i> − 1)(<i>x</i> + 4) = <i>x</i>² + 4<i>x</i> − <i>x</i> − 4 = <i>x</i>² + 3<i>x</i> − 4.</p></div>
+<div class="warn"><p>Il y a quatre produits, pas deux : (<i>x</i> + 2)(<i>x</i> + 3) n’est pas <i>x</i>² + 6. Sur la figure, oublier les deux rectangles du milieu, c’est perdre 3<i>x</i> + 2<i>x</i>. Pour ne rien oublier, relie chaque terme de gauche à chaque terme de droite, comme une poignée de main entre deux équipes.</p></div>`,
+   fig:(()=>{ const P=plane({x:[-1.5,8.5],y:[-1.2,7.2],grid:false,axes:false,w:280});
+     P.rect(0,0,4,4,{fill:'var(--math)',fo:.3,c:'var(--ink)',w:2}).rect(4,0,3,4,{fill:'var(--spark)',fo:.45,c:'var(--ink)',w:2}).rect(0,4,4,2,{fill:'var(--accent)',fo:.2,c:'var(--ink)',w:2}).rect(4,4,3,2,{fill:'var(--sci)',fo:.3,c:'var(--ink)',w:2});
+     P.text(2,2,'x²',{a:'middle',dy:5,s:16}).text(5.5,2,'3x',{a:'middle',dy:5,s:15}).text(2,5,'2x',{a:'middle',dy:5,s:15}).text(5.5,5,'6',{a:'middle',dy:5,s:15});
+     P.text(2,0,'x',{a:'middle',dy:18}).text(5.5,0,'3',{a:'middle',dy:18}).text(0,2,'x',{a:'end',dx:-6,dy:5}).text(0,5,'2',{a:'end',dx:-6,dy:5}); return P.svg(); })()},
   {kind:'Méthode',h:'Développer un produit',
    p:'Développer, c’est transformer un produit en somme. <b>Simple distributivité</b> : k(a + b) = ka + kb, le facteur devant multiplie chaque terme de la parenthèse. <b>Double distributivité</b> : (a + b)(c + d) = ac + ad + bc + bd, chaque terme de la première parenthèse multiplie chaque terme de la seconde. Un signe moins devant le facteur se distribue aussi.',
    demo:{enonce:'Développer −2(3x − 5), puis (x + 2)(x + 3).',
@@ -84,7 +143,11 @@ MATHS.push(
     conclusion:'−2(3x − 5) = −6x + 10 et (x + 2)(x + 3) = x² + 5x + 6.'},
    note:'<b>Factoriser</b>, c’est le chemin inverse : 4x + 12 = 4(x + 3). On repère le facteur commun à tous les termes et on le sort.'},
   {h:'À toi',p:'Développe <i>3(x + 4)</i>.',opts:['3x + 4','3x + 12','3x + 7','x + 12'],ans:1,why:'Le 3 multiplie chaque terme de la parenthèse : 3·x + 3·4 = 3x + 12.'},
-  {h:'(a + b)², un carré en quatre morceaux',p:'Un carré de côté <i>a + b</i> se découpe en un carré <i>a²</i>, un carré <i>b²</i> et deux rectangles <i>ab</i>.',
+  {h:'(a + b)², un carré en quatre morceaux',p:`<p>(3 + 2)² = 5² = 25, alors que 3² + 2² = 9 + 4 = 13. Il manque 12. Où sont-ils passés&nbsp;?</p>
+<div class="thm"><p>Pour tous nombres <i>a</i> et <i>b</i> : <b>(<i>a</i> + <i>b</i>)² = <i>a</i>² + 2<i>ab</i> + <i>b</i>²</b>. C’est la première <b>identité remarquable</b>.</p></div>
+<div class="why"><p>(<i>a</i> + <i>b</i>)² = (<i>a</i> + <i>b</i>)(<i>a</i> + <i>b</i>). La double distributivité donne <i>a</i>² + <i>ab</i> + <i>ba</i> + <i>b</i>², et <i>ab</i> + <i>ba</i> = 2<i>ab</i>.</p></div>
+<div class="idea"><p>Sur la figure, un carré de côté <i>a</i> + <i>b</i> se découpe en un carré <i>a</i>², un carré <i>b</i>² et <b>deux rectangles</b> <i>ab</i>. Les 12 manquants de l’exemple sont ces deux rectangles : 2 × 3 × 2 = 12.</p></div>
+<div class="ex"><p>(<i>x</i> + 4)² = <i>x</i>² + 2 × 4 × <i>x</i> + 4² = <i>x</i>² + 8<i>x</i> + 16. Contrôle pour <i>x</i> = 1 : 5² = 25 et 1 + 8 + 16 = 25. Calcul mental : 31² = (30 + 1)² = 900 + 60 + 1 = 961.</p></div>`,
    params:[{id:'a',l:'a',min:1,max:4,v:3},{id:'b',l:'b',min:1,max:3,v:2}],
    draw:v=>{ const s=v.a+v.b,P=plane({x:[-0.8,7.3],y:[-0.8,7.3],grid:false,axes:false});
      P.rect(0,v.b,v.a,v.a,{fill:'var(--math)',fo:.35,c:'var(--ink)',w:2}).rect(v.a,0,v.b,v.b,{fill:'var(--spark)',fo:.5,c:'var(--ink)',w:2})
@@ -93,6 +156,12 @@ MATHS.push(
      return P.svg(); },
    info:v=>`(${v.a} + ${v.b})² = ${v.a*v.a} + 2·${v.a*v.b} + ${v.b*v.b} = ${(v.a+v.b)**2}`,
    note:'<b>Erreur fréquente :</b> (a + b)² n’est pas a² + b². Il manque les deux rectangles ab.'},
+  {kind:'Théorie',h:'Avec un signe moins : (a − b)² et (a + b)(a − b)',p:`<p>Deux autres produits reviennent sans cesse, et ils donnent des astuces de calcul mental : 99² ou 21 × 19 se calculent en quelques secondes.</p>
+<div class="thm"><p><b>(<i>a</i> − <i>b</i>)² = <i>a</i>² − 2<i>ab</i> + <i>b</i>²</b> et <b>(<i>a</i> + <i>b</i>)(<i>a</i> − <i>b</i>) = <i>a</i>² − <i>b</i>²</b>.</p></div>
+<div class="why"><p>Par double distributivité : (<i>a</i> − <i>b</i>)(<i>a</i> − <i>b</i>) = <i>a</i>² − <i>ab</i> − <i>ba</i> + <i>b</i>², avec « moins par moins donne plus » pour le dernier terme. Et (<i>a</i> + <i>b</i>)(<i>a</i> − <i>b</i>) = <i>a</i>² − <i>ab</i> + <i>ba</i> − <i>b</i>² : les deux termes du milieu s’annulent.</p></div>
+<div class="ex"><p>99² = (100 − 1)² = 10 000 − 200 + 1 = 9 801. 21 × 19 = (20 + 1)(20 − 1) = 400 − 1 = 399. Avec des lettres : (<i>x</i> − 5)² = <i>x</i>² − 10<i>x</i> + 25.</p></div>
+<div class="idea"><p>Lues de droite à gauche, ces égalités servent à <b>factoriser</b> : <i>x</i>² − 9 = <i>x</i>² − 3² = (<i>x</i> + 3)(<i>x</i> − 3).</p></div>
+<div class="warn"><p>(<i>a</i> − <i>b</i>)² n’est pas <i>a</i>² − <i>b</i>² : pour <i>a</i> = 5 et <i>b</i> = 3, (5 − 3)² = 4 alors que 25 − 9 = 16.</p></div>`},
   {kind:'Méthode',h:'Utiliser les identités remarquables',
    p:'Trois produits reviennent si souvent qu’on les connaît par cœur : <b>(a + b)² = a² + 2ab + b²</b>, <b>(a − b)² = a² − 2ab + b²</b> et <b>(a + b)(a − b) = a² − b²</b>. Pour t’en servir, repère ce qui joue le rôle de a et de b, puis remplace.',
    demo:{enonce:'Développer (x − 3)² et (2x + 5)(2x − 5).',
@@ -115,6 +184,14 @@ MATHS.push(
     conclusion:'P = 4x + 10. Pour x = 3, P = 22. Si P = 34, alors x = 6 : le rectangle mesure 6 sur 11.'},
    note:'Pour une différence comme (x + 2)² − x², développe d’abord, puis réduis : les x² s’annulent.'},
   {h:'Réduis',p:'Réduis <i>3x + 2(x − 1)</i>.',opts:['5x − 1','5x − 2','3x + 2x − 1','6x − 2'],ans:1,why:'2(x − 1) = 2x − 2, puis 3x + 2x = 5x : on obtient 5x − 2.'},
+  {kind:'Récapitulatif',h:'Ce qu’il faut retenir',p:`<div class="keep"><ul>
+<li>Une lettre remplace un nombre. 4<i>x</i> = 4 × <i>x</i> et <i>x</i>² = <i>x</i> × <i>x</i>.</li>
+<li>Distributivité : <i>k</i>(<i>a</i> + <i>b</i>) = <i>ka</i> + <i>kb</i>. Double distributivité : (<i>a</i> + <i>b</i>)(<i>c</i> + <i>d</i>) = <i>ac</i> + <i>ad</i> + <i>bc</i> + <i>bd</i>, quatre produits.</li>
+<li>Réduire : on regroupe les termes semblables (les <i>x</i>, les <i>x</i>², les nombres) en additionnant leurs coefficients.</li>
+<li>Identités : (<i>a</i> + <i>b</i>)² = <i>a</i>² + 2<i>ab</i> + <i>b</i>², (<i>a</i> − <i>b</i>)² = <i>a</i>² − 2<i>ab</i> + <i>b</i>², (<i>a</i> + <i>b</i>)(<i>a</i> − <i>b</i>) = <i>a</i>² − <i>b</i>².</li>
+<li>Factoriser, c’est le chemin inverse : on sort le facteur commun.</li>
+<li>Contrôle toujours un calcul en remplaçant <i>x</i> par une valeur simple, comme 1 ou 2.</li></ul></div>
+<p>Dans les problèmes, écris d’abord l’expression avec <i>x</i>, puis réduis-la avant de calculer.</p>`},
   {kind:'Problème',h:'Le plan de la chambre',
    p:'Sur le plan d’une chambre rectangulaire, la largeur vaut <i>x</i> mètres et la longueur vaut 3 m de plus. Tu veux écrire l’aire et le périmètre en fonction de <i>x</i>, puis retrouver les dimensions à partir d’une mesure.',
    fig:(()=>{ const P=plane({x:[-1.5,8.5],y:[-1.2,5],grid:false,axes:false}); P.rect(0,0,7,4,{fill:'var(--math)',fo:.2,c:'var(--ink)',w:2}).text(3.5,0,'x + 3',{a:'middle',dy:18}).text(0,2,'x',{a:'end',dx:-8,dy:5}); return P.svg(); })(),
@@ -140,10 +217,21 @@ MATHS.push(
 {id:'equations1',br:'alg',lv:'ecole',h:'Équations du 1er degré',p:'Trouver l’inconnue en gardant la balance en équilibre.',
  lessons:['La balance','Équations avec parenthèses','Mettre un problème en équation','Inéquations'],
  steps:[
-  {h:'Une équation est une balance',p:'Les deux côtés pèsent pareil. On peut faire la même opération des deux côtés sans la déséquilibrer. Avance étape par étape.',
+  {h:'Une équation est une balance',p:`<p>« Je pense à un nombre. Je le triple, j’ajoute 2 et je trouve 11. Quel est mon nombre&nbsp;? » Pour répondre, on appelle le nombre <i>x</i> et on écrit 3<i>x</i> + 2 = 11.</p>
+<div class="def"><p>Une <b>équation</b> est une égalité qui contient une inconnue, souvent notée <i>x</i>. Une <b>solution</b> est une valeur de <i>x</i> qui rend l’égalité vraie. <b>Résoudre</b>, c’est trouver toutes les solutions.</p></div>
+<div class="idea"><p>Imagine une balance en équilibre. À gauche, trois boîtes de poids <i>x</i> et deux billes de poids 1. À droite, onze billes. Les deux plateaux pèsent pareil : c’est le signe =. On peut faire la même chose sur les deux plateaux sans casser l’équilibre.</p></div>
+<div class="ex"><p>Teste <i>x</i> = 4 : 3 × 4 + 2 = 14, pas 11. Teste <i>x</i> = 3 : 3 × 3 + 2 = 11. Donc 3 est solution. Deviner marche ici, mais pas avec 5<i>x</i> − 4 = 2<i>x</i> + 7, dont la solution est ${F(11,3)} : il faut une méthode.</p></div>
+<p>Avance le curseur : on enlève 2 billes de chaque plateau, puis on partage chaque plateau en trois.</p>`,
    params:[{id:'e',l:'Étape',min:0,max:2,v:0}],
    draw:v=>[balance({x:3,u:2},{x:0,u:11}),balance({x:3,u:0},{x:0,u:9}),balance({x:1,u:0},{x:0,u:3})][v.e],
    info:v=>['<b>3x + 2 = 11</b>','On enlève 2 de chaque côté : <b>3x = 9</b>','On divise chaque côté par 3 : <b>x = 3</b>'][v.e]},
+  {kind:'Théorie',h:'Les deux règles de la balance',p:`<p>Pour trouver <i>x</i>, on transforme l’équation en une équation plus simple qui a les <b>mêmes solutions</b>, jusqu’à lire « <i>x</i> = … ». Deux règles suffisent.</p>
+<div class="prop"><p><b>Règle 1 :</b> on peut ajouter ou soustraire un même nombre (ou un même terme en <i>x</i>) aux deux membres. <b>Règle 2 :</b> on peut multiplier ou diviser les deux membres par un même nombre <b>non nul</b>.</p></div>
+<div class="why"><p>Si deux plateaux pèsent pareil, ils pèsent encore pareil quand on enlève 3 billes de chacun, ou quand on garde la moitié de chacun. L’équilibre est conservé, donc la solution aussi.</p></div>
+<div class="ex"><p>2<i>x</i> + 3 = 9. On enlève 3 des deux côtés : 2<i>x</i> = 6. On divise les deux côtés par 2 : <i>x</i> = 3. Contrôle : 2 × 3 + 3 = 9. La figure montre la balance avant et après la première règle.</p></div>
+<div class="idea"><p>« Faire passer de l’autre côté en changeant de signe » n’est qu’un raccourci de la règle 1 : soustraire 3 des deux côtés fait disparaître le + 3 à gauche et fait apparaître − 3 à droite.</p></div>
+<div class="warn"><p>On ne divise jamais par 0, et on agit toujours sur <b>les deux</b> membres en entier : diviser seulement le côté gauche fausse tout.</p></div>`,
+   fig:balance({x:2,u:3},{x:0,u:9})+balance({x:2,u:0},{x:0,u:6})},
   {kind:'Méthode',h:'Isoler x pas à pas',
    p:'Pour résoudre, on défait ce qui entoure x. 1) On regroupe les termes en x d’un côté et les nombres de l’autre, en ajoutant ou en soustrayant la même chose des deux côtés. 2) On divise les deux côtés par le nombre devant x. 3) On contrôle en remplaçant x dans l’équation de départ.',
    demo:{enonce:'Résoudre 7x − 4 = 3x + 8.',
@@ -167,6 +255,12 @@ MATHS.push(
      {f:'Contrôle : 2·(7 + 5) = 24 et 4·(7 − 1) = 24 ✓',w:'On remplace x par 7 des deux côtés.'}],
     conclusion:'La solution est x = 7.'}},
   {h:'Avec parenthèses',p:'Résous <i>3(x − 2) = x + 4</i>.',lab:'x =',ans:5,why:'3x − 6 = x + 4, donc 2x = 10 et x = 5. Contrôle : 3·3 = 9 = 5 + 4.'},
+  {kind:'Théorie',h:'Aucune solution, ou tous les nombres',p:`<p>Parfois, en regroupant les <i>x</i>, ils disparaissent tous. Il ne reste qu’une égalité entre deux nombres. Que conclure&nbsp;?</p>
+<div class="prop"><p>Une équation du 1er degré a en général <b>une seule</b> solution. Mais si les <i>x</i> s’éliminent : si l’égalité restante est <b>fausse</b> (comme 3 = 5), l’équation n’a <b>aucune solution</b> ; si elle est <b>vraie</b> (comme 0 = 0), <b>tout nombre</b> est solution.</p></div>
+<div class="ex"><p>2<i>x</i> + 3 = 2<i>x</i> + 5. On enlève 2<i>x</i> des deux côtés : 3 = 5, faux. Aucun nombre ne marche : à gauche on aura toujours 2 de moins qu’à droite.</p>
+<p>2(<i>x</i> + 1) = 2<i>x</i> + 2. On développe : 2<i>x</i> + 2 = 2<i>x</i> + 2, puis 0 = 0, vrai. Les deux membres sont la même expression écrite autrement : tout nombre est solution. Test avec <i>x</i> = 10 : 22 = 22.</p></div>
+<div class="idea"><p>En situation concrète : deux tarifs « 2 CHF par km plus 3 CHF » et « 2 CHF par km plus 5 CHF » ne coûtent jamais la même chose. Le second coûte toujours 2 CHF de plus.</p></div>
+<div class="warn"><p>Trouver 0 = 0 ne veut pas dire « <i>x</i> = 0 ». Et trouver <i>x</i> = 0 est une vraie solution unique, très différente de « aucune solution ».</p></div>`},
   {kind:'Méthode',h:'Mettre un problème en équation',
    p:'1) <b>Choisis l’inconnue</b>, souvent ce qu’on demande : « soit x = … ». 2) <b>Exprime les autres quantités</b> en fonction de x. 3) <b>Traduis la phrase-clé</b> (« ensemble », « autant que », « le triple ») par une égalité. 4) Résous, puis <b>réponds par une phrase</b> et contrôle avec l’énoncé.',
    demo:{enonce:'Un stylo coûte 3 CHF de plus qu’un cahier. Deux cahiers et un stylo coûtent 18 CHF. Quel est le prix d’un cahier&nbsp;?',
@@ -179,6 +273,14 @@ MATHS.push(
    note:'Dans un problème d’âges, tout le monde vieillit du même nombre d’années : dans t ans, l’âge a devient a + t. Mets des parenthèses : « le triple de son âge dans t ans » s’écrit 3(9 + t), pas 3·9 + t.'},
   {kind:'Défi',h:'Mettre en équation',p:'Léa a trois fois l’âge de son frère. Ensemble, ils ont 48 ans. Quel âge a son frère&nbsp;?',unit:'ans',ans:12,
    why:'Frère : x. Léa : 3x. Donc x + 3x = 48, 4x = 48 et x = 12.'},
+  {kind:'Théorie',h:'Inéquation : toute une demi-droite de solutions',p:`<p>« Avec 20 CHF, combien de billets à 3 CHF puis-je acheter&nbsp;? » On ne cherche pas une égalité mais une limite : 3<i>x</i> ≤ 20. C’est une <b>inéquation</b>.</p>
+<div class="def"><p>Une inéquation compare deux expressions avec <, >, ≤ ou ≥. On lit ≤ « inférieur ou égal ». Ses solutions forment en général tout un morceau de la droite des nombres, par exemple « tous les nombres plus grands que 4 », noté <i>x</i> > 4.</p></div>
+<div class="ex"><p><i>x</i> + 3 > 7 donne <i>x</i> > 4. Le nombre 4,5 est solution (7,5 > 7), 10 aussi, mais 4 ne l’est pas (7 > 7 est faux). Sur la figure, le rond vide en 4 dit « 4 exclu ».</p></div>
+<div class="why"><p>Les deux règles de la balance marchent encore, sauf une : <b>multiplier ou diviser par un nombre négatif retourne le sens</b>. En effet 2 < 5, mais −2 > −5 : multiplier par −1 inverse l’ordre, comme un miroir autour de 0.</p></div>
+<div class="ex"><p>−2<i>x</i> < 6. On divise par −2 et on retourne : <i>x</i> > −3. Contrôle : <i>x</i> = 0 donne 0 < 6, vrai ; <i>x</i> = −4 donne 8 < 6, faux.</p></div>`,
+   fig:(()=>{ const P=plane({x:[-1.5,10.5],y:[-1.1,1.1],grid:false,axes:false});
+     P.seg(-1.2,0,10.2,0,{c:'var(--muted)',w:1.5}); for(let k=-1;k<=10;k++){ P.seg(k,-0.15,k,0.15,{c:'var(--muted)',w:1.5}).text(k,0,k<0?'−1':String(k),{a:'middle',dy:24,s:11,c:'var(--muted)'}); }
+     P.seg(4,0,10.2,0,{c:'var(--accent)',w:5}).circ(4,0,0.22,{c:'var(--accent)',w:2.5,fill:'var(--surface)',fo:1}).text(7,0,'x > 4',{a:'middle',dy:-12,s:13,c:'var(--accent)'}); return P.svg(); })()},
   {kind:'Méthode',h:'Résoudre une inéquation',
    p:'Une <b>inéquation</b> (<, >, ≤, ≥) se résout comme une équation, avec une règle en plus : si on multiplie ou divise les deux côtés par un nombre <b>négatif</b>, on <b>retourne</b> le sens de l’inégalité. La solution est un ensemble de nombres. Si l’inconnue est un nombre entier (de films, de personnes), on cherche le premier entier qui convient.',
    demo:{enonce:'Un abonnement coûte 20 CHF, plus 4 CHF par séance. Sans abonnement, une séance coûte 6 CHF. À partir de combien de séances l’abonnement est-il strictement moins cher&nbsp;?',
@@ -190,6 +292,13 @@ MATHS.push(
     conclusion:'Dès 11 séances, l’abonnement est plus avantageux.'},
    note:'Exemple de retournement : −3x < 12 donne x > −4, car on divise par −3.'},
   {h:'Le premier entier',p:'Quel est le plus petit nombre entier <i>x</i> tel que <i>3x + 5 > 20</i>&nbsp;?',lab:'x =',ans:6,why:'3x > 15, donc x > 5. Le plus petit entier strictement supérieur à 5 est 6.'},
+  {kind:'Récapitulatif',h:'Ce qu’il faut retenir',p:`<div class="keep"><ul>
+<li>Une solution d’une équation est une valeur de <i>x</i> qui rend l’égalité vraie. On la contrôle en remplaçant <i>x</i> dans l’équation de départ.</li>
+<li>Règles de la balance : on ajoute ou soustrait la même chose des deux côtés ; on multiplie ou divise les deux côtés par un même nombre non nul.</li>
+<li>Ordre de travail : développer les parenthèses, regrouper les <i>x</i> d’un côté et les nombres de l’autre, diviser par le coefficient de <i>x</i>.</li>
+<li>Si les <i>x</i> disparaissent : égalité fausse, aucune solution ; égalité vraie, tout nombre est solution.</li>
+<li>Mettre en équation : choisir l’inconnue, exprimer le reste avec elle, traduire la phrase-clé, répondre par une phrase.</li>
+<li>Inéquation : mêmes règles, mais on retourne le sens si on multiplie ou divise par un nombre négatif.</li></ul></div>`},
   {kind:'Problème',h:'Avec ou sans carte',
    p:'Au cinéma, un billet coûte 15 CHF. Avec la carte annuelle, qui coûte 30 CHF, chaque billet ne coûte plus que 10 CHF. On note <i>x</i> le nombre de films vus dans l’année. À partir de combien de films la carte vaut-elle la peine&nbsp;?',
    parts:[
@@ -213,12 +322,22 @@ MATHS.push(
 {id:'proportion',br:'ana',lv:'ecole',h:'Proportionnalité et pourcentages',p:'Règle de trois, pourcentages, TVA et soldes.',
  lessons:['Grandeurs proportionnelles','Pourcentages','Hausses et baisses successives','Échelles et vitesses'],
  steps:[
-  {h:'Proportionnel = droite qui passe par 0',p:'Si 1 kg de pommes coûte <i>p</i> francs, <i>x</i> kg coûtent <i>p·x</i>. Le graphe est une droite qui part de l’origine.',
+  {h:'Proportionnel = droite qui passe par 0',p:`<p>Au marché, 1 kg de pommes coûte 2,50 CHF. Deux fois plus de pommes coûtent deux fois plus cher, trois fois plus coûtent trois fois plus. Ce lien très régulier s’appelle la <b>proportionnalité</b>.</p>
+<div class="def"><p>Deux grandeurs <i>x</i> et <i>y</i> sont <b>proportionnelles</b> s’il existe un nombre <i>k</i>, toujours le même, tel que <i>y</i> = <i>k</i> · <i>x</i>. Ce nombre <i>k</i> est le <b>coefficient de proportionnalité</b>. Ici, <i>k</i> est le prix au kilo.</p></div>
+<div class="idea"><p>Sur le graphique, les points (quantité ; prix) sont alignés sur une droite qui <b>passe par l’origine</b> : 0 kg coûte 0 CHF. Plus <i>k</i> est grand, plus la droite est raide. Bouge le curseur pour le voir.</p></div>
+<div class="ex"><p>Avec <i>k</i> = 2,5 : 2 kg coûtent 2,5 × 2 = 5 CHF et 4 kg coûtent 2,5 × 4 = 10 CHF. Doubler la quantité double bien le prix.</p></div>
+<div class="warn"><p>Tout ce qui augmente n’est pas proportionnel. Un taxi à 5 CHF de prise en charge plus 2 CHF par km coûte 7 CHF pour 1 km et 9 CHF pour 2 km : pas le double. Sa droite ne passe pas par 0.</p></div>`,
    params:[{id:'p',l:'Prix au kilo',min:1,max:6,step:.5,v:2.5,u:' CHF'}],
    draw:v=>{ const P=plane({x:[-0.4,5.5],y:[-2,32],h:260,step:1,grid:false,lx:1,ly:10});
      for(let y=0;y<=30;y+=10) P.seg(0,y,5.5,y,{c:'var(--line)',w:1}); P.fn(x=>v.p*x,{from:0});
      [1,2,3,4,5].forEach(x=>P.dot(x,v.p*x,{r:5})); P.text(5.4,0,'kg',{a:'end',dy:-6,c:'var(--muted)'}); return P.svg(); },
    info:v=>`1 kg → ${fmt(v.p)} CHF · 2 kg → ${fmt(2*v.p)} CHF · 4 kg → ${fmt(4*v.p)} CHF`},
+  {kind:'Théorie',h:'Le tableau de proportionnalité',p:`<p>Pour organiser une situation proportionnelle, on range les valeurs dans un tableau à deux lignes. Le tableau montre d’un coup d’œil comment passer d’une ligne à l’autre.</p>
+<table style="border-collapse:collapse;margin:8px 0"><tr><td style="border:1px solid var(--line);padding:4px 10px">Cahiers</td><td style="border:1px solid var(--line);padding:4px 10px">1</td><td style="border:1px solid var(--line);padding:4px 10px">4</td><td style="border:1px solid var(--line);padding:4px 10px">6</td><td style="border:1px solid var(--line);padding:4px 10px">10</td></tr><tr><td style="border:1px solid var(--line);padding:4px 10px">Prix (CHF)</td><td style="border:1px solid var(--line);padding:4px 10px">2,50</td><td style="border:1px solid var(--line);padding:4px 10px">10</td><td style="border:1px solid var(--line);padding:4px 10px">15</td><td style="border:1px solid var(--line);padding:4px 10px">25</td></tr></table>
+<div class="prop"><p>Un tableau est de proportionnalité quand on passe de la 1re ligne à la 2e en multipliant <b>toujours par le même nombre</b> <i>k</i>. Conséquences : si on multiplie une colonne par un nombre, l’autre ligne suit ; et la somme de deux colonnes est encore une colonne.</p></div>
+<div class="ex"><p>Ici <i>k</i> = 10 ÷ 4 = 2,5 : c’est le prix d’un cahier, la colonne « 1 ». 6 cahiers coûtent 6 × 2,5 = 15 CHF. 10 cahiers, c’est 4 + 6 cahiers : 10 + 15 = 25 CHF.</p></div>
+<div class="idea"><p>Passer par la colonne « 1 », c’est la <b>règle de trois</b> : on divise pour trouver la valeur d’une unité, puis on multiplie.</p></div>
+<div class="warn"><p>Avant de calculer, vérifie que les quotients prix ÷ quantité sont tous égaux. Si 4 cahiers coûtent 10 CHF mais 8 cahiers 18 CHF (une promotion), le tableau n’est pas proportionnel.</p></div>`},
   {kind:'Méthode',h:'La règle de trois : passer par l’unité',
    p:'Deux grandeurs sont <b>proportionnelles</b> si on passe de l’une à l’autre en multipliant toujours par le même nombre. Pour calculer une valeur inconnue, on <b>passe par l’unité</b> : on calcule ce que vaut 1, puis on multiplie. Vérifie d’abord que la situation est proportionnelle : le double de quantité doit coûter le double.',
    demo:{enonce:'4 cahiers coûtent 10 CHF. Combien coûtent 7 cahiers&nbsp;?',
@@ -228,6 +347,17 @@ MATHS.push(
      {f:'Contrôle : 7 est un peu moins que le double de 4, et 17,50 un peu moins que le double de 10 ✓',w:'Un ordre de grandeur évite les erreurs grossières.'}],
     conclusion:'7 cahiers coûtent 17,50 CHF.'}},
   {h:'Règle de trois',p:'3 kg de pommes coûtent 7,50 CHF. Combien coûtent 5 kg&nbsp;?',unit:'CHF',ans:12.5,tol:.001,why:'Prix au kilo : 7,50 ÷ 3 = 2,50 CHF. Pour 5 kg : 5 × 2,50 = 12,50 CHF.'},
+  {kind:'Théorie',h:'Un pourcentage est une fraction de 100',p:`<p>« 40 % des élèves viennent à vélo », « −30 % sur les vestes » : les pourcentages permettent de comparer des parts même quand les totaux sont différents, en ramenant tout à 100.</p>
+<div class="def"><p><i>t</i> % se lit « <i>t</i> pour cent » et veut dire ${F('t',100)}. Prendre <i>t</i> % d’une quantité, c’est la multiplier par ${F('t',100)}.</p></div>
+<div class="ex"><p>15 % de 80 CHF : 0,15 × 80 = 12 CHF. 25 % = ${F(25,100)} = ${F(1,4)} : prendre 25 %, c’est prendre le quart. 50 % est la moitié, 10 % le dixième.</p></div>
+<div class="ex"><p>Dans l’autre sens : 12 filles dans une classe de 30 élèves, c’est ${F(12,30)} = 0,4 = ${F(40,100)}, donc 40 % de filles. On divise la partie par le total, puis on multiplie par 100.</p></div>
+<div class="idea"><p>Un pourcentage est un coefficient de proportionnalité : la part est proportionnelle au total. 10 % de 300 vaut 30, 10 % de 600 vaut 60.</p></div>
+<div class="warn"><p>Un pourcentage n’a de sens que si on sait <b>de quoi</b> on le prend. 10 % de 50 et 10 % de 500 ne sont pas la même somme.</p></div>`},
+  {kind:'Théorie',h:'Augmenter de t %, c’est multiplier par 1 + t/100',p:`<p>Un prix de 80 CHF augmente de 15 %. On peut calculer la hausse, 12 CHF, puis l’ajouter : 92 CHF. Il existe un chemin plus court, une seule multiplication.</p>
+<div class="prop"><p>Augmenter de <i>t</i> %, c’est multiplier par <b>1 + ${F('t',100)}</b>. Baisser de <i>t</i> %, c’est multiplier par <b>1 − ${F('t',100)}</b>. Ce nombre s’appelle le <b>coefficient multiplicateur</b>.</p></div>
+<div class="why"><p>80 + 15 % de 80 = 80 × 1 + 80 × 0,15 = 80 × (1 + 0,15) = 80 × 1,15. C’est la distributivité à l’envers : on factorise par 80.</p></div>
+<div class="ex"><p>Hausse de 15 % : 80 × 1,15 = 92 CHF. Baisse de 10 % : 92 × 0,9 = 82,80 CHF. Pour retrouver un prix avant une hausse de 15 %, on <b>divise</b> par 1,15 : 92 ÷ 1,15 = 80.</p></div>
+<div class="warn"><p>Une hausse de 10 % suivie d’une baisse de 10 % ne ramène pas au départ : 100 × 1,1 = 110, puis 110 × 0,9 = 99. La baisse porte sur 110, une somme plus grande que 100. Les coefficients successifs se <b>multiplient</b> : 1,1 × 0,9 = 0,99.</p></div>`},
   {kind:'Méthode',h:'Le coefficient multiplicateur',
    p:'Augmenter de t %, c’est multiplier par <b>1 + t/100</b>. Baisser de t %, c’est multiplier par <b>1 − t/100</b>. Pour des variations successives, on <b>multiplie les coefficients</b>, on ne les additionne pas. Le coefficient global se relit en pourcentage : 0,9 signifie −10 %, 1,035 signifie +3,5 %. Pour retrouver un prix de départ, on divise par le coefficient.',
    demo:{enonce:'Un prix de 80 CHF augmente de 15 %, puis baisse de 10 %. Quel est le prix final, et quelle est la variation totale&nbsp;?',
@@ -242,6 +372,11 @@ MATHS.push(
    opts:['Il revient au prix de départ','Il a baissé de 4 %','Il a monté de 4 %','Il a baissé de 2 %'],ans:1,
    why:'×1,2 puis ×0,8 donne ×0,96. La baisse s’applique à un montant plus grand, donc on perd 4 %.'},
   {kind:'Défi',h:'La TVA',p:'Une facture fait 200 CHF hors taxe. Avec la TVA suisse de 8,1 %, combien paie-t-on&nbsp;?',unit:'CHF',ans:216.2,tol:.001,why:'200 × 1,081 = 216,20 CHF.'},
+  {kind:'Théorie',h:'Vitesse et échelle : deux proportionnalités cachées',p:`<p>Une voiture roule à vitesse constante, une carte réduit un paysage : dans les deux cas, une grandeur est proportionnelle à une autre, et le coefficient porte un nom.</p>
+<div class="def"><p>À vitesse constante, la <b>distance</b> parcourue est proportionnelle à la <b>durée</b> : distance = vitesse × durée. La vitesse en km/h est la distance parcourue en une heure. Sur une carte à l’<b>échelle 1 : <i>n</i></b>, la longueur réelle est proportionnelle à la longueur sur la carte, avec le coefficient <i>n</i>.</p></div>
+<div class="ex"><p>À 60 km/h pendant 2,5 h : 60 × 2,5 = 150 km. Pendant 45 min, soit ${F(45,60)} = 0,75 h : 60 × 0,75 = 45 km. Sur une carte au 1:25 000, 1 cm représente 25 000 cm, c’est-à-dire 250 m.</p></div>
+<div class="idea"><p>On retrouve les trois formes d’une même relation : distance = vitesse × durée, durée = distance ÷ vitesse, vitesse = distance ÷ durée.</p></div>
+<div class="warn"><p>Les heures ne sont pas décimales : 1 h 30 min = 1,5 h, pas 1,3 h, car 30 min est la moitié d’une heure. Et avant d’utiliser une échelle, mets les deux longueurs dans la même unité.</p></div>`},
   {kind:'Méthode',h:'Échelles et vitesses',
    p:'Une échelle <b>1 : n</b> veut dire que 1 cm sur la carte vaut n cm en vrai. Longueur réelle = longueur sur la carte × n, puis on convertit (1 km = 100 000 cm). Pour retrouver n : n = longueur réelle ÷ longueur sur la carte, dans la même unité. À vitesse constante : <b>durée = distance ÷ vitesse</b>. Pour passer des heures aux minutes, on multiplie par 60.',
    demo:{enonce:'Sur une carte au 1:25 000, un chemin mesure 12 cm. Combien de temps faut-il pour le parcourir à 4 km/h&nbsp;?',
@@ -253,6 +388,14 @@ MATHS.push(
     conclusion:'Le chemin mesure 3 km et se parcourt en 45 minutes.'},
    note:'Échelle inconnue : si ces 3 km mesurent 6 cm sur une autre carte, n = 300 000 ÷ 6 = 50 000. C’est une carte au 1:50 000.'},
   {h:'Sur la carte',p:'Sur une carte au 1:20 000, deux villages sont à 7 cm l’un de l’autre. Quelle est la distance réelle&nbsp;?',unit:'km',ans:1.4,tol:.001,why:'7 × 20 000 = 140 000 cm = 1 400 m = 1,4 km.'},
+  {kind:'Récapitulatif',h:'Ce qu’il faut retenir',p:`<div class="keep"><ul>
+<li>Proportionnel : <i>y</i> = <i>k</i> · <i>x</i> avec <i>k</i> fixe. Le graphique est une droite qui passe par l’origine.</li>
+<li>Règle de trois : on passe par l’unité (on divise), puis on multiplie. Vérifie d’abord que la situation est proportionnelle.</li>
+<li><i>t</i> % = ${F('t',100)}. Pourcentage d’une partie : partie ÷ total × 100.</li>
+<li>Hausse de <i>t</i> % : × (1 + ${F('t',100)}). Baisse : × (1 − ${F('t',100)}). Variations successives : on multiplie les coefficients. Retour en arrière : on divise.</li>
+<li>Échelle 1 : <i>n</i> : réel = carte × <i>n</i>, dans la même unité (1 km = 100 000 cm).</li>
+<li>Distance = vitesse × durée, avec la durée en heures décimales.</li></ul></div>
+<p>Dans les problèmes, écris chaque étape avec son unité.</p>`},
   {kind:'Problème',h:'Soldes et carte fidélité',
    p:'Une veste coûte 180 CHF. Pendant les soldes, elle est à −30 %. À la caisse, ta carte fidélité donne encore −10 % sur le prix soldé. Le vendeur affirme que tu as eu « 40 % de rabais ». Vérifie.',
    parts:[
@@ -279,7 +422,12 @@ MATHS.push(
 {id:'pythagore',br:'geo',lv:'ecole',h:'Théorème de Pythagore',p:'Le plus célèbre des théorèmes, vu avec des carrés.',
  lessons:['Le théorème en images','La réciproque','Distances dans un repère','Pythagore dans l’espace'],
  steps:[
-  {h:'a² + b² = c²',p:'Dans un triangle rectangle, l’aire du carré construit sur l’hypoténuse égale la somme des aires des deux autres carrés.',
+  {h:'a² + b² = c²',p:`<p>Un menuisier veut vérifier qu’un coin de cadre est bien droit, un randonneur veut savoir la longueur d’une pente. Dans un triangle rectangle, connaître deux côtés suffit pour trouver le troisième. C’est le théorème de Pythagore.</p>
+<div class="def"><p>Dans un triangle <b>rectangle</b>, les deux côtés qui forment l’angle droit s’appellent les <b>côtés de l’angle droit</b>. Le troisième, en face de l’angle droit, est l’<b>hypoténuse</b> : c’est toujours le plus long côté.</p></div>
+<div class="thm"><p>Si un triangle est rectangle, de côtés de l’angle droit <i>a</i> et <i>b</i> et d’hypoténuse <i>c</i>, alors <b><i>a</i>² + <i>b</i>² = <i>c</i>²</b>.</p></div>
+<div class="idea"><p>Construis un carré sur chaque côté. L’aire du grand carré, posé sur l’hypoténuse, égale la somme des aires des deux petits. La figure affiche ces aires : bouge les curseurs, l’égalité tient toujours.</p></div>
+<div class="ex"><p>Avec <i>a</i> = 3 et <i>b</i> = 4 : 9 + 16 = 25 = <i>c</i>², donc <i>c</i> = 5, car 5 × 5 = 25.</p></div>
+<div class="warn"><p>Le théorème ne vaut que pour un triangle rectangle. Et l’égalité porte sur les <b>carrés</b> : 3 + 4 = 7 n’est pas la longueur de l’hypoténuse.</p></div>`,
    params:[{id:'a',l:'Côté a',min:1,max:5,v:3},{id:'b',l:'Côté b',min:1,max:5,v:4}],
    draw:v=>{ const a=v.a,b=v.b,P=plane({x:[-5.5,10.5],y:[-5.5,10.5],grid:false,axes:false,w:300});
      P.poly([[0,0],[a,0],[a,-a],[0,-a]],{fill:'var(--math)',fo:.35,c:'var(--ink)',w:1.5})
@@ -289,6 +437,22 @@ MATHS.push(
      P.text(a/2,-a/2,`${a*a}`,{a:'middle',dy:5,s:15}).text(-b/2,b/2,`${b*b}`,{a:'middle',dy:5,s:15}).text((a+b)/2,(a+b)/2,`${a*a+b*b}`,{a:'middle',dy:5,s:16});
      return P.svg(); },
    info:v=>`${v.a}² + ${v.b}² = ${v.a*v.a} + ${v.b*v.b} = ${v.a*v.a+v.b*v.b}, donc c = ${fmt(Math.hypot(v.a,v.b))}`},
+  {kind:'Théorie',h:'Pourquoi c’est vrai : la preuve par découpage',p:`<p>Vérifier sur quelques triangles ne prouve rien : il faudrait les essayer tous. Voici un argument qui marche pour n’importe quel triangle rectangle, avec seulement des aires.</p>
+<div class="why"><p>Prends un grand carré de côté <i>a</i> + <i>b</i>. Place dans ses coins quatre copies du triangle rectangle, comme sur la figure. Au milieu, il reste un carré penché dont le côté est l’hypoténuse <i>c</i>. On calcule l’aire du grand carré de deux façons :</p>
+<p>(<i>a</i> + <i>b</i>)² = 4 × ${F('ab',2)} + <i>c</i>², soit <i>a</i>² + 2<i>ab</i> + <i>b</i>² = 2<i>ab</i> + <i>c</i>².</p>
+<p>On enlève 2<i>ab</i> des deux côtés : <i>a</i>² + <i>b</i>² = <i>c</i>².</p></div>
+<div class="ex"><p>Avec <i>a</i> = 3 et <i>b</i> = 4 : le grand carré a une aire de 7² = 49. Les quatre triangles font 4 × 6 = 24. Il reste 49 − 24 = 25 pour le carré du milieu, donc <i>c</i> = 5.</p></div>
+<div class="idea"><p>La preuve utilise l’identité (<i>a</i> + <i>b</i>)² = <i>a</i>² + 2<i>ab</i> + <i>b</i>² et l’aire d’un triangle rectangle, la moitié du rectangle <i>a</i> × <i>b</i>.</p></div>
+<div class="warn"><p>Le carré du milieu est bien un carré seulement parce que les triangles ont un angle droit : sans angle droit, l’argument tombe.</p></div>`,
+   fig:(()=>{ const P=plane({x:[-1,8],y:[-1,8],grid:false,axes:false,w:240});
+     [[[0,0],[3,0],[0,4]],[[3,0],[7,0],[7,3]],[[7,3],[7,7],[4,7]],[[4,7],[0,7],[0,4]]].forEach(t=>P.poly(t,{fill:'var(--spark)',fo:.45,c:'var(--ink)',w:1.5}));
+     P.poly([[3,0],[7,3],[4,7],[0,4]],{fill:'var(--accent)',fo:.25,c:'var(--ink)',w:2}).text(3.5,3.5,'c²',{a:'middle',dy:6,s:17});
+     P.text(1.5,0,'a',{a:'middle',dy:16}).text(5,0,'b',{a:'middle',dy:16}).text(0,2,'b',{a:'end',dx:-6,dy:5}).text(0,5.5,'a',{a:'end',dx:-6,dy:5}); return P.svg(); })()},
+  {kind:'Théorie',h:'La racine carrée défait le carré',p:`<p>Pythagore donne <i>c</i>² = 25. Mais on veut <i>c</i>, pas <i>c</i>². Il faut une opération qui fasse le chemin inverse du carré.</p>
+<div class="def"><p>Pour un nombre <i>x</i> ≥ 0, la <b>racine carrée</b> de <i>x</i>, notée <b>√<i>x</i></b>, est le nombre positif dont le carré vaut <i>x</i>. Le symbole √ vient d’un « r » stylisé, pour « racine ».</p></div>
+<div class="ex"><p>√25 = 5 car 5² = 25. √49 = 7, √144 = 12, √1 = 1, √0 = 0. Souvent le résultat n’est pas entier : √2 ≈ 1,414, car 1,414² = 1,999 396, presque 2. On garde alors la valeur exacte √2 ou un arrondi.</p></div>
+<div class="idea"><p>√<i>x</i> est le côté d’un carré d’aire <i>x</i>. Un carré de 49 cm² a un côté de 7 cm. C’est exactement le lien entre les carrés de la figure de Pythagore et les côtés du triangle.</p></div>
+<div class="warn"><p>La racine d’une somme n’est pas la somme des racines : √(9 + 16) = √25 = 5, alors que √9 + √16 = 3 + 4 = 7. On additionne d’abord les carrés, et on prend la racine <b>à la fin</b>. Et √(−4) n’existe pas : aucun carré n’est négatif.</p></div>`},
   {kind:'Méthode',h:'Calculer un côté avec Pythagore',
    p:'Repère d’abord l’<b>hypoténuse</b> : le côté en face de l’angle droit, toujours le plus long. Écris ensuite <b>hypoténuse² = côté² + côté²</b>. Si on cherche l’hypoténuse, on additionne les carrés. Si on cherche un côté de l’angle droit, on <b>soustrait</b> : côté² = hypoténuse² − autre côté². On termine par une racine carrée.',
    demo:{enonce:'Le triangle ABC est rectangle en B, avec AC = 13 cm et AB = 5 cm. Calculer BC.',
@@ -303,6 +467,11 @@ MATHS.push(
    fig:(()=>{ const P=plane({x:[-0.5,4.5],y:[-0.5,5],grid:false,axes:false,w:240}); P.seg(0,0,4.2,0,{c:'var(--muted)',w:3}).seg(0,0,0,4.8,{c:'var(--muted)',w:6}).seg(3,0,0,4,{c:'var(--spark)',w:5})
      .text(1.5,0,'3 m',{a:'middle',dy:18}).text(1.6,2.2,'5 m',{s:14}).text(0,2,'?',{dx:-14,s:16}); return P.svg(); })(),
    unit:'m',ans:4,why:'h² + 3² = 5², donc h² = 25 − 9 = 16 et h = 4 m.'},
+  {kind:'Théorie',h:'La réciproque : reconnaître un angle droit',p:`<p>Les bâtisseurs anciens traçaient des angles droits avec une simple corde à nœuds. En la tendant en triangle de côtés 3, 4 et 5, ils obtenaient un angle droit. Pourquoi est-ce sûr&nbsp;?</p>
+<div class="thm"><p><b>Réciproque de Pythagore :</b> si, dans un triangle, le carré du plus grand côté est égal à la somme des carrés des deux autres, alors le triangle est rectangle, et l’angle droit est <b>en face du plus grand côté</b>.</p></div>
+<div class="idea"><p>Le théorème part de l’angle droit et arrive à l’égalité. La réciproque fait le chemin inverse : de l’égalité vers l’angle droit. On peut aussi l’utiliser pour dire non : si l’égalité est fausse, le triangle n’est <b>pas</b> rectangle, sinon le théorème direct serait contredit.</p></div>
+<div class="ex"><p>Côtés 6, 8 et 10 : 10² = 100 et 6² + 8² = 36 + 64 = 100. Égalité : rectangle, l’angle droit est en face du côté 10. Côtés 4, 5 et 6 : 6² = 36 et 4² + 5² = 16 + 25 = 41. 36 ≠ 41 : pas rectangle.</p></div>
+<div class="warn"><p>Compare toujours le carré du <b>plus grand</b> côté avec la somme des deux autres. Avec 6, 8 et 10, calculer 6² + 10² ne mène à rien. Et un dessin « qui a l’air droit » ne prouve rien : seul le calcul compte.</p></div>`},
   {kind:'Méthode',h:'Prouver qu’un triangle est rectangle',
    p:'On connaît les trois côtés. 1) Repère le plus grand. 2) Calcule son carré d’une part, la somme des carrés des deux autres d’autre part. 3) Compare. En cas d’égalité, le triangle est rectangle, et l’angle droit est <b>en face du plus grand côté</b> : c’est la <b>réciproque</b> de Pythagore. Sinon, il n’est pas rectangle.',
    demo:{enonce:'Les triangles de côtés 8, 15, 17 et 6, 7, 9 sont-ils rectangles&nbsp;?',
@@ -314,6 +483,14 @@ MATHS.push(
     conclusion:'Le triangle 8, 15, 17 est rectangle, le triangle 6, 7, 9 ne l’est pas.'}},
   {kind:'Défi',h:'La réciproque',p:'Un triangle a des côtés de 5, 12 et 13 cm. Est-il rectangle&nbsp;?',opts:['Oui','Non','On ne peut pas savoir sans mesurer un angle'],ans:0,
    why:'5² + 12² = 25 + 144 = 169 = 13². La réciproque de Pythagore dit qu’il est rectangle.'},
+  {kind:'Théorie',h:'La distance entre deux points d’un repère',p:`<p>Sur un plan quadrillé, mesurer en suivant les lignes est facile. Mais la distance à vol d’oiseau entre deux points, en biais, ne se lit pas sur le quadrillage. Pythagore la donne.</p>
+<div class="prop"><p>Pour A(<i>x</i><sub>A</sub> ; <i>y</i><sub>A</sub>) et B(<i>x</i><sub>B</sub> ; <i>y</i><sub>B</sub>) : <b>AB² = (<i>x</i><sub>B</sub> − <i>x</i><sub>A</sub>)² + (<i>y</i><sub>B</sub> − <i>y</i><sub>A</sub>)²</b>, puis AB = √(AB²).</p></div>
+<div class="why"><p>Pars de A, avance horizontalement jusqu’au point C sous B, puis monte jusqu’à B. Le trajet AC est horizontal, CB vertical : l’angle en C est droit. [AB] est l’hypoténuse du triangle ACB, dont les côtés de l’angle droit sont les écarts des coordonnées.</p></div>
+<div class="ex"><p>Sur la figure, A(1 ; 1) et B(5 ; 4) : écarts 5 − 1 = 4 et 4 − 1 = 3. AB² = 16 + 9 = 25, donc AB = 5. Autre exemple : A(1 ; 2) et B(6 ; 14) donnent des écarts 5 et 12, AB² = 25 + 144 = 169 et AB = 13.</p></div>
+<div class="warn"><p>Un écart peut être négatif, son carré ne l’est jamais : (−3)² = 9. L’ordre des points ne change donc rien. Attention aux parenthèses : 5 − (−1) = 6.</p></div>`,
+   fig:(()=>{ const P=plane({x:[-0.5,6.5],y:[-0.5,5],w:260,lab:1});
+     P.seg(1,1,5,1,{c:'var(--spark)',w:2.5,dash:true}).seg(5,1,5,4,{c:'var(--spark)',w:2.5,dash:true}).seg(1,1,5,4,{c:'var(--accent)',w:3});
+     P.dot(1,1,{l:'A',dx:-14}).dot(5,4,{l:'B'}).dot(5,1,{l:'C',dy:16,r:4,c:'var(--muted)'}).text(3,1,'4',{a:'middle',dy:16}).text(5,2.5,'3',{dx:8}); return P.svg(); })()},
   {kind:'Méthode',h:'Pythagore dans un repère et dans l’espace',
    p:'Dans un repère, [AB] est l’hypoténuse d’un triangle rectangle dont les côtés sont les écarts des coordonnées : <b>AB² = (x<sub>B</sub> − x<sub>A</sub>)² + (y<sub>B</sub> − y<sub>A</sub>)²</b>. Dans un pavé de dimensions L, l et h, on applique Pythagore deux fois : la diagonale du sol, puis la grande diagonale. D’où <b>D² = L² + l² + h²</b>. Enfin, l’aire d’un triangle rectangle vaut le produit des deux côtés de l’angle droit, divisé par 2.',
    demo:{enonce:'Calculer la distance entre A(2 ; 1) et B(5 ; 5), puis la grande diagonale d’un pavé de 2 × 3 × 6.',
@@ -324,6 +501,14 @@ MATHS.push(
      {f:'Grande diagonale : D² = d² + 6² = 13 + 36 = 49, donc D = 7',w:'La diagonale du sol et l’arête verticale forment un angle droit.'}],
     conclusion:'AB = 5 et la grande diagonale du pavé mesure 7.'}},
   {h:'Distance dans un repère',p:'Quelle est la distance entre A(−1 ; 2) et B(5 ; 10)&nbsp;?',lab:'AB =',ans:10,why:'Écarts : 5 − (−1) = 6 et 10 − 2 = 8. AB² = 36 + 64 = 100, donc AB = 10.'},
+  {kind:'Récapitulatif',h:'Ce qu’il faut retenir',p:`<div class="keep"><ul>
+<li>L’hypoténuse est le côté en face de l’angle droit, le plus long.</li>
+<li>Théorème : si le triangle est rectangle, hypoténuse² = côté² + côté². On le prouve en découpant un carré de côté <i>a</i> + <i>b</i>.</li>
+<li>Pour l’hypoténuse, on additionne les carrés ; pour un côté de l’angle droit, on soustrait. On termine par une racine carrée, prise à la fin.</li>
+<li>Réciproque : si le carré du plus grand côté égale la somme des carrés des deux autres, le triangle est rectangle. Sinon, il ne l’est pas.</li>
+<li>Repère : AB² = (<i>x</i><sub>B</sub> − <i>x</i><sub>A</sub>)² + (<i>y</i><sub>B</sub> − <i>y</i><sub>A</sub>)².</li>
+<li>Pavé : D² = L² + l² + h², Pythagore appliqué deux fois.</li></ul></div>
+<p>Dans les problèmes, cherche d’abord le triangle rectangle caché dans la situation.</p>`},
   {kind:'Problème',h:'La tringle dans la chambre',
    p:'Une chambre a la forme d’un pavé : 4 m de long, 3 m de large et 2,4 m de haut. Tu dois y ranger une tringle rigide de 5,3 m. Rentre-t-elle, et comment&nbsp;?',
    parts:[
@@ -347,12 +532,38 @@ MATHS.push(
 {id:'aires',br:'geo',lv:'ecole',h:'Aires et périmètres',p:'Du rectangle au disque, découper et recoller.',
  lessons:['Le parallélogramme','Triangles et trapèzes','Le disque et π','Volumes de solides'],
  steps:[
-  {h:'Pencher sans changer l’aire',p:'Coupe le triangle de gauche d’un parallélogramme, recolle-le à droite : tu obtiens un rectangle. Son aire vaut toujours <b>base × hauteur</b>.',
+  {kind:'Théorie',h:'Aire ou périmètre : deux mesures différentes',p:`<p>Pour clôturer un jardin, tu as besoin de la longueur de son tour. Pour y semer du gazon, tu as besoin de sa surface. Ce sont deux questions différentes, avec deux réponses différentes.</p>
+<div class="def"><p>Le <b>périmètre</b> d’une figure est la longueur de son bord : il se mesure en cm, m, km. Son <b>aire</b> est la place qu’elle occupe : c’est le nombre de carrés unités qu’elle contient. Elle se mesure en cm² (carrés de 1 cm de côté), m², km².</p></div>
+<div class="ex"><p>Le rectangle de la figure mesure 6 cm sur 4 cm. Périmètre : 6 + 4 + 6 + 4 = 20 cm. Aire : 4 rangées de 6 carrés, soit 6 × 4 = 24 cm². Un rectangle de 10 cm sur 2 cm a un périmètre plus grand, 24 cm, mais une aire plus petite, 20 cm².</p></div>
+<div class="idea"><p>Un périmètre additionne des longueurs. Une aire multiplie deux longueurs : c’est pourquoi son unité porte un « ² ».</p></div>
+<div class="warn"><p>1 m = 100 cm, mais 1 m² n’est pas 100 cm². Un carré de 1 m de côté contient 100 rangées de 100 petits carrés : 1 m² = 10 000 cm².</p></div>`,
+   fig:(()=>{ const P=plane({x:[-1.7,7],y:[-1,4.6],grid:false,axes:false,w:260});
+     for(let i=0;i<6;i++) for(let j=0;j<4;j++) P.rect(i,j,1,1,{fill:'var(--math)',fo:.2,c:'var(--line)',w:1});
+     P.rect(0,0,6,4,{c:'var(--spark)',w:3.5}).text(3,0,'6 cm',{a:'middle',dy:18}).text(0,2,'4 cm',{a:'end',dx:-4,dy:5,s:11}); return P.svg(); })()},
+  {h:'Pencher sans changer l’aire',p:`<p>Un parallélogramme a ses côtés opposés parallèles, mais il penche. Comment mesurer sa surface, alors qu’on ne sait compter les carrés que dans un rectangle&nbsp;?</p>
+<div class="def"><p>On choisit un côté comme <b>base</b>. La <b>hauteur</b> est la distance entre la base et le côté opposé, mesurée <b>perpendiculairement</b> à la base. Aire du parallélogramme = <b>base × hauteur</b>.</p></div>
+<div class="idea"><p>Coupe le triangle de gauche le long de la hauteur pointillée, et recolle-le à droite : tu obtiens un rectangle de même base et de même hauteur. On n’a rien ajouté ni enlevé, donc l’aire est la même.</p></div>
+<div class="ex"><p>Base 5, hauteur 3 : aire = 5 × 3 = 15, quelle que soit l’inclinaison du curseur. Avec une inclinaison de 1,5, le côté penché mesure environ 3,35, mais ce nombre ne sert pas pour l’aire.</p></div>
+<div class="warn"><p>Ne multiplie pas les deux côtés : 5 × 3,35 ≈ 16,8 est faux. Plus le parallélogramme penche, plus son côté s’allonge, mais son aire ne bouge pas.</p></div>`,
    params:[{id:'s',l:'Inclinaison',min:-3,max:3,step:.5,v:1.5}],
    draw:v=>{ const P=plane({x:[-3.5,8.5],y:[-1,4],grid:false,axes:false});
      P.poly([[0,0],[5,0],[5+v.s,3],[v.s,3]],{fill:'var(--math)',fo:.3,c:'var(--ink)',w:2}).rect(0,0,5,3,{c:'var(--muted)',w:1.5,dash:true});
      P.seg(v.s,3,v.s,0,{c:'var(--spark)',w:2,dash:true}).text(2.5,0,'base 5',{a:'middle',dy:18}).text(v.s,1.5,'h = 3',{dx:6}); return P.svg(); },
    info:()=>'Aire = 5 × 3 = 15, quelle que soit l’inclinaison.'},
+  {kind:'Théorie',h:'Le triangle, moitié d’un parallélogramme',p:`<p>On sait calculer l’aire d’un parallélogramme. Un triangle n’en est pas un, mais il en est exactement la moitié.</p>
+<div class="prop"><p>Aire d’un triangle = ${F('base × hauteur',2)}. La hauteur est le segment issu du sommet opposé, <b>perpendiculaire</b> à la base (ou à son prolongement).</p></div>
+<div class="why"><p>Prends une copie du triangle, fais-la tourner d’un demi-tour et colle-la contre le côté de droite. Les deux triangles forment un parallélogramme de même base et de même hauteur (figure). Le triangle en est la moitié, donc son aire est base × hauteur ÷ 2.</p></div>
+<div class="ex"><p>Sur la figure, base 6 et hauteur 3 : le parallélogramme a une aire de 18, le triangle de ${F(18,2)} = 9. Dans un triangle rectangle de côtés de l’angle droit 5 et 8, l’un sert de base, l’autre de hauteur : aire = 5 × 8 ÷ 2 = 20.</p></div>
+<div class="idea"><p>N’importe quel côté peut servir de base, à condition de prendre la hauteur qui lui correspond. Le résultat est toujours le même. Le trapèze se traite de la même façon : deux trapèzes identiques forment un parallélogramme de base « grande base + petite base ».</p></div>
+<div class="warn"><p>N’oublie pas le « ÷ 2 ». Et dans un triangle très ouvert, la hauteur tombe en dehors du triangle, sur le prolongement de la base.</p></div>`,
+   fig:(()=>{ const P=plane({x:[-0.8,8.8],y:[-1,3.8],grid:false,axes:false,w:300});
+     P.poly([[6,0],[8,3],[2,3]],{fill:'var(--spark)',fo:.2,c:'var(--muted)',w:1.5,dash:true}).poly([[0,0],[6,0],[2,3]],{fill:'var(--math)',fo:.35,c:'var(--ink)',w:2});
+     P.seg(2,3,2,0,{c:'var(--accent)',w:2,dash:true}).text(3,0,'base 6',{a:'middle',dy:18}).text(2,1.5,'h = 3',{dx:6,s:12}); return P.svg(); })()},
+  {kind:'Théorie',h:'Le disque et le nombre π',p:`<p>Enroule une ficelle autour d’une boîte ronde, puis compare sa longueur au diamètre. Tu trouves un peu plus de 3 fois le diamètre. Et ceci pour <b>tous</b> les cercles, petits ou grands.</p>
+<div class="def"><p>Le quotient périmètre ÷ diamètre est le même pour tous les cercles. Ce nombre s’appelle <b>π</b> (« pi ») : π ≈ 3,14159. D’où, pour un cercle de rayon <i>r</i> et de diamètre <i>d</i> = 2<i>r</i> : <b>périmètre = π · <i>d</i> = 2π<i>r</i></b> et <b>aire du disque = π<i>r</i>²</b>.</p></div>
+<div class="idea"><p>D’où vient π<i>r</i>²&nbsp;? Découpe le disque en parts de pizza très fines et range-les tête-bêche. Elles forment presque un rectangle de hauteur <i>r</i> et de longueur la moitié du tour, π<i>r</i>. Aire : π<i>r</i> × <i>r</i> = π<i>r</i>².</p></div>
+<div class="ex"><p>Rayon 4 cm : périmètre = 2π × 4 = 8π ≈ 25,13 cm et aire = π × 4² = 16π ≈ 50,27 cm².</p></div>
+<div class="warn"><p>Repère si on te donne le rayon ou le diamètre : le rayon est la moitié du diamètre. Et π<i>r</i>² veut dire π × <i>r</i> × <i>r</i>, pas (π<i>r</i>)².</p></div>`},
   {kind:'Méthode',h:'Choisir la bonne formule',
    p:'<ul><li>Rectangle : L × l. Parallélogramme : base × hauteur.</li><li>Triangle : <b>base × hauteur ÷ 2</b>, la moitié d’un parallélogramme.</li><li>Trapèze : (grande base + petite base) × hauteur ÷ 2.</li><li>Disque de rayon r : aire <b>π·r²</b>, périmètre <b>2π·r = π·d</b>.</li></ul>La hauteur est toujours perpendiculaire à la base. Si on te donne le diamètre, divise-le par 2 avant d’utiliser π·r².',
    demo:{enonce:'Calculer l’aire et le périmètre d’un disque de diamètre 10 cm (au centième), puis l’aire d’un trapèze de bases 7 cm et 3 cm, de hauteur 4 cm.',
@@ -367,6 +578,11 @@ MATHS.push(
   {h:'Le disque',p:'Aire d’un disque de rayon 3 cm, arrondie au centième&nbsp;?',unit:'cm²',ans:28.27,tol:.011,why:'A = π·r² = π × 9 ≈ 28,27 cm².'},
   {h:'Le tour de la roue',p:'Une roue a un diamètre de 60 cm. Quelle distance parcourt-elle en un tour&nbsp;? (au centième)',unit:'cm',ans:188.5,tol:.011,why:'Un tour, c’est le périmètre : π × d = 60π ≈ 188,50 cm.'},
   {kind:'Défi',h:'Changer d’échelle',p:'Si on double le côté d’un carré, son aire est…',opts:['doublée','multipliée par 4','multipliée par 8','inchangée'],ans:1,why:'(2c)² = 4c². L’aire grandit comme le carré des longueurs.'},
+  {kind:'Théorie',h:'Agrandir une figure : longueurs × k, aires × k²',p:`<p>Une pizza de 30 cm de diamètre coûte-t-elle normalement deux fois plus qu’une pizza de 15 cm&nbsp;? Non : elle contient bien plus que le double de pâte.</p>
+<div class="prop"><p>Si toutes les longueurs d’une figure sont multipliées par un nombre <i>k</i>, son <b>périmètre</b> est multiplié par <i>k</i> et son <b>aire</b> par <b><i>k</i>²</b>. Pour un solide, le volume est multiplié par <i>k</i>³.</p></div>
+<div class="why"><p>Une aire est toujours un produit de deux longueurs (base × hauteur, <i>r</i> × <i>r</i>…). Chacune est multipliée par <i>k</i>, donc le produit est multiplié par <i>k</i> × <i>k</i> = <i>k</i>².</p></div>
+<div class="ex"><p>Un carré de côté 2 a une aire de 4. Triple son côté : côté 6, aire 36 = 9 × 4, et 9 = 3². Pizza : le rayon passe de 7,5 à 15 cm, donc <i>k</i> = 2 et l’aire est multipliée par 4. La grande pizza vaut quatre petites.</p></div>
+<div class="warn"><p>Le périmètre, lui, n’est multiplié que par <i>k</i> : le carré de côté 6 a un tour de 24, trois fois celui du carré de côté 2, qui vaut 8.</p></div>`},
   {kind:'Méthode',h:'Découper une figure composée',
    p:'Une figure compliquée se <b>découpe</b> en morceaux simples : rectangles, triangles, disques, demi-disques. On <b>ajoute</b> les aires des morceaux et on <b>retranche</b> celles des trous. Pour un périmètre, on suit le bord : seules les lignes extérieures comptent. Si une longueur est inconnue mais qu’on connaît le total, on écrit l’égalité et on isole la longueur.',
    demo:{enonce:'Un massif de fleurs est formé d’un rectangle de 6 m sur 4 m et d’un demi-disque de diamètre 4 m collé sur un petit côté. Calculer son aire et son périmètre, puis la longueur du rectangle qui donnerait un tour de 25 m.',
@@ -377,6 +593,14 @@ MATHS.push(
      {f:'L = (25 − 4 − 2π) ÷ 2 ≈ 7,36 m',w:'On isole L : on retire ce qui est connu, puis on divise par 2.'}],
     conclusion:'Aire ≈ 30,28 m², périmètre ≈ 22,28 m. Pour un tour de 25 m, le rectangle doit mesurer environ 7,36 m de long.'},
    note:'Quand on achète des pots de peinture ou des rouleaux, on arrondit toujours <b>vers le haut</b> : 3,2 pots, c’est 4 pots.'},
+  {kind:'Récapitulatif',h:'Ce qu’il faut retenir',p:`<div class="keep"><ul>
+<li>Périmètre : longueur du bord, en cm ou m. Aire : nombre de carrés unités, en cm² ou m². 1 m² = 10 000 cm².</li>
+<li>Rectangle : L × l. Parallélogramme : base × hauteur, la hauteur étant perpendiculaire à la base.</li>
+<li>Triangle : base × hauteur ÷ 2. Trapèze : (grande base + petite base) × hauteur ÷ 2.</li>
+<li>Cercle : périmètre π<i>d</i> = 2π<i>r</i>. Disque : aire π<i>r</i>², avec le rayon.</li>
+<li>Figure composée : on découpe, on additionne les morceaux, on retire les trous. Pour le périmètre, seul le bord extérieur compte.</li>
+<li>Longueurs × <i>k</i> : périmètre × <i>k</i>, aire × <i>k</i>².</li></ul></div>
+<p>Dans les problèmes, fais un croquis et note l’unité de chaque résultat.</p>`},
   {kind:'Problème',h:'Repeindre le mur',
    p:'Tu repeins un mur de 4,5 m de large et 2,5 m de haut. Il contient une porte de 0,9 m sur 2 m et une fenêtre ronde de rayon 0,4 m, qu’on ne peint pas. Il faut deux couches, et un pot couvre 5 m².',
    parts:[
@@ -400,12 +624,22 @@ MATHS.push(
 {id:'thales',br:'geo',lv:'ecole',h:'Thalès et agrandissements',p:'Mesurer un arbre avec son ombre, lire une carte.',
  lessons:['Agrandir et réduire','Le théorème de Thalès','Mesurer l’inaccessible','Échelles des cartes'],
  steps:[
-  {h:'Agrandir d’un facteur k',p:'Quand on agrandit une figure d’un facteur <i>k</i>, toutes les longueurs sont multipliées par <i>k</i>. Les angles ne changent pas.',
+  {h:'Agrandir d’un facteur k',p:`<p>Quand tu zoomes sur une photo, le visage grandit mais reste le même visage : rien n’est déformé. En géométrie, on dit que la photo a été <b>agrandie</b>.</p>
+<div class="def"><p>Agrandir ou réduire une figure d’un <b>facteur</b> <i>k</i> (un nombre positif), c’est multiplier <b>toutes</b> ses longueurs par <i>k</i>. Si <i>k</i> > 1, c’est un agrandissement ; si <i>k</i> < 1, une réduction. Les <b>angles</b> ne changent pas.</p></div>
+<div class="idea"><p>La forme est conservée parce que tous les côtés grandissent dans la même proportion. Sur la figure, le petit triangle et le grand ont exactement les mêmes angles. Bouge le curseur : sous 1, le « grand » devient plus petit que l’original.</p></div>
+<div class="ex"><p>Un triangle de côtés 2, 3 et 4 cm, agrandi avec <i>k</i> = 1,5, a des côtés de 3 ; 4,5 et 6 cm. Réduit avec <i>k</i> = 0,5, il a des côtés de 1 ; 1,5 et 2 cm. Le périmètre passe de 9 cm à 13,5 cm (× 1,5), comme l’indique la ligne sous la figure.</p></div>
+<div class="warn"><p>Ajouter la même longueur à chaque côté déforme la figure. Un rectangle de 2 sur 4 auquel on ajoute 2 cm partout devient 4 sur 6 : la longueur valait le double de la largeur, elle n’en vaut plus qu’une fois et demie.</p></div>`,
    params:[{id:'k',l:'Facteur k',min:.5,max:3,step:.25,v:2}],
    draw:v=>{ const P=plane({x:[-0.5,9],y:[-0.5,6],grid:false,axes:false}); const t=[[0,0],[2,0],[0.6,1.6]];
      P.poly(t.map(p=>[p[0]*v.k,p[1]*v.k]),{fill:'var(--math)',fo:.25,c:'var(--math)',w:2.5}).poly(t,{fill:'var(--spark)',fo:.6,c:'var(--ink)',w:1.5});
      return P.svg(); },
    info:v=>`Périmètre × ${fmt(v.k)} · Aire × ${fmt(v.k*v.k,4)}`},
+  {kind:'Théorie',h:'Reconnaître un agrandissement : des rapports égaux',p:`<p>On te montre deux rectangles. L’un est-il un agrandissement de l’autre, ou bien a-t-il été étiré&nbsp;? Il suffit de calculer des quotients.</p>
+<div class="prop"><p>Une figure est un agrandissement (ou une réduction) d’une autre si les <b>rapports</b> entre longueurs correspondantes sont tous égaux : ${F('longueur de l’image','longueur d’origine')} = <i>k</i>, toujours le même nombre. Ce rapport commun est le facteur.</p></div>
+<div class="ex"><p>Rectangles 4 × 6 et 10 × 15 : ${F(10,4)} = 2,5 et ${F(15,6)} = 2,5. Les rapports sont égaux : le second est un agrandissement du premier, de facteur 2,5.</p>
+<p>Rectangles 4 × 6 et 6 × 8 : ${F(6,4)} = 1,5 mais ${F(8,6)} ≈ 1,33. Les rapports diffèrent : le second a été déformé.</p></div>
+<div class="idea"><p>Les rapports égaux, c’est encore de la proportionnalité : les longueurs de l’image sont proportionnelles aux longueurs d’origine, avec le coefficient <i>k</i>.</p></div>
+<div class="warn"><p>Associe bien les côtés qui se correspondent : la longueur avec la longueur, la largeur avec la largeur. Comparer 10 avec 6 n’aurait aucun sens.</p></div>`},
   {kind:'Méthode',h:'Calculer avec un facteur d’agrandissement',
    p:'Le <b>facteur</b> k se calcule avec deux longueurs qui se correspondent : <b>k = longueur de l’image ÷ longueur d’origine</b>. Si k > 1, on agrandit ; si k < 1, on réduit. Toutes les longueurs sont multipliées par k, les <b>aires par k²</b> et les volumes par k³. Les angles ne changent pas.',
    demo:{enonce:'Un triangle de côtés 3, 4 et 5 cm, d’aire 6 cm², est agrandi : le côté de 3 cm devient 7,5 cm. Calculer le facteur, les autres côtés et la nouvelle aire.',
@@ -415,6 +649,21 @@ MATHS.push(
      {f:'Aire : 6 × 2,5² = 6 × 6,25 = 37,5 cm²',w:'Une aire est faite de deux longueurs : elle est multipliée par k².'},
      {f:'Contrôle : 7,5 × 10 ÷ 2 = 37,5 ✓',w:'Le triangle 3, 4, 5 est rectangle : son aire vaut le produit des côtés de l’angle droit, divisé par 2.'}],
     conclusion:'k = 2,5 ; côtés de 7,5, 10 et 12,5 cm ; aire de 37,5 cm², et non 15 cm².'}},
+  {kind:'Théorie',h:'La configuration de Thalès',p:`<p>Coupe un triangle par une droite parallèle à l’un de ses côtés. Tu détaches en haut un petit triangle. Il a exactement la même forme que le grand : c’en est une réduction.</p>
+<div class="thm"><p><b>Théorème de Thalès :</b> dans un triangle ABC, soit M un point de [AB] et N un point de [AC]. Si (MN) est <b>parallèle</b> à (BC), alors ${F('AM','AB')} = ${F('AN','AC')} = ${F('MN','BC')}.</p></div>
+<div class="why"><p>Les triangles AMN et ABC ont l’angle en A en commun. Comme (MN) et (BC) sont parallèles, les angles en M et en B sont égaux, de même en N et en C. Mêmes angles : AMN est une réduction de ABC, et le rapport commun est le facteur de réduction.</p></div>
+<div class="ex"><p>Sur la figure, AM = 4, AB = 10, AC = 15 et BC = 12. Le facteur vaut ${F(4,10)} = 0,4. Donc AN = 15 × 0,4 = 6 et MN = 12 × 0,4 = 4,8.</p></div>
+<div class="warn"><p>Les trois rapports comparent un côté du <b>petit</b> triangle au côté correspondant du <b>grand</b>. ${F('AM','MB')} = ${F(4,6)} n’est pas égal à ${F('MN','BC')}, car [MB] n’est pas un côté du petit triangle. Et sans parallèles, le théorème ne s’applique pas.</p></div>`,
+   fig:(()=>{ const P=plane({x:[-0.8,7.8],y:[-0.9,5.6],grid:false,axes:false,w:280});
+     P.poly([[2,5],[0,0],[7,0]],{fill:'var(--math)',fo:.15,c:'var(--ink)',w:2}).poly([[2,5],[1.2,3],[4,3]],{fill:'var(--spark)',fo:.4,c:'var(--ink)',w:2});
+     P.seg(0.4,3,4.8,3,{c:'var(--accent)',w:1.5,dash:true}).seg(-0.4,0,7.4,0,{c:'var(--accent)',w:1.5,dash:true});
+     P.dot(2,5,{l:'A',dx:-4,dy:-10}).dot(0,0,{l:'B',dx:-14,dy:14}).dot(7,0,{l:'C',dx:6,dy:14}).dot(1.2,3,{l:'M',dx:-18,dy:4}).dot(4,3,{l:'N',dx:8,dy:4}); return P.svg(); })()},
+  {kind:'Théorie',h:'Triangles semblables : deux angles suffisent',p:`<p>Thalès demande des parallèles. Mais deux triangles peuvent avoir la même forme sans être emboîtés, par exemple un bâton et un arbre avec leurs ombres. Comment le reconnaître&nbsp;?</p>
+<div class="def"><p>Deux triangles sont <b>semblables</b> si l’un est un agrandissement de l’autre : mêmes angles, et côtés correspondants proportionnels.</p></div>
+<div class="prop"><p>Pour que deux triangles soient semblables, il suffit qu’ils aient <b>deux angles égaux</b>.</p></div>
+<div class="why"><p>Dans tout triangle, les trois angles font 180°. Si deux angles sont égaux, le troisième l’est aussi : par exemple, avec 50° et 60°, le troisième vaut 180 − 50 − 60 = 70° dans les deux triangles.</p></div>
+<div class="ex"><p>Au même moment, un bâton de 1,2 m fait une ombre de 2 m et une tour une ombre de 30 m. Les deux triangles ont un angle droit au sol et le même angle des rayons du soleil, qui sont parallèles. Ils sont semblables, de facteur ${F(30,2)} = 15 : la tour mesure 1,2 × 15 = 18 m.</p></div>
+<div class="warn"><p>Les côtés qui se correspondent sont ceux qui font face aux angles égaux. La hauteur du bâton va avec la hauteur de la tour, l’ombre avec l’ombre.</p></div>`},
   {kind:'Méthode',h:'Appliquer Thalès et les triangles semblables',
    p:'Deux triangles sont <b>semblables</b>, l’un étant un agrandissement de l’autre, s’ils ont <b>deux angles égaux</b>. Cas typique de <b>Thalès</b> : dans le triangle ABC, M est sur [AB], N sur [AC], et (MN) est parallèle à (BC). Alors <b>AM/AB = AN/AC = MN/BC</b>. Méthode : repère les sommets qui se correspondent, écris l’égalité des rapports, puis fais un produit en croix.',
    demo:{enonce:'Dans le triangle ABC, M est sur [AB] et N sur [AC], avec (MN) parallèle à (BC). On sait que AM = 3, AB = 5 et BC = 8. Calculer MN.',
@@ -441,6 +690,14 @@ MATHS.push(
    note:'Sur un plan au 1:50, les aires sont divisées par 50² = 2 500 : c’est le facteur k² vu plus haut.'},
   {h:'Lire une carte',p:'Sur une carte nationale au 1:25 000, 4 cm représentent…',opts:['250 m','1 km','4 km','10 km'],ans:1,why:'4 × 25 000 = 100 000 cm = 1 000 m = 1 km.'},
   {kind:'Défi',h:'Et l’aire&nbsp;?',p:'On agrandit une photo d’un facteur 3. Par combien son aire est-elle multipliée&nbsp;?',lab:'×',ans:9,why:'Les longueurs sont × 3, donc l’aire est × 3² = 9.'},
+  {kind:'Récapitulatif',h:'Ce qu’il faut retenir',p:`<div class="keep"><ul>
+<li>Agrandir d’un facteur <i>k</i> : toutes les longueurs × <i>k</i>, les angles inchangés. <i>k</i> > 1 agrandit, <i>k</i> < 1 réduit.</li>
+<li><i>k</i> = longueur de l’image ÷ longueur d’origine, et ce rapport est le même pour toutes les paires de côtés correspondants.</li>
+<li>Périmètres × <i>k</i>, aires × <i>k</i>², volumes × <i>k</i>³.</li>
+<li>Thalès : si (MN) // (BC), avec M sur [AB] et N sur [AC], alors AM/AB = AN/AC = MN/BC.</li>
+<li>Deux triangles avec deux angles égaux sont semblables : leurs côtés correspondants sont proportionnels. Ombres au soleil : hauteur ÷ ombre est le même pour tous les objets.</li>
+<li>Échelle 1 : <i>n</i> : du plan au réel, × <i>n</i> ; du réel au plan, ÷ <i>n</i>.</li></ul></div>
+<p>Dans les problèmes, repère d’abord les deux triangles semblables et les sommets qui se correspondent.</p>`},
   {kind:'Problème',h:'Le plan au 1:50',
    p:'Sur un plan à l’échelle 1:50, ta chambre est un rectangle de 8 cm sur 7 cm. Tu veux connaître ses vraies dimensions, puis dessiner ton lit, qui mesure 2 m sur 0,9 m.',
    parts:[
