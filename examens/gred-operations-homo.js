@@ -1,0 +1,53 @@
+/* Déclic — examen de compétence : Opérations sur les homomorphismes et transposée */
+(()=>{
+const M=A=>mat(A.map(r=>r.map(x=>typeof x==='number'?fmt(x):x)));
+EXAMS['gred-operations-homo']=[
+ {n:'Somme et multiple d’applications linéaires', r:'Additionner des homomorphismes', qs:[
+   {q:'<i>f</i>(<i>x</i> ; <i>y</i>) = (<i>x</i> − <i>y</i> ; 2<i>y</i>) et <i>g</i>(<i>x</i> ; <i>y</i>) = (3<i>x</i> ; <i>x</i> + <i>y</i>). Quelle est la première coordonnée de (<i>f</i> + <i>g</i>)(2 ; 1)&nbsp;?', lab:'1re coordonnée =', ans:7, why:'(<i>f</i> + <i>g</i>)(2 ; 1) = <i>f</i>(2 ; 1) + <i>g</i>(2 ; 1) = (1 ; 2) + (6 ; 3) = (7 ; 5).'},
+   {q:'<i>f</i>(<i>x</i> ; <i>y</i>) = (<i>x</i> − <i>y</i> ; 2<i>y</i>) et <i>g</i>(<i>x</i> ; <i>y</i>) = (3<i>x</i> ; <i>x</i> + <i>y</i>). Que vaut (2<i>f</i> − <i>g</i>)(<i>x</i> ; <i>y</i>)&nbsp;?', opts:['(5<i>x</i> − 2<i>y</i> ; <i>x</i> + 5<i>y</i>)','(−<i>x</i> + 2<i>y</i> ; <i>x</i> + 3<i>y</i>)','(−<i>x</i> − 2<i>y</i> ; −<i>x</i> + 3<i>y</i>)','(2<i>x</i> − 2<i>y</i> ; 4<i>y</i> − <i>x</i>)'], ans:2, why:'2<i>f</i>(<i>x</i> ; <i>y</i>) − <i>g</i>(<i>x</i> ; <i>y</i>) = (2<i>x</i> − 2<i>y</i> − 3<i>x</i> ; 4<i>y</i> − <i>x</i> − <i>y</i>) = (−<i>x</i> − 2<i>y</i> ; −<i>x</i> + 3<i>y</i>).'},
+   {q:'Que faut-il pour que la somme <i>f</i> + <i>g</i> de deux applications linéaires ait un sens&nbsp;?', opts:['Que l’arrivée de <i>f</i> soit le départ de <i>g</i>','Que <i>f</i> et <i>g</i> soient bijectives','Rien de particulier','Que <i>f</i> et <i>g</i> aient le même espace de départ et le même espace d’arrivée'], ans:3, why:'(<i>f</i> + <i>g</i>)(<b>u</b>) = <i>f</i>(<b>u</b>) + <i>g</i>(<b>u</b>) demande que <b>u</b> soit dans le départ des deux et que <i>f</i>(<b>u</b>), <i>g</i>(<b>u</b>) s’additionnent dans le même espace. La première condition est celle de la composition.'},
+   {q:'Sur les polynômes, on pose <i>T</i> = 2 id − <i>D</i>, avec <i>D</i>(<i>P</i>) = <i>P</i>′. Quel est le coefficient de <i>x</i> dans <i>T</i>(<i>x</i>² + 3<i>x</i>)&nbsp;?', lab:'coefficient de x :', ans:4, why:'<i>T</i>(<i>P</i>) = 2<i>P</i> − <i>P</i>′ = 2<i>x</i>² + 6<i>x</i> − (2<i>x</i> + 3) = 2<i>x</i>² + 4<i>x</i> − 3. Le coefficient de <i>x</i> est 4.'},
+ ]},
+ {n:'L’espace L(E, F)', r:'L’espace vectoriel L(E, F)', qs:[
+   {q:'Quel est le vecteur nul de l’espace vectoriel L(<i>E</i>, <i>F</i>)&nbsp;?', opts:['Le vecteur nul de <i>E</i>','L’application nulle <b>u</b> ↦ <b>0</b>','L’identité','Le réel 0'], ans:1, why:'Les « vecteurs » de L(<i>E</i>, <i>F</i>) sont des applications. L’élément neutre de la somme est l’application nulle : <i>f</i> + 0 = <i>f</i>.'},
+   {q:'Les automorphismes de ℝ² forment-ils un sous-espace vectoriel de L(ℝ²)&nbsp;?', opts:['Oui, car la réciproque d’un isomorphisme est linéaire','Non : l’application nulle n’est pas un automorphisme, et id + (−id) = 0 n’en est pas un','Oui, car ils sont tous linéaires','Non, car L(ℝ²) n’est pas un espace vectoriel'], ans:1, why:'Un sous-espace contient le vecteur nul, ici l’application nulle, qui n’est pas bijective. La somme de deux automorphismes peut d’ailleurs être nulle.'},
+   {q:'Dans L(ℝ, ℝ), on prend <i>f</i>(<i>x</i>) = 3<i>x</i> et <i>g</i>(<i>x</i>) = −5<i>x</i>. Que vaut (2<i>f</i> + <i>g</i>)(4)&nbsp;?', lab:'(2f + g)(4) =', ans:4, why:'(2<i>f</i> + <i>g</i>)(<i>x</i>) = 6<i>x</i> − 5<i>x</i> = <i>x</i> : c’est l’identité, qui correspond au réel 6 − 5 = 1. Donc (2<i>f</i> + <i>g</i>)(4) = 4.'},
+ ]},
+ {n:'Combiner des matrices', r:'Combiner des matrices', qs:[
+   {q:'Avec A = ' + M([[1,-2],[0,3]]) + ' et B = ' + M([[4,1],[-1,2]]) + ', quel est le coefficient de la 1re ligne, 2e colonne de 2A − B&nbsp;?', lab:'coefficient =', ans:-5, why:'Case par case : 2·(−2) − 1 = −5. En entier : 2A − B = (−2 −5 ; 1 4).'},
+   {q:'Avec A = ' + M([[2,0,-1],[1,3,4]]) + ' et B = ' + M([[1,1,0],[-2,0,5]]) + ', quel est le coefficient de la 2e ligne, 3e colonne de A + 3B&nbsp;?', lab:'coefficient =', ans:19, why:'4 + 3·5 = 19. En entier : A + 3B = (5 3 −1 ; −5 3 19).'},
+   {q:'<i>f</i>(<i>x</i> ; <i>y</i>) = (<i>x</i> + 2<i>y</i> ; −<i>y</i>) et <i>g</i>(<i>x</i> ; <i>y</i>) = (3<i>x</i> ; <i>x</i> − <i>y</i>). Quel est le coefficient de la 2e ligne, 1re colonne de la matrice de <i>f</i> − 2<i>g</i>&nbsp;?', lab:'coefficient =', ans:-2, why:'Mat(<i>f</i>) = (1 2 ; 0 −1), Mat(<i>g</i>) = (3 0 ; 1 −1), donc Mat(<i>f</i> − 2<i>g</i>) = (1 − 6, 2 − 0 ; 0 − 2, −1 + 2) = (−5 2 ; −2 1).'},
+   {q:'A est une matrice 2 × 3 et B une matrice 3 × 2. Que vaut A + B&nbsp;?', opts:['Une matrice 2 × 2','Une matrice 3 × 3','Elle n’existe pas : les tailles diffèrent','Une matrice 2 × 3'], ans:2, why:'La somme se fait case par case, entre matrices de même taille. A et B représenteraient des applications entre des espaces différents.'},
+ ]},
+ {n:'Dimension des espaces de matrices et d’applications', r:'L’espace des matrices et sa dimension', qs:[
+   {q:'Soit <i>E</i> l’espace des polynômes de degré ≤ 2. Quelle est la dimension de L(<i>E</i>, ℝ²)&nbsp;?', lab:'dimension =', ans:6, why:'dim <i>E</i> = 3 et dim ℝ² = 2 : une application linéaire de <i>E</i> dans ℝ² a une matrice 2 × 3, soit 6 coefficients libres.'},
+   {q:'Dans la base canonique (E₁₁, E₁₂, E₂₁, E₂₂) de M₂,₂(ℝ), quelle est la coordonnée sur E₁₂ de la matrice ' + M([[2,-1],[0,7]]) + '&nbsp;?', lab:'coordonnée =', ans:-1, why:'(2 −1 ; 0 7) = 2E₁₁ − E₁₂ + 0E₂₁ + 7E₂₂ : la coordonnée sur E₁₂ est le coefficient de la case (1, 2), soit −1.'},
+   {q:'Quelle est la dimension de L(ℝ³), l’espace des endomorphismes de ℝ³&nbsp;?', lab:'dimension =', ans:9, why:'Un endomorphisme de ℝ³ a une matrice 3 × 3 : dim L(ℝ³) = dim M₃,₃(ℝ) = 3 × 3 = 9.'},
+   {q:'Dans M₂,₃(ℝ), quelle est la matrice E₂₁ de la base canonique&nbsp;?', opts:[M([[0,1,0],[0,0,0]]),M([[0,0],[1,0],[0,0]]),M([[0,0,0],[0,1,0]]),M([[0,0,0],[1,0,0]])], ans:3, why:'E₂₁ a un 1 en ligne 2, colonne 1, et des 0 ailleurs ; elle a la taille 2 × 3 de l’espace. La première proposition est E₁₂.'},
+ ]},
+ {n:'La transposée', r:'La transposée', qs:[
+   {q:'Soit A = ' + M([[1,-2,4],[0,3,5]]) + '. Quel est le coefficient de la 3e ligne, 1re colonne de ᵗA&nbsp;?', lab:'(ᵗA)₃₁ =', ans:4, why:'(ᵗA)₃₁ = a₁₃ = 4. En entier ᵗA = (1 0 ; −2 3 ; 4 5), une matrice 3 × 2 : la ligne 1 de A est devenue la colonne 1.'},
+   {q:'A est une matrice 4 × 2. Quelle est la taille de ᵗA&nbsp;?', opts:['4 × 2','2 × 4','4 × 4','2 × 2'], ans:1, why:'Transposer échange lignes et colonnes : les 4 lignes de A deviennent 4 colonnes. ᵗA est 2 × 4.'},
+   {q:'Quelle est la transposée du vecteur colonne ' + M([[1],[2],[3]]) + '&nbsp;?', opts:['La colonne (3 ; 2 ; 1)','La ligne (1 2 3)','La ligne (3 2 1)','La même colonne'], ans:1, why:'Une colonne 3 × 1 devient une ligne 1 × 3, dans le même ordre : (ᵗX)₁ⱼ = <i>x</i>ⱼ₁.'},
+ ]},
+ {n:'Transposer un produit', r:'Transposer un produit', qs:[
+   {q:'Soient A = ' + M([[2,1],[0,-1]]) + ' et B = ' + M([[1,3],[2,0]]) + '. Quel est le coefficient de la 1re ligne, 2e colonne de ᵗ(AB)&nbsp;?', lab:'coefficient =', ans:-2, why:'(ᵗ(AB))₁₂ = (AB)₂₁ = 0·1 + (−1)·2 = −2. En entier AB = (4 6 ; −2 0) et ᵗ(AB) = (4 −2 ; 6 0).'},
+   {q:'Pour trois matrices de tailles compatibles, que vaut ᵗ(ABC)&nbsp;?', opts:['ᵗA ᵗB ᵗC','ᵗB ᵗA ᵗC','ᵗC ᵗB ᵗA','ᵗ(CBA)'], ans:2, why:'On applique deux fois la règle : ᵗ((AB)C) = ᵗC ᵗ(AB) = ᵗC ᵗB ᵗA. L’ordre est entièrement renversé.'},
+   {q:'Comment se simplifie ᵗ(A ᵗB)&nbsp;?', opts:['B ᵗA','ᵗA B','ᵗB ᵗA','A ᵗB'], ans:0, why:'ᵗ(XY) = ᵗY ᵗX avec X = A et Y = ᵗB : ᵗ(ᵗB) ᵗA = B ᵗA, car transposer deux fois ne change rien.'},
+   {q:'Soient A = ' + M([[1,2],[3,0]]) + ' et B = ' + M([[0,1],[1,1]]) + '. Quel est le coefficient de la 1re ligne, 1re colonne de ᵗ(AB)&nbsp;?', lab:'coefficient =', ans:2, why:'AB = (2 3 ; 0 3), donc ᵗ(AB) = (2 0 ; 3 3) et le coefficient vaut 2. Le mauvais ordre ᵗA ᵗB = (3 4 ; 0 2) donnerait 3 : c’est ᵗB ᵗA qu’il faut.'},
+   {q:'Soit A = ' + M([[3,1],[5,2]]) + '. Quel est le coefficient en haut à droite de (ᵗA)⁻¹&nbsp;?', lab:'coefficient =', ans:-5, why:'(ᵗA)⁻¹ = ᵗ(A⁻¹). Or <i>ad</i> − <i>bc</i> = 1 et A⁻¹ = (2 −1 ; −5 3), donc ᵗ(A⁻¹) = (2 −5 ; −1 3). Le coefficient vaut −5.'},
+ ]},
+ {n:'Matrices symétriques et antisymétriques', r:'Matrices symétriques et antisymétriques', qs:[
+   {q:'Pour quelle valeur de <i>a</i> la matrice ' + M([[2,'<i>a</i>'],[-3,1]]) + ' est-elle symétrique&nbsp;?', lab:'a =', ans:-3, why:'Symétrique : a₁₂ = a₂₁, donc <i>a</i> = −3.'},
+   {q:'La matrice ' + M([[0,2,'<i>b</i>'],[-2,0,-1],[4,1,0]]) + ' est antisymétrique. Combien vaut <i>b</i>&nbsp;?', lab:'b =', ans:-4, why:'Antisymétrique : a₁₃ = −a₃₁ = −4. Les autres cases le confirment : a₁₂ = 2 = −a₂₁ et a₂₃ = −1 = −a₃₂, avec une diagonale nulle.'},
+   {q:'Quelle est la dimension de l’espace S₄ des matrices symétriques 4 × 4&nbsp;?', lab:'dim S₄ =', ans:10, why:'Une matrice symétrique est déterminée par sa diagonale (4 cases) et son triangle supérieur (6 cases) : <i>n</i>(<i>n</i> + 1)/2 = 4 · 5/2 = 10.'},
+   {q:'Laquelle de ces matrices est à la fois symétrique et antisymétrique&nbsp;?', opts:['I₂',M([[0,1],[-1,0]]),M([[0,1],[1,0]]),'La matrice nulle'], ans:3, why:'Si ᵗM = M et ᵗM = −M, alors M = −M, donc M = 0. I₂ et (0 1 ; 1 0) sont seulement symétriques, (0 1 ; −1 0) seulement antisymétrique.'},
+ ]},
+ {n:'Décomposition symétrique + antisymétrique', r:'Décomposer une matrice en symétrique + antisymétrique', qs:[
+   {q:'Soit A = ' + M([[3,5],[-1,2]]) + '. Dans A = S + K, quel est le coefficient de la 1re ligne, 2e colonne de S&nbsp;?', lab:'S₁₂ =', ans:2, why:'S₁₂ = (a₁₂ + a₂₁)/2 = (5 − 1)/2 = 2. Donc S = (3 2 ; 2 2) et K = (0 3 ; −3 0) ; on vérifie S + K = A.'},
+   {q:'Soit A = ' + M([[1,0,4],[2,5,-3],[0,1,6]]) + '. Dans A = S + K, quel est le coefficient de la 2e ligne, 3e colonne de K&nbsp;?', lab:'K₂₃ =', ans:-2, why:'K₂₃ = (a₂₃ − a₃₂)/2 = (−3 − 1)/2 = −2. En entier K = (0 −1 2 ; 1 0 −2 ; −2 2 0).'},
+   {q:'Que vaut la diagonale de K = (A − ᵗA)/2 pour une matrice carrée A&nbsp;?', opts:['Celle de A','Elle est nulle','Le double de celle de A','Elle est quelconque'], ans:1, why:'Les cases diagonales ne bougent pas en transposant : (aᵢᵢ − aᵢᵢ)/2 = 0. Toute la diagonale de A passe dans S.'},
+   {q:'Pourquoi l’écriture A = S + K (S symétrique, K antisymétrique) est-elle unique&nbsp;?', opts:['Parce que S et K ont la même taille que A','Parce que A est inversible','Parce que si S + K = S′ + K′, alors S − S′ = K′ − K est à la fois symétrique et antisymétrique, donc nulle','Parce que S = A dans tous les cas'], ans:2, why:'La seule matrice symétrique et antisymétrique est la matrice nulle, donc S = S′ et K = K′. Aucune hypothèse sur A n’est nécessaire.'},
+ ]},
+];
+})();

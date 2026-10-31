@@ -60,13 +60,34 @@ L'élève ne connaît que ce qu'il a vu dans les étapes précédentes (et dans 
 
 Chaque chapitre doit aussi donner **la boîte à outils complète du thème** : toutes les techniques classiques dont on a besoin pour réussir une grande variété d'exercices sur ce sujet, pas seulement celles des exercices déjà présents. Chaque technique a son étape Méthode, puis au moins un exercice qui la fait pratiquer. Une fiche « Méthodes » rassemble automatiquement les étapes Méthode du chapitre.
 
+## Une théorie qui enseigne (pas un résumé)
+Un lecteur qui découvre la notion doit pouvoir la **comprendre** avec la théorie seule, sans autre livre. Une étape de théorie qui tient en trois lignes est un rappel pour quelqu'un qui sait déjà : c'est interdit ici. Le vérificateur refuse toute étape de théorie de moins de 70 mots ; vise **120 à 250 mots**, découpés en blocs.
+
+Une étape de théorie = **une seule idée**, développée entièrement :
+1. **Le problème ou la question** qui rend la notion nécessaire (une situation concrète, un calcul qu'on ne sait pas encore faire, une question naturelle). Une ou deux phrases.
+2. **La définition** (ou l'énoncé), précise, avec la notation, dans un bloc `def` (ou `thm`, `prop`).
+3. **L'idée** derrière : ce que la définition veut dire avec des mots simples, l'image mentale, ce que la figure montre. Bloc `idea`.
+4. **Pourquoi c'est vrai** pour un théorème ou une propriété : la preuve quand elle est courte, sinon l'argument clé, et ce qui casse si une hypothèse manque (contre-exemple). Bloc `why`.
+5. **Un exemple entièrement écrit**, petit, avec les nombres : on applique la définition et on voit le résultat. Bloc `ex`.
+6. Le **piège** classique ou la nuance (bloc `warn`), quand il y en a un.
+
+Les blocs s'écrivent dans `p` : `<div class="def"><p>…</p></div>`, de même `thm`, `prop`, `idea`, `why`, `ex`, `warn`, `keep`. Le titre du bloc s'affiche tout seul ; pour un autre titre : `<div class="blk" data-t="Remarque">…</div>`. Les paragraphes ordinaires sont des `<p>`. Un bloc n'est pas obligatoire à chaque étape, mais une étape de théorie sans définition, ni idée, ni exemple est trop pauvre.
+
+Autres règles :
+- Une **grande notion** (limite, dérivée, groupe, intégrale, espace vectoriel…) prend **2 à 4 étapes** : d'abord le problème et l'intuition avec une figure, puis la définition et un premier exemple, puis les propriétés avec leur justification, puis les cas particuliers ou les pièges.
+- Les **propriétés** ne sont pas des listes à apprendre par cœur : chacune a une phrase qui dit pourquoi elle est vraie ou d'où elle vient.
+- Un **théorème** important a toujours : hypothèses claires, conclusion, idée de la preuve, un exemple d'application, un contre-exemple quand une hypothèse tombe.
+- Les **notations** nouvelles sont expliquées la première fois (comment on lit, pourquoi ce symbole).
+- Avant les problèmes, une étape **`kind:'Récapitulatif'`** « Ce qu'il faut retenir » reprend les définitions, formules et méthodes du chapitre dans un bloc `keep` (liste à puces).
+- Un chapitre compte alors en général **10 à 16 étapes** de cours (théorie, méthodes, exercices) avant les problèmes.
+
 ## Exigences de contenu
 - **Exactitude avant tout.** Recalcule chaque réponse avec `node -e` ou `python3 -c`. Une erreur dans une correction ruine la confiance.
-- Chapitre : 6 à 10 étapes de cours, au moins **3 exercices** et au moins **1 figure à curseurs** utile, puis les **2 problèmes**.
-- Théorie en petits morceaux de 2 à 4 phrases, formule clé en évidence. `note` pour les pièges et astuces.
+- Chapitre : 10 à 16 étapes de cours, au moins **3 exercices** et au moins **1 figure à curseurs** utile, puis les **2 problèmes**.
+- Théorie développée (voir « Une théorie qui enseigne »), une idée par étape, formule clé en évidence. `note` pour une astuce courte en plus des blocs.
 - Ton : tutoiement, phrases courtes, voix active. Pas d'emoji. Évite les tirets cadratins en incise.
 - Notation : `<i>` pour les variables, `<b>` pour les mots-clés, Unicode (x², xₙ, ℝ, ∈, ≤) ou `<sup>`/`<sub>`, `F(a,b)` pour les fractions, `mat([[…]])` pour les matrices, `py(\`…\`)` pour le code. Utilise l'apostrophe typographique ’ dans les textes.
 - Figures : `plane()` en 2D, `space()` en 3D, couleurs `var(--…)` uniquement, 320 px de large, étiquettes avec `dot(…,{l:'A'})` ou `text`. Moins de ~60 positions par curseur, et chaque `v` doit tomber sur la grille `min + k·step`.
 
 ## Vérification (obligatoire)
-Lance `node tools/harness.js cours/<ton-fichier>.js` depuis la racine du dépôt et corrige jusqu'à `OK`. Le vérificateur exige les 2 problèmes en fin de chapitre (avec énoncé, questions, indices, corrections et `sol`), teste toutes les positions des curseurs et contrôle le HTML. Il ne vérifie pas les maths : ça, c'est ton travail.
+Lance `node tools/harness.js cours/<ton-fichier>.js` depuis la racine du dépôt et corrige jusqu'à `OK`. Le vérificateur exige les 2 problèmes en fin de chapitre (avec énoncé, questions, indices, corrections et `sol`), refuse les étapes de théorie de moins de 70 mots, exige l'examen de compétence du chapitre (`examens/<id>.js`, voir `docs/EXAMENS.md`), teste toutes les positions des curseurs et contrôle le HTML. Il ne vérifie pas les maths : ça, c'est ton travail.

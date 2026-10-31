@@ -3,7 +3,7 @@
 const vm=require('vm'), fs=require('fs'), path=require('path');
 const ROOT=path.join(__dirname,'..');
 let files=process.argv.slice(2);
-if(!files.length) files=fs.readdirSync(path.join(ROOT,'cours')).filter(f=>f.endsWith('.js')).sort((a,b)=>(a==='maths.js')-(b==='maths.js')||a.localeCompare(b)).map(f=>'cours/'+f);
+if(!files.length) files=fs.readdirSync(path.join(ROOT,'cours')).filter(f=>f.endsWith('.js')).sort((a,b)=>(b==='maths.js')-(a==='maths.js')||a.localeCompare(b)).map(f=>'cours/'+f);
 const ctx=vm.createContext({console,Math,Number,String,Array,Object,JSON,isFinite,isNaN,parseFloat,parseInt});
 const run=f=>vm.runInContext(fs.readFileSync(path.join(ROOT,f),'utf8'),ctx,{filename:f});
 run('lib.js'); for(const f of files) run(f);
@@ -76,6 +76,9 @@ function checkSteps(id,stepsArr,{min=5,maths=false}={}){
         const h=checkAnswer(st,w); if(h!==null){ ex++; html+=h; }
       }
       if(st.ok&&st.opts) errs.push(`${w}: ok et opts ne se combinent pas`);
+      // Une étape de théorie enseigne : au moins 70 mots de texte (docs/BRIEF.md, « Une théorie qui enseigne »)
+      if(!st.parts&&!st.demo&&!st.opts&&!('ans' in st)&&!st.ok){ const words=((st.p||'')+' '+(st.note||'')).replace(/<[^>]+>/g,' ').split(/\s+/).filter(x=>x.length>1).length;
+        if(words<70) errs.push(`${w}: théorie trop courte (${words} mots) : développe (motivation, définition, idée, exemple)`); }
       if(bad(html)) errs.push(`${w}: texte contient NaN/undefined`);
       tagsBalanced(html,w);
     }catch(e){ errs.push(`${w}: exception ${e.message}`); }

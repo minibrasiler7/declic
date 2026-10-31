@@ -8,7 +8,7 @@ Site : https://minibrasiler7.github.io/declic/
 
 - **Cours complets** (`cours/*.js`) : Analyse I et II, algèbre linéaire (plan et dimension 3), géométrie analytique (avec les coniques), informatique (Python et algorithmique), physique, chimie. Chaque chapitre se termine par deux problèmes en plusieurs questions, avec indices et solution rédigée.
 - **Notions fondamentales** (`cours/gred-*.js`) : 25 chapitres de mathématique « structurelle » sur le plan du tome 1 de *Notions fondamentales de la mathématique élémentaire* (Louis Gred) : logique, ensembles, relations, applications, groupes, anneaux et corps.
-- **Mathématiques par niveau** (`cours/maths.js`) : 26 cours, de l'école obligatoire à l'université.
+- **Mathématiques par niveau** (`cours/maths.js` et `maths-ecole.js`, `maths-gym.js`, `maths-uni.js`) : 26 cours, de l'école obligatoire à l'université.
 - **Découvertes** : leçons courtes de code et de musique (dans `app.js`).
 - **Examens de compétence** (`examens/<id>.js`) : à la fin de chaque chapitre, une trentaine d’exercices techniques, une seule tentative par question, puis un score et un bilan par notion (bien compris, à entraîner, avec un lien vers l’étape à revoir). Format : `docs/EXAMENS.md`.
 

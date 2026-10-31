@@ -153,6 +153,20 @@ pre.code{background:var(--surface);border:1px solid var(--line);border-radius:14
 .card th,.card td{border:1px solid var(--line);padding:6px 10px;text-align:center}
 .card th{background:var(--accent-soft)}
 .ptext pre.code{margin:12px 0}.ptext>p{margin:0 0 10px}
+/* Blocs de théorie : définition, idée, pourquoi, exemple, piège, retenir */
+.ptext :is(.blk,.def,.thm,.prop,.idea,.why,.ex,.warn,.keep){position:relative;margin:14px 0;padding:12px 16px 12px 18px;border-radius:14px;border-left:4px solid var(--c,var(--accent));background:color-mix(in srgb,var(--c,var(--accent)) 7%,var(--surface))}
+.ptext :is(.blk,.def,.thm,.prop,.idea,.why,.ex,.warn,.keep)::before{content:attr(data-t);display:block;font:700 11px var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--c,var(--accent));margin-bottom:4px}
+.ptext :is(.blk,.def,.thm,.prop,.idea,.why,.ex,.warn,.keep)>p{margin:0 0 8px}.ptext :is(.blk,.def,.thm,.prop,.idea,.why,.ex,.warn,.keep)>:last-child{margin-bottom:0}
+.ptext .def{--c:var(--math)}.ptext .def::before{content:"Définition"}
+.ptext .thm{--c:var(--math)}.ptext .thm::before{content:"Théorème"}
+.ptext .prop{--c:var(--math)}.ptext .prop::before{content:"Propriété"}
+.ptext .idea{--c:var(--accent)}.ptext .idea::before{content:"L’idée"}
+.ptext .why{--c:var(--code)}.ptext .why::before{content:"Pourquoi c’est vrai"}
+.ptext .ex{--c:var(--ok)}.ptext .ex::before{content:"Exemple"}
+.ptext .warn{--c:var(--bad)}.ptext .warn::before{content:"Piège"}
+.ptext .keep{--c:var(--spark)}.ptext .keep::before{content:"À retenir"}
+.ptext .blk[data-t]::before{content:attr(data-t)}
+.ptext ul,.ptext ol{margin:0 0 10px;padding-left:22px}.ptext li{margin:3px 0}
 .disclaim{font-size:13px;color:var(--muted);margin:6px 0 0}
 .choices{display:grid;gap:10px}
 .choices.row{grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}
@@ -334,6 +348,9 @@ body.annot-on .card{outline:2px dashed color-mix(in srgb,var(--accent) 45%,trans
 
 <script src="lib.js"></script>
 <script src="cours/maths.js"></script>
+<script src="cours/maths-ecole.js"></script>
+<script src="cours/maths-gym.js"></script>
+<script src="cours/maths-uni.js"></script>
 <script src="cours/an1.js"></script>
 <script src="cours/an2a.js"></script>
 <script src="cours/an2p.js"></script>
@@ -351,6 +368,19 @@ body.annot-on .card{outline:2px dashed color-mix(in srgb,var(--accent) 45%,trans
 <script src="cours/gred-grp2.js"></script>
 <script src="cours/gred-ann1.js"></script>
 <script src="cours/gred-ann2.js"></script>
+<script src="cours/gred-ana1.js"></script>
+<script src="cours/gred-ana2.js"></script>
+<script src="cours/gred-ana3.js"></script>
+<script src="cours/gred-ana4.js"></script>
+<script src="cours/gred-ana5.js"></script>
+<script src="cours/gred-ana6.js"></script>
+<script src="cours/gred-lin1.js"></script>
+<script src="cours/gred-lin2.js"></script>
+<script src="cours/gred-lin3.js"></script>
+<script src="cours/gred-lin4.js"></script>
+<script src="cours/gred-lin5.js"></script>
+<script src="cours/rel-restreinte.js"></script>
+<script src="cours/rel-generale.js"></script>
 <script src="app.js"></script>
 <script src="compte.js"></script>
 <script src="ink.js"></script>
