@@ -16,22 +16,46 @@ const cells=(P,x,y,vals,c='var(--code)',cw=0.8)=>{ P.rect(x,y-0.4,cw*vals.length
 const ref=(P,x1,y1,x2,y2,c='var(--ink)')=>P.arrow(x1,y1,x2,y2,{c,w:2,hs:9});
 // petit tableau HTML (traces de variables)
 const tab=(h,rows)=>`<table style="margin:6px auto;border-collapse:collapse;text-align:center"><tr>${h.map(x=>`<th style="padding:2px 10px;border-bottom:1px solid var(--line)">${x}</th>`).join('')}</tr>${rows.map(r=>`<tr>${r.map(x=>`<td style="padding:2px 10px">${x}</td>`).join('')}</tr>`).join('')}</table>`;
+// sortie d’un programme (texte brut) et exemple « programme + sortie exacte » (vérifiée avec python3)
+const out=s=>`<pre class="code">${esc(s)}</pre>`;
+const exe=(code,o,txt='')=>`<div class="ex"><p>Ce programme :</p>${py(code)}<p>affiche exactement :</p>${out(o)}${txt}</div>`;
 
 COURS.push(
 
 /* ===================== 1. SYNTAXE, TYPES, VARIABLES ===================== */
 {subj:'ics',sem:'py',id:'ics-syntaxe',h:'Syntaxe, types et variables',p:'Les types de base, les opérateurs et leurs priorités, les conversions et l’affectation.',steps:[
- {h:'Quatre types de base',p:`Chaque valeur a un <b>type</b>. Les entiers sont des ${cd('int')}, les nombres à virgule des ${cd('float')}, le texte des ${cd('str')} et les valeurs de vérité des ${cd('bool')}. La fonction ${cd('type()')} donne le type d’une valeur.`,
+ {h:'Quatre types de base',p:`<p>Quand tu écris 7, 3.5 ou 'Ada', Python doit savoir quelles opérations ont un sens. On peut diviser 7 par 2, mais pas le texte 'Ada' par 2. C’est le rôle du <b>type</b>.</p>
+<div class="def"><p>Chaque valeur a un <b>type</b>. Les quatre types de base sont : ${cd('int')}, les entiers (sans limite de taille) ; ${cd('float')}, les nombres à virgule, écrits avec un point ; ${cd('str')}, le texte (une <i>chaîne</i> de caractères), entre ' ' ou " " ; ${cd('bool')}, les deux valeurs de vérité ${cd('True')} et ${cd('False')}. ${cd('type(v)')} donne le type de la valeur <i>v</i>.</p></div>
+<div class="idea"><p>Le type est collé à la valeur, pas au nom qui la désigne. C’est lui qui décide de ce que fait un opérateur : ${cd('+')} additionne deux int, mais colle deux str. Python ne devine jamais : 5 et '5' sont deux valeurs différentes, l’une se calcule, l’autre s’écrit.</p></div>
+${exe(`print(type(5), type(5.0), type('5'))
+print(5 == 5.0, 5 == '5')`,`<class 'int'> <class 'float'> <class 'str'>
+True False`,`<p>5 et 5.0 n’ont pas le même type mais la même valeur numérique, donc ${cd('==')} répond True. Un nombre n’est jamais égal à un texte.</p>`)}
+<div class="warn"><p>Les guillemets changent tout : ${cd("'42'")} est un texte de deux caractères, pas un nombre. Et la virgule ne sert pas de séparateur décimal (voir la remarque).</p></div>`,
   fig:py(`n = 42          # int
 x = 3.14        # float (point, pas virgule)
 nom = 'Ada'     # str, entre ' ' ou " "
 ok = True       # bool : True ou False
 print(type(x))  # affiche <class 'float'>`),
   note:'Le séparateur décimal est le <b>point</b> : 3.14. Écrire 3,14 crée un tuple de deux entiers.'},
+ {kind:'Théorie',h:'Deux divisions : / et //',p:`<p>Combien font 6 divisé par 2 ? En maths, 3. En Python, la réponse dépend de l’opérateur que tu choisis, et même son type change.</p>
+<div class="def"><p>${cd('a / b')} est la <b>division exacte</b> : son résultat est <b>toujours un float</b>, même quand la division tombe juste. ${cd('a // b')} est la <b>division entière</b> : elle garde seulement le quotient entier. Entre deux int, elle rend un int ; si l’un des deux est un float, elle rend un float sans partie décimale.</p></div>
+<div class="idea"><p>Un float est stocké en binaire avec environ 16 chiffres significatifs. La plupart des nombres décimaux, comme 0.1, n’ont pas d’écriture binaire finie : la machine garde une approximation très proche. Les int, eux, sont toujours exacts.</p></div>
+${exe(`print(6 / 2, 7 / 2, 7 // 2, 7.0 // 2)
+print(0.1 + 0.2)
+print(0.1 + 0.2 == 0.3)`,`3.0 3.5 3 3.0
+0.30000000000000004
+False`)}
+<div class="warn"><p>Ne compare jamais deux float avec ${cd('==')}. Teste plutôt qu’ils sont très proches : ${cd('abs(x - y) < 1e-9')}. Et si tu veux un entier, utilise ${cd('//')}, pas ${cd('/')}.</p></div>`},
  {h:'Division et type',p:`Que valent ${cd('type(7 / 2)')} et ${cd('type(7 // 2)')}&nbsp;?`,
   opts:[`${cd('int')} et ${cd('int')}`,`${cd('float')} et ${cd('float')}`,`${cd('float')} et ${cd('int')}`,`${cd('int')} et ${cd('float')}`],ans:2,
   why:`${cd('/')} est la division exacte : elle rend toujours un float (7 / 2 = 3.5, et même 6 / 2 = 3.0). ${cd('//')} est la division entière : entre deux int, elle rend un int (7 // 2 = 3).`},
- {h:'Quotient entier et reste',p:`${cd('a // b')} est le quotient entier <i>q</i>, ${cd('a % b')} le reste <i>r</i>. Python arrondit le quotient <b>vers le bas</b>, si bien que pour <i>b</i> &gt; 0 le reste vérifie toujours 0 ≤ <i>r</i> &lt; <i>b</i> et <b><i>a</i> = <i>b</i>·<i>q</i> + <i>r</i></b>. Essaie un <i>a</i> négatif.`,
+ {h:'Quotient entier et reste',p:`<p>Pour répartir 17 bonbons entre 5 enfants, il faut deux nombres : combien chacun en reçoit, et combien il en reste. Python les donne avec deux opérateurs.</p>
+<div class="def"><p>${cd('a // b')} est le <b>quotient entier</b> <i>q</i>, ${cd('a % b')} le <b>reste</b> <i>r</i> (on lit « <i>a</i> modulo <i>b</i> »). Pour <i>b</i> &gt; 0, ils vérifient toujours <b><i>a</i> = <i>b</i>·<i>q</i> + <i>r</i></b> avec <b>0 ≤ <i>r</i> &lt; <i>b</i></b>.</p></div>
+<div class="idea"><p>Python arrondit le quotient <b>vers le bas</b>, c’est-à-dire vers −∞. Ainsi <i>b</i>·<i>q</i> est le plus grand multiple de <i>b</i> inférieur ou égal à <i>a</i>, et le reste est la distance de ce multiple à <i>a</i> : la flèche orange de la figure. Elle est toujours positive, même quand <i>a</i> est négatif.</p></div>
+${exe(`print(17 // 5, 17 % 5)
+print(-7 // 2, -7 % 2, int(-7 / 2))`,`3 2
+-4 1 -3`,`<p>17 = 5 · 3 + 2. Pour −7, le multiple de 2 juste en dessous est −8 : −7 = 2 · (−4) + 1.</p>`)}
+<div class="warn"><p>${cd('int(-7 / 2)')} vaut −3, car int() coupe vers 0, alors que ${cd('-7 // 2')} vaut −4. Avec des négatifs, ces deux écritures ne sont pas interchangeables. Essaie un <i>a</i> négatif sur la figure.</p></div>`,
   params:[{id:'a',l:'a',min:-12,max:12,v:7},{id:'b',l:'b',min:1,max:5,v:3}],
   draw:v=>{ const q=Math.floor(v.a/v.b), r=v.a-v.b*q, P=plane({x:[-13,13],y:[-3.6,3.6],grid:false,axes:false});
     P.seg(-12.6,0,12.6,0,{c:'var(--muted)',w:1.5});
@@ -45,7 +69,15 @@ print(type(x))  # affiche <class 'float'>`),
   note:`Les traits marquent les multiples de <i>b</i>. <i>b</i>·${cd('(a // b)')} est le plus grand multiple de <i>b</i> inférieur ou égal à <i>a</i>. Ainsi −7 // 2 = −4 et −7 % 2 = 1.`},
  {h:'Calcule',p:`Que vaut ${cd('17 // 5 * 2 + 17 % 5')}&nbsp;?`,lab:'résultat =',ans:8,
   why:`17 // 5 = 3 et 17 % 5 = 2. Puis 3 * 2 = 6 (même priorité, de gauche à droite), et 6 + 2 = 8.`},
- {h:'Priorités des opérateurs',p:`Du plus prioritaire au moins prioritaire : les parenthèses, puis ${cd('**')}, puis le signe moins unaire, puis ${cd('* / // %')} (de gauche à droite), puis ${cd('+ -')}. La puissance ${cd('**')} se lit de <b>droite à gauche</b>.`,
+ {h:'Priorités des opérateurs',p:`<p>2 + 3 * 4 vaut-il 14 ou 20 ? La machine ne peut pas hésiter : elle suit des règles fixes de priorité, proches de celles des maths.</p>
+<div class="def"><p>Du plus prioritaire au moins prioritaire : les <b>parenthèses</b> ; la puissance ${cd('**')} ; le <b>moins unaire</b> (le signe de −3) ; ${cd('* / // %')} ; enfin ${cd('+ -')}. À priorité égale, Python calcule <b>de gauche à droite</b>, sauf ${cd('**')}, qui se lit <b>de droite à gauche</b>.</p></div>
+<div class="idea"><p>Avant de calculer, Python place des parenthèses invisibles autour des opérations les plus fortes. ${cd('2 + 3 * 4 ** 2')} se lit ${cd('2 + (3 * (4 ** 2))')}. Pour ${cd('**')}, la lecture de droite à gauche suit la convention des maths : 2<sup>3<sup>2</sup></sup> = 2<sup>9</sup>.</p></div>
+${exe(`print(2 + 3 * 4, (2 + 3) * 4)
+print(7 - 2 - 1, 2 ** 3 ** 2)
+print(-3 ** 2, 17 // 5 * 2)`,`14 20
+4 512
+-9 6`,`<p>7 − 2 − 1 = (7 − 2) − 1 = 4. ${cd('17 // 5 * 2')} = (17 // 5) * 2 = 3 * 2, et non 17 // 10.</p>`)}
+<div class="warn"><p>Dans le doute, ajoute des parenthèses : elles ne coûtent rien et rendent le calcul lisible.</p></div>`,
   fig:py(`print(2 ** 3 ** 2)   # 2 ** 9 = 512
 print(-2 ** 2)       # -(2 ** 2) = -4
 print(10 - 4 - 3)    # (10 - 4) - 3 = 3
@@ -66,7 +98,29 @@ print(2 * 3 % 4)     # (2 * 3) % 4 = 2`),
   note:'Pour revenir en arrière, on recolle les morceaux : 3 h 20 min = 3 · 60 + 20 = 200 min.'},
  {h:'Le chiffre des centaines',p:`Que vaut ${cd('58372 // 100 % 10')}&nbsp;?`,lab:'résultat =',ans:3,
   why:'58372 // 100 = 583 (on efface 7 et 2), puis 583 % 10 = 3 : c’est le chiffre des centaines.'},
- {h:'Conversions et affectation',p:`${cd('int()')}, ${cd('float()')}, ${cd('str()')} et ${cd('bool()')} convertissent une valeur. ${cd('int(3.9)')} <b>tronque</b> vers 0. L’affectation ${cd('x = expr')} évalue d’abord la droite, puis attache le nom <i>x</i> au résultat : ${cd('x = x + 1')} a donc un sens.`,
+ {kind:'Théorie',h:'L’affectation : la droite d’abord',p:`<p>En maths, <i>x</i> = <i>x</i> + 1 est une équation sans solution. En Python, ${cd('x = x + 1')} est une instruction parfaitement normale. Le signe ${cd('=')} n’y veut pas dire « est égal à ».</p>
+<div class="def"><p>L’<b>affectation</b> ${cd('nom = expression')} se fait en deux temps : 1) Python <b>évalue</b> la partie droite avec les valeurs <b>actuelles</b> des variables ; 2) il <b>attache</b> le nom au résultat. Si le nom existait, il désigne désormais la nouvelle valeur. Un nom contient des lettres, des chiffres et _, ne commence pas par un chiffre, et ${cd('Age')} n’est pas ${cd('age')}.</p></div>
+<div class="idea"><p>Une affectation est un ordre, pas une relation. ${cd('y = x * 2')} range dans <i>y</i> un <b>nombre</b>, pas la formule : si <i>x</i> change ensuite, <i>y</i> ne bouge pas. ${cd('x += 2')} est un raccourci pour ${cd('x = x + 2')} (de même ${cd('-=')}, ${cd('*=')}, ${cd('//=')}). Dans ${cd('a, b = b, a + b')}, toute la droite est calculée avant la moindre affectation.</p></div>
+${exe(`x = 5
+y = x * 2
+x = x + 1
+print(x, y)
+a, b = 1, 2
+a, b = b, a + b
+print(a, b)`,`6 10
+2 3`,`<p><i>y</i> a reçu 10 quand <i>x</i> valait 5. Ensuite, la droite (2, 1 + 2) est calculée avec les anciennes valeurs.</p>`)}
+<div class="warn"><p>Lire un nom qui n’a encore jamais été affecté provoque ${cd('NameError')}. L’ordre des lignes compte.</p></div>`},
+ {h:'Conversions et affectation',p:`<p>${cd('input()')} renvoie toujours du texte, et ${cd("'3' + 4")} est une erreur. Pour mélanger texte et nombres, il faut <b>convertir</b>.</p>
+<div class="def"><p>${cd('int(v)')}, ${cd('float(v)')}, ${cd('str(v)')} et ${cd('bool(v)')} fabriquent une valeur du type demandé à partir de <i>v</i>. ${cd('int(3.9)')} <b>tronque</b> vers 0 ; ${cd("int('42')")} lit l’écriture d’un entier ; ${cd('str(7)')} écrit un nombre en texte ; ${cd('bool(v)')} vaut False pour 0, 0.0 et la chaîne vide '', True pour tout le reste.</p></div>
+<div class="idea"><p>Convertir ne modifie pas la valeur de départ : on obtient une <b>nouvelle</b> valeur, qu’il faut ranger avec une affectation. Après ${cd('n = int(s)')}, <i>s</i> est toujours un texte. La figure rappelle aussi l’affectation de l’étape précédente.</p></div>
+${exe(`s = '12'
+n = int(s)
+print(n + 1, s + '1')
+print(int(-3.9), float('2.5') * 2, str(3) + '3')
+print(bool(0), bool(''), bool('0'))`,`13 121
+-3 5.0 33
+False False True`,`<p>'0' n’est pas la chaîne vide : il contient un caractère, donc bool('0') vaut True.</p>`)}
+<div class="warn"><p>${cd('int()')} refuse un texte qui n’est pas l’écriture d’un entier : ${cd("int('3.5')")} et ${cd("int('abc')")} lèvent ${cd('ValueError')}.</p></div>`,
   fig:py(`int('42') + 1     # 43
 str(7) + '7'      # '77' : + colle deux chaînes
 '3' * 3           # '333'
@@ -77,6 +131,16 @@ x += 2            # raccourci de x = x + 2, x vaut 7
 a, b = 1, 2
 a, b = b, a       # échange : a vaut 2, b vaut 1`),
   note:`${cd('input()')} renvoie toujours une <b>chaîne</b>. Pour lire un nombre, écris ${cd('int(input())')}.`},
+ {kind:'Théorie',h:'Coller et répéter des chaînes',p:`<p>Les opérateurs ${cd('+')} et ${cd('*')} existent aussi pour le texte, mais ils n’y font pas un calcul : ils construisent une nouvelle chaîne.</p>
+<div class="def"><p>${cd('s + t')} <b>concatène</b> deux chaînes : elle les met bout à bout. ${cd('s * n')}, avec <i>n</i> entier, <b>répète</b> <i>s</i> <i>n</i> fois. ${cd('len(s)')} donne le nombre de caractères de <i>s</i>.</p></div>
+<div class="idea"><p>Un opérateur regarde les types de ses deux côtés avant d’agir. Deux int : ${cd('*')} multiplie. Un str et un int : ${cd('*')} répète. Deux str : ${cd('+')} colle. Un str et un int : ${cd('+')} ne sait que faire, et Python refuse plutôt que de deviner.</p></div>
+${exe(`a = '3'
+print(a * 2, int(a) * 2, a + a)
+print(len('Bonjour'), '-' * 5)
+print('Total :', 5)`,`33 6 33
+7 -----
+Total : 5`,`<p>print sépare ses arguments par une espace : c’est la façon simple d’afficher un texte suivi d’un nombre.</p>`)}
+<div class="warn"><p>${cd("'Total : ' + 5")} lève ${cd('TypeError')}. Convertis d’abord : ${cd("'Total : ' + str(5)")}. Et ${cd("'ab' * 2.0")} est aussi une erreur : on ne répète pas un texte 2,0 fois.</p></div>`},
  {kind:'Méthode',h:'Lire un message d’erreur',
   p:`<p>Quand Python ne peut pas exécuter une ligne, il s’arrête et affiche un message (une <i>traceback</i>). Lis-le <b>par le bas</b> : la dernière ligne donne le <b>type</b> d’erreur et une explication, la ligne au-dessus montre l’instruction fautive et son numéro.</p><ul><li>${cd('SyntaxError')} ou ${cd('IndentationError')} : le code est mal écrit (parenthèse ou deux-points oubliés, mauvais décalage).</li><li>${cd('NameError')} : nom inconnu (faute de frappe, variable pas encore créée).</li><li>${cd('TypeError')} : opération impossible entre ces types, comme une chaîne + un entier.</li><li>${cd('ValueError')} : bon type mais valeur impossible, comme ${cd("int('abc')")}.</li><li>${cd('ZeroDivisionError')} : division par zéro.</li></ul>`,
   demo:{enonce:'Ce programme plante. Trouver pourquoi et le corriger.'+py(`age = 17
@@ -129,6 +193,8 @@ c = a * 2
 print(b, c)`),
   opts:[cd('6 6'),cd('33 33'),cd('6 33'),cd('33 6')],ans:2,
   why:`${cd('int(a)')} vaut l’entier 3, donc b = 6. Mais <i>a</i> reste la chaîne '3', et une chaîne multipliée par 2 est répétée : c = '33'. print affiche 6 33.`},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir',p:`<p>Ce chapitre pose le vocabulaire de base : des valeurs typées, des opérateurs, des noms.</p>
+<div class="keep"><ul><li>Quatre types : ${cd('int')}, ${cd('float')} (point décimal), ${cd('str')}, ${cd('bool')}. Le type décide de ce que fait un opérateur.</li><li>${cd('/')} rend toujours un float ; ${cd('//')} donne le quotient entier, arrondi vers le bas ; ${cd('%')} le reste. Pour <i>b</i> &gt; 0 : <i>a</i> = <i>b</i>·(<i>a</i> // <i>b</i>) + <i>a</i> % <i>b</i> et 0 ≤ <i>a</i> % <i>b</i> &lt; <i>b</i>.</li><li>Les float sont approchés : pas de ${cd('==')} entre float.</li><li>Priorités : parenthèses, ${cd('**')} (de droite à gauche), moins unaire, ${cd('* / // %')}, ${cd('+ -')} ; à égalité, de gauche à droite.</li><li>Affectation : la droite est évaluée d’abord, puis le nom est attaché au résultat. ${cd('x += 1')} = ${cd('x = x + 1')}.</li><li>Conversions ${cd('int()')}, ${cd('float()')}, ${cd('str()')}, ${cd('bool()')} : elles fabriquent une nouvelle valeur. ${cd('input()')} renvoie un str.</li><li>Chaînes : ${cd('+')} colle, ${cd('*')} répète, ${cd('len')} compte ; str + int lève TypeError.</li><li>Méthodes : découper avec // et % (chiffres : ${cd('n // 10**k % 10')}) ; lire une erreur par le bas (type, message, ligne) ; tracer un programme avec un tableau, une ligne par instruction.</li></ul></div>`},
  {kind:'Problème',h:'Le rendu de monnaie',p:`Une caisse rend la monnaie avec des billets de 20 et de 10, puis des pièces de 2 et de 1 (en francs). Le programme ci-dessous compte combien il en faut de chaque sorte, en commençant par les plus grosses. Trace-le ligne par ligne.`+py(`prix = 37
 paye = 100
 rendu = paye - prix
@@ -167,7 +233,14 @@ print(-t // 3600, -t % 3600)`),
 
 /* ===================== 2. RÉFÉRENCES ET MUTABILITÉ ===================== */
 {subj:'ics',sem:'py',id:'ics-references',h:'Références et mutabilité',p:'Un nom n’est qu’une étiquette sur un objet : aliasing, objets mutables, is contre ==, copies.',steps:[
- {h:'Des noms et des objets',p:`En Python, une variable est un <b>nom</b> qui <b>référence</b> un objet en mémoire. ${cd('x = [1, 2]')} crée un objet liste, puis attache le nom <i>x</i> à cet objet. Chaque objet a une identité, donnée par ${cd('id(x)')}.`,
+ {h:'Des noms et des objets',p:`<p>Après ${cd('b = a')}, si on modifie <i>b</i>, est-ce que <i>a</i> change ? Pour répondre sans deviner, il faut savoir ce qu’est vraiment une variable.</p>
+<div class="def"><p>Un <b>objet</b> est une valeur rangée en mémoire. Il a un type, un contenu et une <b>identité</b>, un numéro unique pendant toute sa vie, donné par ${cd('id()')}. Une <b>variable</b> est un <b>nom</b> qui <b>référence</b> un objet. ${cd('x = [1, 2]')} crée d’abord un objet liste, puis attache le nom <i>x</i> à cet objet.</p></div>
+<div class="idea"><p>Pense à des <b>étiquettes</b> accrochées à des objets, pas à des boîtes qui portent un nom. Un objet peut porter plusieurs étiquettes. Un nom, lui, désigne un seul objet à la fois. Sur la figure, chaque flèche est une référence.</p></div>
+${exe(`x = [1, 2]
+y = x
+z = [1, 2]
+print(id(x) == id(y), id(x) == id(z))`,`True False`,`<p><i>y</i> est une deuxième étiquette sur l’objet de <i>x</i>. <i>z</i> désigne un autre objet, créé par la troisième ligne, qui a seulement le même contenu.</p>`)}
+<div class="warn"><p>La valeur de ${cd('id(x)')} change d’une exécution à l’autre : elle ne sert qu’à comparer deux identités dans un même programme.</p></div>`,
   fig:memFig(2.6,P=>{ nameAt(P,1.4,1.9,'x'); cells(P,4.5,1.9,[1,2]); ref(P,1.75,1.9,4.45,1.9);
     nameAt(P,1.4,0.6,'n'); box(P,4.5,0.6,0.9,'5','var(--math)'); ref(P,1.75,0.6,4.45,0.6); P.text(6.6,1.9,'objet list',{s:12,c:'var(--muted)'}); P.text(6.6,0.6,'objet int',{s:12,c:'var(--muted)'}); }),
   note:'Une flèche représente une référence. Plusieurs noms peuvent pointer vers le même objet.'},
@@ -188,7 +261,11 @@ print(b, len(b), sum(b))`),
 L[1] = 0
 print(sum(L))`),lab:'affichage :',ans:15,
   why:'L = [3, 1, 3, 1, 3, 1, 4], puis la case d’indice 1 devient 0 : [3, 0, 3, 1, 3, 1, 4]. Somme : 15.'},
- {h:'Deux noms, une seule liste',p:`Avance ligne par ligne. ${cd('b = a')} ne copie rien : <i>b</i> devient un deuxième nom pour la <b>même</b> liste. C’est l’<b>aliasing</b>.`,
+ {h:'Deux noms, une seule liste',p:`<p>Que fait exactement ${cd('b = a')} quand <i>a</i> désigne une liste ? Avance ligne par ligne avec le curseur et regarde les flèches.</p>
+<div class="def"><p>On parle d’<b>aliasing</b> quand deux noms référencent le <b>même</b> objet. ${cd('b = a')} ne copie rien : Python évalue <i>a</i>, trouve l’objet, et attache le nom <i>b</i> à ce même objet.</p></div>
+<div class="idea"><p>Il n’y a qu’une liste et deux étiquettes. Une modification faite par un nom (étape 3, ${cd('b.append(4)')}) se voit donc par l’autre. Mais réaffecter un nom (étape 4, ${cd('a = [7]')}) déplace seulement son étiquette vers un nouvel objet : l’ancienne liste reste là, toujours désignée par <i>b</i>.</p></div>
+<div class="ex"><p>Après l’étape 3, ${cd('print(a)')} affiche [1, 2, 3, 4], alors qu’on n’a jamais écrit <i>a</i> dans la ligne 3. Après l’étape 4, ${cd('print(a, b)')} affiche [7] [1, 2, 3, 4].</p></div>
+<div class="warn"><p>On ne voit cet effet qu’avec les objets qu’on peut modifier, comme les listes. Avec des entiers, il est invisible : c’est l’objet de l’étape « Mutable ou immuable ».</p></div>`,
   params:[{id:'e',l:'Étape',min:1,max:4,v:1}],
   draw:v=>{ const L=['a = [1, 2, 3]','b = a','b.append(4)','a = [7]'];
     const fig=memFig(3,P=>{ const big=v.e>=3?[1,2,3,4]:[1,2,3];
@@ -204,7 +281,19 @@ b.append(3)
 print(a)`),
   opts:[cd('[1, 2]'),cd('[1, 2, 3]'),cd('[3]'),'Une erreur'],ans:1,
   why:'<i>a</i> et <i>b</i> référencent la même liste. append la modifie sur place, donc on voit le 3 par les deux noms : [1, 2, 3].'},
- {h:'Mutable ou immuable',p:`Un objet <b>mutable</b> peut être modifié sur place : ${cd('list')}, ${cd('dict')}, ${cd('set')}. Un objet <b>immuable</b> ne change jamais : ${cd('int')}, ${cd('float')}, ${cd('bool')}, ${cd('str')}, ${cd('tuple')}. Avec un immuable, ${cd('y += 1')} crée un nouvel objet et y attache <i>y</i>.`,
+ {h:'Mutable ou immuable',p:`<p>Avec des entiers, ${cd('y = x')} puis ${cd('y += 1')} ne change pas <i>x</i>. Avec des listes, l’équivalent change les deux noms. La différence ne vient pas de l’affectation, mais des objets.</p>
+<div class="def"><p>Un objet <b>mutable</b> peut être modifié sur place : ${cd('list')}, ${cd('dict')}, ${cd('set')}. Un objet <b>immuable</b> ne change jamais après sa création : ${cd('int')}, ${cd('float')}, ${cd('bool')}, ${cd('str')}, ${cd('tuple')}.</p></div>
+<div class="idea"><p>Toute « modification » d’un immuable fabrique en réalité un <b>nouvel</b> objet. ${cd('y += 1')} calcule y + 1 = 6, crée l’objet 6 et y attache <i>y</i>. L’objet 5 n’a pas bougé et <i>x</i> le désigne toujours (figure). Sur une liste, ${cd('L += [2]')} modifie l’objet lui-même, et tous ses noms le voient.</p></div>
+${exe(`s = 'abc'
+t = s
+s = s + 'd'
+print(s, t)
+L = [1]
+M = L
+L += [2]
+print(L, M)`,`abcd abc
+[1, 2] [1, 2]`)}
+<div class="warn"><p>Un tuple est immuable, mais il contient des références. Dans ${cd('t = (1, [2])')}, on ne peut pas remplacer t[1], mais ${cd('t[1].append(3)')} est permis : la liste change, le tuple garde la même référence.</p></div>`,
   fig:py(`x = 5
 y = x
 y += 1
@@ -214,7 +303,16 @@ print(x, y)   # 5 6 : x n'a pas bougé`)+memFig(2.4,P=>{ nameAt(P,1.4,1.8,'x'); 
 s[0] = 'z'`),
   opts:[`<i>s</i> devient ${cd("'zbc'")}`,`<i>s</i> devient ${cd("'z'")}`,`Une erreur ${cd('TypeError')}`,'Rien, la ligne est ignorée'],ans:2,
   why:`Une chaîne est immuable : on ne peut pas changer une de ses lettres. Python lève TypeError (« 'str' object does not support item assignment »). Il faut construire une nouvelle chaîne : ${cd("s = 'z' + s[1:]")}.`},
- {h:'is contre ==',p:`${cd('a == b')} compare les <b>valeurs</b>. ${cd('a is b')} teste si les deux noms référencent le <b>même objet</b>. Deux listes peuvent être égales sans être le même objet.`,
+ {h:'is contre ==',p:`<p>Deux listes [1, 2] écrites séparément sont-elles « la même chose » ? Cette question en cache deux : ont-elles le même contenu, et sont-elles le même objet ?</p>
+<div class="def"><p>${cd('a == b')} compare les <b>valeurs</b> : pour deux listes, même longueur et cases égales une à une. ${cd('a is b')} vaut True si et seulement si les deux noms référencent le <b>même objet</b>, c’est-à-dire ${cd('id(a) == id(b)')}.</p></div>
+<div class="idea"><p>Deux vrais jumeaux se ressemblent trait pour trait (==) sans être la même personne (is). Si ${cd('a is b')}, alors forcément ${cd('a == b')}. La réciproque est fausse. La différence compte dès qu’on modifie : modifier <i>a</i> modifie <i>b</i> seulement si ${cd('a is b')}.</p></div>
+${exe(`a = [0] * 2
+b = [0, 0]
+print(a == b, a is b)
+b[0] = 1
+print(a == b, a)`,`True False
+False [0, 0]`)}
+<div class="warn"><p>N’utilise pas ${cd('is')} pour comparer des nombres ou des chaînes : le résultat dépend de détails internes de Python. Réserve-le à ${cd('x is None')} et aux questions d’identité.</p></div>`,
   fig:py(`a = [1, 2]
 c = [1, 2]
 print(a == c)   # True : mêmes valeurs
@@ -228,6 +326,31 @@ c = [1, 2]
 print(a is b, a is c, a == c)`),
   opts:[cd('True True True'),cd('True False False'),cd('False False True'),cd('True False True')],ans:3,
   why:'<i>b</i> est un alias de <i>a</i> : a is b vaut True. <i>c</i> est une autre liste : a is c vaut False. Mais ses valeurs sont les mêmes : a == c vaut True.'},
+ {kind:'Théorie',h:'Une liste range des références',p:`<p>Que contient vraiment une liste de listes comme ${cd('m = [[0, 0], [0, 0]]')} ? Pas des listes rangées l’une dans l’autre, mais des flèches.</p>
+<div class="def"><p>Chaque case d’une liste contient une <b>référence</b> vers un objet, exactement comme un nom. ${cd('L[i] = x')} fait pointer la case <i>i</i> vers l’objet <i>x</i>, sans rien copier.</p></div>
+<div class="idea"><p>Deux cases peuvent donc pointer vers le même objet. C’est ce que fait ${cd('[L] * 3')} : il répète trois fois <b>la même flèche</b> vers L. Écrire dans ${cd('m[0][0]')}, c’est suivre la flèche de la case 0 puis modifier l’objet trouvé au bout : tous ceux qui pointent vers lui le voient.</p></div>
+${exe(`L = [0, 0]
+m = [L, L]
+m[0][0] = 5
+print(m, L)
+P = [0] * 3
+P[0] = 1
+print(P)`,`[[5, 0], [5, 0]] [5, 0]
+[1, 0, 0]`,`<p>Dans P, les trois cases pointent vers le même entier 0. Mais un entier ne se modifie pas : ${cd('P[0] = 1')} redirige seulement la case 0, et les autres gardent leur 0.</p>`)}
+<div class="warn"><p>Le piège ne concerne que les cases qui pointent vers un objet <b>mutable</b>. Pour une grille, crée chaque ligne à part : ${cd('[[0] * 3, [0] * 3, [0] * 3]')}.</p></div>`},
+ {kind:'Théorie',h:'Copie superficielle et copie profonde',p:`<p>Tu veux travailler sur une copie d’une liste sans abîmer l’original. Selon ce que contient la liste, une copie « simple » suffit ou non.</p>
+<div class="def"><p>${cd('m[:]')}, ${cd('list(m)')} et ${cd('m.copy()')} font une <b>copie superficielle</b> : une nouvelle liste extérieure, dont les cases pointent vers les <b>mêmes</b> objets que celles de <i>m</i>. ${cd('copy.deepcopy(m)')}, après ${cd('import copy')}, fait une <b>copie profonde</b> : elle recopie aussi, de proche en proche, chaque objet contenu.</p></div>
+<div class="idea"><p>Pour une liste de nombres ou de chaînes, la copie superficielle suffit : les cases pointent vers des immuables, que personne ne peut modifier. Pour une liste de listes, les sous-listes restent partagées : seule la copie profonde les sépare.</p></div>
+${exe(`import copy
+m = [[1, 2], [3, 4]]
+s = m[:]
+d = copy.deepcopy(m)
+s[0][0] = 9
+s.append([5])
+print(m)
+print(d)`,`[[9, 2], [3, 4]]
+[[1, 2], [3, 4]]`,`<p>${cd('s.append([5])')} ne touche pas <i>m</i>, car la liste extérieure de <i>s</i> est neuve. Mais ${cd('s[0][0] = 9')} modifie une sous-liste partagée avec <i>m</i>.</p>`)}
+<div class="warn"><p>Une copie a toujours un coût : la copie profonde parcourt tout. Ne copie que si tu dois vraiment modifier sans toucher l’original.</p></div>`},
  {h:'Copier une liste de listes',p:`${cd('m[:]')}, ${cd('list(m)')} et ${cd('m.copy()')} font une copie <b>superficielle</b> : nouvelle liste extérieure, mais mêmes sous-listes. ${cd('copy.deepcopy(m)')} (après ${cd('import copy')}) copie tout. Choisis la ligne pour que ${cd('b[0][0] = 9')} ne change pas <i>m</i>.`,
   params:[{id:'k',l:'Instruction',min:0,max:3,v:0}],
   draw:v=>{ const opt=['b = m','b = m[:]','b = m.copy()','b = copy.deepcopy(m)'][v.k];
@@ -274,6 +397,8 @@ b = b + [4]
 print(a, b)`),
   opts:[cd('[1, 2] [1, 2, 3, 4]'),cd('[1, 2, 3] [1, 2, 3, 4]'),cd('[1, 2, 3, 4] [1, 2, 3, 4]'),cd('[1, 2, 3] [1, 2, 3]')],ans:1,
   why:`${cd('b += [3]')} modifie sur place la liste partagée : a et b valent [1, 2, 3]. Puis ${cd('b + [4]')} crée une nouvelle liste, attachée à b seul. a reste [1, 2, 3].`},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir',p:`<p>Tout ce chapitre tient en une image : des noms (et des cases de liste) qui pointent vers des objets.</p>
+<div class="keep"><ul><li>Une variable est un nom qui <b>référence</b> un objet ; un objet a un type, un contenu et une identité (${cd('id')}).</li><li>${cd('b = a')} ne copie pas : deux noms, un seul objet (aliasing).</li><li>Mutables : list, dict, set. Immuables : int, float, bool, str, tuple. « Modifier » un immuable crée un nouvel objet.</li><li>${cd('==')} compare les contenus, ${cd('is')} les identités ; ${cd('is')} seulement pour None.</li><li>Une case de liste contient une référence : ${cd('[L] * 3')} répète la même flèche.</li><li>Copie superficielle (${cd('m[:]')}, ${cd('list(m)')}, ${cd('m.copy()')}) : nouvelle liste extérieure, mêmes objets dedans. Copie profonde : ${cd('copy.deepcopy(m)')}.</li><li>Méthode : pour chaque ligne, se demander si elle <b>modifie un objet</b> (append, L[i] = x, +=) ou si elle <b>déplace une flèche</b> (nom = expression).</li><li>Listes : indices à partir de 0, ${cd('len')}, ${cd('sum')} ; ${cd('+')} et ${cd('*')} fabriquent de nouvelles listes, ${cd('append')} modifie.</li></ul></div>`},
  {kind:'Problème',h:'Trois noms, combien de listes&nbsp;?',p:`Suis l’état de la mémoire ligne par ligne. Pour chaque instruction, demande-toi si elle <b>modifie un objet</b> sur place ou si elle <b>attache un nom</b> à un nouvel objet. Dessine les flèches si besoin.`+py(`a = [1, 2, 3]
 b = a
 c = a[:]
@@ -318,13 +443,41 @@ print(t)`),
 
 /* ===================== 3. FONCTIONS ===================== */
 {subj:'ics',sem:'py',id:'ics-fonctions',h:'Fonctions',p:'Définir une fonction, passer des arguments, renvoyer un résultat, comprendre la portée et importer des bibliothèques.',steps:[
- {h:'Définir et appeler',p:`${cd('def')} définit une fonction : un nom, des <b>paramètres</b> entre parenthèses, puis un bloc indenté. ${cd('return')} renvoie une valeur et termine la fonction. À l’appel, on passe des <b>arguments</b>.`,
+ {h:'Définir et appeler',p:`<p>Tu dois calculer l’aire de dix rectangles. Plutôt que de recopier dix fois la formule, tu l’écris une fois, tu lui donnes un nom, et tu l’utilises quand tu veux : c’est une fonction.</p>
+<div class="def"><p>${cd('def nom(p1, p2):')} suivi d’un bloc indenté <b>définit</b> une fonction. Les noms entre parenthèses sont ses <b>paramètres</b>. Un <b>appel</b> ${cd('nom(a1, a2)')} lui passe des <b>arguments</b> : chaque paramètre reçoit la valeur de l’argument correspondant, puis le corps s’exécute. ${cd('return v')} termine l’appel et renvoie <i>v</i>.</p></div>
+<div class="idea"><p>${cd('def')} ne calcule rien : il range la recette sous un nom. Le corps ne s’exécute qu’au moment d’un appel, et à <b>chaque</b> appel. Lors d’un appel, l’expression ${cd('nom(…)')} est remplacée par la valeur renvoyée, qu’on peut utiliser dans un calcul.</p></div>
+${exe(`def carre(x):
+    print('calcul de', x)
+    return x * x
+
+print('début')
+y = carre(3) + carre(4)
+print(y)`,`début
+calcul de 3
+calcul de 4
+25`,`<p>Rien ne s’affiche à la définition. Les deux appels exécutent le corps l’un après l’autre, puis 9 + 16 est rangé dans <i>y</i>.</p>`)}
+<div class="warn"><p>Sans parenthèses, ${cd('carre')} désigne la fonction elle-même, sans l’appeler : ${cd('print(carre)')} affiche une description de la fonction, pas un nombre.</p></div>`,
   fig:py(`def aire_rectangle(l, h):
     return l * h
 
 a = aire_rectangle(3, 4)   # a vaut 12
 print(a + 1)               # 13`),
   note:`Une fonction sans ${cd('return')} renvoie ${cd('None')}. Afficher avec print n’est pas renvoyer.`},
+ {kind:'Théorie',h:'Renvoyer ou afficher',p:`<p>Une fonction qui affiche son résultat semble marcher : on voit le bon nombre à l’écran. Le problème apparaît quand on veut se servir de ce nombre dans un calcul.</p>
+<div class="def"><p>${cd('return expr')} termine l’appel <b>immédiatement</b> et donne la valeur de <i>expr</i> à l’endroit qui a appelé. Une fonction qui se termine sans ${cd('return')} (ou avec un ${cd('return')} seul) renvoie ${cd('None')}, une valeur spéciale qui veut dire « rien ».</p></div>
+<div class="idea"><p>${cd('print')} montre une valeur à l’humain qui regarde l’écran ; ${cd('return')} la donne au programme, qui peut la stocker ou la combiner. Les lignes placées après un ${cd('return')} exécuté ne sont jamais atteintes.</p></div>
+${exe(`def double_affiche(x):
+    print(2 * x)
+
+def double(x):
+    return 2 * x
+    print('jamais affiché')
+
+a = double(5) + 1
+b = double_affiche(5)
+print(a, b)`,`10
+11 None`,`<p>Le 10 vient du print à l’intérieur de double_affiche. Cette fonction renvoie None, que <i>b</i> reçoit.</p>`)}
+<div class="warn"><p>${cd('double_affiche(5) + 1')} affiche 10, puis lève ${cd('TypeError')} : on ne peut pas ajouter 1 à None.</p></div>`},
  {h:'print ou return',p:'Qu’affiche ce code&nbsp;?',fig:py(`def f(x):
     print(x + 1)
 
@@ -332,7 +485,14 @@ r = f(2)
 print(r)`),
   opts:[cd('3') +' puis '+cd('3'),cd('3')+' puis '+cd('None'),cd('None')+' seulement',cd('3')+' seulement'],ans:1,
   why:'L’appel f(2) affiche 3. Mais f n’a pas de return : elle renvoie None, donc r vaut None et la deuxième ligne affiche None.'},
- {h:'Positionnels, nommés, par défaut',p:`Les arguments <b>positionnels</b> remplissent les paramètres dans l’ordre. Un argument <b>nommé</b> (${cd('c=3')}) vise un paramètre par son nom. Un paramètre avec <b>valeur par défaut</b> peut être omis. Choisis un appel.`,
+ {h:'Positionnels, nommés, par défaut',p:`<p>Une fonction a parfois plusieurs paramètres, dont certains prennent presque toujours la même valeur. Python offre trois façons de les remplir.</p>
+<div class="def"><p>Un argument <b>positionnel</b> remplit les paramètres dans l’ordre de la définition. Un argument <b>nommé</b>, comme ${cd('c=3')}, vise un paramètre par son nom, quelle que soit sa place. Un paramètre écrit ${cd('b=10')} dans le ${cd('def')} a une <b>valeur par défaut</b> : on peut l’omettre à l’appel.</p></div>
+<div class="idea"><p>À l’appel, Python remplit d’abord les positionnels de gauche à droite, puis les nommés par leur nom, puis complète les paramètres restants avec leurs défauts. Un paramètre qui reste vide, ou qui est rempli deux fois, provoque ${cd('TypeError')}. Choisis un appel avec le curseur : la couleur dit comment chaque paramètre a été rempli.</p></div>
+${exe(`def f(a, b=10, c=100):
+    return a + b + c
+
+print(f(1, c=3), f(2, 5))`,`14 107`,`<p>f(1, c=3) : a = 1, b garde 10, c = 3. f(2, 5) : a = 2, b = 5, c garde 100.</p>`)}
+<div class="warn"><p>${cd('f(1, a=2)')} lève TypeError : <i>a</i> reçoit deux valeurs. Et une valeur par défaut est calculée une seule fois, quand Python exécute la ligne ${cd('def')} : avec un défaut mutable comme ${cd('[]')}, tous les appels partagent la même liste (dernier problème).</p></div>`,
   params:[{id:'k',l:'Appel',min:0,max:5,v:0}],
   draw:v=>{ const C=[['f(1)',[1,'p'],[10,'d'],[100,'d']],['f(1, 2)',[1,'p'],[2,'p'],[100,'d']],['f(1, c=3)',[1,'p'],[10,'d'],[3,'n']],['f(c=3, a=1)',[1,'n'],[10,'d'],[3,'n']],['f(1, 2, 3)',[1,'p'],[2,'p'],[3,'p']],['f(b=5, a=2)',[2,'n'],[5,'n'],[100,'d']]][v.k];
     const col={p:'var(--accent)',n:'var(--spark)',d:'var(--muted)'};
@@ -346,7 +506,19 @@ print(r)`),
 
 print(g(4, z=2))`),lab:'résultat =',ans:10,
   why:'x = 4 (positionnel), y garde sa valeur par défaut 3, z = 2 (nommé). Donc 4 · 3 − 2 = 10.'},
- {h:'Portée locale et globale',p:`Un nom affecté <b>dans</b> une fonction est <b>local</b> : il n’existe que pendant l’appel et masque un éventuel nom global identique. Pour réaffecter une variable globale, il faut déclarer ${cd('global x')}.`,
+ {h:'Portée locale et globale',p:`<p>Dans une fonction, tu écris ${cd('x = 5')} alors qu’il existe déjà un <i>x</i> dans le programme principal. Lequel change ? La réponse s’appelle la <b>portée</b> d’un nom.</p>
+<div class="def"><p>Un nom <b>affecté</b> dans le corps d’une fonction (paramètres compris) est <b>local</b> : il naît au début de l’appel, disparaît au ${cd('return')}, et masque un nom global identique. Un nom seulement <b>lu</b> dans la fonction, jamais affecté, est cherché parmi les noms <b>globaux</b>. Pour réaffecter un nom global depuis une fonction, il faut déclarer ${cd('global x')} au début du corps.</p></div>
+<div class="idea"><p>Chaque appel reçoit son propre tableau de noms, son <b>cadre</b>. Python décide qu’un nom est local en lisant tout le corps avant de l’exécuter : s’il y a une affectation à ce nom n’importe où dans la fonction, il est local partout dans la fonction.</p></div>
+${exe(`taux = 2
+def f(x):
+    return x * taux      # taux est lu : global
+
+def g(x):
+    taux = 10            # taux est affecté : local
+    return x * taux
+
+print(f(3), g(3), taux)`,`6 30 2`)}
+<div class="warn"><p>${cd('def incr(): n = n + 1')} avec un <i>n</i> global lève ${cd('UnboundLocalError')} : <i>n</i> est local, car affecté, et on le lit avant de lui avoir donné une valeur.</p></div>`,
   fig:py(`x = 10
 def f():
     x = 5        # x local, le x global n'est pas touché
@@ -358,7 +530,20 @@ compteur = 0
 def incr():
     global compteur
     compteur += 1`),
-  note:'Un paramètre est une variable locale qui référence l’objet passé. Si cet objet est une liste, la modifier sur place (append) se voit à l’extérieur. Réaffecter le paramètre, non.'},
+  note:'Évite global quand tu peux : une fonction qui reçoit ses données en paramètres et renvoie son résultat se teste et se réutilise bien plus facilement.'},
+ {kind:'Théorie',h:'Un paramètre reçoit l’objet, pas une copie',p:`<p>Si on passe une liste à une fonction et que la fonction la modifie, l’appelant le voit-il ? Il suffit de savoir ce que fait Python au moment de l’appel.</p>
+<div class="def"><p>À l’appel ${cd('f(a)')}, Python évalue l’argument <i>a</i>, puis attache le paramètre local <i>L</i> à l’objet obtenu, exactement comme ${cd('L = a')}. Aucune copie n’est faite : pendant l’appel, <i>L</i> et <i>a</i> sont deux noms pour le même objet.</p></div>
+<div class="idea"><p>On retrouve les règles du chapitre sur les références. <b>Modifier</b> l’objet par le paramètre (${cd('L.append(…)')}, ${cd('L[i] = …')}) se voit dehors. <b>Réaffecter</b> le paramètre (${cd('L = …')}, ${cd('n = n + 1')}) déplace seulement l’étiquette locale, que l’appelant ne voit pas. Avec un entier, seule la seconde chose est possible.</p></div>
+${exe(`def f(L, n):
+    L.append(n)
+    n = n + 1
+    L = [0]
+
+a = [1]
+k = 5
+f(a, k)
+print(a, k)`,`[1, 5] 5`,`<p>append a modifié la liste de <i>a</i>. Les deux réaffectations n’ont touché que les noms locaux, effacés à la fin de l’appel.</p>`)}
+<div class="warn"><p>Pour qu’une fonction ne touche pas la liste reçue, fais-lui travailler sur une copie : ${cd('L = L[:]')} en première ligne du corps.</p></div>`},
  {h:'Une liste passée en argument',p:'Qu’affiche ce code&nbsp;?',fig:py(`def ajoute(L):
     L.append(0)
     L = [9]
@@ -398,7 +583,15 @@ def k(n):
 x = 1
 print(k(x + 2))`),lab:'affichage :',ans:39,
   why:'k(3) : h(3, 2) met x = 5 dans son cadre et renvoie 10, donc m = 10. Puis h(10, 3) : x = 13, et on renvoie 13 · 3 = 39. Le x global vaut toujours 1.'},
- {h:'Importer une bibliothèque',p:`${cd('import math')} donne accès à ${cd('math.sqrt')}, ${cd('math.pi')}, ${cd('math.floor')}, ${cd('math.ceil')}… On peut aussi écrire ${cd('from math import sqrt')}. Le module ${cd('random')} tire des nombres au hasard.`,
+ {h:'Importer une bibliothèque',p:`<p>Racine carrée, arrondis, tirages au hasard : ces fonctions ont déjà été écrites et rangées dans des <b>modules</b>. Il suffit de les charger.</p>
+<div class="def"><p>${cd('import math')} charge le module <i>math</i> et crée le nom ${cd('math')}. On atteint son contenu avec un point : ${cd('math.sqrt')}, ${cd('math.pi')}, ${cd('math.floor')} (arrondi vers le bas), ${cd('math.ceil')} (vers le haut). ${cd('from math import sqrt')} importe seulement <i>sqrt</i>, qu’on écrit alors sans préfixe. Le module ${cd('random')} tire des nombres au hasard.</p></div>
+<div class="idea"><p>Le point se lit « dans » : ${cd('math.floor')} est « floor dans math ». Ce préfixe évite les conflits de noms : ta propre fonction floor et celle de math peuvent coexister.</p></div>
+${exe(`import math
+from math import sqrt
+print(math.sqrt(16), sqrt(2) ** 2 == 2)
+print(math.floor(-2.5), math.ceil(-2.5), math.pi)`,`4.0 False
+-3 -2 3.141592653589793`,`<p>math.sqrt renvoie toujours un float, même pour un carré parfait. √2 est approché, donc son carré n’est pas exactement 2.</p>`)}
+<div class="warn"><p>Appeler ${cd('sqrt(2)')} sans l’avoir importé lève ${cd('NameError')}. Et les résultats de random changent à chaque exécution : on ne peut pas prévoir leur sortie exacte.</p></div>`,
   fig:py(`import math
 import random
 
@@ -433,6 +626,8 @@ def distance(xa, ya, xb, yb):
 
 print(f(1, c=5) + f(c=1, a=2, b=0))`),lab:'affichage :',ans:326,
   why:'f(1, c=5) : a = 1, b = 2, c = 5, soit 100 + 20 + 5 = 125. f(c=1, a=2, b=0) : 200 + 0 + 1 = 201. Somme : 326.'},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir',p:`<p>Une fonction est une recette nommée, exécutée dans son propre cadre à chaque appel.</p>
+<div class="keep"><ul><li>${cd('def nom(params):')} définit sans exécuter ; ${cd('nom(args)')} exécute le corps et vaut la valeur renvoyée.</li><li>${cd('return')} termine l’appel et renvoie une valeur ; sans return, la fonction renvoie ${cd('None')}. print affiche, return renvoie.</li><li>Arguments positionnels (dans l’ordre), nommés (${cd('c=3')}), valeurs par défaut (calculées une seule fois, à la ligne def).</li><li>Un nom affecté dans la fonction est local ; un nom seulement lu est cherché dans le global ; ${cd('global x')} pour réaffecter un global.</li><li>Un paramètre est attaché à l’objet passé, sans copie : modifier l’objet se voit dehors, réaffecter le paramètre non.</li><li>${cd('import math')} puis ${cd('math.sqrt')} ; ${cd('from math import sqrt')} ; ${cd('random.randint(a, b)')} inclut <i>b</i>.</li><li>Méthodes : tracer les appels avec un cadre par appel, empilés ; découper un problème en petites fonctions qui renvoient leur résultat.</li></ul></div>`},
  {kind:'Problème',h:'Un x peut en cacher un autre',p:`Deux fonctions utilisent un nom <i>x</i> qui existe aussi au niveau global. Suis chaque appel en séparant bien les variables locales de la variable globale. N’oublie pas que le paramètre de <i>g</i> s’appelle lui aussi <i>x</i>.`+py(`x = 3
 
 def f(y):
@@ -472,7 +667,18 @@ print(a, len(b), c, len(d))`),
 
 /* ===================== 4. STRUCTURES DE CONTRÔLE ===================== */
 {subj:'ics',sem:'py',id:'ics-controle',h:'Structures de contrôle',p:'Choisir avec if, répéter avec while et for, sortir d’une boucle, imbriquer des boucles.',steps:[
- {h:'if, elif, else',p:`Python teste les conditions <b>dans l’ordre</b> et exécute le premier bloc dont la condition est vraie, puis saute les autres. Les blocs sont délimités par l’<b>indentation</b> (4 espaces). On combine les conditions avec ${cd('and')}, ${cd('or')} et ${cd('not')}.`,
+ {h:'if, elif, else',p:`<p>Un programme doit souvent réagir différemment selon les données : afficher « suffisant » ou « insuffisant » selon une note. Il lui faut un aiguillage.</p>
+<div class="def"><p>${cd('if c1:')} suivi d’un bloc, puis éventuellement des ${cd('elif c2:')} et un ${cd('else:')}, chacun avec son bloc. Python évalue les conditions <b>dans l’ordre</b>, exécute le bloc de la <b>première</b> condition vraie, puis saute tous les autres. Si aucune n’est vraie, il exécute le bloc ${cd('else')}, s’il existe. Un <b>bloc</b> est l’ensemble des lignes indentées (4 espaces) qui suivent les deux-points.</p></div>
+<div class="idea"><p>Une chaîne if / elif / else choisit <b>un seul</b> chemin. Plusieurs ${cd('if')} à la suite, eux, sont indépendants : chacun est testé, et plusieurs blocs peuvent s’exécuter. L’indentation n’est pas décorative : c’est elle qui dit où un bloc s’arrête.</p></div>
+${exe(`n = 15
+if n % 3 == 0:
+    print('fizz')
+elif n % 5 == 0:
+    print('buzz')
+if n % 5 == 0:
+    print('cinq')`,`fizz
+cinq`,`<p>15 est multiple de 3 : le elif est sauté, bien que 15 soit aussi multiple de 5. Le second if est un nouveau test, indépendant du premier.</p>`)}
+<div class="warn"><p>Oublier les deux-points donne ${cd('SyntaxError')}, une ligne mal décalée ${cd('IndentationError')} ou, pire, un bloc qui s’arrête au mauvais endroit sans aucune erreur.</p></div>`,
   fig:py(`note = 4.5
 if note >= 5.5:
     print('très bien')
@@ -493,7 +699,21 @@ else:
     print('C')`),
   opts:[cd('A')+' puis '+cd('B'),cd('B'),cd('A'),cd('C')],ans:2,
   why:'7 > 5 est vrai : on affiche A, et les branches elif et else sont sautées, même si 7 > 3 est vrai aussi.'},
- {h:'La boucle while',p:`${cd('while condition:')} répète son bloc <b>tant que</b> la condition est vraie. Le corps doit faire évoluer la condition, sinon la boucle ne s’arrête jamais. Ici, la suite de Syracuse : choisis le départ, puis avance tour par tour.`+py(`n = n0
+ {kind:'Théorie',h:'Comparer et combiner des conditions',p:`<p>« Entre 0 et 10, mais pas égal à 3 » : une vraie condition combine souvent plusieurs comparaisons.</p>
+<div class="def"><p>Les comparaisons ${cd('==')}, ${cd('!=')}, ${cd('<')}, ${cd('<=')}, ${cd('>')}, ${cd('>=')} donnent un bool. ${cd('A and B')} est vrai si les deux le sont ; ${cd('A or B')} si au moins une l’est ; ${cd('not A')} inverse. Priorités : les comparaisons, puis ${cd('not')}, puis ${cd('and')}, puis ${cd('or')}. ${cd('0 <= x < 10')} s’écrit directement et signifie ${cd('0 <= x and x < 10')}.</p></div>
+<div class="idea"><p>Python évalue ${cd('and')} et ${cd('or')} <b>de gauche à droite, et s’arrête dès qu’il connaît la réponse</b>. Si A est faux, ${cd('A and B')} est faux sans regarder B ; si A est vrai, ${cd('A or B')} est vrai sans regarder B. On s’en sert pour protéger un calcul : ${cd('x != 0 and 10 / x > 2')} ne divise jamais par zéro.</p></div>
+${exe(`x = 0
+print(x != 0 and 10 / x > 2)
+print(x == 0 or 10 / x > 2)
+print(not x > 3 and x < 5)`,`False
+True
+True`,`<p>Dans les deux premières lignes, 10 / x n’est jamais calculé. La troisième se lit (not (x &gt; 3)) and (x &lt; 5).</p>`)}
+<div class="warn"><p>${cd('x == 1 or 2')} ne teste pas « x vaut 1 ou 2 » : il se lit ${cd('(x == 1) or 2')}, et 2 compte comme vrai. Le test passe toujours. Écris ${cd('x == 1 or x == 2')}.</p></div>`},
+ {h:'La boucle while',p:`<p>Il faut parfois répéter un calcul sans savoir à l’avance combien de fois : diviser par 2 tant que c’est possible, attendre qu’une somme dépasse 100.</p>
+<div class="def"><p>${cd('while condition:')} suivi d’un bloc. Python teste la condition. Si elle est vraie, il exécute <b>tout</b> le bloc, puis revient au test. Dès que le test est faux, il saute le bloc et passe à la suite du programme. Un passage dans le bloc s’appelle un <b>tour</b>.</p></div>
+<div class="idea"><p>Le test a lieu au <b>début</b> de chaque tour, jamais au milieu du bloc. Si la condition est fausse dès le départ, la boucle fait zéro tour. Le corps doit modifier une variable de la condition, sinon la condition reste vraie et la boucle ne s’arrête jamais.</p></div>
+<div class="ex"><p>Avec n0 = 6, la boucle ci-dessous (suite de Syracuse) donne n = 3, 10, 5, 16, 8, 4, 2, 1 : après 8 tours, n != 1 est faux et la boucle s’arrête avec pas = 8. Vérifie-le sur la figure.</p></div>
+<div class="warn"><p>Une boucle infinie ne produit pas d’erreur : le programme tourne sans fin. On l’interrompt avec Ctrl+C. Choisis le départ, puis avance tour par tour.</p></div>`+py(`n = n0
 pas = 0
 while n != 1:
     if n % 2 == 0:
@@ -532,7 +752,14 @@ while n > 1:
     k += 1
 print(k)`),lab:'k =',ans:4,
   why:'n prend les valeurs 100, 33, 11, 3, 1. Quatre divisions, puis n > 1 est faux : k = 4.'},
- {h:'for et range',p:`${cd('for x in sequence:')} donne à <i>x</i> chaque élément de la séquence, dans l’ordre. ${cd('range(debut, fin, pas)')} produit les entiers de <i>debut</i> inclus à <i>fin</i> <b>exclue</b>, de <i>pas</i> en <i>pas</i>. ${cd('break')} quitte la boucle, ${cd('continue')} passe directement au tour suivant.`,
+ {h:'for et range',p:`<p>Quand on sait d’avance ce qu’on parcourt (les nombres de 1 à 100, les lettres d’un mot, les éléments d’une liste), une boucle ${cd('while')} avec un compteur à gérer soi-même est inutilement risquée.</p>
+<div class="def"><p>${cd('for x in sequence:')} suivi d’un bloc : <i>x</i> prend successivement <b>chaque élément</b> de la séquence, dans l’ordre, et le bloc s’exécute une fois par élément. ${cd('range(fin)')}, ${cd('range(debut, fin)')} et ${cd('range(debut, fin, pas)')} produisent les entiers de <i>debut</i> (0 par défaut) <b>inclus</b> à <i>fin</i> <b>exclue</b>, de <i>pas</i> en <i>pas</i> (1 par défaut, négatif pour descendre).</p></div>
+<div class="idea"><p>La fin exclue n’est pas un caprice : ${cd('range(a, b)')} contient exactement <i>b</i> − <i>a</i> entiers, et ${cd('range(len(L))')} parcourt exactement les indices de L. La boucle for gère seule sa variable : pas de ${cd('i += 1')} à oublier.</p></div>
+${exe(`s = 0
+for k in range(1, 5):
+    s = s + k
+print(s, list(range(10, 0, -3)), list(range(3, 3)))`,`10 [10, 7, 4, 1] []`,`<p>k vaut 1, 2, 3, 4 : 5 est exclu. ${cd('list()')} sert seulement à afficher les entiers d’un range. range(3, 3) est vide : la boucle ferait zéro tour.</p>`)}
+<div class="warn"><p>Réaffecter la variable de boucle dans le bloc ne change pas la suite : au tour suivant, for lui redonne l’élément suivant. ${cd('for i in range(3): i = 10')} fait quand même ses 3 tours.</p></div>`,
   fig:py(`range(5)          # 0, 1, 2, 3, 4
 range(2, 6)       # 2, 3, 4, 5
 range(10, 0, -3)  # 10, 7, 4, 1
@@ -622,6 +849,19 @@ for x in [4, 7, -2, 5]:
 print(tous_pairs([2, 4, 7, 8]), tous_pairs([]))`),
   opts:[cd('False False'),cd('True True'),cd('False True'),cd('True False')],ans:2,
   why:'Dans [2, 4, 7, 8], 7 est un contre-exemple : False. Pour la liste vide, la boucle ne tourne pas et on atteint return True : aucun élément ne contredit « tous pairs ».'},
+ {kind:'Théorie',h:'Sortir d’une boucle ou sauter un tour',p:`<p>Tu cherches le plus petit diviseur de 91. Dès que tu l’as trouvé, continuer la boucle ne sert à rien. Et parfois, certains tours ne t’intéressent pas du tout.</p>
+<div class="def"><p>${cd('break')} arrête <b>immédiatement</b> la boucle qui le contient : le programme reprend à la première ligne après la boucle. ${cd('continue')} abandonne le reste du tour en cours et passe au tour suivant : élément suivant pour un for, nouveau test pour un while.</p></div>
+<div class="idea"><p>${cd('break')} est une porte de sortie, ${cd('continue')} un « passe ton tour ». On les place presque toujours dans un ${cd('if')}. Dans deux boucles imbriquées, ${cd('break')} ne quitte que la boucle <b>intérieure</b>. Après un break, la variable de boucle garde la valeur qu’elle avait.</p></div>
+${exe(`for d in range(2, 100):
+    if 91 % d == 0:
+        break
+print(d)
+for k in range(6):
+    if k % 2 == 0:
+        continue
+    print(k, end=' ')`,`7
+1 3 5`,`<p>La première boucle s’arrête à d = 7, car 91 = 7 · 13. Dans la seconde, les k pairs sautent le print.</p>`)}
+<div class="warn"><p>Dans un while, un ${cd('continue')} placé avant la mise à jour du compteur saute cette mise à jour : la condition ne change plus et la boucle devient infinie.</p></div>`},
  {h:'break et continue',p:'Qu’affiche ce code&nbsp;?',fig:py(`for i in range(10):
     if i % 3 == 0:
         continue
@@ -630,7 +870,15 @@ print(tous_pairs([2, 4, 7, 8]), tous_pairs([]))`),
     print(i, end=' ')`),
   opts:[cd('1 2 4 5 7 8'),cd('1 2 4 5 7'),cd('0 1 2 4 5 7'),cd('1 2')],ans:1,
   why:'Les multiples de 3 (0, 3, 6) sont sautés par continue. On affiche 1, 2, 4, 5, 7. À i = 8, la condition i > 7 déclenche break avant le print.'},
- {h:'Boucles imbriquées',p:`Une boucle dans une boucle : pour <b>chaque</b> tour de la boucle extérieure, la boucle intérieure fait <b>tous</b> ses tours. Si l’intérieure dépend de <i>i</i>, le nombre de tours varie.`,
+ {h:'Boucles imbriquées',p:`<p>Pour parcourir toutes les cases d’un tableau, ou tous les couples (<i>i</i>, <i>j</i>), une seule boucle ne suffit pas : il en faut une dans l’autre.</p>
+<div class="def"><p>Deux boucles sont <b>imbriquées</b> quand la boucle intérieure est dans le bloc de la boucle extérieure. Pour <b>chaque</b> tour de la boucle extérieure, la boucle intérieure fait <b>tous</b> ses tours. Le nombre total de tours intérieurs est la somme, sur les valeurs de <i>i</i>, des longueurs des boucles intérieures.</p></div>
+<div class="idea"><p>Pense à un compteur kilométrique : le chiffre de droite fait un tour complet avant que celui de gauche avance d’un cran. Si la boucle intérieure dépend de <i>i</i>, comme ${cd('range(i, 3)')} sur la figure, ses lignes ont des longueurs différentes : on compte ligne par ligne.</p></div>
+${exe(`for i in range(1, 3):
+    for j in range(1, 4):
+        print(i * j, end=' ')
+    print()`,`1 2 3
+2 4 6`,`<p>Le ${cd('print()')} vide est dans la boucle extérieure, hors de l’intérieure : il passe à la ligne une fois par valeur de <i>i</i>. 2 × 3 = 6 tours intérieurs.</p>`)}
+<div class="warn"><p>Donne des noms différents aux deux variables de boucle. Si les deux s’appellent <i>i</i>, la boucle intérieure écrase la valeur de l’extérieure.</p></div>`,
   fig:py(`for i in range(3):
     for j in range(i, 3):
         print(i, j)
@@ -699,6 +947,8 @@ assert maxi([-3, -1]) == -1`),
     return c`),
   opts:[cd('assert compte_entre([2, 5, 7], 1, 9) == 3'),cd('assert compte_entre([], 0, 10) == 0'),cd('assert compte_entre([4, 6], 4, 6) == 2'),cd('assert compte_entre([1, 20], 5, 10) == 0')],ans:2,
   why:'Le cas limite est l’égalité avec une borne : 4 &lt; 4 et 6 &lt; 6 sont faux, donc la fonction renvoie 0 au lieu de 2. Il faut écrire a &lt;= x &lt;= b. Les trois autres tests passent et ne voient rien.'},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir',p:`<p>Choisir et répéter : avec ces outils, un programme ne suit plus seulement ses lignes de haut en bas.</p>
+<div class="keep"><ul><li>${cd('if / elif / else')} : la première condition vraie gagne, les autres sont sautées. Les blocs sont définis par l’indentation.</li><li>${cd('and')}, ${cd('or')}, ${cd('not')} ; évaluation de gauche à droite qui s’arrête dès que la réponse est connue ; ${cd('x == 1 or x == 2')}, jamais ${cd('x == 1 or 2')}.</li><li>${cd('while c:')} teste au début de chaque tour ; <i>n</i> tours = <i>n</i> tests vrais + 1 test faux.</li><li>${cd('for x in seq:')} ; ${cd('range(a, b, p)')} va de <i>a</i> inclus à <i>b</i> exclu, et range(a, b) a b − a éléments.</li><li>${cd('break')} sort de la boucle intérieure, ${cd('continue')} saute au tour suivant.</li><li>Boucles imbriquées : l’intérieure fait tous ses tours pour chaque tour de l’extérieure.</li><li>Motifs : accumulateur (valeur neutre avant la boucle), compteur, maximum initialisé avec L[0], drapeau ou return dans la boucle pour « au moins un », contre-exemple pour « tous ».</li><li>Méthodes : tableau des tours, déroulé ligne par ligne des boucles imbriquées, print de débogage, cas limites testés avec ${cd('assert')}.</li></ul></div>`},
  {kind:'Problème',h:'Quand la somme dépasse 100',p:`On additionne les carrés 1², 2², 3²… tant que la somme ne dépasse pas 100. Il faut trouver la valeur qui fait sortir de la boucle, puis voir ce que change une petite modification de la condition.`+py(`n = 0
 s = 0
 while s <= 100:
@@ -738,11 +988,26 @@ print(compte)`),
 
 /* ===================== 5. CHAÎNES ET LISTES ===================== */
 {subj:'ics',sem:'py',id:'ics-listes',h:'Chaînes et listes',p:'Accéder par indice, découper en tranches, utiliser les méthodes courantes, parcourir et modifier une liste.',steps:[
- {h:'Indices',p:`Une chaîne ou une liste de longueur <i>n</i> a des indices de 0 à <i>n</i> − 1. ${cd('s[0]')} est le premier élément. Les indices <b>négatifs</b> partent de la fin : ${cd('s[-1]')} est le dernier. ${cd('len(s)')} donne la longueur.`,
+ {h:'Indices',p:`<p>Une chaîne ou une liste est une suite d’éléments rangés dans un ordre. Pour lire « la troisième lettre » ou « le dernier élément », il faut une façon de désigner une position.</p>
+<div class="def"><p>Une séquence <i>s</i> de longueur <i>n</i> = ${cd('len(s)')} a des <b>indices</b> de 0 à <i>n</i> − 1, et ${cd('s[i]')} est son élément d’indice <i>i</i>. Les <b>indices négatifs</b> comptent depuis la fin : ${cd('s[-k]')} désigne ${cd('s[n - k]')}, donc ${cd('s[-1]')} est le dernier élément.</p></div>
+<div class="idea"><p>L’indice dit combien d’éléments on saute depuis le début : ${cd('s[0]')} n’en saute aucun, d’où le départ à 0. Sur la figure, chaque case porte ses deux indices : le positif en haut, le négatif en bas. Ils désignent la même case.</p></div>
+${exe(`s = 'PYTHON'
+L = [10, 20, 30]
+print(s[0], s[5], s[-1], s[-6])
+print(L[1] + L[-1], len(s))`,`P N N P
+50 6`)}
+<div class="warn"><p>Lire, oui ; écrire, pas toujours. ${cd('L[0] = 7')} est permis car une liste est mutable, mais ${cd("s[0] = 'J'")} lève TypeError : une chaîne est immuable.</p></div>`,
   fig:(()=>{ const s='PYTHON', P=plane({x:[0,7],y:[0,2.6],grid:false,axes:false}); const c=cells(P,0.5,1.3,s.split(''),'var(--code)',1);
     c.forEach((p,i)=>{ P.text(p[0],2.2,String(i),{a:'middle',s:12,c:'var(--accent)'}); P.text(p[0],0.4,String(i-6).replace('-','−'),{a:'middle',s:12,c:'var(--spark)'}); }); return P.svg(); })(),
   note:`${cd('s[6]')} sur 'PYTHON' lève IndexError : le dernier indice valide est 5.`},
- {h:'Les tranches',p:`${cd('s[a:b:c]')} prend les éléments d’indice <i>a</i> inclus à <i>b</i> <b>exclu</b>, de <i>c</i> en <i>c</i>. Si on omet <i>a</i>, on part du début. Si on omet <i>b</i>, on va jusqu’à la fin. ${cd('s[::-1]')} renverse.`,
+ {h:'Les tranches',p:`<p>Extraire un morceau, comme les trois premières lettres ou la fin d’un mot, sans écrire de boucle : c’est le rôle des tranches.</p>
+<div class="def"><p>${cd('s[a:b:c]')} est la <b>tranche</b> formée des éléments d’indices <i>a</i>, <i>a</i> + <i>c</i>, <i>a</i> + 2<i>c</i>… strictement avant <i>b</i>. Valeurs par défaut : <i>a</i> = début, <i>b</i> = fin, <i>c</i> = 1. Le résultat est une <b>nouvelle</b> chaîne ou une nouvelle liste.</p></div>
+<div class="idea"><p>Imagine les indices <i>a</i> et <i>b</i> posés sur les bords gauches des cases, comme les traits vert et rouge de la figure. ${cd('s[a:b]')} prend ce qui est entre les deux traits, soit <i>b</i> − <i>a</i> éléments. Ainsi ${cd('s[:k]')} et ${cd('s[k:]')} se recollent exactement en <i>s</i>.</p></div>
+${exe(`s = 'PROGRAMME'
+print(s[1:5], s[:3], s[5:])
+print(s[::2], s[::-1], len(s[4:2]))`,`ROGR PRO AMME
+PORME EMMARGORP 0`,`<p>s[4:2] est vide, car 4 ≥ 2 avec un pas positif. Avec un pas de −1, on part de la fin et on avance vers la gauche.</p>`)}
+<div class="warn"><p>Sur une liste, une tranche est une <b>copie superficielle</b> : après ${cd('M = L[1:3]')}, ${cd('M[0] = 9')} ne modifie pas L. Règle les curseurs pour voir chaque tranche.</p></div>`,
   params:[{id:'a',l:'a',min:0,max:9,v:1},{id:'b',l:'b',min:0,max:9,v:5},{id:'c',l:'c',min:1,max:3,v:1}],
   draw:v=>{ const s='PROGRAMME', P=plane({x:[0,10],y:[0,2.8],grid:false,axes:false}); const sel=new Set(); for(let i=v.a;i<v.b;i+=v.c) sel.add(i);
     s.split('').forEach((ch,i)=>{ P.rect(0.5+i,0.9,1,0.8,{fill:sel.has(i)?'var(--spark)':'var(--surface)',fo:sel.has(i)?.5:1,c:'var(--code)',w:2}); P.text(1+i,1.3,ch,{a:'middle',dy:5,s:14}); P.text(1+i,2.15,String(i),{a:'middle',s:11,c:'var(--muted)'}); });
@@ -762,7 +1027,16 @@ print(compte)`),
  {h:'La fin du mot',p:`Avec ${cd("s = 'ingenieur'")}, que vaut ${cd('s[-3:]')}&nbsp;?`,
   opts:[cd("'ieur'"),cd("'r'"),cd("'eur'"),cd("'nie'")],ans:2,
   why:`${cd('s[-3:]')} part de l’indice −3 (le e de « eur ») et va jusqu’à la fin : 'eur'. Les trois derniers caractères.`},
- {h:'Méthodes des chaînes',p:`Une chaîne est immuable : ses méthodes <b>renvoient une nouvelle chaîne</b> sans modifier l’originale. ${cd('split')} découpe en liste de mots, ${cd('join')} recolle une liste avec un séparateur.`,
+ {h:'Méthodes des chaînes',p:`<p>Nettoyer un texte, le couper en mots, compter une lettre : ces opérations reviennent sans cesse, et Python les fournit toutes faites.</p>
+<div class="def"><p>Une <b>méthode</b> est une fonction attachée à un objet, appelée avec un point : ${cd('s.upper()')}. Pour une chaîne : ${cd('strip')} retire les espaces aux bouts, ${cd('split(sep)')} découpe en <b>liste</b> de morceaux (aux espaces si on ne donne pas de séparateur), ${cd('sep.join(L)')} recolle une liste de chaînes avec <i>sep</i> entre deux, ${cd('replace')}, ${cd('find')} (indice, ou −1 si absent), ${cd('count')}, ${cd('upper')}, ${cd('lower')}.</p></div>
+<div class="idea"><p>Une chaîne est immuable : aucune méthode ne la modifie. Chacune <b>renvoie</b> un résultat neuf (une chaîne, une liste ou un nombre), qu’il faut ranger dans une variable pour le garder.</p></div>
+${exe(`s = ' a-b-c '
+t = s.strip()
+mots = t.split('-')
+print(mots, '+'.join(mots))
+print(len(s), len(t), 'banane'.find('z'), 'banane'.count('a'))`,`['a', 'b', 'c'] a+b+c
+7 5 -1 2`,`<p>s n’a pas changé : il a toujours 7 caractères, espaces compris.</p>`)}
+<div class="warn"><p>${cd('join')} ne prend que des chaînes : ${cd("'-'.join([1, 2])")} lève TypeError. Convertis d’abord chaque nombre avec str.</p></div>`,
   fig:py(`s = '  Bonjour le monde  '
 s.strip()                # 'Bonjour le monde'
 s.split()                # ['Bonjour', 'le', 'monde']
@@ -778,7 +1052,15 @@ s.split()                # ['Bonjour', 'le', 'monde']
  {h:'Enchaîner les méthodes',p:'Qu’affiche ce code&nbsp;?',fig:py(`print('-'.join('a b c'.split()).upper())`),
   opts:[cd('a-b-c'),cd('A-B-C'),cd('A B C'),cd("['A', 'B', 'C']")],ans:1,
   why:`'a b c'.split() donne ['a', 'b', 'c']. join les recolle avec '-' : 'a-b-c'. upper met en majuscules : A-B-C.`},
- {h:'Modifier une liste',p:`Une liste est mutable. ${cd('L[i] = x')} remplace un élément. ${cd('append')} ajoute à la fin, ${cd('insert(i, x)')} insère avant l’indice <i>i</i>, ${cd('pop()')} retire et renvoie le dernier, ${cd('remove(x)')} retire la première occurrence de <i>x</i>.`,
+ {h:'Modifier une liste',p:`<p>Une liste de courses grandit, rétrécit et change. Contrairement à une chaîne, une liste se modifie <b>sur place</b>.</p>
+<div class="def"><p>${cd('L[i] = x')} remplace l’élément d’indice <i>i</i>. ${cd('L.append(x)')} ajoute <i>x</i> à la fin. ${cd('L.insert(i, x)')} insère <i>x</i> à l’indice <i>i</i> et décale la suite vers la droite. ${cd('L.pop()')} retire le dernier élément et le <b>renvoie</b> ; ${cd('L.pop(i)')} fait de même pour l’indice <i>i</i>. ${cd('L.remove(x)')} retire la <b>première</b> occurrence de <i>x</i>.</p></div>
+<div class="idea"><p>Ces méthodes changent l’objet lui-même : tous les noms qui le référencent voient le changement. Elles renvoient ${cd('None')}, sauf pop, qui renvoie l’élément retiré. Après un insert ou un remove, les indices des éléments suivants changent.</p></div>
+${exe(`L = [4, 2, 4]
+r = L.append(1)
+L.remove(4)
+x = L.pop(0)
+print(L, x, r)`,`[4, 1] 2 None`,`<p>remove(4) retire seulement le premier 4 : [2, 4, 1]. pop(0) retire et renvoie 2.</p>`)}
+<div class="warn"><p>${cd('L = L.append(1)')} range None dans L : la liste est perdue. Une méthode qui modifie s’appelle seule sur sa ligne.</p></div>`,
   fig:py(`L = [5, 3, 8]
 L.append(1)       # [5, 3, 8, 1]
 L.insert(0, 7)    # [7, 5, 3, 8, 1]
@@ -786,7 +1068,17 @@ x = L.pop()       # x = 1, L = [7, 5, 3, 8]
 L.remove(3)       # [7, 5, 8]
 for i, v in enumerate(L):
     print(i, v)   # 0 7, puis 1 5, puis 2 8`),
-  note:`${cd('L.sort()')} trie sur place et renvoie None. ${cd('sorted(L)')} renvoie une nouvelle liste triée. Donc ${cd('L = L.sort()')} perd la liste. ${cd('L.pop(i)')} retire et renvoie l’élément d’indice <i>i</i>.`},
+  note:`Retirer un élément absent, comme ${cd('L.remove(7)')} quand 7 n’est pas dans L, lève ValueError. Teste d’abord avec ${cd('7 in L')}.`},
+ {kind:'Théorie',h:'Trier : sort ou sorted',p:`<p>Ranger des notes dans l’ordre, des noms par ordre alphabétique : Python sait trier, de deux façons qui ne font pas la même chose.</p>
+<div class="def"><p>${cd('L.sort()')} trie la liste L <b>sur place</b>, dans l’ordre croissant, et renvoie None. ${cd('sorted(seq)')} renvoie une <b>nouvelle</b> liste triée et laisse <i>seq</i> intacte ; elle accepte aussi une chaîne ou un tuple. Avec ${cd('reverse=True')}, l’ordre devient décroissant.</p></div>
+<div class="idea"><p>C’est la distinction du chapitre sur les références : modifier l’objet, ou en fabriquer un nouveau. Les chaînes se comparent lettre à lettre, comme dans un dictionnaire, et les majuscules passent avant les minuscules.</p></div>
+${exe(`L = [3, 1, 2]
+M = sorted(L)
+print(L, M)
+r = L.sort()
+print(L, r, sorted('bca'), sorted(['ours', 'Ane', 'chat']))`,`[3, 1, 2] [1, 2, 3]
+[1, 2, 3] None ['a', 'b', 'c'] ['Ane', 'chat', 'ours']`,`<p>sorted d’une chaîne donne la liste de ses lettres triées. 'Ane' passe devant 'chat' parce que A majuscule passe avant toutes les minuscules.</p>`)}
+<div class="warn"><p>${cd('L = L.sort()')} met None dans L. Et on ne peut pas trier un mélange de nombres et de chaînes : ${cd("sorted([1, 'a'])")} lève TypeError.</p></div>`},
  {h:'Insère au bon endroit',p:`${cd('L = [1, 3, 8, 9]')}. Choisis <i>k</i> pour que ${cd('L.insert(k, 6)')} laisse la liste triée. Plusieurs <i>k</i> conviennent, y compris un négatif.`,
   params:[{id:'k',l:'k',min:-5,max:5,v:0}],
   draw:v=>{ const L=[1,3,8,9]; let i=v.k<0?v.k+L.length:v.k; i=Math.max(0,Math.min(i,L.length)); L.splice(i,0,6);
@@ -861,6 +1153,8 @@ print(sorted(res))`),
    conclusion:'La liste n’est pas triée, et on l’a su après 4 comparaisons.'}},
  {h:'Compter les hausses',p:`Pour ${cd('L = [3, 5, 2, 8, 9, 1]')}, combien d’indices <i>i</i> vérifient ${cd('L[i] < L[i + 1]')}&nbsp;?`,lab:'hausses =',ans:3,
   why:'On compare les 5 couples voisins : 3 &lt; 5 oui, 5 &lt; 2 non, 2 &lt; 8 oui, 8 &lt; 9 oui, 9 &lt; 1 non. Trois hausses.'},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir',p:`<p>Chaînes et listes sont deux séquences : mêmes indices, mêmes tranches, mais l’une est immuable et l’autre non.</p>
+<div class="keep"><ul><li>Indices de 0 à len(s) − 1 ; ${cd('s[-k]')} = ${cd('s[len(s) - k]')} ; un indice trop grand lève IndexError.</li><li>Tranche ${cd('s[a:b:c]')} : de <i>a</i> inclus à <i>b</i> exclu, de <i>c</i> en <i>c</i> ; b − a éléments ; jamais d’erreur ; ${cd('s[::-1]')} renverse.</li><li>Méthodes de chaîne (strip, split, join, replace, find, count, upper, lower) : elles renvoient un résultat neuf, la chaîne ne change pas.</li><li>Liste mutable : ${cd('L[i] = x')}, append, insert, pop (renvoie l’élément), remove (première occurrence) ; elles renvoient None.</li><li>${cd('L.sort()')} trie sur place et renvoie None ; ${cd('sorted(L)')} renvoie une nouvelle liste.</li><li>Parcours : par valeur (${cd('for x in L')}), par indice (${cd('range(len(L))')}), les deux (${cd('enumerate')}). Réaffecter x ne change pas L.</li><li>Méthodes : écrire les indices sous la chaîne pour une tranche ; construire une nouvelle liste plutôt que modifier celle qu’on parcourt ; ${cd('range(len(L) - 1)')} pour comparer des voisins.</li></ul></div>`},
  {kind:'Problème',h:'Transformer une phrase',p:`Ce programme découpe une phrase en mots. Il met une majuscule aux mots de plus de 3 lettres et renverse les autres, puis recolle le tout. Trace-le mot par mot.`+py(`phrase = 'le chat dort sur le tapis'
 mots = phrase.split()
 res = []
@@ -894,7 +1188,17 @@ print(L)`),
 
 /* ===================== 6. TUPLES, DICTIONNAIRES, COMPRÉHENSIONS ===================== */
 {subj:'ics',sem:'py',id:'ics-dicos',h:'Tuples, dictionnaires et compréhensions',p:'Regrouper avec les tuples, associer clés et valeurs avec les dictionnaires, construire en une ligne avec les compréhensions.',steps:[
- {h:'Tuples et déballage',p:`Un <b>tuple</b> ${cd('(3, 4)')} est une séquence <b>immuable</b>. On le <b>déballe</b> en plusieurs noms : ${cd('x, y = t')}. C’est ainsi qu’une fonction renvoie plusieurs valeurs, et qu’on échange deux variables.`,
+ {h:'Tuples et déballage',p:`<p>Un point du plan a deux coordonnées ; une fonction veut parfois renvoyer deux résultats, un minimum et un maximum. Il faut un objet qui regroupe quelques valeurs, sans qu’on puisse le modifier par erreur.</p>
+<div class="def"><p>Un <b>tuple</b> est une séquence <b>immuable</b>. Il s’écrit avec des virgules, souvent entre parenthèses : ${cd('t = (3, 4)')} ou ${cd('t = 3, 4')}. Indices, tranches, ${cd('len')} et ${cd('in')} marchent comme pour une liste, mais aucune modification n’est possible. Le <b>déballage</b> ${cd('x, y = t')} affecte les éléments un par un, dans l’ordre, à autant de noms.</p></div>
+<div class="idea"><p>${cd('return a, b')} renvoie <b>un seul</b> objet : un tuple à deux éléments, que l’appelant déballe. Dans ${cd('a, b = b, a')}, la droite fabrique d’abord le tuple (b, a) avec les valeurs actuelles, puis le déballe : c’est un échange sans variable intermédiaire.</p></div>
+${exe(`t = 3, 4
+x, y = t
+print(t, t[0] + t[1], type(t))
+a, b = 5, 8
+a, b = b, a - b
+print(a, b)`,`(3, 4) 7 <class 'tuple'>
+8 -3`,`<p>a − b est calculé avec les anciennes valeurs 5 et 8 avant toute affectation.</p>`)}
+<div class="warn"><p>C’est la virgule qui fait le tuple, pas les parenthèses : ${cd('(5,)')} est un tuple, ${cd('(5)')} est l’entier 5.</p></div>`,
   fig:py(`t = (3, 4)
 x, y = t          # x = 3, y = 4
 u = (5,)          # tuple à un élément : la virgule compte
@@ -911,7 +1215,16 @@ a, b = b, a + b
 print(a, b)`),
   opts:[cd('2 4'),cd('4 8'),cd('5 8'),cd('3 5')],ans:3,
   why:'Toute la partie droite est évaluée avant d’affecter. (1, 2) devient (2, 1 + 2) = (2, 3), puis (3, 2 + 3) = (3, 5). Ce sont les termes de Fibonacci.'},
- {h:'Dictionnaires',p:`Un <b>dictionnaire</b> associe des <b>clés</b> à des <b>valeurs</b> : ${cd("{'Ana': 19, 'Ben': 20}")}. On lit ${cd("d['Ana']")}, on ajoute ou modifie par ${cd("d['Zoé'] = 21")}. Les clés sont uniques et doivent être immuables (int, str, tuple…).`,
+ {h:'Dictionnaires',p:`<p>Pour retrouver l’âge d’Ana dans une liste de couples (nom, âge), il faut parcourir la liste jusqu’à tomber sur Ana. On voudrait écrire directement « l’âge de Ana ».</p>
+<div class="def"><p>Un <b>dictionnaire</b> est un ensemble de couples <b>clé : valeur</b>, écrit ${cd("{'Ana': 19, 'Ben': 20}")}. ${cd('d[k]')} lit la valeur de la clé <i>k</i> ; ${cd('d[k] = v')} ajoute le couple, ou remplace la valeur si <i>k</i> existe déjà ; ${cd('del d[k]')} le retire ; ${cd('k in d')} teste si <i>k</i> est une clé ; ${cd('d.get(k, defaut)')} lit sans risque d’erreur ; ${cd('len(d)')} compte les couples.</p></div>
+<div class="idea"><p>Un dictionnaire est une table de correspondance : à chaque clé, une seule valeur. Les clés sont donc uniques, les valeurs peuvent se répéter et être de n’importe quel type (nombres, listes, autres dictionnaires). On n’y accède pas par position mais par clé.</p></div>
+${exe(`age = {'Ana': 19, 'Ben': 20}
+age['Ana'] = 21
+age['Zoé'] = 18
+print(age, len(age))
+print('Ben' in age, 20 in age, age.get('Max', -1))`,`{'Ana': 21, 'Ben': 20, 'Zoé': 18} 3
+True False -1`)}
+<div class="warn"><p>${cd('in')} teste les <b>clés</b>, pas les valeurs : ${cd('20 in age')} est faux alors que Ben a 20 ans. Pour les valeurs, écris ${cd('20 in age.values()')}.</p></div>`,
   fig:py(`age = {'Ana': 19, 'Ben': 20}
 age['Ana']          # 19
 age.get('Zoé', 0)   # 0 : valeur par défaut si la clé manque
@@ -920,7 +1233,22 @@ del age['Ben']      # retire la clé
 for nom, a in age.items():   # couples (clé, valeur)
     print(nom, a)`),
   note:`${cd("age['Zoé']")} sur une clé absente lève KeyError. ${cd('keys()')}, ${cd('values()')} et ${cd('items()')} donnent les clés, les valeurs et les couples.`},
- {h:'Compter avec un dictionnaire',p:`Le motif classique pour compter : ${cd('d[c] = d.get(c, 0) + 1')}. Avance lettre par lettre dans ${cd("'abracadabra'")}.`+py(`d = {}
+ {kind:'Théorie',h:'Pourquoi les clés sont immuables',p:`<p>${cd("d['Ana']")} trouve la valeur aussitôt, même dans un dictionnaire d’un million de clés. Python ne parcourt pas les clés une à une : il sait où chercher.</p>
+<div class="def"><p>Pour ranger une clé, Python calcule à partir d’elle un nombre, son <b>hachage</b> (${cd('hash(k)')}), qui désigne directement l’emplacement du couple en mémoire. Une clé doit donc être <b>hachable</b> : un objet immuable, comme int, float, str, bool, ou un tuple d’immuables.</p></div>
+<div class="blk" data-t="Pourquoi"><p>Si une clé pouvait changer après avoir été rangée, son hachage changerait, et Python chercherait ensuite au mauvais endroit : le couple serait perdu. C’est pourquoi une liste, un dictionnaire ou un ensemble ne peuvent pas servir de clé.</p></div>
+${exe(`d = {}
+d[(1, 2)] = 'point'
+d['ab'] = 3
+print(d[(1, 2)], len(d))`,`point 2`,`<p>Le tuple (1, 2) est une clé valable, pratique pour des coordonnées. Mais une ligne ${cd('d[[1, 2]] = 0')} arrêterait le programme sur ${cd('TypeError')}, avec un message qui contient « unhashable type: 'list' » : une liste n’est pas hachable.</p>`)}
+<div class="warn"><p>La rapidité se voit dans les tests d’appartenance : ${cd('x in L')} parcourt toute la liste, alors que ${cd('k in d')} va directement à la bonne case. Pour des recherches fréquentes, préfère un dictionnaire.</p></div>`},
+ {h:'Compter avec un dictionnaire',p:`<p>Compter les lettres d’un mot : on ne sait pas à l’avance quelles lettres apparaîtront, donc on ne peut pas prévoir une variable par lettre. Un dictionnaire lettre → compteur crée ses clés au fur et à mesure.</p>
+<div class="def"><p>Le motif de comptage est ${cd('d[c] = d.get(c, 0) + 1')}. ${cd('d.get(c, 0)')} vaut le compteur actuel de <i>c</i> s’il existe, 0 sinon ; on ajoute 1 et on range le résultat sous la clé <i>c</i>.</p></div>
+<div class="idea"><p>La première fois qu’une lettre apparaît, sa clé est créée avec la valeur 1 ; les fois suivantes, son compteur augmente. Sur la figure, chaque barre est un compteur, dans l’ordre où les clés sont apparues.</p></div>
+${exe(`d = {}
+for c in 'banane':
+    d[c] = d.get(c, 0) + 1
+print(d)`,`{'b': 1, 'a': 2, 'n': 2, 'e': 1}`)}
+<div class="warn"><p>${cd('d[c] += 1')} seul lève KeyError à la première rencontre de <i>c</i>, car la clé n’existe pas encore. Avance lettre par lettre dans ${cd("'abracadabra'")}.</p></div>`+py(`d = {}
 for c in 'abracadabra':
     d[c] = d.get(c, 0) + 1`),
   params:[{id:'e',l:'Lettres lues',min:0,max:11,v:2}],
@@ -983,7 +1311,14 @@ for x in L:
         g[r] = []
     g[r].append(x)`),lab:'somme =',ans:12,
   why:'Les restes par 3 sont 1, 1, 2, 0, 2, 1. g = {1: [4, 7, 1], 2: [2, 5], 0: [9]}, donc sum(g[1]) = 4 + 7 + 1 = 12.'},
- {h:'Compréhensions',p:`Une <b>compréhension</b> construit une liste en une ligne : ${cd('[expr for x in iterable if condition]')}. Elle équivaut à une boucle qui fait ${cd('append(expr)')}. Avec des accolades et ${cd('clé: valeur')}, on construit un dictionnaire.`,
+ {h:'Compréhensions',p:`<p>Le motif « liste vide, boucle for, append » revient sans cesse pour filtrer ou transformer. Python a une écriture courte qui dit la même chose en une ligne.</p>
+<div class="def"><p>Une <b>compréhension de liste</b> s’écrit ${cd('[expr for x in iterable]')} ou ${cd('[expr for x in iterable if condition]')}. Elle construit une <b>nouvelle</b> liste : pour chaque <i>x</i> du parcours (qui vérifie la condition, s’il y en a une), elle ajoute la valeur de <i>expr</i>, dans l’ordre du parcours.</p></div>
+<div class="idea"><p>Lis-la comme une phrase : « la liste des x * x, pour x dans range(6), si x est pair ». La figure montre la boucle équivalente : même ordre, mêmes éléments. La variable <i>x</i> n’existe qu’à l’intérieur des crochets.</p></div>
+${exe(`L = [3, -1, 4, -5]
+print([2 * x for x in L])
+print([x for x in L if x > 0], [len(m) for m in ['le', 'chat']])`,`[6, -2, 8, -10]
+[3, 4] [2, 4]`,`<p>La première transforme chaque élément, la deuxième filtre sans transformer, la troisième transforme des mots en nombres. L n’a pas changé.</p>`)}
+<div class="warn"><p>Une compréhension sert à <b>construire</b> une liste. Pour seulement afficher ou cumuler, une boucle ordinaire est plus claire. La figure montre aussi une compréhension de dictionnaire, détaillée plus loin.</p></div>`,
   fig:py(`carres = [x * x for x in range(6) if x % 2 == 0]
 # [0, 4, 16]
 
@@ -998,6 +1333,14 @@ longueurs = {m: len(m) for m in ['le', 'chat']}
   note:'Le filtre if se place à la fin. Pour transformer selon un cas, mets une expression conditionnelle au début : [x if x > 0 else 0 for x in L].'},
  {h:'Compter avec une compréhension',p:`Que vaut ${cd('len([x for x in range(20) if x % 3 == 0])')}&nbsp;?`,lab:'longueur =',ans:7,
   why:'Les multiples de 3 de 0 à 19 sont 0, 3, 6, 9, 12, 15, 18 : il y en a 7. Attention à ne pas oublier 0.'},
+ {kind:'Théorie',h:'Compréhension de dictionnaire',p:`<p>Construire en une ligne une table « mot → longueur », ou inverser un dictionnaire : les compréhensions existent aussi avec des accolades.</p>
+<div class="def"><p>${cd('{cle: valeur for x in iterable if condition}')} construit un <b>nouveau dictionnaire</b>. Pour chaque <i>x</i> retenu, Python calcule <i>cle</i> et <i>valeur</i>, puis fait l’équivalent de ${cd('d[cle] = valeur')}.</p></div>
+<div class="idea"><p>Puisque c’est une suite d’affectations, une clé qui revient <b>écrase</b> la valeur précédente : le dernier couple gagne, et la clé garde la place de sa première apparition. Le dictionnaire peut donc avoir moins de clés que d’éléments parcourus.</p></div>
+${exe(`mots = ['le', 'chat', 'et', 'la', 'souris']
+lg = {m: len(m) for m in mots}
+par_long = {len(m): m for m in mots}
+print(lg['chat'], par_long)`,`4 {2: 'la', 4: 'chat', 6: 'souris'}`,`<p>Trois mots ont 2 lettres : 'le', puis 'et', puis 'la' s’écrivent tour à tour sous la clé 2, et seul 'la' reste.</p>`)}
+<div class="warn"><p>${cd('{}')} est un dictionnaire vide, pas un ensemble. Pour garder tous les mots d’une même longueur, il faut un dictionnaire de listes, construit avec une boucle (méthode « Regrouper »).</p></div>`},
  {kind:'Méthode',h:'Compréhension à deux for, et ordre des chaînes',
   p:`<p>${cd('[e for a in A for b in B if cond]')} équivaut à deux boucles imbriquées, dans le <b>même ordre</b> que les for : la première est l’extérieure. Pour chaque couple (a, b), on ajoute e si la condition est vraie.</p><p>Les chaînes se comparent avec ${cd('<')} dans l’ordre du dictionnaire : on compare lettre à lettre, et la première différence décide. ${cd("'chat' < 'chien'")} est vrai car a vient avant i. Un préfixe passe devant (${cd("'ab' < 'abc'")}), et les majuscules passent avant les minuscules (${cd("'Zoé' < 'ana'")}). Pour former des paires sans doublon, on garde seulement a &lt; b.</p>`,
   demo:{enonce:'Que vaut <i>P</i>&nbsp;?'+py(`L = ['x', 'y', 'z']
@@ -1013,6 +1356,17 @@ for a in L:
    conclusion:'P = [(\'x\', \'y\'), (\'x\', \'z\'), (\'y\', \'z\')] : les 3 paires distinctes, chacune une fois.'}},
  {h:'Paires de même parité',p:`Que vaut ${cd('len([(a, b) for a in range(5) for b in range(5) if a < b and (a + b) % 2 == 0])')}&nbsp;?`,lab:'longueur =',ans:4,
   why:'a + b est pair quand a et b ont la même parité. Avec a &lt; b : (0, 2), (0, 4), (2, 4) et (1, 3). Il y en a 4.'},
+ {kind:'Théorie',h:'Les ensembles',p:`<p>Pour savoir qui a déjà voté, une seule question compte : « ce nom est-il dedans ? ». L’ordre et les doublons n’ont aucun intérêt.</p>
+<div class="def"><p>Un <b>ensemble</b> (${cd('set')}) est une collection <b>sans ordre et sans doublon</b> d’objets hachables. On l’écrit ${cd('{1, 2, 3}')} ou ${cd('set(seq)')} ; ${cd('set()')} est l’ensemble vide. ${cd('s.add(x)')} ajoute, ${cd('s.remove(x)')} retire, ${cd('x in s')} teste, ${cd('len(s)')} compte. ${cd('s | t')}, ${cd('s & t')} et ${cd('s - t')} donnent la réunion, l’intersection et la différence.</p></div>
+<div class="idea"><p>Un ensemble fonctionne comme un dictionnaire qui n’aurait que des clés : même hachage, donc test ${cd('x in s')} immédiat et éléments immuables. Ajouter un élément déjà présent ne fait rien : c’est ce qui élimine les doublons.</p></div>
+${exe(`s = set('mississippi')
+print(len(s), 's' in s, 'z' in s)
+t = {1, 2, 3}
+t.add(2)
+t.add(4)
+print(t, t & {3, 4, 5})`,`4 True False
+{1, 2, 3, 4} {3, 4}`,`<p>'mississippi' n’a que 4 lettres distinctes : m, i, s, p. Le deuxième add(2) ne change rien.</p>`)}
+<div class="warn"><p>Un ensemble n’a pas d’indices : ${cd('s[0]')} lève TypeError. Et ne compte pas sur l’ordre d’affichage de ses éléments.</p></div>`},
  {kind:'Méthode',h:'Choisir la bonne structure de données',
   p:`<ul><li><b>Liste</b> : des éléments dans un <b>ordre</b>, doublons permis, accès par position ${cd('L[i]')}.</li><li><b>Tuple</b> : un petit groupe fixe (des coordonnées, plusieurs valeurs renvoyées). Immuable, il peut servir de clé.</li><li><b>Dictionnaire</b> : associer une <b>clé</b> à une valeur (nom → note), et retrouver vite la valeur d’une clé.</li><li><b>Ensemble</b> (${cd('set')}) : des éléments <b>sans doublon</b>, sans ordre, avec un test ${cd('x in s')} rapide. ${cd('set()')} est l’ensemble vide, ${cd('s.add(x)')} ajoute, et ${cd('len(set(L))')} compte les valeurs distinctes de L.</li></ul>`,
   demo:{enonce:'Pour un vote, on doit (1) savoir qui a déjà voté, (2) compter les voix de chaque candidat, (3) garder l’ordre d’arrivée des bulletins. Quelle structure pour chaque besoin&nbsp;?',
@@ -1029,6 +1383,8 @@ for a in L:
  {kind:'Défi',h:'Dictionnaire de listes',p:'Qu’affiche ce code&nbsp;?',fig:py(`notes = {'Ana': [5, 6, 4], 'Ben': [3, 4], 'Léo': [6, 6, 5, 5]}
 print(sum([len(L) for n, L in notes.items() if sum(L) / len(L) >= 5]))`),lab:'affichage :',ans:7,
   why:'Moyennes : Ana 5, Ben 3,5, Léo 5,5. On garde Ana et Léo, et on additionne leurs nombres de notes : 3 + 4 = 7.'},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir',p:`<p>Quatre structures, chacune pour un besoin : la liste pour l’ordre, le tuple pour un petit groupe fixe, le dictionnaire pour associer, l’ensemble pour l’appartenance.</p>
+<div class="keep"><ul><li>Tuple : séquence immuable, faite par la virgule ; déballage ${cd('x, y = t')} ; ${cd('return a, b')} renvoie un tuple ; dans ${cd('a, b = b, a')}, la droite est calculée d’abord.</li><li>Dictionnaire : ${cd('d[k]')} (KeyError si absente), ${cd('d[k] = v')} ajoute ou remplace, ${cd('del')}, ${cd('d.get(k, defaut)')} ; ${cd('in')} teste les clés ; ordre d’insertion conservé.</li><li>Clés hachables donc immuables (int, str, tuple…) : c’est le hachage qui rend ${cd('k in d')} immédiat.</li><li>Compter : ${cd('d[c] = d.get(c, 0) + 1')}. Regrouper : créer ${cd('d[c] = []')} si la clé manque, puis append.</li><li>Parcours : ${cd('for k in d')} (clés), ${cd('d.items()')} (couples), ${cd('d.values()')} (valeurs).</li><li>Compréhensions : ${cd('[e for x in it if c]')} ; ${cd('{k: v for x in it}')}, où une clé répétée écrase la précédente ; deux for se lisent comme deux boucles, la première étant l’extérieure.</li><li>Ensemble : sans ordre ni doublon, ${cd('set()')} vide, add, ${cd('in')}, | & −.</li></ul></div>`},
  {kind:'Problème',h:'Le mot le plus fréquent',p:`On compte les mots d’un texte avec un dictionnaire, puis on cherche le mot le plus fréquent et les mots qui n’apparaissent qu’une fois. Deux mots sont à égalité : regarde bien quel test les départage.`+py(`texte = 'pomme kiwi pomme poire kiwi figue'
 freq = {}
 for m in texte.split():
