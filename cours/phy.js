@@ -17,7 +17,11 @@ const rnd=i=>{ const s=Math.sin(i*12.9898+78.233)*43758.5453; return s-Math.floo
 COURS.push(
 /* ================= 1. CINÉMATIQUE ================= */
 {subj:'phy', sem:'all', id:'phy-cinematique', h:'Mouvement dans le plan', p:'Décrire un mouvement : position, vitesse et accélération comme dérivées, jusqu’au tir parabolique.', steps:[
- {h:'Référentiel et repère',p:`Un mouvement se décrit toujours <b>par rapport à</b> quelque chose : c’est le <b>référentiel</b> (le sol, un train, le Soleil). On y fixe un <b>repère</b> (O ; <i>i</i>, <i>j</i>) et une horloge. La position du mobile M est le vecteur <b>OM(<i>t</i>) = <i>x</i>(<i>t</i>) <i>i</i> + <i>y</i>(<i>t</i>) <i>j</i></b>, en mètres.`,
+ {h:'Référentiel et repère',p:`<p>Assis dans un train, ton sac est immobile. Pour quelqu’un sur le quai, il file à 100 km/h. Les deux ont raison : « bouger » n’a de sens que <b>par rapport à</b> quelque chose. Avant tout calcul, il faut donc dire depuis où on regarde.</p>
+<div class="def"><p>Le <b>référentiel</b> est l’objet de référence par rapport auquel on décrit le mouvement (le sol, le train, le Soleil), muni d’une horloge. On y fixe un <b>repère</b> (O ; <i>i</i>, <i>j</i>) : une origine O et deux vecteurs unitaires perpendiculaires. La <b>position</b> du mobile M à l’instant <i>t</i> est le vecteur <b>OM(<i>t</i>) = <i>x</i>(<i>t</i>) <i>i</i> + <i>y</i>(<i>t</i>) <i>j</i></b>. Les fonctions <i>x</i>(<i>t</i>) et <i>y</i>(<i>t</i>), en mètres, sont les <b>équations horaires</b>.</p></div>
+<div class="idea"><p>Le référentiel est le « décor », le repère est la règle graduée posée dedans. Changer de repère dans le même référentiel ne change que les nombres. Changer de référentiel change le mouvement lui-même.</p></div>
+<div class="ex"><p>Une balle a pour équations horaires <i>x</i>(<i>t</i>) = 3<i>t</i> et <i>y</i>(<i>t</i>) = 4<i>t</i> − <i>t</i>². À <i>t</i> = 1 s, elle est en (3 ; 3) : 3 m à droite de O et 3 m au-dessus.</p></div>
+<div class="warn"><p>Le repère doit être écrit sur le schéma : sans sens positif choisi, le signe d’une vitesse ne veut rien dire.</p></div>`,
   fig:(()=>{ const P=plane({x:[-1.3,8],y:[-0.5,4.5],grid:false,axes:false,w:300});
     P.arrow(0,0,7.6,0,{c:'var(--muted)',w:1.5,hs:8}).arrow(0,0,0,4.2,{c:'var(--muted)',w:1.5,hs:8}).text(7.5,0,'x',{dy:16,c:'var(--muted)'}).text(0,4.1,'y',{dx:-14,c:'var(--muted)'});
     P.curve(t=>t,t=>3.5-0.128*(t-4)**2,0.3,7.2,{c:'var(--line)',w:3,dash:true});
@@ -25,7 +29,16 @@ COURS.push(
     P.dot(t,y,{l:'M'}).text(0,0,'O',{dx:-14,dy:14}); P.seg(t,y,t,0,{c:'var(--muted)',w:1,dash:true}).seg(t,y,0,y,{c:'var(--muted)',w:1,dash:true});
     P.text(t,0,'x(t)',{a:'middle',dy:16,c:'var(--muted)',s:12}).text(0,y,'y(t)',{a:'end',dx:-4,c:'var(--muted)',s:12}); return P.svg(); })(),
   note:'La <b>trajectoire</b> (en pointillé) est l’ensemble des positions occupées. Elle dépend du référentiel : la valve d’une roue de vélo décrit un cercle pour le cycliste, une cycloïde pour le piéton.'},
- {h:'Vitesse et accélération sont des dérivées',p:`La vitesse est la dérivée de la position, l’accélération celle de la vitesse : <b><i>v</i> = d<b>OM</b>/d<i>t</i></b> (m/s) et <b><i>a</i> = d<i>v</i>/d<i>t</i></b> (m/s²). Ici <i>x</i> = 3<i>t</i>, <i>y</i> = 4<i>t</i> − <i>t</i>². Déplace le temps : la vitesse reste <b>tangente</b> à la trajectoire.`,
+ {h:'Vitesse moyenne et vitesse instantanée',p:`<p>Un compteur de vitesse affiche une valeur <b>à chaque instant</b>. Or une vitesse, c’est une distance divisée par une durée. Comment parler de vitesse « à l’instant <i>t</i> », quand la durée est nulle&nbsp;?</p>
+<div class="def"><p>Entre <i>t</i> et <i>t</i> + Δ<i>t</i>, le mobile se déplace de Δ<b>OM</b>. Sa <b>vitesse moyenne</b> est Δ<b>OM</b>/Δ<i>t</i>. La <b>vitesse instantanée</b> est la limite de ce quotient quand Δ<i>t</i> tend vers 0 : <b><i>v</i>(<i>t</i>) = d<b>OM</b>/d<i>t</i></b>, la dérivée de la position. Composante par composante : <i>v<sub>x</sub></i> = d<i>x</i>/d<i>t</i> et <i>v<sub>y</sub></i> = d<i>y</i>/d<i>t</i>, en m/s.</p></div>
+<div class="idea"><p>On mesure le déplacement sur des durées de plus en plus courtes. Le petit déplacement finit par épouser la trajectoire : c’est pourquoi la vitesse instantanée est toujours <b>tangente</b> à la trajectoire.</p></div>
+<div class="ex"><p>Avec <i>x</i> = 3<i>t</i> et <i>y</i> = 4<i>t</i> − <i>t</i>², à partir de <i>t</i> = 1 s : sur Δ<i>t</i> = 1 s, la vitesse moyenne vaut (3 ; 1) m/s ; sur 0,1 s, (3 ; 1,9) m/s ; sur 0,01 s, (3 ; 1,99) m/s. La limite est (3 ; 2) m/s, exactement ce que donne la dérivée <i>v<sub>y</sub></i> = 4 − 2<i>t</i> en <i>t</i> = 1. Sa norme vaut √(9 + 4) ≈ 3,61 m/s.</p></div>
+<div class="warn"><p>La vitesse moyenne n’est pas la moyenne des vitesses : un aller à 60 km/h et un retour à 40 km/h donnent 48 km/h en moyenne, pas 50.</p></div>`},
+ {h:'Vitesse et accélération sont des dérivées',p:`<p>Une voiture qui démarre, freine ou tourne voit sa vitesse changer. Pour décrire ce changement, on refait avec la vitesse ce qu’on a fait avec la position.</p>
+<div class="def"><p>L’<b>accélération</b> est la dérivée de la vitesse : <b><i>a</i> = d<i>v</i>/d<i>t</i></b>, soit <i>a<sub>x</sub></i> = d<i>v<sub>x</sub></i>/d<i>t</i> et <i>a<sub>y</sub></i> = d<i>v<sub>y</sub></i>/d<i>t</i>. Son unité est le m/s² : des m/s gagnés par seconde.</p></div>
+<div class="idea"><p>Position, vitesse, accélération forment une chaîne : on descend en dérivant, on remonte en cherchant une primitive. Une accélération existe dès que le vecteur vitesse change, en norme <b>ou en direction</b>.</p></div>
+<div class="ex"><p>Ici <i>x</i> = 3<i>t</i>, <i>y</i> = 4<i>t</i> − <i>t</i>². On dérive : <i>v</i> = (3 ; 4 − 2<i>t</i>), puis <i>a</i> = (0 ; −2) m/s², constante. Déplace le temps : la flèche <i>v</i> reste tangente au chemin, la flèche <i>a</i> ne bouge pas.</p></div>
+<div class="warn"><p><i>a<sub>y</sub></i> &lt; 0 ne veut pas dire « ralentit ». Avant le sommet, <i>v<sub>y</sub></i> &gt; 0 diminue : la balle monte de moins en moins vite. Après, <i>v<sub>y</sub></i> &lt; 0 grandit en valeur absolue : elle redescend de plus en plus vite. Le mobile ralentit quand <i>a</i> et <i>v</i> sont de sens opposés.</p></div>`,
   params:[{id:'t',l:'Temps t',min:0,max:4,step:.1,v:.5,u:' s'}],
   draw:v=>{ const P=plane({x:[-0.5,13],y:[-1.5,5.5],grid:true,step:1,lab:2}); const t=v.t, x=3*t, y=4*t-t*t, vx=3, vy=4-2*t;
     P.curve(s=>3*s,s=>4*s-s*s,0,4,{c:'var(--line)',w:3,dash:true}).curve(s=>3*s,s=>4*s-s*s,0,t||1e-6,{c:'var(--math)',w:3});
@@ -46,6 +59,11 @@ COURS.push(
   why:'v(t) = dx/dt = 4t − 3, donc v(2) = 8 − 3 = 5 m/s.'},
  {h:'Remonter à la position',p:'Un mobile a une accélération constante <i>a</i> = 4 m/s², avec <i>v</i>(0) = −2 m/s et <i>x</i>(0) = 1 m. Où se trouve-t-il à <i>t</i> = 3 s&nbsp;?',lab:'x =',unit:'m',ans:13,tol:.01,
   why:'v(t) = −2 + 4t, puis x(t) = 1 − 2t + 2t². À t = 3 s : x = 1 − 6 + 18 = 13 m.'},
+ {h:'D’où viennent les trois équations du MRUA',p:`<p>Démarrage d’une voiture, freinage régulier, chute d’une pierre : dans tous ces cas l’accélération reste la même pendant un moment. On peut alors écrire une fois pour toutes la vitesse et la position, au lieu d’intégrer à chaque fois.</p>
+<div class="def"><p>Un mouvement est <b>rectiligne uniformément accéléré</b> (MRUA) quand il se fait sur un axe avec une accélération <i>a</i> constante. Avec <i>v</i>₀ = <i>v</i>(0) et <i>x</i>₀ = <i>x</i>(0) :</p><ul><li><b><i>v</i>(<i>t</i>) = <i>v</i>₀ + <i>a t</i></b></li><li><b><i>x</i>(<i>t</i>) = <i>x</i>₀ + <i>v</i>₀<i>t</i> + ½ <i>a t</i>²</b></li><li><b><i>v</i>² − <i>v</i>₀² = 2<i>a</i>(<i>x</i> − <i>x</i>₀)</b></li></ul></div>
+<div class="why"><p>d<i>v</i>/d<i>t</i> = <i>a</i> constante : une primitive est <i>at</i> + <i>C</i>, et <i>v</i>(0) = <i>v</i>₀ fixe <i>C</i> = <i>v</i>₀. Ensuite d<i>x</i>/d<i>t</i> = <i>v</i>₀ + <i>at</i> donne <i>x</i> = <i>x</i>₀ + <i>v</i>₀<i>t</i> + ½<i>at</i>². Enfin on tire <i>t</i> = (<i>v</i> − <i>v</i>₀)/<i>a</i> de la première et on le reporte dans la deuxième : après simplification, <i>t</i> disparaît et il reste la troisième.</p></div>
+<div class="ex"><p><i>v</i>₀ = 10 m/s, <i>a</i> = 2,0 m/s², pendant 10 s : <i>v</i> = 10 + 20 = 30 m/s et <i>x</i> − <i>x</i>₀ = 100 + 100 = 200 m. Contrôle : 30² − 10² = 800 = 2 × 2,0 × 200.</p></div>
+<div class="warn"><p>Ces formules supposent <i>a</i> <b>constante</b>. Si l’accélération change, il faut découper en phases ou revenir à l’intégration.</p></div>`},
  {kind:'Méthode',h:'Les équations du MRUA : laquelle choisir',p:`<p><b>Quand</b> : l’accélération est constante sur un axe (démarrage, freinage régulier, chute libre).</p><p><b>Pourquoi</b> : en intégrant <i>a</i> constante, on obtient <i>v</i> = <i>v</i>₀ + <i>at</i> et <i>x</i> − <i>x</i>₀ = <i>v</i>₀<i>t</i> + ½<i>at</i>². Si on tire <i>t</i> = (<i>v</i> − <i>v</i>₀)/<i>a</i> de la première et qu’on le reporte dans la seconde, <i>t</i> disparaît : <b><i>v</i>² − <i>v</i>₀² = 2<i>a</i>(<i>x</i> − <i>x</i>₀)</b>.</p><p><b>Comment</b> : 1. Convertis tout en SI (km/h ÷ 3,6 donne des m/s). 2. Oriente l’axe dans le sens du mouvement : un freinage a alors <i>a</i> &lt; 0. 3. Fais la liste des grandeurs connues et de l’inconnue, puis prends l’équation qui ne contient <b>que</b> celles-là. Le temps n’est ni donné ni demandé&nbsp;? Prends la relation sans <i>t</i>.</p>`,
   demo:{enonce:'Une moto passe de 36 km/h à 108 km/h sur 200 m, avec une accélération constante. Calcule son accélération, puis la durée de la manœuvre.',
    etapes:[
@@ -58,6 +76,11 @@ COURS.push(
  {h:'Mouvement rectiligne uniformément accéléré',p:`Si <i>a</i> est constante sur un axe : <b><i>v</i>(<i>t</i>) = <i>v</i>₀ + <i>a t</i></b> et <b><i>x</i>(<i>t</i>) = <i>x</i>₀ + <i>v</i>₀<i>t</i> + ½ <i>a t</i>²</b>. En éliminant <i>t</i> : <b><i>v</i>² − <i>v</i>₀² = 2<i>a</i>(<i>x</i> − <i>x</i>₀)</b>.<br>Une voiture passe de 0 à 100 km/h en 8,0 s, avec une accélération constante. Quelle distance parcourt-elle&nbsp;? Arrondis au mètre.`,
   unit:'m',ans:111.1,tol:.6,why:'v = 100/3,6 = 27,8 m/s, a = 27,8/8 = 3,47 m/s². Alors x = ½·a·t² = ½·3,47·64 ≈ 111 m (c’est aussi la vitesse moyenne 13,9 m/s × 8 s).',
   note:'Pense à convertir en unités SI : 1 m/s = 3,6 km/h.'},
+ {h:'La chute libre',p:`<p>Lâche en même temps une bille d’acier et une balle de ping-pong de 2 m de haut : elles touchent le sol presque ensemble. Une plume, elle, traîne derrière. Qu’est-ce qui fixe la façon dont un objet tombe&nbsp;?</p>
+<div class="def"><p>Un corps est en <b>chute libre</b> quand il n’est soumis qu’à son poids. Son accélération vaut alors <b><i>a</i> = <i>g</i></b>, verticale vers le bas, avec <b><i>g</i> ≈ 9,81 m/s²</b> à la surface de la Terre, la même pour tous les corps.</p></div>
+<div class="why"><p>Le poids vaut <i>m</i><i>g</i> et la 2e loi de Newton (vue plus loin, au chapitre sur les forces) donne <i>m</i><i>a</i> = <i>m</i><i>g</i> : la masse se simplifie. Hypothèses : l’air est négligeable (objet compact et pas trop rapide) et la hauteur de chute est petite devant le rayon de la Terre, pour que <i>g</i> reste constant. La plume viole la première : sur la Lune, sans air, elle tombe comme un marteau.</p></div>
+<div class="ex"><p>Une pierre lâchée de 5,0 m : axe vers le bas, MRUA avec <i>v</i>₀ = 0. Alors 5,0 = ½ × 9,81 × <i>t</i>² donne <i>t</i> = √(10/9,81) ≈ 1,01 s, et <i>v</i> = √(2 × 9,81 × 5,0) ≈ 9,90 m/s, environ 36 km/h.</p></div>
+<div class="warn"><p>« Libre » ne veut pas dire « vers le bas ». Une balle lancée vers le haut est en chute libre dès qu’elle quitte la main : elle monte en ralentissant, mais son accélération vaut déjà <i>g</i> vers le bas.</p></div>`},
  {kind:'Méthode',h:'La démarche de résolution d’un problème de physique',p:`<p><b>Quand</b> : toujours, dès qu’un énoncé décrit une situation et pose une question.</p><p><b>Pourquoi</b> : la plupart des erreurs viennent d’un système mal choisi, d’un signe ou d’une unité. Une démarche fixe les évite.</p><p><b>Comment</b> : 1. <b>Système</b> : qu’est-ce que j’étudie&nbsp;? 2. <b>Référentiel</b> et <b>repère</b> : origine, axes orientés. 3. <b>Schéma</b> avec les données, converties en SI. 4. <b>Bilan</b> : forces subies, ou nature du mouvement. 5. <b>Loi</b> qui relie les données à l’inconnue. 6. <b>Projection</b> sur les axes. 7. <b>Résolution littérale</b>, puis seulement l’application numérique. 8. <b>Vérification</b> : unité, signe, ordre de grandeur.</p>`,
   demo:{enonce:'On lâche une balle sans vitesse du haut d’une tour de 45 m. On néglige l’air. Combien de temps dure la chute, et à quelle vitesse la balle arrive-t-elle au sol&nbsp;?',
    etapes:[
@@ -99,7 +122,11 @@ COURS.push(
    conclusion:'Pour l’angle entre deux directions (par exemple une vitesse et une pente), calcule l’angle de chacune avec l’horizontale, puis fais la différence.'}},
  {h:'La direction de la vitesse',p:'Un projectile a pour vitesse <i>v<sub>x</sub></i> = 6,0 m/s et <i>v<sub>y</sub></i> = −8,0 m/s. Quel angle sa vitesse fait-elle avec l’horizontale&nbsp;? Arrondis au dixième de degré.',unit:'°',ans:53.13,tol:.06,
   why:'tan β = 8,0/6,0 ≈ 1,33, donc β ≈ 53,1° sous l’horizontale. Sa norme vaut √(36 + 64) = 10 m/s.'},
- {h:'Le tir parabolique',p:`Lancé avec <i>v</i>₀ sous l’angle α, un projectile ne subit que son poids (on néglige l’air) : <i>a</i> = (0 ; −<i>g</i>). En intégrant deux fois : <b><i>x</i> = <i>v</i>₀ cos α · <i>t</i></b> et <b><i>y</i> = <i>v</i>₀ sin α · <i>t</i> − ½ <i>g t</i>²</b>. La composante horizontale de la vitesse ne change jamais.`,
+ {h:'Le tir parabolique',p:`<p>Un ballon frappé en l’air avance et monte en même temps, puis redescend. On veut savoir où il retombe et à quelle hauteur il passe.</p>
+<div class="def"><p>Lancé de O avec la vitesse <i>v</i>₀ sous l’angle α au-dessus de l’horizontale (axe <i>y</i> vers le haut), un projectile en chute libre a pour <b>équations horaires</b> : <b><i>x</i> = <i>v</i>₀ cos α · <i>t</i></b> et <b><i>y</i> = <i>v</i>₀ sin α · <i>t</i> − ½ <i>g t</i>²</b>.</p></div>
+<div class="why"><p>Seul le poids agit, donc <i>a</i> = (0 ; −<i>g</i>). Sur <i>x</i>, l’accélération est nulle : <i>v<sub>x</sub></i> garde sa valeur initiale <i>v</i>₀ cos α, et <i>x</i> croît régulièrement. Sur <i>y</i>, c’est un MRUA de vitesse initiale <i>v</i>₀ sin α et d’accélération −<i>g</i>. Les deux axes sont <b>indépendants</b> : on résout deux mouvements sur un axe, reliés seulement par le même <i>t</i>.</p></div>
+<div class="ex"><p><i>v</i>₀ = 14 m/s, α = 45° : <i>v<sub>x</sub></i> = <i>v</i><sub>0y</sub> ≈ 9,90 m/s. Le ballon retombe quand <i>y</i> = 0, soit <i>t</i> = 2 × 9,90/9,81 ≈ 2,02 s, à <i>x</i> ≈ 9,90 × 2,02 ≈ 20,0 m. Au sommet, <i>v<sub>y</sub></i> = 0 et la hauteur vaut 9,90²/(2 × 9,81) ≈ 5,0 m. Règle les curseurs sur ces valeurs pour le voir.</p></div>
+<div class="warn"><p>Sans air seulement. Un vrai ballon freiné par l’air retombe plus court, sur une courbe plus raide à la descente.</p></div>`,
   params:[{id:'v0',l:'Vitesse v₀',min:5,max:20,v:14,u:' m/s'},{id:'al',l:'Angle α',min:10,max:80,step:5,v:45,u:'°'},{id:'t',l:'Temps t',min:0,max:4,step:.1,v:.6,u:' s'}],
   draw:v=>{ const P=plane({x:[-2,42],y:[-2,22],grid:true,step:5,lab:10}); const c=Math.cos(rad(v.al)), s=Math.sin(rad(v.al)), T=2*v.v0*s/g, t=Math.min(v.t,T);
     const x=v.v0*c*t, y=Math.max(0,v.v0*s*t-.5*g*t*t), vy=v.v0*s-g*t;
@@ -141,6 +168,17 @@ COURS.push(
   why:'Au sommet v<sub>y</sub> = 0. Avec v<sub>y0</sub> = 20·sin 30° = 10 m/s : h = v<sub>y0</sub>²/(2g) = 100/19,62 ≈ 5,10 m.'},
  {kind:'Défi',h:'Depuis la falaise',p:'Une pierre est lancée horizontalement à 8,0 m/s du haut d’une falaise de 20 m. À quelle distance du pied de la falaise touche-t-elle le sol&nbsp;? Arrondis au dixième.',unit:'m',ans:16.15,tol:.06,
   why:'La chute verticale est libre : 20 = ½·9,81·t², donc t = √(40/9,81) = 2,02 s. Horizontalement x = 8,0 × 2,02 ≈ 16,2 m.'},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir : cinématique',p:`<div class="keep"><ul>
+<li>Un mouvement se décrit dans un <b>référentiel</b> choisi, muni d’un repère orienté : <b>OM</b>(<i>t</i>) = <i>x</i>(<i>t</i>) <i>i</i> + <i>y</i>(<i>t</i>) <i>j</i>.</li>
+<li><b><i>v</i> = d<b>OM</b>/d<i>t</i></b>, tangente à la trajectoire ; <b><i>a</i> = d<i>v</i>/d<i>t</i></b>. On descend en dérivant, on remonte avec une primitive et les <b>conditions initiales</b>.</li>
+<li>MRUA (<i>a</i> constante) : <i>v</i> = <i>v</i>₀ + <i>at</i>, <i>x</i> = <i>x</i>₀ + <i>v</i>₀<i>t</i> + ½<i>at</i>², <i>v</i>² − <i>v</i>₀² = 2<i>a</i>(<i>x</i> − <i>x</i>₀). Choisis l’équation qui ne contient que les données et l’inconnue.</li>
+<li>Mouvement en plusieurs phases : la fin d’une phase donne les conditions initiales de la suivante.</li>
+<li>Chute libre : <i>a</i> = <i>g</i> ≈ 9,81 m/s² vers le bas, quelle que soit la masse (air négligé).</li>
+<li>Composantes : <i>v<sub>x</sub></i> = <i>v</i> cos α, <i>v<sub>y</sub></i> = <i>v</i> sin α ; norme √(<i>v<sub>x</sub></i>² + <i>v<sub>y</sub></i>²), direction tan α = <i>v<sub>y</sub></i>/<i>v<sub>x</sub></i>.</li>
+<li>Tir parabolique : <i>x</i> = <i>v</i>₀ cos α · <i>t</i>, <i>y</i> = <i>v</i>₀ sin α · <i>t</i> − ½<i>gt</i>². Trajectoire <i>y</i> = <i>x</i> tan α − <i>gx</i>²/(2<i>v</i>₀² cos² α).</li>
+<li>Sommet : <i>v<sub>y</sub></i> = 0, hauteur gagnée <i>v</i><sub>0y</sub>²/(2<i>g</i>). Impact : <i>y</i> = niveau du sol. Portée sur sol plat : <i>v</i>₀² sin 2α/<i>g</i>, maximale à 45°.</li>
+<li>Démarche : système, référentiel, schéma en SI, loi, projection, calcul littéral, application numérique, vérification d’unité et d’ordre de grandeur.</li>
+</ul></div>`},
  {kind:'Problème',h:'Le freinage d’urgence',
   p:'Une voiture roule à 90 km/h sur une route sèche. La conductrice aperçoit un obstacle immobile 60 m devant elle. Elle réagit au bout de <i>t</i><sub>r</sub> = 1,0 s, pendant lequel la voiture garde sa vitesse. Elle freine ensuite avec une décélération constante de 7,5 m/s². S’arrête-t-elle à temps&nbsp;?',
   fig:(()=>{ const P=plane({x:[-4,72],y:[-6,7],grid:false,axes:false,w:320,h:110});
@@ -172,13 +210,21 @@ COURS.push(
 
 /* ================= 2. MOUVEMENT CIRCULAIRE ================= */
 {subj:'phy', sem:'all', id:'phy-circulaire', h:'Mouvement circulaire et repère de Frenet', p:'Séparer l’accélération en une partie qui change la norme de la vitesse et une partie qui la fait tourner.', steps:[
- {h:'Le repère de Frenet',p:`Sur une trajectoire courbe, on attache au mobile deux vecteurs unitaires : <b><i>e</i>ₜ</b>, tangent et dans le sens du mouvement, et <b><i>e</i>ₙ</b>, perpendiculaire et tourné vers le centre de courbure. La vitesse s’écrit simplement <b><i>v</i> = <i>v e</i>ₜ</b>.`,
+ {h:'Le repère de Frenet',p:`<p>Dans un virage, les axes <i>x</i> et <i>y</i> du sol sont mal adaptés : la vitesse change de direction sans arrêt et ses deux composantes varient même si le compteur reste fixe. Il vaut mieux des axes qui suivent le mobile.</p>
+<div class="def"><p>Le <b>repère de Frenet</b> est attaché au mobile M. Il a deux vecteurs unitaires : <b><i>e</i>ₜ</b>, tangent à la trajectoire et orienté dans le sens du mouvement, et <b><i>e</i>ₙ</b>, perpendiculaire à <i>e</i>ₜ et tourné vers l’intérieur du virage, vers le <b>centre de courbure</b> C. Le <b>rayon de courbure</b> R est la distance CM. Dans ce repère, la vitesse s’écrit <b><i>v</i> = <i>v e</i>ₜ</b>, où <i>v</i> est la valeur lue au compteur.</p></div>
+<div class="idea"><p>Pense à un passager : « devant » est <i>e</i>ₜ, « vers l’intérieur du virage » est <i>e</i>ₙ. La vitesse n’a qu’une composante, puisqu’elle est toujours tangente. Toute la difficulté est reportée sur le fait que ces axes tournent.</p></div>
+<div class="ex"><p>Une voiture roule à 15 m/s sur un rond-point de rayon 50 m. Partout, <i>v</i> = 15 <i>e</i>ₜ et R = 50 m. Dans le repère du sol, en revanche, <i>v<sub>x</sub></i> et <i>v<sub>y</sub></i> oscillent entre −15 et +15 m/s à chaque tour.</p></div>
+<div class="warn"><p><i>e</i>ₜ et <i>e</i>ₙ changent de direction à chaque instant. Sur une ligne droite, il n’y a pas de virage : R est infini et seul <i>e</i>ₜ sert.</p></div>`,
   fig:(()=>{ const P=plane({x:[-3,3],y:[-2.6,2.8],grid:false,axes:false,w:280}); const th=rad(50), x=2*Math.cos(th), y=2*Math.sin(th);
     P.circ(0,0,2,{c:'var(--line)',w:3}).dot(0,0,{r:4,c:'var(--muted)',l:'C'});
     vec(P,x,y,x-Math.sin(th)*1.1,y+Math.cos(th)*1.1,'var(--accent)','eₜ'); vec(P,x,y,x-Math.cos(th)*1.1,y-Math.sin(th)*1.1,'var(--math)','eₙ',{dy:16});
     P.seg(0,0,x,y,{c:'var(--muted)',w:1,dash:true}).text(x/2,y/2,'R',{dx:6,dy:12,c:'var(--muted)'}).dot(x,y,{l:'M',dx:8,dy:16}); return P.svg(); })(),
   note:'Le repère de Frenet bouge avec le mobile : <i>e</i>ₜ et <i>e</i>ₙ changent de direction à chaque instant.'},
- {h:'Accélération tangentielle et normale',p:`Dans ce repère, <b><i>a</i> = (d<i>v</i>/d<i>t</i>) <i>e</i>ₜ + (<i>v</i>²/R) <i>e</i>ₙ</b>. La partie tangentielle <i>a</i>ₜ change la <b>norme</b> de la vitesse. La partie normale <i>a</i>ₙ = <i>v</i>²/R, toujours vers le centre, change sa <b>direction</b>. Ici R = 2 m.`,
+ {h:'Accélération tangentielle et normale',p:`<p>Une vitesse peut changer de deux façons : en valeur (on accélère ou on freine) ou en direction (on tourne). Le repère de Frenet sépare ces deux effets.</p>
+<div class="thm"><p>Dans le repère de Frenet, <b><i>a</i> = (d<i>v</i>/d<i>t</i>) <i>e</i>ₜ + (<i>v</i>²/R) <i>e</i>ₙ</b>. La composante <b>tangentielle</b> <i>a</i>ₜ = d<i>v</i>/d<i>t</i> change la norme de la vitesse. La composante <b>normale</b> <i>a</i>ₙ = <i>v</i>²/R, toujours positive, vers le centre de courbure, change sa direction.</p></div>
+<div class="why"><p>On dérive le produit <i>v</i> = <i>v e</i>ₜ : <i>a</i> = (d<i>v</i>/d<i>t</i>) <i>e</i>ₜ + <i>v</i> (d<i>e</i>ₜ/d<i>t</i>). Le vecteur unitaire <i>e</i>ₜ tourne à la vitesse angulaire <i>v</i>/R. Un vecteur de longueur 1 qui tourne ainsi varie perpendiculairement à lui-même, vers l’intérieur, à la vitesse <i>v</i>/R : d<i>e</i>ₜ/d<i>t</i> = (<i>v</i>/R) <i>e</i>ₙ. D’où le terme <i>v</i>²/R.</p></div>
+<div class="ex"><p>Réglage initial : R = 2 m, <i>v</i> = 2 m/s, <i>a</i>ₜ = 1 m/s². Alors <i>a</i>ₙ = 4/2 = 2 m/s² et ‖<i>a</i>‖ = √(1² + 2²) ≈ 2,24 m/s². Mets <i>a</i>ₜ à 0 : il ne reste que la partie vers le centre.</p></div>
+<div class="warn"><p>Une vitesse constante en norme n’empêche pas l’accélération : tant qu’on tourne, <i>a</i>ₙ ≠ 0.</p></div>`,
   params:[{id:'th',l:'Position θ',min:0,max:345,step:15,v:30,u:'°'},{id:'v',l:'Vitesse v',min:1,max:4,step:.5,v:2,u:' m/s'},{id:'at',l:'aₜ = dv/dt',min:-2,max:2,step:.5,v:1,u:' m/s²'}],
   draw:v=>{ const P=plane({x:[-3.6,3.6],y:[-3.6,3.6],grid:false,axes:false,w:300}); const th=rad(v.th), x=2*Math.cos(th), y=2*Math.sin(th);
     const tx=-Math.sin(th), ty=Math.cos(th), nx=-Math.cos(th), ny=-Math.sin(th), an=v.v**2/2, k=.4;
@@ -199,6 +245,11 @@ COURS.push(
    conclusion:'‖<i>a</i>‖ ≈ 3,20 m/s². Erreur fréquente : écrire 2,0 + 2,5 = 4,5 m/s², comme si les deux composantes étaient dans la même direction.'}},
  {h:'Le virage',p:'Une voiture roule à 72 km/h dans un virage de rayon 50 m, à vitesse constante. Quelle est son accélération normale&nbsp;?',lab:'aₙ =',unit:'m/s²',ans:8,tol:.01,
   why:'72 km/h = 20 m/s. aₙ = v²/R = 400/50 = 8 m/s², presque g.'},
+ {h:'Vitesse angulaire, période et fréquence',p:`<p>Sur un manège, l’enfant au bord et celui près de l’axe font un tour dans le même temps, mais l’un va bien plus vite que l’autre. Il faut une grandeur commune à tous les points d’un objet qui tourne.</p>
+<div class="def"><p>On repère M sur le cercle par l’angle θ, en <b>radians</b>. La <b>vitesse angulaire</b> est <b>ω = dθ/d<i>t</i></b>, en rad/s. La <b>période</b> T est la durée d’un tour, la <b>fréquence</b> <i>f</i> = 1/T le nombre de tours par seconde (Hz). Pour une rotation uniforme : <b>T = 2π/ω</b> et <b><i>v</i> = ωR</b>.</p></div>
+<div class="why"><p>Un arc d’angle θ en radians mesure <i>s</i> = Rθ : c’est la définition même du radian. En dérivant, <i>v</i> = d<i>s</i>/d<i>t</i> = R dθ/d<i>t</i> = Rω. Un tour, c’est θ = 2π, parcouru en T = 2π/ω. Et l’accélération normale devient <i>v</i>²/R = ω²R.</p></div>
+<div class="ex"><p>Une roue de rayon 0,30 m fait 10 tours par seconde. ω = 2π × 10 ≈ 62,8 rad/s, T = 0,10 s, la jante va à <i>v</i> = 62,8 × 0,30 ≈ 18,8 m/s, et son accélération vaut ω²R ≈ 1184 m/s², plus de 120 <i>g</i>.</p></div>
+<div class="warn"><p>Ces formules exigent des radians. Avec des degrés, <i>s</i> = Rθ est faux d’un facteur π/180.</p></div>`},
  {h:'Mouvement circulaire uniforme',p:`Si <i>v</i> est constante, <i>a</i>ₜ = 0 et l’accélération est purement <b>centripète</b> : <b><i>a</i> = <i>v</i>²/R = ω²R</b>, avec la vitesse angulaire <b>ω = <i>v</i>/R</b> (rad/s). Un tour dure la période <b>T = 2π/ω = 2πR/<i>v</i></b>.`,
   opts:['L’accélération est nulle puisque la vitesse est constante','L’accélération est tangente à la trajectoire','L’accélération est dirigée vers le centre du cercle','L’accélération est dirigée vers l’extérieur du cercle'],ans:2,
   why:'La norme de v est constante mais sa direction tourne. Il reste aₙ = v²/R, dirigée vers le centre. L’« effet centrifuge » n’est ressenti que dans le référentiel qui tourne.'},
@@ -235,6 +286,15 @@ COURS.push(
   why:'s = πR = π × 30 ≈ 94,2 m, parcourus à 12 m/s : t = 94,25/12 ≈ 7,85 s.'},
  {kind:'Défi',h:'Freiner dans un virage',p:'Une voiture roule à 10 m/s dans un virage de rayon 40 m et freine avec dv/dt = −3,0 m/s². Quelle est la norme de son accélération&nbsp;? Arrondis au centième.',unit:'m/s²',ans:3.905,tol:.011,
   why:'aₙ = v²/R = 100/40 = 2,5 m/s² et aₜ = −3,0 m/s². Ces deux composantes sont perpendiculaires : ‖a‖ = √(3,0² + 2,5²) ≈ 3,91 m/s².'},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir : mouvement circulaire',p:`<div class="keep"><ul>
+<li>Repère de Frenet : <i>e</i>ₜ tangent dans le sens du mouvement, <i>e</i>ₙ vers le centre de courbure ; <b><i>v</i> = <i>v e</i>ₜ</b>.</li>
+<li><b><i>a</i> = (d<i>v</i>/d<i>t</i>) <i>e</i>ₜ + (<i>v</i>²/R) <i>e</i>ₙ</b> : <i>a</i>ₜ change la norme de la vitesse, <i>a</i>ₙ sa direction.</li>
+<li>Les deux composantes sont perpendiculaires : <b>‖<i>a</i>‖ = √(<i>a</i>ₜ² + <i>a</i>ₙ²)</b>, jamais leur somme.</li>
+<li>Angles en radians : <i>s</i> = Rθ, <b><i>v</i> = ωR</b>, <b>T = 2π/ω</b>, <i>f</i> = 1/T. N tr/min donne ω = 2πN/60.</li>
+<li>Mouvement circulaire uniforme : <i>a</i>ₜ = 0, accélération centripète <b><i>a</i> = <i>v</i>²/R = ω²R</b>.</li>
+<li>Le long de la courbe, avec <i>a</i>ₜ constante, les équations du MRUA valent pour l’abscisse curviligne <i>s</i>.</li>
+<li>À vitesse donnée, <i>a</i>ₙ croît quand R diminue ; à rayon donné, elle croît comme <i>v</i>².</li>
+</ul></div>`},
  {kind:'Problème',h:'La centrifugeuse des pilotes',
   p:'Pour entraîner des pilotes, on les fait tourner dans une cabine placée au bout d’un bras de 8,0 m. On veut, en régime de rotation uniforme, une accélération centripète de 5<i>g</i>, soit 49,05 m/s². La centrifugeuse part du repos et atteint ce régime en 30 s, avec une accélération tangentielle constante.',
   parts:[
@@ -258,7 +318,10 @@ COURS.push(
 
 /* ================= 3. NEWTON ================= */
 {subj:'phy', sem:'all', id:'phy-newton', h:'Lois de Newton et forces', p:'Les trois lois, les forces usuelles et la méthode du bilan des forces.', steps:[
- {h:'Les trois lois',p:`<b>1. Inertie</b> : dans un référentiel galiléen, un corps soumis à des forces qui se compensent est au repos ou en mouvement rectiligne uniforme. <b>2. Loi fondamentale</b> : <b>Σ<i>F</i> = <i>m a</i></b> (N = kg·m/s²). <b>3. Actions réciproques</b> : si A exerce <i>F</i><sub>A/B</sub> sur B, alors B exerce <b><i>F</i><sub>B/A</sub> = −<i>F</i><sub>A/B</sub></b> sur A.`,
+ {h:'Les trois lois',p:`<p>La cinématique décrit un mouvement sans dire pourquoi il a lieu. Une <b>force</b> est l’action d’un objet sur un autre : pousser, tirer, attirer. Trois lois relient ces actions au mouvement. On les détaille une par une dans les étapes suivantes.</p>
+<div class="thm"><p><b>1. Inertie</b> : dans un référentiel galiléen, un corps soumis à des forces qui se compensent est au repos ou en mouvement rectiligne uniforme. <b>2. Loi fondamentale</b> : <b>Σ<i>F</i> = <i>m a</i></b>, la somme vectorielle des forces égale la masse fois l’accélération. Son unité, le newton, vaut 1 N = 1 kg·m/s². <b>3. Actions réciproques</b> : si A exerce <i>F</i><sub>A/B</sub> sur B, alors B exerce <b><i>F</i><sub>B/A</sub> = −<i>F</i><sub>A/B</sub></b> sur A.</p></div>
+<div class="idea"><p>La 3e loi dit qu’une force est toujours une <b>interaction</b> : impossible de pousser sans être poussé. La figure montre les deux forces d’une même interaction : même droite, même norme, sens opposés.</p></div>
+<div class="ex"><p>Une pomme de 0,20 kg tombe : la Terre la tire avec 0,20 × 9,81 ≈ 1,96 N. La pomme tire la Terre avec 1,96 N aussi. Mais la Terre a une masse de 5,97 × 10²⁴ kg : son accélération, 1,96/(5,97 × 10²⁴) ≈ 3 × 10⁻²⁵ m/s², est imperceptible.</p></div>`,
   fig:(()=>{ const P=plane({x:[-4,4],y:[-1.3,1.3],grid:false,axes:false,w:300});
     P.circ(-1.6,0,.9,{fill:'var(--math)',fo:.3,c:'var(--ink)',w:2}).circ(1.6,0,.6,{fill:'var(--spark)',fo:.5,c:'var(--ink)',w:2});
     P.text(-1.6,0,'A',{a:'middle',dy:5}).text(1.6,0,'B',{a:'middle',dy:5});
@@ -281,10 +344,23 @@ COURS.push(
     {f:'Contrôle : 4 forces. Pas de « force de l’enfant » appliquée directement au traîneau.',w:'L’enfant ne touche pas le traîneau : il agit par la corde.'},
    ],
    conclusion:'<i>P</i>, <i>N</i>, <i>f</i> et <i>T</i>. La corde inclinée soulève un peu le traîneau : ici <i>N</i> est plus petite que <i>mg</i>. Seule la projection des forces dira de combien.'}},
+ {h:'Le principe d’inertie',p:`<p>Pendant des siècles, on a cru qu’il fallait une force pour <b>entretenir</b> un mouvement : une charrette s’arrête dès qu’on cesse de tirer. Pourtant, un palet sur la glace glisse loin sans que rien ne le pousse. Qui a raison&nbsp;?</p>
+<div class="thm"><p><b>Principe d’inertie</b> (1re loi). Dans un <b>référentiel galiléen</b>, si les forces sur un corps se compensent (Σ<i>F</i> = 0), sa vitesse est constante : il reste au repos, ou il va en ligne droite à vitesse constante. Inversement, si la vitesse change, en norme ou en direction, une force nette agit.</p></div>
+<div class="idea"><p>Une force ne sert pas à <b>maintenir</b> une vitesse, mais à la <b>changer</b>. La charrette s’arrête parce que le frottement du sol, lui, ne cesse pas. Un référentiel galiléen est un référentiel où ce principe se vérifie : le sol convient très bien pour des expériences courtes, un bus qui freine ne convient pas.</p></div>
+<div class="ex"><p>Un palet parcourt 10 m en 2,0 s sur une glace presque sans frottement : 5,0 m/s. Rien ne le pousse dans le sens du mouvement, et il continue à 5,0 m/s, en ligne droite. Son poids et la réaction de la glace se compensent.</p></div>
+<div class="warn"><p>Dans un bus qui freine, tu es « projeté » vers l’avant sans qu’aucune force ne te pousse : c’est ton inertie, vue depuis un référentiel non galiléen.</p></div>`},
  {h:'La balle en vol',p:'Une balle vient de quitter la main du lanceur et monte encore. On néglige l’air. Quelles forces s’exercent sur elle&nbsp;?',
   opts:['Son poids et la force du lancer, qui la fait monter','Son poids seulement','Aucune force, puisqu’elle ne touche rien','Son poids et une force vers le haut qui le compense'],ans:1,
   why:'Après le lâcher, plus rien ne la touche : seule la Terre agit, à distance. Elle monte encore grâce à sa vitesse (c’est l’inertie), pas grâce à une force. Le poids la ralentit.'},
- {h:'Les forces usuelles',p:`<b>Poids</b> <i>P</i> = <i>m g</i>, vertical vers le bas. <b>Réaction normale</b> <i>N</i>, perpendiculaire au support. <b>Frottement</b> parallèle au support et opposé au glissement : <i>f</i> ≤ μₛ<i>N</i> sans glissement, <i>f</i> = μ<sub>d</sub><i>N</i> en glissement. <b>Tension</b> d’un fil, dirigée le long du fil. Sur un plan incliné d’angle α, on projette : <b><i>N</i> = <i>mg</i> cos α</b> et la composante motrice vaut <b><i>mg</i> sin α</b>.`,
+ {h:'La loi fondamentale de la dynamique',p:`<p>Pousse un caddie vide, puis un caddie plein, avec la même force : le plein démarre bien plus lentement. La 2e loi dit exactement de combien.</p>
+<div class="thm"><p><b>Σ<i>F</i> = <i>m a</i></b>, dans un référentiel galiléen. Σ<i>F</i> est la <b>résultante</b>, la somme vectorielle de toutes les forces extérieures exercées sur le système ; <i>m</i> est sa masse, en kg ; <i>a</i> son accélération.</p></div>
+<div class="idea"><p>La masse mesure la résistance d’un corps à changer de vitesse. À force égale, une masse double accélère deux fois moins. L’accélération a toujours la direction et le sens de la résultante, pas forcément ceux de la vitesse : une voiture qui freine avance, mais sa résultante pointe vers l’arrière.</p></div>
+<div class="ex"><p>Une voiture de 1500 kg reçoit une force motrice de 3600 N et subit 600 N de résistances. Résultante : 3000 N vers l’avant, donc <i>a</i> = 3000/1500 = 2,0 m/s². Chargée à 2000 kg avec les mêmes forces : <i>a</i> = 1,5 m/s².</p></div>
+<div class="warn"><p>Σ<i>F</i> est une égalité de vecteurs : on n’additionne pas des normes de forces qui ne sont pas alignées. On projette sur des axes (méthodes plus bas).</p></div>`},
+ {h:'Les forces usuelles',p:`<p>Pour appliquer Σ<i>F</i> = <i>m a</i>, il faut savoir quelles forces agissent et dans quelle direction. Presque tous les exercices n’en utilisent que quatre.</p>
+<div class="def"><ul><li><b>Poids</b> <i>P</i> = <i>m g</i>, vertical vers le bas : l’attraction de la Terre, la seule force à distance ici.</li><li><b>Réaction normale</b> <i>N</i>, perpendiculaire au support, qui l’empêche d’être traversé.</li><li><b>Frottement</b> <i>f</i>, parallèle au support et opposé au glissement (détaillé plus bas).</li><li><b>Tension</b> <i>T</i> d’un fil, dirigée le long du fil : un fil tire, il ne pousse pas.</li></ul></div>
+<div class="why"><p>Sur un plan incliné d’angle α, on prend un axe le long de la pente. Le poids fait l’angle α avec la perpendiculaire au plan : sa composante le long de la pente vaut <b><i>mg</i> sin α</b> (motrice), sa composante perpendiculaire <b><i>mg</i> cos α</b>. Rien ne bouge perpendiculairement au plan, donc <b><i>N</i> = <i>mg</i> cos α</b>.</p></div>
+<div class="ex"><p>Réglage initial : <i>m</i> = 2 kg, α = 20°. <i>mg</i> sin 20° ≈ 6,71 N et <i>N</i> ≈ 18,4 N. Avec μ = 0,3, le frottement maximal vaut 5,53 N &lt; 6,71 N : le bloc glisse, avec <i>a</i> = 9,81 × (sin 20° − 0,3 cos 20°) ≈ 0,59 m/s².</p></div>`,
   params:[{id:'al',l:'Angle α',min:0,max:50,step:2,v:20,u:'°'},{id:'mu',l:'Coefficient μ',min:0,max:.8,step:.1,v:.3}],
   draw:v=>{ const P=plane({x:[-1,10],y:[-2.5,8],grid:false,axes:false,w:300}); const a=rad(v.al), ca=Math.cos(a), sa=Math.sin(a), ux=ca, uy=-sa, nx=sa, ny=ca;
     P.poly([[0,0],[9*ca,0],[0,9*sa]],{fill:'var(--line)',fo:.6,c:'var(--muted)',w:1.5}).seg(-1,0,10,0,{c:'var(--muted)',w:1.5});
@@ -325,6 +401,11 @@ COURS.push(
     {f:'<i>a</i> = <i>g</i>(sin 15° − μ<sub>d</sub> cos 15°) = 9,81 × (0,259 − 0,097) ≈ 1,59 m/s²',w:'La masse se simplifie. On ne remplace par les nombres qu’à la fin.'},
    ],
    conclusion:'<i>a</i> ≈ 1,59 m/s². Unité : <i>g</i> multiplié par un nombre sans dimension donne bien des m/s². Le résultat ne dépend pas de la masse.'}},
+ {h:'Le frottement solide',p:`<p>Une armoire lourde ne bouge pas quand tu la pousses doucement, puis d’un coup elle part, et la pousser devient plus facile. Le frottement n’a donc pas une valeur fixe : il dépend de ce qu’on lui demande.</p>
+<div class="def"><p>Le frottement <i>f</i> est la composante de la force de contact parallèle au support. Tant que l’objet ne glisse pas, c’est le frottement <b>statique</b> : <b><i>f</i> ≤ μₛ<i>N</i></b>. Dès qu’il glisse, c’est le frottement <b>dynamique</b> : <b><i>f</i> = μ<sub>d</sub><i>N</i></b>, opposé au glissement. Les coefficients μₛ et μ<sub>d</sub>, sans unité, dépendent des deux matériaux, avec en général μ<sub>d</sub> &lt; μₛ.</p></div>
+<div class="idea"><p>Le frottement statique est une force « à la demande » : il prend exactement la valeur qui maintient l’équilibre, jusqu’à un plafond μₛ<i>N</i>. Il est proportionnel à <i>N</i> parce que plus on presse deux surfaces, plus leurs aspérités s’accrochent.</p></div>
+<div class="ex"><p>Un livre de 1,0 kg sur une table, μₛ = 0,50 : <i>N</i> = 9,81 N et le plafond vaut 4,9 N. Pousse-le avec 2,0 N : il ne bouge pas, et <i>f</i> = 2,0 N, pas 4,9 N. Sur une pente, l’équilibre demande <i>mg</i> sin α ≤ μₛ<i>mg</i> cos α, soit <b>tan α ≤ μₛ</b> : avec μₛ = 0,30, le bloc tient jusqu’à 16,7°, quelle que soit sa masse.</p></div>
+<div class="warn"><p>Écrire <i>f</i> = μ<i>N</i> pour un objet immobile est faux en général : ce n’est vrai qu’à la limite du glissement.</p></div>`},
  {kind:'Méthode',h:'Frottement : l’objet glisse-t-il&nbsp;?',p:`<p><b>Quand</b> : un objet est poussé, tiré ou posé sur une pente, et l’énoncé ne dit pas s’il bouge.</p><p><b>Pourquoi</b> : le frottement statique s’adapte. Il vaut exactement ce qu’il faut pour empêcher le glissement, jusqu’à un maximum μₛ<i>N</i>. Au-delà, l’objet glisse et le frottement prend la valeur fixe μ<sub>d</sub><i>N</i>.</p><p><b>Comment</b> : 1. Suppose l’objet immobile et calcule le frottement <i>f</i> nécessaire à l’équilibre. 2. Compare-le à μₛ<i>N</i>. 3. Si <i>f</i> ≤ μₛ<i>N</i>, l’hypothèse est juste : l’objet reste immobile avec ce <i>f</i>. 4. Sinon, l’objet glisse : prends <i>f</i> = μ<sub>d</sub><i>N</i> et applique Σ<i>F</i> = <i>m a</i>. Sur une pente sans autre force, l’équilibre exige <i>mg</i> sin α ≤ μₛ<i>mg</i> cos α, soit <b>tan α ≤ μₛ</b>.</p>`,
   demo:{enonce:'Une caisse de 20 kg repose sur un sol horizontal, avec μₛ = 0,40 et μ<sub>d</sub> = 0,30. On la pousse horizontalement avec 60 N, puis avec 120 N. Que se passe-t-il dans chaque cas&nbsp;?',
    etapes:[
@@ -390,6 +471,17 @@ COURS.push(
    conclusion:'Au-delà de 14 m/s, la voiture décolle. Au fond d’un creux, le centre est au-dessus : <i>N</i> = <i>m</i>(<i>g</i> + <i>v</i>²/R), le sol pousse plus fort que le poids.'}},
  {h:'Le cycliste sur la bosse',p:'Un cycliste franchit le sommet d’une bosse de rayon 10 m. Quelle vitesse maximale lui permet de garder le contact avec le sol&nbsp;? Arrondis au centième.',lab:'v =',unit:'m/s',ans:9.905,tol:.011,
   why:'N = m(g − v²/R) ≥ 0 donne v ≤ √(gR) = √(98,1) ≈ 9,90 m/s, environ 36 km/h.'},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir : lois de Newton',p:`<div class="keep"><ul>
+<li><b>Inertie</b> : Σ<i>F</i> = 0 ⇔ vitesse constante (repos ou ligne droite uniforme), dans un référentiel galiléen. Une force change la vitesse, elle ne l’entretient pas.</li>
+<li><b>Loi fondamentale</b> : <b>Σ<i>F</i> = <i>m a</i></b>, égalité de vecteurs ; 1 N = 1 kg·m/s². <i>a</i> a le sens de la résultante.</li>
+<li><b>Actions réciproques</b> : <i>F</i><sub>B/A</sub> = −<i>F</i><sub>A/B</sub>, sur deux corps différents, donc elles ne se compensent jamais.</li>
+<li>Forces usuelles : poids <i>mg</i> vers le bas, réaction <i>N</i> perpendiculaire au support, frottement parallèle, tension le long du fil.</li>
+<li>Plan incliné : composante motrice <i>mg</i> sin α, <i>N</i> = <i>mg</i> cos α (sans autre force perpendiculaire).</li>
+<li>Frottement : statique <i>f</i> ≤ μₛ<i>N</i> (vaut ce qu’il faut), dynamique <i>f</i> = μ<sub>d</sub><i>N</i>. Sur une pente, l’objet tient si tan α ≤ μₛ.</li>
+<li>Méthode : système, diagramme des forces, axes (un le long de <i>a</i>), projection, équilibre sur l’axe perpendiculaire.</li>
+<li>Corps reliés par un fil : même <i>a</i>, même <i>T</i> aux deux bouts (fil et poulie idéaux) ; une équation par corps.</li>
+<li>Mouvement circulaire uniforme : la résultante vaut <i>mv</i>²/R vers le centre. Perte de contact quand <i>N</i> s’annule.</li>
+</ul></div>`},
  {kind:'Problème',h:'Le colis sur la rampe',
   p:'Un déménageur tire un colis de 20 kg sur une rampe inclinée à 25°, avec une sangle parallèle à la rampe. La tension de la sangle vaut 150 N. Le coefficient de frottement dynamique entre le colis et la rampe est μ<sub>d</sub> = 0,30. Le colis glisse vers le haut de la rampe.',
   fig:(()=>{ const P=plane({x:[-1,10],y:[-1,6],grid:false,axes:false,w:300}); const a=rad(25), ca=Math.cos(a), sa=Math.sin(a), ux=-ca, uy=sa, nx=sa, ny=ca, k=2.2/196.2;
@@ -424,6 +516,16 @@ COURS.push(
 
 /* ================= 4. QUANTITÉ DE MOUVEMENT ================= */
 {subj:'phy', sem:'all', id:'phy-quantite', h:'Quantité de mouvement et centre de masse', p:'Une grandeur qui se conserve dans les chocs, et un point qui résume tout un système.', steps:[
+ {h:'L’élan d’un corps : p = mv',p:`<p>Arrêter un camion qui roule au pas est bien plus dur qu’arrêter une balle de tennis lancée fort. Ce qui compte n’est ni la masse seule, ni la vitesse seule, mais les deux ensemble.</p>
+<div class="def"><p>La <b>quantité de mouvement</b> d’un corps de masse <i>m</i> et de vitesse <i>v</i> est le vecteur <b><i>p</i> = <i>m v</i></b>, en kg·m/s. Elle a la direction et le sens de la vitesse. Pour un système de plusieurs corps, on additionne les vecteurs : <i>p</i><sub>tot</sub> = Σ<i>m</i><sub>i</sub><i>v</i><sub>i</sub>.</p></div>
+<div class="why"><p>Si la masse ne change pas, <i>m a</i> = <i>m</i> d<i>v</i>/d<i>t</i> = d(<i>m v</i>)/d<i>t</i>. La 2e loi de Newton s’écrit donc <b>d<i>p</i>/d<i>t</i> = Σ<i>F</i></b> : les forces font varier <i>p</i>. Une force <i>F</i> appliquée pendant Δ<i>t</i> change <i>p</i> de <i>F</i> Δ<i>t</i>. Pour arrêter un grand <i>p</i> avec une force raisonnable, il faut du temps.</p></div>
+<div class="ex"><p>Un camion de 10 t à 10 km/h (2,78 m/s) : <i>p</i> = 10 000 × 2,78 ≈ 27 800 kg·m/s. Une balle de fusil de 10 g à 400 m/s : <i>p</i> = 0,010 × 400 = 4,0 kg·m/s. Le camion a 7000 fois plus d’élan, bien qu’il aille 144 fois moins vite.</p></div>
+<div class="warn"><p><i>p</i> est un vecteur : sur un axe, une vitesse vers la gauche donne un <i>p</i> négatif. Deux corps de même masse qui se croisent à la même vitesse ont un <i>p</i><sub>tot</sub> nul.</p></div>`},
+ {h:'Système isolé : pourquoi p se conserve',p:`<p>Dans un choc entre deux voitures, les forces sont énormes, brèves et impossibles à mesurer. On peut pourtant prévoir les vitesses après le choc, sans rien savoir de ces forces.</p>
+<div class="thm"><p>Si la somme des forces <b>extérieures</b> sur un système est nulle (système <b>isolé</b> ou pseudo-isolé), sa quantité de mouvement totale est <b>conservée</b> : <b><i>p</i><sub>avant</sub> = <i>p</i><sub>après</sub></b>.</p></div>
+<div class="why"><p>Deux corps 1 et 2 interagissent. d<i>p</i>₁/d<i>t</i> = <i>F</i><sub>2/1</sub> + <i>F</i><sub>ext,1</sub> et d<i>p</i>₂/d<i>t</i> = <i>F</i><sub>1/2</sub> + <i>F</i><sub>ext,2</sub>. On additionne : par la 3e loi, <i>F</i><sub>2/1</sub> + <i>F</i><sub>1/2</sub> = 0. Il reste d<i>p</i><sub>tot</sub>/d<i>t</i> = Σ<i>F</i><sub>ext</sub> = 0. Les forces intérieures, aussi violentes soient-elles, s’annulent par paires.</p></div>
+<div class="ex"><p>Un canon de 500 kg, au repos sur des rails, tire un boulet de 5,0 kg à 200 m/s. Avant : <i>p</i> = 0. Après : 5,0 × 200 + 500 <i>V</i> = 0, donc <i>V</i> = −2,0 m/s. Le canon recule à 2,0 m/s.</p></div>
+<div class="warn"><p>Hypothèse à vérifier : le frottement des rails et le poids ne sont pas nuls, mais pendant un choc très bref leur effet est négligeable. Après le choc, ils agissent de nouveau : la conservation ne vaut que pendant le choc.</p></div>`},
  {h:'La quantité de mouvement',p:`Pour un point de masse <i>m</i> et de vitesse <i>v</i> : <b><i>p</i> = <i>m v</i></b> (kg·m/s). La 2e loi de Newton s’écrit en général <b>d<i>p</i>/d<i>t</i> = Σ<i>F</i><sub>ext</sub></b>. Pour un système <b>isolé</b> (ou dont les forces extérieures se compensent), la quantité de mouvement totale est <b>conservée</b>.`,
   lab:'p =',unit:'kg·m/s',ans:2.9,tol:.01,
   fig:'<p>Exemple : une balle de tennis de 58 g servie à 50 m/s. Calcule sa quantité de mouvement.</p>',
@@ -448,7 +550,10 @@ COURS.push(
     {f:'Perte : 9,0 − 6,0 = 3,0 J, soit un tiers',w:'Cette énergie a servi à déformer l’attelage et à le chauffer.'},
    ],
    conclusion:'3,0 J dissipés. Un choc où les objets restent collés perd toujours de l’énergie cinétique : c’est le cas parfaitement inélastique.'}},
- {h:'Les chocs sur un rail',p:`Le chariot 1 arrive à 2 m/s sur le chariot 2 immobile. Pendant le choc, les forces intérieures dominent : <b><i>p</i> est conservée</b>. Dans un choc <b>élastique</b>, l’énergie cinétique l’est aussi. Dans un choc <b>parfaitement inélastique</b>, les chariots restent accrochés.`,
+ {h:'Les chocs sur un rail',p:`<p>Tous les chocs conservent <i>p</i>, mais ils ne se ressemblent pas : deux boules de billard rebondissent, deux wagons s’accrochent. La différence tient à l’énergie cinétique.</p>
+<div class="def"><p>Un choc est <b>élastique</b> si l’énergie cinétique totale est conservée. Il est <b>parfaitement inélastique</b> si les corps restent accrochés : ils repartent avec une vitesse commune. Pour un chariot 1 à la vitesse <i>v</i>₁ sur un chariot 2 immobile :</p><ul><li>accrochés : <b><i>v</i>′ = <i>m</i>₁<i>v</i>₁/(<i>m</i>₁ + <i>m</i>₂)</b> ;</li><li>élastique : <b><i>v</i>₁′ = (<i>m</i>₁ − <i>m</i>₂)<i>v</i>₁/(<i>m</i>₁ + <i>m</i>₂)</b> et <b><i>v</i>₂′ = 2<i>m</i>₁<i>v</i>₁/(<i>m</i>₁ + <i>m</i>₂)</b>.</li></ul></div>
+<div class="why"><p>Accrochés, une seule inconnue : <i>m</i>₁<i>v</i>₁ = (<i>m</i>₁ + <i>m</i>₂)<i>v</i>′. Élastique, deux inconnues et deux équations, <i>p</i> et <i>E</i><sub>c</sub> conservées ; leur résolution donne les formules ci-dessus.</p></div>
+<div class="ex"><p>Réglage initial, 2 kg sur 2 kg à 2 m/s, élastique : <i>v</i>₁′ = 0 et <i>v</i>₂′ = 2 m/s. Passe en accroché : <i>v</i>′ = 1 m/s, et <i>E</i><sub>c</sub> tombe de 4 J à 2 J. Avec 1 kg sur 3 kg, élastique : <i>v</i>₁′ = −1 m/s (il rebondit) et <i>v</i>₂′ = 1 m/s ; <i>E</i><sub>c</sub> reste 2 J.</p></div>`,
   params:[{id:'m1',l:'Masse m₁',min:1,max:5,v:2,u:' kg'},{id:'m2',l:'Masse m₂',min:1,max:5,v:2,u:' kg'},{id:'e',l:'Choc (0 accroché, 1 élastique)',min:0,max:1,v:1}],
   draw:v=>{ const P=plane({x:[0,10],y:[0,5.4],grid:false,axes:false,w:300}); const w1=.6+.2*v.m1, w2=.6+.2*v.m2;
     let a1,a2; if(v.e){ a1=(v.m1-v.m2)/(v.m1+v.m2)*2; a2=2*v.m1/(v.m1+v.m2)*2; } else { a1=a2=v.m1*2/(v.m1+v.m2); }
@@ -490,7 +595,11 @@ COURS.push(
    conclusion:'5,1 cm. Si on avait écrit directement ½ × 0,050 × 6,0² = 0,300 × <i>g h</i>, on aurait trouvé 31 cm : c’est oublier que le choc mou a dissipé 5/6 de l’énergie cinétique.'}},
  {h:'La pâte et le pendule',p:'Une boule de pâte de 0,10 kg à 8,0 m/s se colle à un bloc de 0,30 kg suspendu à un fil, au repos. De quelle hauteur le bloc s’élève-t-il&nbsp;? Donne-la en cm, arrondie au dixième.',lab:'h =',unit:'cm',ans:20.39,tol:.06,
   why:'Choc : 0,10 × 8,0 = 0,40 V, donc V = 2,0 m/s. Montée : h = V²/(2g) = 4/19,62 ≈ 0,204 m = 20,4 cm.'},
- {h:'Le centre de masse',p:`Pour un système de points, le <b>centre de masse</b> G est la moyenne des positions pondérée par les masses : <b><i>r</i><sub>G</sub> = Σ <i>m</i><sub>i</sub> <i>r</i><sub>i</sub> / Σ <i>m</i><sub>i</sub></b>. Sur une tige légère, c’est le point où elle tient en équilibre.`,
+ {h:'Le centre de masse',p:`<p>Un marteau lancé en tournoyant a un mouvement compliqué. Pourtant, un point de ce marteau décrit une simple parabole. Quel est ce point&nbsp;?</p>
+<div class="def"><p>Pour des points de masses <i>m</i><sub>i</sub> aux positions <i>r</i><sub>i</sub>, le <b>centre de masse</b> G est la moyenne des positions <b>pondérée par les masses</b> : <b><i>r</i><sub>G</sub> = Σ<i>m</i><sub>i</sub><i>r</i><sub>i</sub> / Σ<i>m</i><sub>i</sub></b>. On l’applique coordonnée par coordonnée.</p></div>
+<div class="idea"><p>Chaque masse « tire » G vers elle, d’autant plus qu’elle est lourde. Sur une tige légère, G est le point où elle tient en équilibre sur un doigt. Pour deux masses, G est sur le segment, et les distances à G sont inversement proportionnelles aux masses : <i>m</i>₁<i>d</i>₁ = <i>m</i>₂<i>d</i>₂.</p></div>
+<div class="ex"><p>Réglage initial : 1 kg en <i>x</i> = 0 et 3 kg en <i>x</i> = 6 m. <i>x</i><sub>G</sub> = (1 × 0 + 3 × 6)/4 = 4,5 m. G est à 4,5 m de la masse légère et à 1,5 m de la lourde : 1 × 4,5 = 3 × 1,5.</p></div>
+<div class="warn"><p>G n’est pas forcément dans la matière : le centre de masse d’un anneau est au centre du trou.</p></div>`,
   params:[{id:'m1',l:'Masse m₁ (en x = 0)',min:1,max:5,v:1,u:' kg'},{id:'m2',l:'Masse m₂ (en x = 6 m)',min:1,max:5,v:3,u:' kg'}],
   draw:v=>{ const P=plane({x:[-1,7],y:[-1.4,1.4],grid:false,axes:false,w:300}); const xg=6*v.m2/(v.m1+v.m2);
     P.seg(0,0,6,0,{c:'var(--ink)',w:3}).circ(0,0,.25+.08*v.m1,{fill:'var(--math)',fo:.6,c:'var(--ink)',w:1.5}).circ(6,0,.25+.08*v.m2,{fill:'var(--spark)',fo:.7,c:'var(--ink)',w:1.5});
@@ -515,7 +624,10 @@ COURS.push(
   ok:v=>v.x2===4, why:'x<sub>G</sub> = 1·x₂/(3 + 1) = 1 impose x₂ = 4 m. La masse légère doit être 3 fois plus loin de G que la lourde.'},
  {h:'Le centre de masse Terre–Lune',p:'La Lune a une masse 81 fois plus petite que la Terre, et leurs centres sont à 384 000 km l’un de l’autre. À quelle distance du centre de la Terre se trouve le centre de masse du couple&nbsp;? Arrondis au km.',lab:'d =',unit:'km',ans:4682.9,tol:1,
   why:'Origine au centre de la Terre : x<sub>G</sub> = (81m × 0 + m × 384 000)/(82m) = 384 000/82 ≈ 4683 km. C’est à l’intérieur de la Terre, dont le rayon vaut 6371 km.'},
- {h:'Théorème du centre de masse',p:`Pour un système de masse totale <i>M</i> : <b><i>M a</i><sub>G</sub> = Σ<i>F</i><sub>ext</sub></b>. Les forces intérieures (explosion, choc, muscles) n’agissent pas sur le mouvement de G. Un obus qui explose en vol : les débris s’éparpillent, mais leur centre de masse continue la parabole.`,
+ {h:'Théorème du centre de masse',p:`<p>Un obus explose en plein vol : les débris partent dans tous les sens. Peut-on encore dire quelque chose de simple sur leur mouvement&nbsp;?</p>
+<div class="thm"><p>Pour un système de masse totale <i>M</i> : <b><i>M a</i><sub>G</sub> = Σ<i>F</i><sub>ext</sub></b>. G se déplace comme un point unique de masse <i>M</i> qui subirait toutes les forces extérieures. En particulier <i>p</i><sub>tot</sub> = <i>M v</i><sub>G</sub>.</p></div>
+<div class="why"><p>En dérivant deux fois <i>M r</i><sub>G</sub> = Σ<i>m</i><sub>i</sub><i>r</i><sub>i</sub>, on obtient <i>M a</i><sub>G</sub> = Σ<i>m</i><sub>i</sub><i>a</i><sub>i</sub>, la somme de toutes les forces sur tous les points. Les forces intérieures (explosion, choc, muscles) s’annulent par paires, d’après la 3e loi : il ne reste que les forces extérieures.</p></div>
+<div class="ex"><p>Sur la figure, après l’explosion, seul le poids agit encore : G poursuit la parabole de l’obus. Autre cas : deux patineurs de 50 kg et 70 kg, au repos, se repoussent. G reste immobile : si le premier a glissé de 1,4 m, le second a reculé de 1,0 m, car 50 × 1,4 = 70 × 1,0.</p></div>`,
   fig:(()=>{ const P=plane({x:[-1,21],y:[-1,11],grid:false,axes:false,w:300}); const f=x=>x*(20-x)/14;
     P.seg(-1,0,21,0,{c:'var(--muted)',w:1.5}).fn(f,{from:0,to:20,c:'var(--accent)',dash:true,w:2.5}).fn(f,{from:0,to:8,c:'var(--accent)',w:3});
     P.curve(u=>8+u+.8*u,u=>f(8+u)+.6*u,0,4,{c:'var(--spark)',w:2.5}).curve(u=>8+u-.8*u,u=>f(8+u)-.6*u,0,4,{c:'var(--math)',w:2.5});
@@ -524,6 +636,16 @@ COURS.push(
   note:'Corollaire : un système isolé a un centre de masse en mouvement rectiligne uniforme, et <i>p</i><sub>tot</sub> = <i>M v</i><sub>G</sub>.'},
  {kind:'Défi',h:'Le patineur',p:'Un patineur de 60 kg, immobile sur la glace, lance un ballon de 3,0 kg vers l’avant à 10 m/s. À quelle vitesse recule-t-il&nbsp;? (frottements négligés)',unit:'m/s',ans:.5,tol:.001,
   why:'p totale = 0 avant et après : 3,0 × 10 + 60 v = 0, donc v = −0,5 m/s. Il recule à 0,5 m/s.'},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir : quantité de mouvement',p:`<div class="keep"><ul>
+<li><b><i>p</i> = <i>m v</i></b>, vecteur, en kg·m/s ; la 2e loi s’écrit d<i>p</i>/d<i>t</i> = Σ<i>F</i><sub>ext</sub>.</li>
+<li>Système isolé ou pseudo-isolé : <b><i>p</i><sub>tot</sub> conservée</b>, car les forces intérieures s’annulent par paires (3e loi). Oriente un axe et signe chaque vitesse.</li>
+<li>Choc élastique : <i>p</i> et <i>E</i><sub>c</sub> conservées. Choc parfaitement inélastique (accrochés) : <i>p</i> seulement, vitesse commune <i>m</i>₁<i>v</i>₁/(<i>m</i>₁ + <i>m</i>₂).</li>
+<li>Énergie dissipée = <i>E</i><sub>c</sub> avant − <i>E</i><sub>c</sub> après, avec <i>E</i><sub>c</sub> = ½<i>mv</i>².</li>
+<li>Force moyenne pendant un choc : <b><i>F</i> = Δ<i>p</i>/Δ<i>t</i></b>, pour un seul objet, signes compris.</li>
+<li>Choc puis mouvement : <i>p</i> pendant le choc, énergie mécanique après.</li>
+<li>Centre de masse : <b><i>r</i><sub>G</sub> = Σ<i>m</i><sub>i</sub><i>r</i><sub>i</sub>/Σ<i>m</i><sub>i</sub></b> ; chaque morceau compte en son propre centre.</li>
+<li><b><i>M a</i><sub>G</sub> = Σ<i>F</i><sub>ext</sub></b> : les forces intérieures ne changent pas le mouvement de G.</li>
+</ul></div>`},
  {kind:'Problème',h:'L’accrochage des wagons',
   p:'Sur une voie horizontale, un wagon A de 20 t roulant à 1,2 m/s rattrape un wagon B de 15 t qui roule dans le même sens à 0,50 m/s. Les attelages s’enclenchent et les deux wagons repartent ensemble. L’accrochage dure 0,40 s. On néglige les frottements des roues pendant ce temps.',
   parts:[
@@ -546,9 +668,18 @@ COURS.push(
 
 /* ================= 5. OSCILLATEUR ================= */
 {subj:'phy', sem:'all', id:'phy-oscillateur', h:'Oscillateur harmonique', p:'Un ressort, une masse, et l’équation qui décrit toutes les petites oscillations.', steps:[
+ {h:'La force de rappel d’un ressort',p:`<p>Tire sur un élastique ou un ressort : plus tu l’étires, plus il tire fort pour revenir. Cette force qui ramène vers une position d’équilibre est à l’origine de toutes les oscillations de ce chapitre.</p>
+<div class="def"><p><b>Loi de Hooke</b>. Un ressort de longueur à vide ℓ₀, allongé ou comprimé de <i>x</i> = ℓ − ℓ₀, exerce sur l’objet accroché une force de rappel <b><i>F</i> = −<i>k x</i></b>, le long de son axe. La <b>raideur</b> <i>k</i>, en N/m, dit combien de newtons il faut pour l’allonger d’un mètre.</p></div>
+<div class="idea"><p>Le signe moins porte toute la physique : si <i>x</i> &gt; 0 (ressort étiré), la force est négative et ramène vers l’équilibre ; si <i>x</i> &lt; 0 (comprimé), elle pousse vers l’extérieur. La force est proportionnelle à l’écart : deux fois plus étiré, deux fois plus de force.</p></div>
+<div class="ex"><p>Un ressort de raideur 200 N/m étiré de 5,0 cm tire avec |<i>F</i>| = 200 × 0,050 = 10 N. Comprimé de 2,0 cm, il pousse avec 4,0 N. Pour mesurer <i>k</i>, on suspend une masse connue : à l’équilibre, <i>k x</i> = <i>m g</i>.</p></div>
+<div class="warn"><p><i>x</i> se mesure depuis la longueur <b>à vide</b>, pas depuis la longueur totale. Et la loi ne vaut que dans le domaine élastique : trop étiré, le ressort se déforme pour de bon.</p></div>`},
  {h:'La loi de Hooke',p:`Un ressort allongé ou comprimé de <i>x</i> par rapport à sa longueur au repos exerce une force de rappel <b><i>F</i> = −<i>k x</i></b>. La <b>raideur</b> <i>k</i> s’exprime en N/m. Le signe moins dit que la force ramène toujours vers l’équilibre.<br>Une masse de 200 g suspendue à un ressort l’allonge de 4,0 cm à l’équilibre. Calcule <i>k</i>, arrondi au dixième.`,
   lab:'k =',unit:'N/m',ans:49.05,tol:.06,why:'À l’équilibre, k·x = m g, donc k = 0,200 × 9,81/0,040 ≈ 49,1 N/m.'},
- {h:'L’équation du mouvement',p:`Sur un plan horizontal sans frottement, Newton donne <b><i>m x</i>″ = −<i>k x</i></b>, soit <i>x</i>″ + ω₀² <i>x</i> = 0 avec <b>ω₀ = √(<i>k</i>/<i>m</i>)</b>. La solution est <b><i>x</i>(<i>t</i>) = <i>X</i><sub>m</sub> cos(ω₀<i>t</i> + φ)</b>, de période <b>T = 2π√(<i>m</i>/<i>k</i>)</b>. Ici <i>X</i><sub>m</sub> = 0,10 m et φ = 0.`,
+ {h:'L’équation du mouvement',p:`<p>On écarte la masse de 10 cm et on la lâche. Elle va et vient. Peut-on écrire sa position à chaque instant&nbsp;?</p>
+<div class="thm"><p>Masse <i>m</i> sur un plan horizontal sans frottement, ressort de raideur <i>k</i>, <i>x</i> l’écart à l’équilibre. Newton donne <b><i>m x</i>″ = −<i>k x</i></b>, soit <b><i>x</i>″ + ω₀² <i>x</i> = 0</b> avec <b>ω₀ = √(<i>k</i>/<i>m</i>)</b>. Ses solutions sont <b><i>x</i>(<i>t</i>) = <i>X</i><sub>m</sub> cos(ω₀<i>t</i> + φ)</b>, de période <b>T = 2π/ω₀ = 2π√(<i>m</i>/<i>k</i>)</b>.</p></div>
+<div class="why"><p>Le poids et la réaction se compensent : seule la force −<i>kx</i> agit sur l’axe. Vérifions la solution : <i>x</i>′ = −<i>X</i><sub>m</sub>ω₀ sin(ω₀<i>t</i> + φ), puis <i>x</i>″ = −<i>X</i><sub>m</sub>ω₀² cos(ω₀<i>t</i> + φ) = −ω₀² <i>x</i>. Le cosinus est la fonction dont la dérivée seconde est son propre opposé : c’est pourquoi le mouvement est sinusoïdal.</p></div>
+<div class="ex"><p>Réglage initial : <i>m</i> = 1 kg, <i>k</i> = 20 N/m. ω₀ = √20 ≈ 4,47 rad/s et T = 2π/4,47 ≈ 1,40 s. Ici <i>X</i><sub>m</sub> = 0,10 m et φ = 0. Quadruple <i>m</i> au curseur, de 0,5 à 2 kg : T double.</p></div>
+<div class="idea"><p>Lourd = lent, raide = rapide. Une masse grande résiste au changement de vitesse, un ressort raide ramène fort.</p></div>`,
   params:[{id:'m',l:'Masse m',min:.5,max:2,step:.5,v:1,u:' kg'},{id:'k',l:'Raideur k',min:10,max:50,step:10,v:20,u:' N/m'},{id:'t',l:'Temps t',min:0,max:4,step:.1,v:.3,u:' s'}],
   draw:v=>{ const w=Math.sqrt(v.k/v.m), x=.1*Math.cos(w*v.t), vx=-.1*w*Math.sin(w*v.t);
     const A=plane({x:[-.2,3.4],y:[-.5,.6],grid:false,axes:false,w:300}); const bx=1.8+x*6;
@@ -582,6 +713,11 @@ COURS.push(
     B.text(3.1,0,'t (s)',{a:'end',dy:14,c:'var(--muted)',s:11}); return B.svg(); },
   info:v=>`ω₀ = √(40/${fmt(v.m,1)}) = ${fmt(Math.sqrt(40/v.m))} rad/s`,
   ok:v=>Math.abs(v.m-.4)<1e-6, why:'ω₀² = k/m donne m = k/ω₀² = 40/100 = 0,4 kg. La période vaut alors 2π/10 ≈ 0,63 s.'},
+ {h:'Amplitude, pulsation et phase',p:`<p>La formule <i>x</i> = <i>X</i><sub>m</sub> cos(ω₀<i>t</i> + φ) contient trois nombres. Chacun dit quelque chose de différent sur l’oscillation, et il faut savoir les lire sur une courbe.</p>
+<div class="def"><ul><li>L’<b>amplitude</b> <i>X</i><sub>m</sub> &gt; 0 : l’écart maximal à l’équilibre, en m. <i>x</i> va de −<i>X</i><sub>m</sub> à +<i>X</i><sub>m</sub>.</li><li>La <b>pulsation propre</b> ω₀, en rad/s : la vitesse à laquelle tourne l’angle ω₀<i>t</i> + φ. Elle donne la période T = 2π/ω₀ et la fréquence <i>f</i>₀ = 1/T, en Hz.</li><li>La <b>phase à l’origine</b> φ, en rad : où en est le cycle à <i>t</i> = 0.</li></ul></div>
+<div class="idea"><p>ω₀ ne dépend que du système (<i>k</i> et <i>m</i>) : c’est son « rythme propre ». <i>X</i><sub>m</sub> et φ, eux, dépendent de la façon dont on l’a lancé. Le même ressort peut osciller à 1 cm ou à 10 cm, toujours au même rythme.</p></div>
+<div class="ex"><p><i>x</i> = 0,050 cos(4<i>t</i>) : amplitude 5,0 cm, ω₀ = 4 rad/s, T = 2π/4 ≈ 1,57 s, <i>f</i>₀ ≈ 0,64 Hz. φ = 0 : à <i>t</i> = 0, la masse est à l’extrémité, <i>x</i> = +5,0 cm, immobile.</p></div>
+<div class="warn"><p>Ne confonds pas pulsation et fréquence : ω₀ = 2π<i>f</i>₀. Un ressort qui fait 2 allers-retours par seconde a <i>f</i>₀ = 2 Hz mais ω₀ ≈ 12,6 rad/s.</p></div>`},
  {kind:'Méthode',h:'Amplitude et phase à partir des conditions initiales',p:`<p><b>Quand</b> : on connaît la position et la vitesse de départ, et on veut l’amplitude <i>X</i><sub>m</sub> ou l’écriture complète de <i>x</i>(<i>t</i>).</p><p><b>Pourquoi</b> : ω₀ ne dépend que du système, mais <i>X</i><sub>m</sub> et φ dépendent de la façon dont on lance l’oscillation. Avec <i>x</i> = <i>X</i><sub>m</sub> cos(ω₀<i>t</i> + φ), on a <i>v</i> = −<i>X</i><sub>m</sub>ω₀ sin(ω₀<i>t</i> + φ).</p><p><b>Comment</b> : à <i>t</i> = 0 : <i>x</i>₀ = <i>X</i><sub>m</sub> cos φ et <i>v</i>₀ = −<i>X</i><sub>m</sub>ω₀ sin φ. En sommant les carrés : <b><i>X</i><sub>m</sub> = √(<i>x</i>₀² + (<i>v</i>₀/ω₀)²)</b>. Lâché sans vitesse : <i>X</i><sub>m</sub> = |<i>x</i>₀|. Lancé depuis l’équilibre : <i>X</i><sub>m</sub> = |<i>v</i>₀|/ω₀. Puis cos φ = <i>x</i>₀/<i>X</i><sub>m</sub> et sin φ = −<i>v</i>₀/(<i>X</i><sub>m</sub>ω₀) donnent φ.</p>`,
   demo:{enonce:'Un oscillateur de pulsation ω₀ = 10 rad/s part de <i>x</i>₀ = 3,0 cm avec la vitesse <i>v</i>₀ = 0,40 m/s. Trouve <i>X</i><sub>m</sub> et φ.',
    etapes:[
@@ -603,7 +739,10 @@ COURS.push(
    conclusion:'<i>v</i><sub>max</sub> = 0,20 m/s au centre, <i>a</i><sub>max</sub> = 1,0 m/s² aux extrémités. Un objet simplement posé sur un support qui oscille verticalement décolle si l’accélération vers le bas dépasse <i>g</i>.'}},
  {h:'Le haut-parleur',p:'La membrane d’un haut-parleur vibre avec une amplitude de 5,0 cm et une période de 0,50 s. Quelle est son accélération maximale&nbsp;? Arrondis au centième.',lab:'a =',unit:'m/s²',ans:7.896,tol:.011,
   why:'ω₀ = 2π/0,50 ≈ 12,57 rad/s, donc a<sub>max</sub> = X<sub>m</sub>ω₀² = 0,050 × 157,9 ≈ 7,90 m/s².'},
- {h:'Le pendule simple',p:`Une masse au bout d’un fil de longueur <i>L</i> vérifie θ″ = −(<i>g</i>/<i>L</i>) sin θ. Aux <b>petits angles</b>, sin θ ≈ θ (en radians) et on retrouve un oscillateur harmonique : <b>T = 2π√(<i>L</i>/<i>g</i>)</b>. La période ne dépend ni de la masse, ni de l’amplitude.`,
+ {h:'Le pendule simple',p:`<p>Une horloge à balancier n’a pas de ressort : c’est la pesanteur qui ramène la masse. On retrouve pourtant un oscillateur, à une condition.</p>
+<div class="thm"><p>Une masse ponctuelle au bout d’un fil de longueur <i>L</i>, écartée d’un angle θ de la verticale, vérifie <b>θ″ = −(<i>g</i>/<i>L</i>) sin θ</b>. Aux <b>petits angles</b>, sin θ ≈ θ (en radians) : θ″ + (<i>g</i>/<i>L</i>) θ = 0, un oscillateur harmonique de période <b>T = 2π√(<i>L</i>/<i>g</i>)</b>.</p></div>
+<div class="why"><p>La tension du fil est perpendiculaire à la trajectoire : elle ne fait pas avancer la masse. Le long de l’arc, seule agit la composante du poids −<i>mg</i> sin θ. L’arc vaut <i>s</i> = <i>L</i>θ, donc Newton s’écrit <i>m L</i> θ″ = −<i>mg</i> sin θ. La masse se simplifie : la période n’en dépend pas.</p></div>
+<div class="ex"><p>Réglage initial, <i>L</i> = 1 m : T = 2π√(1/9,81) ≈ 2,01 s. Avec <i>L</i> = 0,25 m, quatre fois plus court, T est divisée par 2 : environ 1,0 s.</p></div>`,
   params:[{id:'L',l:'Longueur L',min:.25,max:2,step:.25,v:1,u:' m'},{id:'a',l:'Amplitude θ₀',min:5,max:20,step:5,v:15,u:'°'},{id:'t',l:'Temps t',min:0,max:3,step:.1,v:.4,u:' s'}],
   draw:v=>{ const P=plane({x:[-1.2,1.2],y:[-2.3,.2],grid:false,axes:false,w:240}); const w=Math.sqrt(g/v.L), th=rad(v.a)*Math.cos(w*v.t), x=v.L*Math.sin(th), y=-v.L*Math.cos(th);
     P.seg(-.5,0,.5,0,{c:'var(--ink)',w:4}).seg(0,0,0,-v.L-.15,{c:'var(--muted)',w:1,dash:true}).seg(0,0,x,y,{c:'var(--ink)',w:2});
@@ -624,6 +763,16 @@ COURS.push(
    conclusion:'Résonance à 108 km/h. Plus lentement ou plus vite, les impulsions arrivent à contretemps et se compensent en partie.'}},
  {h:'Le seau qui déborde',p:'En portant un seau, l’eau y oscille avec une période propre de 0,60 s. Tu fais des pas de 0,75 m, et chaque pas donne une petite secousse. À quelle vitesse de marche l’eau risque-t-elle de déborder&nbsp;?',lab:'v =',unit:'m/s',ans:1.25,tol:.01,
   why:'Résonance quand la durée d’un pas égale la période propre : 0,75/v = 0,60 s, donc v = 1,25 m/s, une marche normale. Changer de rythme suffit à l’éviter.'},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir : oscillateur harmonique',p:`<div class="keep"><ul>
+<li>Loi de Hooke : <b><i>F</i> = −<i>k x</i></b>, <i>x</i> mesuré depuis la longueur à vide ; à l’équilibre vertical, <i>k x</i> = <i>mg</i>.</li>
+<li>Équation de l’oscillateur : <b><i>x</i>″ + ω₀²<i>x</i> = 0</b> ; on y ramène Newton et on lit ω₀² devant <i>x</i>. Ressort : <b>ω₀ = √(<i>k</i>/<i>m</i>)</b>.</li>
+<li>Solution : <i>x</i> = <i>X</i><sub>m</sub> cos(ω₀<i>t</i> + φ) ; <b>T = 2π/ω₀</b>, <i>f</i>₀ = 1/T, ω₀ = 2π<i>f</i>₀. T ne dépend pas de l’amplitude.</li>
+<li>Ressort vertical : même ω₀, en mesurant l’écart à la position d’équilibre.</li>
+<li>Conditions initiales : <b><i>X</i><sub>m</sub> = √(<i>x</i>₀² + (<i>v</i>₀/ω₀)²)</b>, cos φ = <i>x</i>₀/<i>X</i><sub>m</sub>.</li>
+<li><b><i>v</i><sub>max</sub> = <i>X</i><sub>m</sub>ω₀</b> au centre, <b><i>a</i><sub>max</sub> = <i>X</i><sub>m</sub>ω₀²</b> aux extrémités.</li>
+<li>Pendule simple aux petits angles : <b>T = 2π√(<i>L</i>/<i>g</i>)</b>, indépendante de la masse.</li>
+<li>Résonance : impulsions de période égale à T₀, par exemple <i>d</i>/<i>v</i> = T₀ ; un amortisseur limite l’amplitude.</li>
+</ul></div>`},
  {kind:'Problème',h:'La suspension de la voiture',
   p:'Une voiture de 1200 kg repose sur quatre ressorts de suspension, qu’on modélise par un seul ressort vertical de raideur <i>k</i>. Quand quatre passagers de 75 kg montent, la caisse s’enfonce de 3,0 cm. On étudie les oscillations verticales de la voiture chargée, sans amortisseur. Le poids ne fait que déplacer la position d’équilibre : autour d’elle, on retrouve <i>m x</i>″ = −<i>k x</i>.',
   parts:[
@@ -647,6 +796,11 @@ COURS.push(
 
 /* ================= 6. HYDROSTATIQUE ================= */
 {subj:'phy', sem:'all', id:'phy-hydrostatique', h:'Pression et hydrostatique', p:'La pression dans un fluide au repos, la presse hydraulique et la poussée d’Archimède.', steps:[
+ {h:'Force et surface : la pression',p:`<p>Dans la neige profonde, à pied, tu t’enfonces jusqu’aux genoux. Avec des skis, tu restes en surface. Ton poids n’a pas changé : seule la surface d’appui a changé. La grandeur qui compte n’est donc pas la force seule.</p>
+<div class="def"><p>Une force <i>F</i> répartie perpendiculairement sur une surface <i>S</i> exerce la <b>pression</b> <b><i>p</i> = <i>F</i>/<i>S</i></b>. Unité : le <b>pascal</b>, 1 Pa = 1 N/m². On utilise aussi le kPa, le MPa et le <b>bar</b>, 1 bar = 10⁵ Pa.</p></div>
+<div class="idea"><p>La pression dit comment la force est « étalée ». Même force, surface dix fois plus petite : pression dix fois plus grande. C’est pourquoi un couteau aiguisé coupe et une punaise s’enfonce. Dans un fluide, la pression pousse sur toute paroi, perpendiculairement à elle.</p></div>
+<div class="ex"><p>Une personne de 70 kg pèse 70 × 9,81 ≈ 687 N. Sur deux chaussures de 250 cm² chacune (0,050 m² en tout) : <i>p</i> ≈ 687/0,050 ≈ 13 700 Pa. Sur deux skis de 0,18 m² chacun : <i>p</i> ≈ 687/0,36 ≈ 1 900 Pa, sept fois moins.</p></div>
+<div class="warn"><p>L’air autour de nous exerce déjà environ 1,013 × 10⁵ Pa : sur 1 m², c’est le poids d’environ 10 t. On ne le sent pas, car il pousse autant de tous les côtés.</p></div>`},
  {kind:'Méthode',h:'Calculer une pression : tout en SI d’abord',p:`<p><b>Quand</b> : une force s’appuie sur une surface (pied, pneu, piston, couvercle) et on demande la pression, ou l’inverse.</p><p><b>Pourquoi</b> : la pression est la force par unité de surface, <b><i>p</i> = <i>F</i>/<i>S</i></b>, en pascals (1 Pa = 1 N/m²). Les surfaces sont souvent données en cm² ou en mm² : comme une surface est un carré de longueurs, on convertit avec le <b>carré</b> du facteur.</p><p><b>Comment</b> : 1. Force en newtons (un poids vaut <i>mg</i>). 2. Surface en m² : 1 cm² = (10⁻² m)² = 10⁻⁴ m², 1 mm² = 10⁻⁶ m². Pour un disque, <i>S</i> = π<i>r</i>². 3. <i>p</i> = <i>F</i>/<i>S</i> en Pa. 4. Convertis si besoin : 1 kPa = 10³ Pa, 1 MPa = 10⁶ Pa, 1 bar = 10⁵ Pa.</p>`,
   demo:{enonce:'Une voiture de 1200 kg repose sur ses quatre pneus. Chaque pneu touche le sol sur 150 cm². Quelle pression exerce-t-elle sur le sol, en bar&nbsp;?',
    etapes:[
@@ -660,7 +814,10 @@ COURS.push(
   lab:'p =',unit:'MPa',ans:5.886,tol:.011,why:'F = 60 × 9,81 = 589 N et S = 1,0·10⁻⁴ m², donc p = 589/10⁻⁴ ≈ 5,89·10⁶ Pa = 5,89 MPa, environ 58 fois la pression atmosphérique.'},
  {h:'La pointe du clou',p:'On enfonce un clou en appuyant avec une force de 50 N. Sa pointe touche le bois sur 0,20 mm². Quelle pression exerce-t-elle, en MPa&nbsp;?',lab:'p =',unit:'MPa',ans:250,tol:.5,
   why:'S = 0,20 × 10⁻⁶ m², donc p = 50/(0,20·10⁻⁶) = 2,5·10⁸ Pa = 250 MPa. Une petite surface multiplie l’effet d’une même force.'},
- {h:'La loi de l’hydrostatique',p:`Dans un fluide au repos de masse volumique ρ, la pression augmente avec la profondeur <i>h</i> : <b><i>p</i> = <i>p</i>₀ + ρ <i>g h</i></b>, où <i>p</i>₀ est la pression à la surface. En un point, la pression agit de la même façon dans toutes les directions.`,
+ {h:'La loi de l’hydrostatique',p:`<p>En plongée, les oreilles font mal dès 2 ou 3 m. Plus on descend, plus l’eau au-dessus de nous est lourde. De combien la pression augmente-t-elle&nbsp;?</p>
+<div class="thm"><p>Dans un liquide au repos, de masse volumique ρ constante, la pression à la profondeur <i>h</i> sous la surface libre vaut <b><i>p</i> = <i>p</i>₀ + ρ<i>g h</i></b>, où <i>p</i>₀ est la pression à la surface. En un point, elle agit de la même façon dans toutes les directions.</p></div>
+<div class="why"><p>Isole par la pensée un cylindre vertical de liquide, de section <i>S</i>, de la surface jusqu’à la profondeur <i>h</i>. Il est immobile, donc les forces verticales se compensent : la pression du dessous le pousse vers le haut avec <i>p S</i>, l’air le pousse vers le bas avec <i>p</i>₀<i>S</i>, et il pèse ρ<i>S h g</i>. D’où <i>p S</i> = <i>p</i>₀<i>S</i> + ρ<i>S h g</i>, et <i>S</i> se simplifie. Hypothèses : fluide au repos et incompressible, <i>g</i> uniforme.</p></div>
+<div class="ex"><p>Réglage initial : eau, <i>h</i> = 3 m. ρ<i>g h</i> = 1000 × 9,81 × 3 ≈ 29,4 kPa, donc <i>p</i> ≈ 101,3 + 29,4 = 130,7 kPa. Passe à la glycérine, plus dense : la pression monte plus vite avec la profondeur.</p></div>`,
   params:[{id:'h',l:'Profondeur h',min:0,max:10,step:.5,v:3,u:' m'},{id:'f',l:'Fluide (huile, eau, glycérine)',min:0,max:2,v:1}],
   draw:v=>{ const rho=[900,1000,1260][v.f], p=101.3+rho*g*v.h/1000;
     const P=plane({x:[-1,8],y:[-11,1.5],w:300,h:280,grid:false,axes:false});
@@ -685,6 +842,11 @@ COURS.push(
   why:'ρgh = 1025 × 9,81 × 20 = 2,01·10⁵ Pa = 2,01 bar. Donc p = 1,013 + 2,011 ≈ 3,02 bar.'},
  {h:'Le tube en U',p:'Dans un tube en U contenant du mercure (ρ = 13 600 kg/m³), on verse de l’eau dans une branche jusqu’à ce que le mercure de l’autre branche dépasse l’interface eau–mercure de 2,0 cm. Quelle hauteur d’eau a-t-on versée, en cm&nbsp;?',lab:'h =',unit:'cm',ans:27.2,tol:.06,
   why:'Au niveau de l’interface, les pressions sont égales : ρ<sub>eau</sub> g h = ρ<sub>Hg</sub> g × 0,020, donc h = 13 600 × 0,020/1000 = 0,272 m = 27,2 cm.'},
+ {h:'Transmettre une pression',p:`<p>Au garage, un mécanicien soulève une voiture de 1,5 t en appuyant sur une petite pédale. Le liquide de la presse n’ajoute aucune énergie : comment une petite force en devient-elle une grande&nbsp;?</p>
+<div class="thm"><p><b>Principe de Pascal</b>. Dans un liquide incompressible au repos, une augmentation de pression Δ<i>p</i> imposée en un point se transmet <b>intégralement</b> à tout le liquide. Dans une presse hydraulique à deux pistons : <b><i>F</i>₁/<i>S</i>₁ = <i>F</i>₂/<i>S</i>₂</b>.</p></div>
+<div class="why"><p>C’est une conséquence de <i>p</i> = <i>p</i>₀ + ρ<i>g h</i> : si la pression en haut augmente de Δ<i>p</i>, celle de chaque point augmente de Δ<i>p</i>, car ρ<i>g h</i> n’a pas changé. Deux pistons au même niveau subissent donc la même pression : la force est proportionnelle à la surface.</p></div>
+<div class="ex"><p>Petit piston de 2,0 cm² poussé avec 50 N, grand piston de 200 cm² : <i>F</i>₂ = 50 × 200/2,0 = 5000 N. Mais le liquide déplacé a le même volume des deux côtés : si le petit piston descend de 10 cm, le grand ne monte que de 0,10 cm.</p></div>
+<div class="warn"><p>La presse multiplie la force, pas l’énergie : 50 N × 0,10 m = 5000 N × 0,0010 m = 5 J des deux côtés.</p></div>`},
  {h:'Le principe de Pascal',p:`Une variation de pression imposée en un point d’un liquide incompressible au repos se transmet <b>intégralement</b> à tout le liquide. Dans une presse hydraulique : <b><i>F</i>₂/<i>S</i>₂ = <i>F</i>₁/<i>S</i>₁</b>.<br>Un piston de 10 cm² est poussé avec 100 N. Quelle force soulève le piston de 500 cm²&nbsp;?`,
   fig:(()=>{ const P=plane({x:[-.5,9],y:[-.5,4.5],grid:false,axes:false,w:280});
     P.poly([[0,3],[0,0],[8,0],[8,2],[3,2],[3,1],[1,1],[1,3]],{open:true,c:'var(--ink)',w:2}).poly([[0,0],[8,0],[8,2],[3,2],[3,1],[1,1],[1,2.5],[0,2.5]],{fill:'var(--sci)',fo:.25,c:null});
@@ -692,7 +854,10 @@ COURS.push(
     vec(P,.5,4.2,.5,2.85,'var(--bad)','F₁',{dx:8,dy:-14}); vec(P,5.5,2.35,5.5,4,'var(--accent)','F₂'); P.text(.5,0,'S₁',{a:'middle',dy:-28,c:'var(--muted)',s:12}).text(5.5,0,'S₂',{a:'middle',dy:-28,c:'var(--muted)',s:12}); return P.svg(); })(),
   opts:['2 N','100 N','500 N','5000 N'],ans:3,
   why:'F₂ = F₁ × S₂/S₁ = 100 × 500/10 = 5000 N. En contrepartie, le grand piston monte 50 fois moins que le petit ne descend : le travail est le même.'},
- {h:'La poussée d’Archimède',p:`Tout corps immergé dans un fluide subit une force verticale, vers le haut, égale au poids du fluide déplacé : <b>Π = ρ<sub>fluide</sub> <i>V</i><sub>imm</sub> <i>g</i></b>. Un corps <b>flotte</b> à l’équilibre quand Π = <i>P</i>, d’où la fraction immergée <b><i>V</i><sub>imm</sub>/<i>V</i> = ρ<sub>corps</sub>/ρ<sub>fluide</sub></b>.`,
+ {h:'La poussée d’Archimède',p:`<p>Un paquebot d’acier de 100 000 t flotte, alors qu’un clou coule. Dans l’eau, tu soulèves facilement un camarade que tu ne porterais pas sur la plage. L’eau pousse vers le haut : de combien&nbsp;?</p>
+<div class="thm"><p>Tout corps immergé dans un fluide au repos subit une force verticale, vers le haut, égale au poids du fluide déplacé : <b>Π = ρ<sub>fluide</sub> <i>V</i><sub>imm</sub> <i>g</i></b>, où <i>V</i><sub>imm</sub> est le volume immergé. Un corps <b>flotte</b> quand Π = <i>P</i> ; la fraction immergée vaut alors <b><i>V</i><sub>imm</sub>/<i>V</i> = ρ<sub>corps</sub>/ρ<sub>fluide</sub></b>.</p></div>
+<div class="why"><p>La pression croît avec la profondeur : le liquide pousse plus fort sous le corps que dessus. Pour un cube d’arête 0,20 m dans l’eau, l’écart de pression entre ses faces est ρ<i>g</i> × 0,20 = 1962 Pa, sur 0,040 m² : 78,5 N vers le haut, exactement le poids de 8 L d’eau. Les forces latérales se compensent. Flottaison : ρ<sub>fluide</sub><i>V</i><sub>imm</sub><i>g</i> = ρ<sub>corps</sub><i>V g</i>.</p></div>
+<div class="ex"><p>Réglage initial : bloc à 600 kg/m³ dans l’eau. Il flotte avec 600/1000 = 60 % de son volume sous la surface. Monte ρ du bloc au-dessus de 1000 : même entièrement immergé, la poussée ne compense plus le poids.</p></div>`,
   params:[{id:'rc',l:'ρ du bloc',min:100,max:1400,step:50,v:600,u:' kg/m³'},{id:'rf',l:'ρ du liquide',min:700,max:1500,step:100,v:1000,u:' kg/m³'}],
   draw:v=>{ const P=plane({x:[-3,3],y:[-3.6,2.6],grid:false,axes:false,w:260}); const fr=v.rc/v.rf, sink=fr>=1;
     P.rect(-3,-3.5,6,3.5,{fill:'var(--sci)',fo:.25,c:null}).seg(-3,0,3,0,{c:'var(--sci)',w:2});
@@ -735,6 +900,14 @@ COURS.push(
    conclusion:'19,6 kN, environ le poids de 2 t, appliqués à 67 cm du fond. Si l’eau monte deux fois plus haut, la force est multipliée par 4 (<i>F</i> ∝ <i>H</i>²).'}},
  {h:'La paroi de l’aquarium',p:'Un aquarium est rempli d’eau douce sur 50 cm de hauteur. Quelle force l’eau exerce-t-elle sur une paroi verticale de 1,0 m de long&nbsp;? Arrondis au newton.',lab:'F =',unit:'N',ans:1226.25,tol:1,
   why:'F = ρgLH²/2 = 1000 × 9,81 × 1,0 × 0,50²/2 ≈ 1226 N, appliquée à H/3 ≈ 17 cm du fond.'},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir : hydrostatique',p:`<div class="keep"><ul>
+<li><b><i>p</i> = <i>F</i>/<i>S</i></b>, en Pa (N/m²) ; 1 bar = 10⁵ Pa ; 1 cm² = 10⁻⁴ m², 1 mm² = 10⁻⁶ m². <i>p</i><sub>atm</sub> ≈ 1,013 × 10⁵ Pa.</li>
+<li>Hydrostatique : <b><i>p</i> = <i>p</i>₀ + ρ<i>g h</i></b>, <i>h</i> mesuré vers le bas depuis la surface libre ; ρ<i>gh</i> est la surpression. Dans l’eau, +1 bar tous les 10 m environ.</li>
+<li>Même liquide au repos, même hauteur : même pression (tube en U : égaliser les pressions à l’interface).</li>
+<li>Pascal : une variation de pression se transmet partout ; presse hydraulique <i>F</i>₁/<i>S</i>₁ = <i>F</i>₂/<i>S</i>₂, la force est multipliée, pas l’énergie.</li>
+<li>Archimède : <b>Π = ρ<sub>fluide</sub><i>V</i><sub>imm</sub><i>g</i></b>, vers le haut. Flottaison : <i>V</i><sub>imm</sub>/<i>V</i> = ρ<sub>corps</sub>/ρ<sub>fluide</sub>. Poids apparent : <i>P</i> − Π.</li>
+<li>Paroi verticale depuis la surface : <b><i>F</i> = ρ<i>gLH</i>²/2</b>, appliquée à <i>H</i>/3 du fond ; en général, surpression moyenne × surface.</li>
+</ul></div>`},
  {kind:'Problème',h:'L’iceberg',
   p:'Un iceberg dérive dans l’océan. Depuis un avion, on estime le volume de sa partie émergée à 5000 m³. La glace a une masse volumique de 917 kg/m³, l’eau de mer 1025 kg/m³. L’iceberg flotte à l’équilibre. On veut connaître sa taille réelle, puis ce qui change s’il entre dans un fjord d’eau douce.',
   parts:[
@@ -763,7 +936,11 @@ COURS.push(
 
 /* ================= 7. ÉNERGIE ================= */
 {subj:'phy', sem:'all', id:'phy-energie', h:'Énergie, travail et puissance', p:'Ce qu’une force fournit au cours d’un déplacement, et ce qui se conserve.', steps:[
- {h:'Le travail d’une force',p:`Une force constante <i>F</i> dont le point d’application se déplace de <i>d</i> = AB effectue le travail <b><i>W</i> = <i>F</i>·<i>d</i> = <i>F d</i> cos θ</b>, en joules (1 J = 1 N·m). Il est <b>moteur</b> si <i>W</i> &gt; 0, <b>résistant</b> si <i>W</i> &lt; 0, et nul si la force est perpendiculaire au déplacement. Ici <i>d</i> = 5 m.`,
+ {h:'Le travail d’une force',p:`<p>Tirer une valise sur 5 m fatigue plus que la tenir immobile, même si les bras forcent dans les deux cas. En physique, une force n’« apporte » quelque chose que si son point d’application se déplace. Le travail mesure cet apport.</p>
+<div class="def"><p>Une force constante <i>F</i> dont le point d’application se déplace en ligne droite de A à B (<i>d</i> = AB) effectue le <b>travail</b> <b><i>W</i> = <i>F</i>·<i>d</i> = <i>F d</i> cos θ</b>, où θ est l’angle entre la force et le déplacement. Unité : le joule, 1 J = 1 N·m.</p></div>
+<div class="idea"><p>Seule la composante de la force <b>le long</b> du déplacement, <i>F</i> cos θ, compte. Le travail est <b>moteur</b> (<i>W</i> &gt; 0) si la force aide le mouvement (θ &lt; 90°), <b>résistant</b> (<i>W</i> &lt; 0) si elle le freine (θ &gt; 90°), <b>nul</b> si elle est perpendiculaire.</p></div>
+<div class="ex"><p>Réglage initial : <i>F</i> = 30 N à θ = 30°, sur <i>d</i> = 5 m. <i>W</i> = 30 × 5 × cos 30° ≈ 130 J. À θ = 90°, <i>W</i> = 0 ; à θ = 180°, <i>W</i> = −150 J : la force freine.</p></div>
+<div class="warn"><p>Porter une valise en marchant sur du plat : ton bras pousse vers le haut, le déplacement est horizontal, le travail de cette force est nul. La fatigue des muscles n’est pas un travail mécanique.</p></div>`,
   params:[{id:'F',l:'Force F',min:10,max:50,step:10,v:30,u:' N'},{id:'th',l:'Angle θ',min:0,max:180,step:15,v:30,u:'°'}],
   draw:v=>{ const P=plane({x:[-1.5,8.5],y:[-1.8,5.6],grid:false,axes:false,w:300}); const c=Math.cos(rad(v.th)), s=Math.sin(rad(v.th)), L=v.F/10;
     P.seg(-1.5,0,8.5,0,{c:'var(--muted)',w:1.5}).rect(-.6,0,1.2,1,{c:'var(--ink)',w:1.5,dash:true,op:.5}).rect(4.4,0,1.2,1,{fill:'var(--math)',fo:.35,c:'var(--ink)',w:2});
@@ -785,6 +962,11 @@ COURS.push(
    conclusion:'Seules la tension et le frottement travaillent. Le travail total, 186 J, fait gagner autant d’énergie cinétique à la caisse.'}},
  {h:'La descente de la skieuse',p:'Une skieuse de 60 kg descend une piste sinueuse, avec 120 m de dénivelé entre le départ et l’arrivée. Quel est le travail de son poids, en kJ&nbsp;? Arrondis au dixième.',lab:'W =',unit:'kJ',ans:70.632,tol:.06,
   why:'W = mg(z<sub>A</sub> − z<sub>B</sub>) = 60 × 9,81 × 120 = 70 632 J ≈ 70,6 kJ, quels que soient les virages.'},
+ {h:'L’énergie cinétique et son théorème',p:`<p>Le travail des forces doit bien servir à quelque chose. Quand une force motrice pousse une voiture, la voiture va plus vite : le travail se retrouve dans la vitesse. On cherche la grandeur qui augmente exactement du travail reçu.</p>
+<div class="thm"><p>Un corps de masse <i>m</i> à la vitesse <i>v</i> possède l’<b>énergie cinétique</b> <b><i>E</i><sub>c</sub> = ½<i>mv</i>²</b>, en J. <b>Théorème de l’énergie cinétique</b> : entre deux états A et B, <b><i>E</i><sub>c</sub>(B) − <i>E</i><sub>c</sub>(A) = Σ<i>W</i><sub>A→B</sub></b>, la somme des travaux de <b>toutes</b> les forces.</p></div>
+<div class="why"><p>Cas simple : résultante constante <i>F</i> le long d’un axe. Son travail vaut <i>F d</i> = <i>m a d</i>. Or en MRUA, <i>v</i><sub>B</sub>² − <i>v</i><sub>A</sub>² = 2<i>a d</i>. Donc <i>F d</i> = ½<i>m v</i><sub>B</sub>² − ½<i>m v</i><sub>A</sub>². Le cas général se démontre de même en découpant le chemin en petits morceaux.</p></div>
+<div class="ex"><p>Une voiture de 1000 kg passe de 10 à 20 m/s. Δ<i>E</i><sub>c</sub> = ½ × 1000 × (400 − 100) = 150 kJ. Si cela se fait sur 100 m, la résultante moyenne vaut 150 000/100 = 1500 N.</p></div>
+<div class="warn"><p><i>E</i><sub>c</sub> croît comme <i>v</i>² : passer de 10 à 20 m/s coûte trois fois plus que de 0 à 10 m/s.</p></div>`},
  {h:'Énergie cinétique et théorème',p:`Un corps de masse <i>m</i> à la vitesse <i>v</i> possède l’<b>énergie cinétique</b> <b><i>E</i><sub>c</sub> = ½ <i>m v</i>²</b>. <b>Théorème de l’énergie cinétique</b> : entre deux instants, <b>Δ<i>E</i><sub>c</sub> = Σ <i>W</i></b>, la somme des travaux de toutes les forces.<br>Quel travail total faut-il fournir à une voiture de 1200 kg pour la faire passer de 0 à 20 m/s, en kJ&nbsp;?`,
   lab:'W =',unit:'kJ',ans:240,tol:.5,why:'ΔE<sub>c</sub> = ½ × 1200 × 20² − 0 = 240 000 J = 240 kJ.'},
  {kind:'Méthode',h:'Appliquer le théorème de l’énergie cinétique',p:`<p><b>Quand</b> : on relie une vitesse à une distance (pas à une durée), et les forces sont connues : vitesse en bas d’une pente, distance de freinage, force moyenne de freinage.</p><p><b>Pourquoi</b> : Δ<i>E</i><sub>c</sub> = Σ<i>W</i> évite de calculer l’accélération et le temps. C’est une équation entre nombres, sans projection de vecteurs.</p><p><b>Comment</b> : 1. Système et deux états, A (départ) et B (arrivée). 2. Bilan des forces et travail de chacune entre A et B. 3. ½<i>mv</i><sub>B</sub>² − ½<i>mv</i><sub>A</sub>² = Σ<i>W</i>. 4. Isole l’inconnue.</p>`,
@@ -796,7 +978,11 @@ COURS.push(
     {f:'½ × 2,0 × <i>v</i>² − 0 = 29,43 − 10,19 ≈ 19,24 J, donc <i>v</i> = √19,24 ≈ 4,39 m/s',w:'Le théorème relie directement la vitesse finale aux travaux.'},
    ],
    conclusion:'<i>v</i> ≈ 4,39 m/s. Sans frottement, on aurait trouvé √(2<i>g</i> × 1,5) ≈ 5,42 m/s.'}},
- {h:'Énergie potentielle et énergie mécanique',p:`Le poids dérive d’une <b>énergie potentielle</b> <b><i>E</i><sub>p</sub> = <i>m g h</i></b>, un ressort de <b>½ <i>k x</i>²</b>. L’énergie mécanique <b><i>E</i><sub>m</sub> = <i>E</i><sub>c</sub> + <i>E</i><sub>p</sub></b> est <b>conservée</b> si seules des forces conservatives travaillent. Une skateuse de 50 kg part sans vitesse du bord d’une rampe de 4,5 m de haut.`,
+ {h:'Énergie potentielle et énergie mécanique',p:`<p>Une skateuse lâchée en haut d’une rampe prend de la vitesse en descendant, puis en perd en remontant de l’autre côté. Quelque chose s’échange entre hauteur et vitesse, comme si la hauteur stockait de l’énergie.</p>
+<div class="def"><p>Le poids dérive de l’<b>énergie potentielle de pesanteur</b> <b><i>E</i><sub>p</sub> = <i>m g z</i></b> (<i>z</i> altitude, mesurée depuis une référence choisie), un ressort de <b><i>E</i><sub>p</sub> = ½<i>k x</i>²</b>. L’<b>énergie mécanique</b> est <b><i>E</i><sub>m</sub> = <i>E</i><sub>c</sub> + <i>E</i><sub>p</sub></b>.</p></div>
+<div class="why"><p>Le travail du poids de A à B vaut <i>mg</i>(<i>z</i><sub>A</sub> − <i>z</i><sub>B</sub>) = −Δ<i>E</i><sub>p</sub>, quel que soit le chemin : on dit que le poids est <b>conservatif</b>. Si seul le poids travaille (la réaction, perpendiculaire, ne travaille pas), le théorème de l’énergie cinétique donne Δ<i>E</i><sub>c</sub> = −Δ<i>E</i><sub>p</sub>, donc <b>Δ<i>E</i><sub>m</sub> = 0</b>.</p></div>
+<div class="ex"><p>La skateuse a 50 kg et part sans vitesse à 4,5 m : <i>E</i><sub>m</sub> = 50 × 9,81 × 4,5 ≈ 2207 J. Réglage initial, <i>x</i> = −2 m, elle est à 2 m : <i>E</i><sub>p</sub> = 981 J, donc <i>E</i><sub>c</sub> ≈ 1226 J et <i>v</i> = √(2 × 9,81 × 2,5) ≈ 7,0 m/s.</p></div>
+<div class="warn"><p>Le zéro de <i>E</i><sub>p</sub> est arbitraire : seules ses variations ont un sens.</p></div>`,
   params:[{id:'x',l:'Position x',min:-3,max:3,step:.25,v:-2,u:' m'}],
   draw:v=>{ const P=plane({x:[-3.6,6.4],y:[-.6,5.4],grid:false,axes:false,w:300}); const h=.5*v.x*v.x, H=4.5;
     P.fn(x=>.5*x*x,{from:-3.2,to:3.2,c:'var(--ink)',w:3}).seg(-3.6,H,3.4,H,{c:'var(--muted)',w:1,dash:true}).dot(v.x,h+.2,{r:8,c:'var(--math)'});
@@ -835,6 +1021,11 @@ COURS.push(
    conclusion:'12,5 kJ dissipés, environ 36 % de l’énergie de départ, avec une force moyenne de 31 N (air et neige).'}},
  {h:'La luge',p:'Une luge de 10 kg part sans vitesse en haut d’une pente de 12 m de dénivelé et arrive en bas à 12 m/s. Quelle énergie les frottements ont-ils dissipée&nbsp;? Arrondis au joule.',unit:'J',ans:457.2,tol:.6,
   why:'E<sub>m</sub> au départ : 10 × 9,81 × 12 = 1177,2 J. En bas : ½ × 10 × 12² = 720 J. Dissipé : 457 J.'},
+ {h:'La puissance : l’énergie par seconde',p:`<p>Monter un escalier en marchant ou en courant demande le même travail contre le poids. Pourtant, en courant, on s’essouffle. Ce qui change, c’est la <b>rapidité</b> avec laquelle l’énergie est fournie.</p>
+<div class="def"><p>La <b>puissance</b> moyenne est le travail fourni divisé par la durée : <b><i>P</i> = <i>W</i>/Δ<i>t</i></b>, en watts, 1 W = 1 J/s. Pour une force <i>F</i> appliquée à un corps de vitesse <i>v</i>, la puissance instantanée vaut <b><i>P</i> = <i>F</i>·<i>v</i> = <i>F v</i> cos θ</b>.</p></div>
+<div class="why"><p>Pendant un petit intervalle Δ<i>t</i>, le corps avance de <i>v</i>Δ<i>t</i> et la force travaille de <i>F v</i> Δ<i>t</i> cos θ. On divise par Δ<i>t</i> : <i>P</i> = <i>F v</i> cos θ.</p></div>
+<div class="ex"><p>Une voiture roule à 30 m/s (108 km/h) contre 600 N de résistances (air, roulement). Pour garder sa vitesse, le moteur doit fournir 600 N vers l’avant : <i>P</i> = 600 × 30 = 18 000 W = 18 kW. En une heure, cela fait 18 kWh d’énergie mécanique.</p></div>
+<div class="warn"><p>Le kW mesure une puissance, le kWh une énergie : 1 kWh = 1000 W × 3600 s = 3,6 × 10⁶ J.</p></div>`},
  {h:'La puissance',p:`La <b>puissance</b> mesure le travail fourni par unité de temps : <b><i>P</i> = <i>W</i>/Δ<i>t</i></b>, en watts (1 W = 1 J/s). Pour une force appliquée à un corps de vitesse <i>v</i>, la puissance instantanée vaut <b><i>P</i> = <i>F</i>·<i>v</i></b>.<br>Une grue soulève à vitesse constante une charge de 500 kg sur 12 m en 20 s. Quelle puissance développe-t-elle&nbsp;?`,
   lab:'P =',unit:'W',ans:2943,tol:1,why:'À vitesse constante, F = mg. W = 500 × 9,81 × 12 = 58 860 J, donc P = 58 860/20 = 2943 W, soit près de 3 kW.',
   note:'Le kilowattheure est une unité d’énergie : 1 kWh = 1000 W × 3600 s = 3,6·10⁶ J.'},
@@ -850,6 +1041,15 @@ COURS.push(
   why:'P<sub>reçue</sub> = P<sub>utile</sub>/η = 1,7/0,85 = 2,0 kW. Les 0,3 kW restants chauffent le moteur.'},
  {kind:'Défi',h:'Le freinage',p:'Une voiture de 1000 kg roule à 25 m/s. Elle freine jusqu’à l’arrêt sur 50 m. Quelle est la force de freinage moyenne, supposée constante&nbsp;?',unit:'N',ans:6250,tol:1,
   why:'Théorème de l’énergie cinétique : 0 − ½ × 1000 × 25² = −F × 50, donc F = 312 500/50 = 6250 N.'},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir : énergie',p:`<div class="keep"><ul>
+<li>Travail d’une force constante : <b><i>W</i> = <i>F d</i> cos θ</b>, en J ; moteur, résistant ou nul (force perpendiculaire).</li>
+<li>Poids : <i>W</i> = <i>mg</i>(<i>z</i><sub>A</sub> − <i>z</i><sub>B</sub>), indépendant du chemin. Frottement constant : <i>W</i> = −<i>f d</i>.</li>
+<li><b><i>E</i><sub>c</sub> = ½<i>mv</i>²</b> ; théorème : <b>Δ<i>E</i><sub>c</sub> = Σ<i>W</i></b> (toutes les forces). Il relie vitesse et distance, sans le temps.</li>
+<li><i>E</i><sub>p</sub> = <i>mgz</i> (référence au choix), ½<i>kx</i>² pour un ressort ; <b><i>E</i><sub>m</sub> = <i>E</i><sub>c</sub> + <i>E</i><sub>p</sub></b>.</li>
+<li>Seules des forces conservatives travaillent : <i>E</i><sub>m</sub>(A) = <i>E</i><sub>m</sub>(B). Avec frottements : Δ<i>E</i><sub>m</sub> = <i>W</i><sub>frottements</sub> &lt; 0, devenu chaleur.</li>
+<li>Chute ou descente sans frottement : <i>v</i> = √(2<i>gh</i>), quelle que soit la masse ; pendule : <i>h</i> = <i>L</i>(1 − cos θ).</li>
+<li><b><i>P</i> = <i>W</i>/Δ<i>t</i> = <i>F v</i></b>, en W ; 1 kWh = 3,6 × 10⁶ J. Rendement η = <i>P</i><sub>utile</sub>/<i>P</i><sub>reçue</sub> : on <b>divise</b> par η pour trouver ce qui est consommé.</li>
+</ul></div>`},
  {kind:'Problème',h:'La puissance d’un ascenseur',
   p:'Une cabine d’ascenseur chargée a une masse de 1200 kg. Elle monte de 30 m, une dizaine d’étages, à vitesse constante en 20 s. Le moteur électrique a un rendement de 80 % : il transforme 80 % de l’énergie électrique reçue en travail mécanique. On néglige les frottements ainsi que les phases de démarrage et d’arrêt.',
   parts:[
@@ -876,7 +1076,11 @@ COURS.push(
 
 /* ================= 8. GAZ PARFAIT ================= */
 {subj:'phy', sem:'all', id:'phy-gaz', h:'Gaz parfait', p:'Des molécules qui s’agitent, une équation d’état et trois transformations simples.', steps:[
- {h:'Le modèle microscopique',p:`Un <b>gaz parfait</b> est fait de molécules ponctuelles, sans interaction entre elles sauf lors de chocs brefs, en agitation désordonnée. La <b>pression</b> vient des chocs des molécules sur les parois, la <b>température</b> mesure leur agitation. Ici <i>n</i> = 0,04 mol.`,
+ {h:'Le modèle microscopique',p:`<p>Un litre d’air contient environ 2,5 × 10²² molécules. Impossible de suivre chacune. On construit donc un modèle simple, qui suffit pour expliquer la pression d’un pneu ou le gonflement d’un ballon.</p>
+<div class="def"><p>Un <b>gaz parfait</b> est fait de molécules ponctuelles, en agitation désordonnée, qui n’interagissent pas entre elles sauf lors de chocs brefs. La <b>pression</b> est l’effet moyen des chocs des molécules sur les parois. La <b>température</b> mesure leur agitation : plus elle est haute, plus elles vont vite.</p></div>
+<div class="idea"><p>Chaque choc donne une petite poussée à la paroi. La pression augmente si les chocs sont plus <b>fréquents</b> (plus de molécules, ou un volume plus petit) ou plus <b>violents</b> (molécules plus rapides, donc température plus haute). Joue avec les curseurs : diminue <i>V</i> ou augmente <i>T</i>, la pression monte.</p></div>
+<div class="ex"><p>Réglage initial : <i>n</i> = 0,04 mol, <i>T</i> = 300 K, <i>V</i> = 2 L. La pression vaut 0,04 × 8,314 × 300/0,002 ≈ 49,9 kPa, et chaque molécule a en moyenne 6,2 × 10⁻²¹ J d’énergie cinétique.</p></div>
+<div class="warn"><p>Le modèle marche bien pour un gaz peu dense. À très haute pression ou près de la liquéfaction, les molécules ne sont plus « ponctuelles et indépendantes », et l’écart devient sensible.</p></div>`,
   params:[{id:'T',l:'Température T',min:100,max:600,step:50,v:300,u:' K'},{id:'V',l:'Volume V',min:1,max:4,step:.5,v:2,u:' L'}],
   draw:v=>{ const P=plane({x:[-.2,4.4],y:[-.2,2.2],grid:false,axes:false,w:300}); const W=v.V, s=Math.sqrt(v.T/300)*.25;
     P.rect(0,0,W,2,{fill:'var(--sci)',fo:.08,c:'var(--ink)',w:2.5}).rect(W,0,.12,2,{fill:'var(--muted)',fo:.8,c:null});
@@ -885,6 +1089,16 @@ COURS.push(
     return P.svg(); },
   info:v=>`<i>p</i> = <i>nRT</i>/<i>V</i> = ${fmt(.04*R_GAZ*v.T/(v.V*1e-3)/1000,1)} kPa · énergie cinétique moyenne par molécule ${fmt(1.5*KB*v.T*1e21,2)}·10⁻²¹ J`,
   note:'Les flèches sont proportionnelles à la vitesse, qui varie comme √T. Doubler la température ne double pas la vitesse des molécules.'},
+ {h:'La température absolue',p:`<p>Chauffe un gaz à volume constant de 0 °C à 100 °C : sa pression augmente de 37 %, pas de l’infini. Si on prolonge la droite <i>p</i>(θ) vers le froid, elle coupe zéro à −273,15 °C. En dessous, la pression serait négative : impossible.</p>
+<div class="def"><p>La <b>température absolue</b> <i>T</i>, en <b>kelvins</b> (K), compte à partir de ce zéro absolu : <b><i>T</i> = θ + 273,15</b>, θ en °C. Un écart de 1 K vaut un écart de 1 °C. À 0 K, l’agitation thermique est minimale ; aucune température ne peut être plus basse.</p></div>
+<div class="idea"><p>Les lois des gaz disent que <i>p</i> ou <i>V</i> sont <b>proportionnels</b> à la température. Cela n’est vrai qu’avec une échelle qui part du vrai zéro : le kelvin. L’échelle Celsius a un zéro arbitraire, celui de la glace fondante.</p></div>
+<div class="ex"><p>Passer de 20 °C à 40 °C, ce n’est pas « doubler la température » : en kelvins, on passe de 293,15 K à 313,15 K, soit ×1,068. À volume constant, la pression n’augmente donc que de 6,8 %.</p></div>
+<div class="warn"><p>Dans un rapport ou une proportion (<i>p</i>/<i>T</i>, <i>V</i>/<i>T</i>), la température est toujours en kelvins. Une différence de températures, elle, est la même en K et en °C.</p></div>`},
+ {h:'La loi des gaz parfaits',p:`<p>Entre le 17e et le début du 19e siècle, on a découvert trois lois séparées : à <i>T</i> fixe, <i>pV</i> reste constant (Boyle-Mariotte) ; à <i>p</i> fixe, <i>V</i> est proportionnel à <i>T</i> (Charles) ; à <i>V</i> fixe, <i>p</i> est proportionnelle à <i>T</i> (Gay-Lussac). Une seule équation les contient toutes.</p>
+<div class="thm"><p><b>Équation d’état du gaz parfait</b> : <b><i>pV</i> = <i>nRT</i></b>, pour <i>n</i> moles, avec la constante des gaz parfaits <b><i>R</i> = 8,314 J/(mol·K)</b>. En SI : <i>p</i> en Pa, <i>V</i> en m³, <i>T</i> en K.</p></div>
+<div class="why"><p>Combine les trois lois : <i>pV</i>/<i>T</i> ne dépend que de la quantité de gaz, et il est proportionnel à <i>n</i> (deux fois plus de molécules dans le même volume, deux fois plus de chocs). La constante de proportionnalité est la même pour tous les gaz dilués : c’est <i>R</i>. Dans le modèle microscopique, <i>R</i> = <i>N</i><sub>A</sub><i>k</i><sub>B</sub>.</p></div>
+<div class="ex"><p>0,50 mol d’air à 20 °C dans un récipient de 10 L : <i>p</i> = 0,50 × 8,314 × 293,15/(10 × 10⁻³) ≈ 1,22 × 10⁵ Pa, soit 1,22 bar.</p></div>
+<div class="idea"><p>Le gaz n’intervient pas : à <i>p</i> et <i>T</i> donnés, une mole de n’importe quel gaz parfait occupe le même volume.</p></div>`},
  {h:'Chauffer à volume constant',p:'Dans un récipient rigide, on fait passer un gaz parfait de 300 K à 600 K. Sa pression…',
   opts:['reste la même','est multipliée par √2','double','quadruple'],ans:2,
   why:'À n et V fixés, p = nRT/V est proportionnelle à T (en kelvins). Les molécules frappent plus souvent et plus fort.'},
@@ -902,9 +1116,17 @@ COURS.push(
    conclusion:'83,5 mol, soit 2,4 kg d’air comprimés dans 10 L. Sous 1 bar, cet air occuperait 2000 L.'}},
  {h:'Le ballon de baudruche',p:'Un ballon de 5,0 L contient de l’air à 1,2 bar (pression absolue) et 25 °C. Combien de moles d’air contient-il&nbsp;? Arrondis au millième.',lab:'n =',unit:'mol',ans:.2421,tol:.0011,
   why:'n = pV/(RT) = 1,2·10⁵ × 5,0·10⁻³/(8,314 × 298,15) = 600/2479 ≈ 0,242 mol.'},
+ {h:'Ce que mesure la température',p:`<p>On a dit que la température mesure l’agitation des molécules. On peut le rendre précis : à une température donnée correspond une énergie cinétique moyenne, et donc une vitesse typique des molécules.</p>
+<div class="thm"><p>Dans un gaz parfait à la température <i>T</i>, l’énergie cinétique moyenne de translation d’une molécule vaut <b>⟨<i>E</i><sub>c</sub>⟩ = (3/2) <i>k</i><sub>B</sub> <i>T</i></b>, avec la constante de Boltzmann <b><i>k</i><sub>B</sub> = <i>R</i>/<i>N</i><sub>A</sub> ≈ 1,381 × 10⁻²³ J/K</b>.</p></div>
+<div class="why"><p>La <b>vitesse quadratique moyenne</b> <i>v</i><sub>q</sub> est définie par ⟨<i>E</i><sub>c</sub>⟩ = ½<i>m</i><i>v</i><sub>q</sub>², <i>m</i> masse d’une molécule. Avec <i>m</i> = <i>M</i>/<i>N</i><sub>A</sub> (<i>M</i> masse molaire en kg/mol) : ½(<i>M</i>/<i>N</i><sub>A</sub>)<i>v</i><sub>q</sub>² = (3/2)(<i>R</i>/<i>N</i><sub>A</sub>)<i>T</i>, d’où <b><i>v</i><sub>q</sub> = √(3<i>RT</i>/<i>M</i>)</b>.</p></div>
+<div class="ex"><p>Hélium (<i>M</i> = 0,004 kg/mol) à 300 K : <i>v</i><sub>q</sub> = √(3 × 8,314 × 300/0,004) ≈ 1368 m/s. À même température, une molécule plus lourde va moins vite : l’énergie moyenne est la même, pas la vitesse.</p></div>
+<div class="warn"><p><i>v</i><sub>q</sub> ∝ √<i>T</i> : doubler <i>T</i> multiplie la vitesse par √2 ≈ 1,41 seulement. Et <i>M</i> doit être en kg/mol, pas en g/mol, sinon on se trompe d’un facteur √1000 ≈ 32.</p></div>`},
  {h:'Température et agitation',p:`La théorie cinétique relie la température à l’énergie cinétique moyenne de translation d’une molécule : <b>⟨<i>E</i><sub>c</sub>⟩ = (3/2) <i>k</i><sub>B</sub> <i>T</i></b>, avec <i>k</i><sub>B</sub> = <i>R</i>/<i>N</i><sub>A</sub> = 1,381·10⁻²³ J/K. On en tire la vitesse quadratique moyenne <b><i>v</i><sub>q</sub> = √(3<i>RT</i>/<i>M</i>)</b>, <i>M</i> en kg/mol.<br>Calcule <i>v</i><sub>q</sub> pour le diazote N₂ (<i>M</i> = 0,028 kg/mol) à 300 K, arrondie au m/s.`,
   lab:'v_q ='.replace('_q','<sub>q</sub>'),unit:'m/s',ans:516.9,tol:1,why:'v<sub>q</sub> = √(3 × 8,314 × 300/0,028) = √267 236 ≈ 517 m/s, plus vite que le son.'},
- {h:'Trois transformations sur le diagramme p–V',p:`Partons de l’état A : <i>p</i> = 100 kPa, <i>V</i> = 2 L, <i>T</i> = 300 K. Une <b>isotherme</b> garde <i>T</i> (hyperbole <i>pV</i> = cste), une <b>isobare</b> garde <i>p</i> (segment horizontal), une <b>isochore</b> garde <i>V</i> (segment vertical). Le travail reçu par le gaz vaut <b><i>W</i> = −∫<i>p</i> d<i>V</i></b>.`,
+ {h:'Trois transformations sur le diagramme p–V',p:`<p>Un gaz passe d’un état A à un état B. Le chemin suivi compte : selon ce qu’on garde fixe, l’état final et l’énergie échangée ne sont pas les mêmes. On représente le chemin sur un diagramme avec <i>V</i> en abscisse et <i>p</i> en ordonnée.</p>
+<div class="def"><p>Pour une quantité de gaz fixée : une <b>isotherme</b> garde <i>T</i> constante (hyperbole <i>pV</i> = cste) ; une <b>isobare</b> garde <i>p</i> constante (segment horizontal, <i>V</i>/<i>T</i> = cste) ; une <b>isochore</b> garde <i>V</i> constant (segment vertical, <i>p</i>/<i>T</i> = cste). Le travail reçu par le gaz vaut <b><i>W</i> = −∫<i>p</i> d<i>V</i></b>.</p></div>
+<div class="idea"><p>Chaque cas se lit dans <i>pV</i> = <i>nRT</i> : on fige une grandeur et les deux autres sont liées. Le travail est l’aire sous la courbe, comptée négative quand le gaz se détend : il pousse alors le piston et fournit de l’énergie.</p></div>
+<div class="ex"><p>Départ A : 100 kPa, 2 L, 300 K. Réglage initial, isotherme jusqu’à 3 L (facteur 1,5) : <i>p</i><sub>B</sub> = 200/3 ≈ 66,7 kPa, <i>T</i> reste 300 K, et <i>W</i> = −200 × ln 1,5 ≈ −81 J. En isobare jusqu’à 3 L, <i>T</i> monterait à 450 K et <i>W</i> = −100 J.</p></div>`,
   params:[{id:'ty',l:'Type (isoT, isoP, isoV)',min:0,max:2,v:0},{id:'k',l:'Facteur (V ou p)',min:.5,max:2,step:.1,v:1.5}],
   draw:v=>{ const P=plane({x:[-.4,4.6],y:[-20,230],w:300,h:240,grid:false,lx:1,ly:50});
     for(let x=1;x<=4;x++) P.seg(x,0,x,230,{c:'var(--line)',w:1}); for(let y=50;y<=200;y+=50) P.seg(0,y,4.6,y,{c:'var(--line)',w:1});
@@ -945,6 +1167,15 @@ COURS.push(
    conclusion:'−300 J pour la détente isobare, +274 J pour la compression isotherme. Vérifie toujours le signe : détente, <i>W</i> &lt; 0 ; compression, <i>W</i> &gt; 0.'}},
  {h:'La détente isotherme',p:'0,20 mol de gaz parfait à 350 K se détend à température constante de 1,0 L à 4,0 L. Quel travail le gaz reçoit-il&nbsp;? Arrondis au joule, avec son signe.',lab:'W =',unit:'J',ans:-806.8,tol:.6,
   why:'W = −nRT ln(V<sub>B</sub>/V<sub>A</sub>) = −0,20 × 8,314 × 350 × ln 4 ≈ −582 × 1,386 ≈ −807 J. Le gaz fournit 807 J.'},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir : gaz parfait',p:`<div class="keep"><ul>
+<li>Modèle : molécules ponctuelles, sans interaction, agitées ; pression = chocs sur les parois, température = agitation.</li>
+<li>Température absolue : <b><i>T</i> = θ + 273,15</b> ; dans tout rapport, <i>T</i> en kelvins.</li>
+<li><b><i>pV</i> = <i>nRT</i></b>, <i>R</i> = 8,314 J/(mol·K), tout en SI : Pa, m³, K. Pression absolue = relative + <i>p</i><sub>atm</sub>.</li>
+<li>Entre deux états, <i>n</i> fixe : <b><i>p</i>₁<i>V</i>₁/<i>T</i>₁ = <i>p</i>₂<i>V</i>₂/<i>T</i>₂</b> ; <i>p</i> et <i>V</i> peuvent rester dans la même unité des deux côtés.</li>
+<li>Isotherme <i>pV</i> = cste, isobare <i>V</i>/<i>T</i> = cste, isochore <i>p</i>/<i>T</i> = cste.</li>
+<li>⟨<i>E</i><sub>c</sub>⟩ = (3/2)<i>k</i><sub>B</sub><i>T</i> et <b><i>v</i><sub>q</sub> = √(3<i>RT</i>/<i>M</i>)</b>, <i>M</i> en kg/mol.</li>
+<li>Travail reçu : <i>W</i> = −∫<i>p</i> d<i>V</i> ; isochore 0, isobare −<i>p</i>Δ<i>V</i>, isotherme −<i>nRT</i> ln(<i>V</i><sub>B</sub>/<i>V</i><sub>A</sub>). Détente : <i>W</i> &lt; 0.</li>
+</ul></div>`},
  {kind:'Problème',h:'Le pneu sur l’autoroute',
   p:'Un pneu de 25 L est gonflé le matin, à 10 °C, à « 2,0 bar » au manomètre de la station-service. Ce manomètre affiche la pression <b>relative</b> : l’écart avec la pression atmosphérique, qui vaut 1,013 bar. Après une heure d’autoroute, l’air du pneu est à 45 °C. On suppose le volume du pneu constant et l’air parfait, de masse molaire 0,029 kg/mol.',
   parts:[
@@ -968,11 +1199,19 @@ COURS.push(
 
 /* ================= 9. THERMODYNAMIQUE ================= */
 {subj:'phy', sem:'all', id:'phy-thermo', h:'États de la matière et thermodynamique', p:'Compressibilité, dilatation, premier principe et transferts de chaleur.', steps:[
+ {h:'Trois états de la matière',p:`<p>On écrase facilement l’air d’une seringue bouchée, presque pas l’eau, pas du tout un caillou. La différence vient de la distance entre les particules.</p>
+<div class="def"><p>Dans un <b>solide</b>, les particules vibrent autour de positions fixes : forme et volume propres. Dans un <b>liquide</b>, elles restent serrées mais glissent les unes sur les autres : volume propre, pas de forme propre. Dans un <b>gaz</b>, elles sont loin les unes des autres et libres : ni forme ni volume propres. La <b>compressibilité</b> <b>χ = −(1/<i>V</i>)(d<i>V</i>/d<i>p</i>)</b>, en Pa⁻¹, mesure la variation relative de volume par pascal ajouté.</p></div>
+<div class="idea"><p>Dans un liquide ou un solide, les particules se touchent déjà : on ne peut presque pas les rapprocher, χ est minuscule. Dans un gaz, il y a surtout du vide entre les molécules. Le signe moins rend χ positif, car le volume diminue quand la pression monte.</p></div>
+<div class="ex"><p>Pour un gaz parfait à température constante, <i>pV</i> = cste donne χ = 1/<i>p</i> : à 1 bar, χ = 10⁻⁵ Pa⁻¹. Ajouter 1000 Pa (0,01 bar) réduit son volume d’environ 10⁻⁵ × 1000 = 1 %. Pour l’eau, χ ≈ 4,6 × 10⁻¹⁰ Pa⁻¹ : la même surpression ne change son volume que de 0,000 05 %.</p></div>
+<div class="warn"><p>« Incompressible » est une approximation, très bonne pour les liquides aux pressions courantes, mais pas exacte.</p></div>`},
  {h:'Solides, liquides, gaz',p:`Dans un solide les particules vibrent autour de positions fixes, dans un liquide elles sont serrées mais glissent, dans un gaz elles sont loin les unes des autres. La <b>compressibilité</b> <b>χ = −(1/<i>V</i>)(d<i>V</i>/d<i>p</i>)</b> le mesure : pour l’eau χ ≈ 4,6·10⁻¹⁰ Pa⁻¹, pour un gaz parfait isotherme χ = 1/<i>p</i> ≈ 10⁻⁵ Pa⁻¹.`,
   opts:['Le volume d’eau diminue de moitié environ','Le volume d’eau diminue d’environ 0,5 %','Le volume d’eau ne change pas du tout','Le volume d’eau augmente légèrement'],ans:1,
   fig:'<p>On augmente de 100 bar (10⁷ Pa) la pression sur 1 L d’eau. Que se passe-t-il&nbsp;?</p>',
   why:'ΔV/V ≈ −χΔp = −4,6·10⁻¹⁰ × 10⁷ = −0,46 %. Un liquide est presque incompressible ; un gaz, lui, verrait son volume divisé par 101 en isotherme.'},
- {h:'La dilatation thermique',p:`Chauffé de Δ<i>T</i>, un solide s’allonge : <b>Δ<i>L</i> = α <i>L</i>₀ Δ<i>T</i></b>, où α est le coefficient de dilatation linéaire (K⁻¹). Le volume suit <b>Δ<i>V</i> = β <i>V</i>₀ Δ<i>T</i></b> avec β ≈ 3α pour un solide. Ici une barre de 50 m.`,
+ {h:'La dilatation thermique',p:`<p>Les rails de chemin de fer, les ponts, les lignes électriques changent de longueur entre l’hiver et l’été. Quelques centimètres suffisent à tordre un rail s’il n’a pas de place pour s’allonger.</p>
+<div class="def"><p>Chauffé de Δ<i>T</i>, un solide de longueur <i>L</i>₀ s’allonge de <b>Δ<i>L</i> = α <i>L</i>₀ Δ<i>T</i></b>. Le <b>coefficient de dilatation linéaire</b> α, en K⁻¹, dépend du matériau. Le volume suit <b>Δ<i>V</i> = β <i>V</i>₀ Δ<i>T</i></b>, avec β ≈ 3α pour un solide.</p></div>
+<div class="why"><p>Plus chaud, chaque atome vibre plus fort et repousse un peu ses voisins : toutes les distances grandissent de la même <b>fraction</b> αΔ<i>T</i>. D’où Δ<i>L</i> proportionnel à <i>L</i>₀. Pour un cube, chaque arête est multipliée par 1 + αΔ<i>T</i>, le volume par (1 + αΔ<i>T</i>)³ ≈ 1 + 3αΔ<i>T</i>, car αΔ<i>T</i> est tout petit.</p></div>
+<div class="ex"><p>Réglage initial : barre d’acier de 50 m, α = 12 × 10⁻⁶ K⁻¹, chauffée de 40 K. Δ<i>L</i> = 12 × 10⁻⁶ × 50 × 40 = 0,024 m = 24 mm. En aluminium (α = 23 × 10⁻⁶ K⁻¹), presque le double.</p></div>`,
   params:[{id:'mat',l:'Matériau (acier, cuivre, alu)',min:0,max:2,v:0},{id:'dT',l:'Échauffement ΔT',min:0,max:100,step:10,v:40,u:' K'}],
   draw:v=>{ const al=[12e-6,17e-6,23e-6][v.mat], dL=al*50*v.dT*1000, P=plane({x:[-.5,12.5],y:[-1.2,1.6],grid:false,axes:false,w:300});
     P.rect(0,0,6,.8,{c:'var(--muted)',w:1.5,dash:true}).rect(0,0,6+dL/20,.8,{fill:['var(--muted)','var(--spark)','var(--sci)'][v.mat],fo:.5,c:'var(--ink)',w:2});
@@ -982,6 +1221,11 @@ COURS.push(
   note:'C’est pourquoi les ponts ont des joints de dilatation. L’eau est une exception : entre 0 et 4 °C, elle se contracte quand on la chauffe.'},
  {h:'Le rail',p:'Un rail d’acier (α = 12·10⁻⁶ K⁻¹) mesure 25 m. De combien s’allonge-t-il, en mm, quand sa température monte de 40 K&nbsp;?',lab:'ΔL =',unit:'mm',ans:12,tol:.01,
   why:'ΔL = 12·10⁻⁶ × 25 × 40 = 0,012 m = 12 mm.'},
+ {h:'Énergie interne, chaleur et travail',p:`<p>Frotte tes mains : elles chauffent, sans aucune flamme. Pose une casserole sur le feu : l’eau chauffe, sans que rien ne bouge. Deux façons très différentes de produire le même effet. Le premier principe les met dans une seule équation.</p>
+<div class="def"><p>L’<b>énergie interne</b> <i>U</i> d’un système est l’énergie de ses particules : agitation et interactions microscopiques. Elle change par deux sortes d’échanges : le <b>travail</b> <i>W</i>, transfert ordonné dû à une force macroscopique (piston, frottement), et la <b>chaleur</b> <i>Q</i>, transfert désordonné dû à un écart de température. <b>Premier principe</b> : <b>Δ<i>U</i> = <i>Q</i> + <i>W</i></b>, avec <i>Q</i> et <i>W</i> comptés positifs quand le système les <b>reçoit</b>.</p></div>
+<div class="idea"><p>C’est la conservation de l’énergie, étendue à l’échelle microscopique. La chaleur n’est pas une substance contenue dans le corps : c’est un échange, comme le travail. Un corps « contient » de l’énergie interne, pas de la chaleur.</p></div>
+<div class="ex"><p>Tu frottes une pièce de monnaie sur la table : le frottement lui donne <i>W</i> = 20 J, et elle n’a pas le temps d’échanger de chaleur (<i>Q</i> ≈ 0). Δ<i>U</i> = +20 J : elle s’échauffe. Pour un solide ou un liquide qu’on chauffe, le volume bouge à peine : <i>W</i> ≈ 0 et Δ<i>U</i> = <i>Q</i>.</p></div>
+<div class="warn"><p>Chaleur et température ne sont pas la même chose. Un gaz qu’on comprime peut s’échauffer tout en cédant de la chaleur.</p></div>`},
  {kind:'Méthode',h:'Le premier principe et ses signes',p:`<p><b>Quand</b> : un système échange de la chaleur et du travail, et on demande la variation de son énergie interne, ou l’un des échanges.</p><p><b>Pourquoi</b> : l’énergie se conserve. L’énergie interne <i>U</i> ne change que par ce qui entre ou sort : <b>Δ<i>U</i> = <i>Q</i> + <i>W</i></b>. Tout est compté du point de vue du système : ce qu’il <b>reçoit</b> est positif, ce qu’il <b>cède</b> ou <b>fournit</b> est négatif.</p><p><b>Comment</b> : 1. Délimite le système. 2. Traduis chaque phrase en signe : « reçoit 300 J de travail » donne <i>W</i> = +300 J, « cède 100 J de chaleur » donne <i>Q</i> = −100 J, « fournit du travail en se détendant » donne <i>W</i> &lt; 0. 3. Additionne. 4. Pour un solide ou un liquide, le volume change à peine : <i>W</i> ≈ 0 et Δ<i>U</i> = <i>Q</i>.</p>`,
   demo:{enonce:'On comprime un gaz : il reçoit 300 J de travail, et dans le même temps il cède 100 J de chaleur au cylindre. Que vaut Δ<i>U</i>, et que devient sa température&nbsp;?',
    etapes:[
@@ -997,6 +1241,11 @@ COURS.push(
   note:'Signe : tout ce que le système reçoit compte en positif. Certains livres d’ingénierie utilisent ΔU = Q − W avec W fourni : c’est la même physique.'},
  {h:'Le gaz qui refroidit',p:'Un gaz reçoit 150 J de travail et cède 400 J de chaleur. Que vaut Δ<i>U</i>&nbsp;?',lab:'ΔU =',unit:'J',ans:-250,tol:.5,
   why:'W = +150 J et Q = −400 J, donc ΔU = −400 + 150 = −250 J. L’énergie interne baisse : le gaz refroidit.'},
+ {h:'Ce que coûte un degré',p:`<p>Au soleil, le sable de la plage brûle les pieds alors que la mer reste fraîche. Ils reçoivent pourtant la même énergie par mètre carré. Certains matériaux demandent beaucoup plus d’énergie que d’autres pour chauffer.</p>
+<div class="def"><p>Pour élever de Δ<i>T</i> la température d’une masse <i>m</i>, <b>sans changement d’état</b>, il faut lui donner <b><i>Q</i> = <i>m c</i> Δ<i>T</i></b>. La <b>chaleur spécifique</b> (ou capacité thermique massique) <i>c</i>, en J/(kg·K), est l’énergie qui chauffe 1 kg de 1 K.</p></div>
+<div class="why"><p><i>Q</i> est proportionnel à <i>m</i> : deux fois plus de matière, deux fois plus de particules à agiter. Il est proportionnel à Δ<i>T</i> tant que <i>c</i> varie peu avec la température, ce qui est le cas loin d’un changement d’état. Si <i>Q</i> &lt; 0, le corps cède de la chaleur et refroidit.</p></div>
+<div class="ex"><p>Chauffer de 10 K un kilogramme d’aluminium (<i>c</i> ≈ 900 J/(kg·K)) coûte 9,0 kJ. Un kilogramme d’eau (<i>c</i> = 4186 J/(kg·K)) demande 41,9 kJ, plus de quatre fois plus. C’est pourquoi l’eau sert à stocker et transporter la chaleur.</p></div>
+<div class="warn"><p>Δ<i>T</i> a la même valeur en K et en °C, car c’est une différence. Pendant un changement d’état, <i>Q</i> = <i>mc</i>Δ<i>T</i> ne s’applique plus (chapitre suivant).</p></div>`},
  {h:'La chaleur spécifique',p:`Pour chauffer une masse <i>m</i> de Δ<i>T</i> sans changement d’état, il faut <b><i>Q</i> = <i>m c</i> Δ<i>T</i></b>. La <b>chaleur spécifique</b> <i>c</i> est en J/(kg·K) : 4186 pour l’eau liquide, environ 900 pour l’aluminium, 450 pour le fer.<br>Quelle énergie faut-il pour chauffer 1,5 kg d’eau de 20 °C à 100 °C, en kJ&nbsp;? Arrondis au kJ.`,
   lab:'Q =',unit:'kJ',ans:502.3,tol:.6,why:'Q = 1,5 × 4186 × 80 = 502 320 J ≈ 502 kJ. Une bouilloire de 2 kW met donc environ 4 minutes.'},
  {kind:'Méthode',h:'Le bilan calorimétrique',p:`<p><b>Quand</b> : on met en contact des corps à des températures différentes, dans un récipient isolé, et on cherche la température finale ou une masse.</p><p><b>Pourquoi</b> : le système complet est isolé : il ne reçoit ni chaleur ni travail de l’extérieur. Ce que les corps chauds cèdent, les corps froids le reçoivent. La somme des chaleurs reçues est donc nulle : <b>Σ<i>m</i><sub>i</sub><i>c</i><sub>i</sub>(<i>T</i><sub>f</sub> − <i>T</i><sub>i</sub>) = 0</b>.</p><p><b>Comment</b> : 1. Fais la liste des corps, avec <i>m</i>, <i>c</i> et la température initiale. 2. Écris pour chacun <i>Q</i> = <i>m c</i>(<i>T</i><sub>f</sub> − <i>T</i><sub>i</sub>) avec la même inconnue <i>T</i><sub>f</sub>. Les signes se règlent seuls : <i>Q</i> &lt; 0 pour un corps qui refroidit. 3. Somme nulle, puis isole <i>T</i><sub>f</sub>. 4. Vérifie que <i>T</i><sub>f</sub> est entre les températures initiales.</p>`,
@@ -1028,6 +1277,10 @@ COURS.push(
    conclusion:'À peine 0,12 K. C’est l’expérience de Joule : il faut 4186 J pour chauffer 1 kg d’eau d’un kelvin, l’équivalent d’une chute de 427 m.'}},
  {h:'La balle de plomb',p:'Une balle de plomb de 10 g arrive à 300 m/s dans une cible et s’y arrête. La moitié de son énergie cinétique chauffe la balle (<i>c</i><sub>plomb</sub> = 130 J/(kg·K)). De combien sa température monte-t-elle&nbsp;? Arrondis au kelvin.',lab:'ΔT =',unit:'K',ans:173.08,tol:.6,
   why:'E<sub>c</sub> = ½ × 0,010 × 300² = 450 J, dont 225 J chauffent la balle : ΔT = 225/(0,010 × 130) ≈ 173 K.'},
+ {h:'Comment la chaleur voyage',p:`<p>Une maison perd de la chaleur par ses murs, par l’air qui circule et vers le ciel froid de la nuit. Pour isoler, il faut savoir par quel chemin la chaleur passe.</p>
+<div class="def"><ul><li><b>Conduction</b> : transfert de proche en proche dans la matière, sans déplacement d’ensemble. À travers une paroi plane d’épaisseur <i>e</i> et de surface <i>S</i>, le flux vaut <b>Φ = λ<i>S</i>Δ<i>T</i>/<i>e</i></b>, en W, λ étant la conductivité thermique en W/(m·K).</li><li><b>Convection</b> : un fluide se déplace et emporte la chaleur avec lui.</li><li><b>Rayonnement</b> : émission d’ondes électromagnétiques, même dans le vide : <b><i>P</i> = εσ<i>S T</i>⁴</b>, σ = 5,67 × 10⁻⁸ W/(m²·K⁴), ε ≤ 1 l’émissivité, <i>T</i> en K.</li></ul></div>
+<div class="idea"><p>En conduction, le flux croît avec l’écart de température et la surface, et décroît avec l’épaisseur : doubler l’isolant divise les pertes par deux. Le rayonnement, en <i>T</i>⁴, explose aux hautes températures.</p></div>
+<div class="ex"><p>Porte en bois de 2,0 m², 4,0 cm d’épaisseur, λ = 0,15 W/(m·K), 15 K d’écart : Φ = 0,15 × 2,0 × 15/0,040 ≈ 113 W. Ta peau (1,8 m², 306 K, ε ≈ 0,98) rayonne environ 880 W, mais reçoit presque autant des murs à 293 K : le bilan net n’est que d’environ 140 W.</p></div>`},
  {h:'Les transferts thermiques',p:`<b>Conduction</b> : transfert de proche en proche dans la matière, sans déplacement global. À travers une paroi : <b>Φ = λ <i>S</i> Δ<i>T</i>/<i>e</i></b> (W), λ la conductivité en W/(m·K). <b>Convection</b> : le fluide lui-même se déplace et emporte la chaleur. <b>Rayonnement</b> : ondes électromagnétiques, même dans le vide, <b><i>P</i> = ε σ <i>S T</i>⁴</b> avec σ = 5,67·10⁻⁸ W/(m²·K⁴).`,
   opts:['×2','×4','×8','×16'],ans:3,fig:'<p>La température absolue d’un corps passe de 300 K à 600 K. Par combien est multipliée la puissance qu’il rayonne&nbsp;?</p>',
   why:'P ∝ T⁴ et 2⁴ = 16. C’est pourquoi le rayonnement domine aux hautes températures.',
@@ -1044,6 +1297,16 @@ COURS.push(
   why:'E = 1,5 kW × 6,0 h = 9,0 kWh = 9,0 × 3,6 MJ = 32,4 MJ.'},
  {kind:'Défi',h:'La vitre',p:'Une vitre simple de 1,5 m² et de 4,0 mm d’épaisseur (λ = 1,0 W/(m·K)) sépare deux faces à 20 K d’écart. Quel flux thermique la traverse par conduction&nbsp;?',lab:'Φ =',unit:'W',ans:7500,tol:1,
   why:'Φ = λSΔT/e = 1,0 × 1,5 × 20/0,004 = 7500 W. En réalité, les couches d’air collées au verre réduisent fortement ce flux, d’où l’intérêt du double vitrage.'},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir : thermodynamique',p:`<div class="keep"><ul>
+<li>Solide, liquide, gaz : particules fixes, serrées et mobiles, ou éloignées. Compressibilité χ = −(1/<i>V</i>)(d<i>V</i>/d<i>p</i>) ; gaz parfait isotherme χ = 1/<i>p</i>.</li>
+<li>Dilatation : <b>Δ<i>L</i> = α<i>L</i>₀Δ<i>T</i></b>, Δ<i>V</i> = β<i>V</i>₀Δ<i>T</i> avec β ≈ 3α.</li>
+<li>Premier principe : <b>Δ<i>U</i> = <i>Q</i> + <i>W</i></b>, reçu = positif. Solide ou liquide : <i>W</i> ≈ 0, Δ<i>U</i> = <i>Q</i>. Gaz parfait : <i>U</i> ne dépend que de <i>T</i>.</li>
+<li>Sans changement d’état : <b><i>Q</i> = <i>mc</i>Δ<i>T</i></b> ; <i>c</i><sub>eau</sub> = 4186 J/(kg·K).</li>
+<li>Calorimétrie, récipient isolé : <b>Σ<i>m</i><sub>i</sub><i>c</i><sub>i</sub>(<i>T</i><sub>f</sub> − <i>T</i><sub>i</sub>) = 0</b> ; <i>T</i><sub>f</sub> entre les températures de départ.</li>
+<li>Énergie mécanique perdue → échauffement : ½<i>mv</i>² ou <i>mgh</i> = <i>mc</i>Δ<i>T</i> (fraction éventuelle).</li>
+<li>Conduction <b>Φ = λ<i>S</i>Δ<i>T</i>/<i>e</i></b>, convection, rayonnement <b><i>P</i> = εσ<i>ST</i>⁴</b>.</li>
+<li><i>E</i> = <i>P</i>Δ<i>t</i> ; 1 kWh = 3,6 × 10⁶ J ; durée de chauffe Δ<i>t</i> = <i>Q</i>/<i>P</i>.</li>
+</ul></div>`},
  {kind:'Problème',h:'Le chauffe-eau',
   p:'Un chauffe-eau électrique contient 150 L d’eau, soit 150 kg. Sa résistance de 2,4 kW la chauffe de 15 °C à 60 °C. Ensuite, un thermostat maintient l’eau à 60 °C. La cuve est entourée d’une mousse isolante de 5,0 cm d’épaisseur (λ = 0,040 W/(m·K)), sur une surface de 2,5 m². La pièce est à 20 °C.',
   parts:[
@@ -1068,9 +1331,17 @@ COURS.push(
 
 /* ================= 10. CHANGEMENTS D'ÉTAT ================= */
 {subj:'phy', sem:'all', id:'phy-changements', h:'Changements d’état', p:'Chaleur latente, paliers de température, pression de vapeur saturante et ébullition en altitude.', steps:[
+ {h:'Changer d’état coûte de l’énergie',p:`<p>Un glaçon posé dans un verre au soleil reçoit de la chaleur sans arrêt, et pourtant il reste à 0 °C jusqu’à ce qu’il ait fondu. Où passe l’énergie reçue, si elle ne chauffe pas&nbsp;?</p>
+<div class="def"><p>Les changements d’état sont la <b>fusion</b> (solide → liquide) et la <b>solidification</b> (inverse), la <b>vaporisation</b> (liquide → gaz) et la <b>liquéfaction</b> ou condensation (inverse), la <b>sublimation</b> (solide → gaz). Sous pression fixée, un corps pur change d’état à température constante, en recevant <b><i>Q</i> = <i>m L</i></b>. La <b>chaleur latente</b> <i>L</i>, en J/kg, dépend du corps et du changement : pour l’eau, <i>L</i><sub>f</sub> = 334 kJ/kg (fusion à 0 °C) et <i>L</i><sub>v</sub> = 2257 kJ/kg (vaporisation à 100 °C).</p></div>
+<div class="idea"><p>Dans la glace, les molécules sont liées dans un réseau. Pour les libérer, il faut fournir de l’énergie qui rompt des liaisons au lieu d’augmenter l’agitation : la température ne bouge pas. Dans le sens inverse, la même énergie est rendue.</p></div>
+<div class="ex"><p>Chauffer 1 kg d’eau de 0 à 100 °C demande 4186 × 100 ≈ 419 kJ. Le vaporiser ensuite demande 2257 kJ, environ 5,4 fois plus.</p></div>
+<div class="warn"><p>La vapeur à 100 °C brûle bien plus que l’eau à 100 °C : en se condensant sur la peau, chaque gramme rend 2,26 kJ en plus.</p></div>`},
  {h:'La chaleur latente',p:`Pour faire changer d’état une masse <i>m</i> à température constante, il faut <b><i>Q</i> = <i>m L</i></b>. <i>L</i> est la <b>chaleur latente</b> (J/kg) : fusion de la glace <i>L</i><sub>f</sub> = 334 kJ/kg, vaporisation de l’eau à 100 °C <i>L</i><sub>v</sub> = 2257 kJ/kg. L’énergie sert à rompre des liaisons, pas à augmenter l’agitation.<br>Quelle énergie faut-il pour fondre 200 g de glace à 0 °C, en kJ&nbsp;?`,
   lab:'Q =',unit:'kJ',ans:66.8,tol:.05,why:'Q = m L<sub>f</sub> = 0,200 × 334 = 66,8 kJ.'},
- {h:'Les paliers de température',p:`On chauffe 1 kg de glace à −20 °C sous 1 atm. Tant qu’il n’y a qu’une phase, <i>T</i> monte (<i>Q</i> = <i>mc</i>Δ<i>T</i>). Pendant un changement d’état, <i>T</i> reste <b>constante</b> : c’est un <b>palier</b>. Capacités : glace 2100, eau 4186, vapeur 2010 J/(kg·K).`,
+ {h:'Les paliers de température',p:`<p>On chauffe régulièrement 1 kg de glace à −20 °C, sous 1 atm, jusqu’à la vapeur. Si on trace la température en fonction de l’énergie reçue, on n’obtient pas une droite, mais un escalier.</p>
+<div class="def"><p>Tant qu’il n’y a qu’une phase, <i>T</i> monte selon <b><i>Q</i> = <i>mc</i>Δ<i>T</i></b>, avec la chaleur spécifique de cette phase : glace 2100, eau 4186, vapeur 2010 J/(kg·K). Pendant un changement d’état, <i>T</i> reste <b>constante</b> : c’est un <b>palier</b>, de longueur <i>mL</i> sur l’axe des énergies.</p></div>
+<div class="idea"><p>Sur la courbe, la pente d’une montée vaut 1/(<i>mc</i>) : plus <i>c</i> est grand, plus la montée est douce. L’eau liquide monte donc deux fois moins vite que la glace. Les paliers sont horizontaux : de l’énergie entre, la température ne bouge pas.</p></div>
+<div class="ex"><p>Les étapes : glace de −20 à 0 °C, 1 × 2100 × 20 = 42 kJ ; fusion, 334 kJ (on arrive à 376 kJ) ; eau de 0 à 100 °C, 418,6 kJ (794,6 kJ) ; ébullition, 2257 kJ (3051,6 kJ). Réglage initial, 200 kJ reçus : on est sur le palier de fusion, (200 − 42)/334 ≈ 47 % de la glace a fondu, à 0 °C.</p></div>`,
   params:[{id:'Q',l:'Énergie reçue Q',min:0,max:3100,step:100,v:200,u:' kJ'}],
   draw:v=>{ const q1=42, q2=376, q3=794.6, q4=3051.6, T=Q=>Q<q1?-20+Q/2.1:Q<q2?0:Q<q3?(Q-q2)/4.186:Q<q4?100:100+(Q-q4)/2.01;
     const P=plane({x:[-250,3300],y:[-45,145],w:300,h:220,grid:false,lx:500,ly:20});
@@ -1099,7 +1370,11 @@ COURS.push(
   why:'Chauffer : 0,5 × 4186 × 80 = 167,4 kJ. Vaporiser : 0,5 × 2257 = 1128,5 kJ. Total ≈ 1296 kJ.'},
  {h:'Du glaçon à l’eau tiède',p:'Quelle énergie faut-il pour transformer 300 g de glace à −10 °C en eau à 50 °C, en kJ&nbsp;? Arrondis au dixième.',lab:'Q =',unit:'kJ',ans:169.29,tol:.06,
   why:'Glace : 0,3 × 2100 × 10 = 6,3 kJ. Fusion : 0,3 × 334 = 100,2 kJ. Eau : 0,3 × 4186 × 50 = 62,79 kJ. Total ≈ 169,3 kJ.'},
- {h:'Pression de vapeur saturante et altitude',p:`Au-dessus d’un liquide, sa vapeur est en équilibre à la <b>pression de vapeur saturante</b> <i>p</i><sub>sat</sub>(<i>T</i>), qui croît très vite avec <i>T</i>. Le liquide <b>bout</b> quand <b><i>p</i><sub>sat</sub>(<i>T</i>) = <i>p</i><sub>ext</sub></b>. En altitude la pression baisse (ici <i>p</i> ≈ 101,3 kPa · e<sup>−<i>z</i>/8400 m</sup>), donc l’eau bout plus tôt.`,
+ {h:'Pression de vapeur saturante et altitude',p:`<p>Pourquoi l’eau bout-elle à 100 °C, et pas à 80 °C ou à 120 °C&nbsp;? La réponse dépend de la pression de l’air qui pèse sur elle : la température d’ébullition n’est pas une constante.</p>
+<div class="def"><p>Dans un récipient fermé, un liquide s’évapore jusqu’à ce que sa vapeur atteigne une pression d’équilibre, la <b>pression de vapeur saturante</b> <i>p</i><sub>sat</sub>(<i>T</i>). Elle croît très vite avec <i>T</i> : pour l’eau, environ 2,3 kPa à 20 °C et 101,3 kPa à 100 °C. Le liquide <b>bout</b> quand <b><i>p</i><sub>sat</sub>(<i>T</i>) = <i>p</i><sub>ext</sub></b>.</p></div>
+<div class="idea"><p>Une bulle de vapeur qui naît au fond doit repousser le liquide et l’air au-dessus. Elle ne survit que si la pression de sa vapeur atteint <i>p</i><sub>ext</sub>. Moins de pression extérieure, ébullition plus tôt ; plus de pression, ébullition plus tard (autocuiseur).</p></div>
+<div class="ex"><p>Avec le modèle de la figure, <i>p</i> ≈ 101,3 kPa × e<sup>−<i>z</i>/8400 m</sup>. Réglage initial, <i>z</i> = 1000 m : <i>p</i><sub>ext</sub> ≈ 90,0 kPa, et la courbe donne une ébullition vers 96,7 °C.</p></div>
+<div class="warn"><p>Ne confonds pas ébullition et évaporation : l’évaporation se fait à la surface, à toute température, tant que l’air n’est pas saturé de vapeur.</p></div>`,
   params:[{id:'z',l:'Altitude z',min:0,max:8000,step:500,v:1000,u:' m'}],
   draw:v=>{ const pe=101.325*Math.exp(-v.z/8400), Te=teb(pe), P=plane({x:[-10,125],y:[-18,215],w:300,h:240,grid:false,lx:20,ly:50});
     for(let x=20;x<=120;x+=20) P.seg(x,0,x,215,{c:'var(--line)',w:1}); for(let y=50;y<=200;y+=50) P.seg(0,y,125,y,{c:'var(--line)',w:1});
@@ -1160,6 +1435,15 @@ COURS.push(
    conclusion:'32 g suffisent, car le trou est minuscule. Plus le trou est petit, plus une petite masse retient une grande surpression.'}},
  {h:'Le piston chargé',p:'Un cylindre vertical est fermé par un piston de 10 cm² qui coulisse sans frottement. Le gaz intérieur est à 150 kPa, l’air extérieur à 100 kPa. Quelle est la masse totale du piston et de sa charge&nbsp;? Arrondis au centième.',lab:'m =',unit:'kg',ans:5.097,tol:.011,
   why:'Δp = 50 kPa et S = 10·10⁻⁴ m² : m = Δp·S/g = 5,0·10⁴ × 1,0·10⁻³/9,81 ≈ 5,10 kg.'},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir : changements d’état',p:`<div class="keep"><ul>
+<li>Changement d’état d’un corps pur, à pression fixée : température constante, <b><i>Q</i> = <i>mL</i></b> ; eau : <i>L</i><sub>f</sub> = 334 kJ/kg, <i>L</i><sub>v</sub> = 2257 kJ/kg. Le sens inverse rend la même énergie.</li>
+<li>Courbe de chauffe : montées <i>Q</i> = <i>mc</i>Δ<i>T</i> (chaleur spécifique de la phase présente) et paliers horizontaux <i>mL</i>.</li>
+<li>Trajet à travers des paliers : découpe en étapes, une loi par étape, puis additionne.</li>
+<li>Bilan avec glace : somme des chaleurs reçues nulle, en ajoutant <i>m L</i><sub>f</sub> et le réchauffement de l’eau de fonte. Vérifie que <i>T</i><sub>f</sub> ≥ 0 °C ; sinon <i>T</i><sub>f</sub> = 0 °C et masse fondue = énergie disponible/<i>L</i><sub>f</sub>.</li>
+<li>Ébullition quand <b><i>p</i><sub>sat</sub>(<i>T</i>) = <i>p</i><sub>ext</sub></b> ; en altitude, l’eau bout plus bas, en autocuiseur plus haut.</li>
+<li>Interpolation linéaire : <i>T</i> ≈ <i>T</i>₁ + (<i>T</i>₂ − <i>T</i>₁)(<i>p</i> − <i>p</i>₁)/(<i>p</i>₂ − <i>p</i>₁).</li>
+<li>Soupape ou piston : <b>(<i>p</i><sub>int</sub> − <i>p</i><sub>ext</sub>)<i>S</i> = <i>mg</i></b>.</li>
+</ul></div>`},
  {kind:'Problème',h:'Trop de glaçons',
   p:'On jette 200 g de glaçons à −10 °C dans 300 g d’eau à 30 °C, dans un récipient isolé et sans pertes. Données : <i>c</i><sub>glace</sub> = 2100 J/(kg·K), <i>c</i><sub>eau</sub> = 4186 J/(kg·K), <i>L</i><sub>f</sub> = 334 kJ/kg. On cherche l’état final : la température et la masse de glace qui reste. Attention, rien ne dit que toute la glace fond.',
   parts:[

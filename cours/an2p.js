@@ -3,6 +3,10 @@
 const ch=Math.cosh, sh=Math.sinh;
 const sup=s=>`<sup>${s}</sup>`;
 const E=s=>`e<sup>${s}</sup>`;
+// blocs de théorie : bk('def', 'paragraphe 1', 'paragraphe 2'), keep([...]) pour le récapitulatif, ov pour le conjugué
+const bk=(c,...ps)=>`<div class="blk ${c}">${ps.map(s=>`<p>${s}</p>`).join('')}</div>`;
+const keep=items=>`<div class="blk keep"><ul>${items.map(s=>`<li>${s}</li>`).join('')}</ul></div>`;
+const ov=s=>`<span style="text-decoration:overline">${s}</span>`;
 // plan complexe avec étiquettes Re / Im
 const cpl=(r=5,lab=2,q={})=>{ const P=plane(Object.assign({x:[-r,r],y:[-r,r],lab},q)); P.text(r*.98,0,'Re',{a:'end',dy:-6,c:'var(--muted)'}).text(0,r*.96,'Im',{dx:6,dy:8,c:'var(--muted)'}); return P; };
 // a + bi en texte
@@ -21,13 +25,22 @@ const oscFig=(l,w)=>{ const P=plane({x:[0,8],y:[-1.1,1.2],h:200,grid:false,lx:2,
 COURS.push(
 /* ===================== 1. Exponentielle, logarithme, puissances ===================== */
 {subj:'an2', sem:'pri', id:'an2-puissances', h:'Exponentielle, logarithme et puissances', p:'Définir aˣ et x^α pour tous les réels grâce à e et ln, et les dériver.', steps:[
- {kind:'Théorie',h:'aˣ, c’est e déguisé',p:`Pour <i>a</i> &gt; 0 et <i>x</i> réel, on <b>définit</b> la puissance par <b>aˣ = ${E('x ln a')}</b>. C’est la seule définition qui prolonge 2³ = 2·2·2 à tous les réels tout en gardant ${'a'+sup('x+y')} = aˣ·a${sup('y')}. Le signe de ln <i>a</i> décide de tout : croissante si <i>a</i> &gt; 1, décroissante si 0 &lt; <i>a</i> &lt; 1.`,
+ {kind:'Théorie',h:'aˣ, c’est e déguisé',p:`<p>Tu sais ce que vaut 2³ = 2·2·2, et même 2${sup('1/2')} = √2. Mais 2${sup('π')} ? On ne peut pas multiplier 2 par lui-même « π fois ». Il faut une définition qui marche pour tout exposant réel et qui garde les règles connues.</p>`
+  +bk('def',`Pour <i>a</i> &gt; 0 et <i>x</i> réel : <b>aˣ = ${E('x ln a')}</b>. On lit « a puissance x ». La base doit être strictement positive, car ln <i>a</i> doit exister.`)
+  +bk('idea',`Toute exponentielle de base <i>a</i> n’est que eˣ avec l’axe des abscisses dilaté par le facteur ln <i>a</i>. Si tu sais tout sur eˣ, tu sais tout sur aˣ. Le signe de ln <i>a</i> décide du sens de variation : ln <i>a</i> &gt; 0 pour <i>a</i> &gt; 1 (croissante), ln <i>a</i> &lt; 0 pour 0 &lt; <i>a</i> &lt; 1 (décroissante), ln 1 = 0 (fonction constante égale à 1).`)
+  +bk('why',`Cette définition prolonge bien les entiers : pour <i>x</i> = 3, ${E('3 ln 2')} = (${E('ln 2')})³ = 2³. Et elle garde la règle ${'a'+sup('x+y')} = aˣ·a${sup('y')}, car ${E('(x+y) ln a')} = ${E('x ln a')}·${E('y ln a')}.`)
+  +bk('ex',`2${sup('0,5')} = ${E('0,5 · ln 2')} = ${E('0,3466')} ≈ 1,414 : c’est bien √2. Et 2${sup('π')} = ${E('π ln 2')} = ${E('2,1776')} ≈ 8,82, un nombre parfaitement défini.`),
   params:[{id:'a',l:'Base a',min:.2,max:3,step:.2,v:2}],
   draw:v=>{ const P=plane({x:[-3,3],y:[-.5,6],h:260,lab:1}); P.fn(Math.exp,{c:'var(--muted)',w:2,dash:true}).fn(x=>Math.pow(v.a,x)).dot(0,1,{r:5,l:'(0 ; 1)'}).dot(1,v.a,{r:5,c:'var(--math)',l:'(1 ; a)'}); return P.svg(); },
   info:v=>`${fmt(v.a,1)}${sup('x')} = ${E(fmt(Math.log(v.a),3)+'·x')} car ln ${fmt(v.a,1)} ≈ ${fmt(Math.log(v.a),3)}${Math.abs(v.a-1)<1e-9?' : la fonction est constante.':v.a<1?' : ln a &lt; 0, la fonction décroît.':' : ln a &gt; 0, la fonction croît.'} (pointillés : eˣ)`,
   note:'Toutes les courbes passent par (0 ; 1), car a⁰ = e⁰ = 1. La base a = e est celle dont la tangente en 0 a une pente exactement 1.'},
  {h:'Réécrire avec e',p:'Laquelle de ces écritures est égale à <i>5ˣ</i> pour tout réel <i>x</i>&nbsp;?',
   opts:[E('5x'),E('x ln 5'),'x·ln 5',E('ln(5x)')],ans:1,why:`Par définition 5ˣ = ${E('x ln 5')}. Attention, ${E('ln(5x)')} = 5x : ce n’est pas une puissance.`},
+ {kind:'Théorie',h:'Les règles des exposants, justifiées',p:`<p>Avec les entiers, tu connais 2³·2⁴ = 2⁷. Ces règles restent-elles vraies avec des exposants réels ? Oui, et la définition par e les démontre toutes d’un coup.</p>`
+  +bk('prop',`Pour <i>a</i>, <i>b</i> &gt; 0 et <i>x</i>, <i>y</i> réels : <b>a${sup('x+y')} = aˣ·a${sup('y')}</b>, <b>(aˣ)${sup('y')} = a${sup('xy')}</b>, <b>(ab)ˣ = aˣ·bˣ</b>, <b>a${sup('−x')} = 1/aˣ</b>, et <b>ln(aˣ) = x ln a</b>.`)
+  +bk('why',`Chaque règle se lit dans l’exposant de e. Produit : ${E('x ln a')}·${E('y ln a')} = ${E('(x+y) ln a')}. Puissance de puissance : (aˣ)${sup('y')} = ${E('y ln(aˣ)')} = ${E('y · x ln a')} = a${sup('xy')}, parce que ln(aˣ) = ln(${E('x ln a')}) = x ln a. Produit des bases : ln(ab) = ln a + ln b, donc ${E('x ln(ab)')} = ${E('x ln a')}·${E('x ln b')}. Inverse : ${E('−x ln a')} = 1/${E('x ln a')}.`)
+  +bk('ex',`(2${sup('1/2')})² = 2${sup('(1/2)·2')} = 2¹ = 2 : c’est pour ça que 2${sup('1/2')} = √2. Et 8${sup('4/3')} = (8${sup('1/3')})⁴ = 2⁴ = 16.`)
+  +bk('warn',`Ces règles supposent <i>a</i> &gt; 0. Et il n’existe aucune règle pour une somme aˣ + a${sup('y')} : 2³ + 2⁴ = 24 n’est pas une puissance simple de 2.`)},
  {kind:'Méthode',h:'Résoudre aˣ = b',p:`<b>Quand</b> : l’inconnue est dans l’exposant (doublement d’un capital, demi-vie, seuil à atteindre). <b>Pourquoi ça marche</b> : aˣ = ${E('x ln a')} et ln est la réciproque de exp, donc ln(aˣ) = x ln a. Le logarithme fait « descendre » l’exposant. <b>Comment</b> : on prend ln des deux côtés (possible si b &gt; 0), puis on divise par ln a ≠ 0 : <b>x = ${F('ln b','ln a')}</b>.`,
   demo:{enonce:'Résous 2ˣ = 10.',etapes:[
    {f:'ln(2ˣ) = ln 10',w:'Les deux membres sont strictement positifs : on peut leur appliquer ln.'},
@@ -38,11 +51,21 @@ COURS.push(
   note:'Si 0 &lt; a &lt; 1, ln a &lt; 0 : attention au sens des inégalités quand tu divises par ln a. Et aˣ = b n’a aucune solution si b ≤ 0, car aˣ &gt; 0.'},
  {h:'Tripler un capital',p:'À 5 % d’intérêts composés, un capital est multiplié par 1,05ˣ en <i>x</i> années. Au bout de combien d’années est-il triplé&nbsp;? Résous 1,05ˣ = 3 et arrondis au centième.',lab:'x =',unit:'ans',ans:22.52,tol:.006,
   why:'x ln 1,05 = ln 3, donc x = ln 3/ln 1,05 ≈ 1,0986/0,04879 ≈ 22,52 ans.'},
- {kind:'Théorie',h:'Puissance généralisée x^α',p:`Pour <i>x</i> &gt; 0 et α réel : <b>x${sup('α')} = ${E('α ln x')}</b>. On dérive comme une composée : <b>(x${sup('α')})′ = α·x${sup('α−1')}</b>, la même règle que pour les entiers. De même <b>(aˣ)′ = ln a · aˣ</b>.`,
+ {kind:'Théorie',h:'Puissance généralisée x^α',p:`<p>Tu sais dériver x², x³ ou 1/x = x⁻¹ avec la règle (xⁿ)′ = n xⁿ⁻¹. Mais √x = x${sup('1/2')} ou x${sup('0,75')} ? Cette fois c’est la base qui varie et l’exposant qui est fixe.</p>`
+  +bk('def',`Pour <i>x</i> &gt; 0 et α réel : <b>x${sup('α')} = ${E('α ln x')}</b>. C’est la <b>fonction puissance</b> d’exposant α.`)
+  +bk('prop',`<b>(x${sup('α')})′ = α·x${sup('α−1')}</b> : la règle des entiers reste vraie pour tout exposant réel.`)
+  +bk('why',`On dérive la composée ${E('α ln x')} : l’exposant α ln x a pour dérivée α/x, donc (x${sup('α')})′ = (α/x)·${E('α ln x')} = (α/x)·x${sup('α')} = α·x${sup('α−1')}, puisque x${sup('α')}/x = x${sup('α−1')}.`)
+  +bk('ex',`Pour f(x) = x${sup('1/3')} : f′(x) = (1/3)·x${sup('−2/3')}, et f′(8) = (1/3)·8${sup('−2/3')} = (1/3)·(1/4) = 1/12 ≈ 0,083. Sur la figure, la pente en x = 1 vaut toujours α, car 1${sup('α−1')} = 1.`)
+  +bk('warn',`Pour α &lt; 0, la courbe descend et explose près de 0 ; pour 0 &lt; α &lt; 1, elle part verticalement de l’origine (pente infinie), comme √x. Toutes passent par (1 ; 1), car 1${sup('α')} = ${E('0')} = 1.`),
   params:[{id:'al',l:'Exposant α',min:-2,max:3,step:.5,v:.5}],
   draw:v=>{ const P=plane({x:[0,4],y:[0,4],lab:1}); P.fn(x=>Math.pow(x,v.al),{from:.01,n:400}).seg(0,0,4,4,{c:'var(--muted)',w:1,dash:true}).dot(1,1,{r:5,l:'(1 ; 1)'}); return P.svg(); },
   info:v=>`f(x) = x${sup(fmt(v.al,1))}, f′(x) = ${fmt(v.al,1)}·x${sup(fmt(v.al-1,1))}, pente en x = 1 : ${fmt(v.al,1)}`,
   note:'x^α n’est définie pour tout α que si x &gt; 0. Pour x ≤ 0, ln x n’existe pas : (−8)^(1/3) n’est pas défini par cette formule.'},
+ {kind:'Théorie',h:'La dérivée de aˣ',p:`<p>Pour f(x) = 2ˣ, la variable est dans l’exposant. Que vaut f′ ? Surtout pas x·2${sup('x−1')} : cette règle-là est réservée aux puissances à exposant fixe.</p>`
+  +bk('prop',`Pour <i>a</i> &gt; 0 : <b>(aˣ)′ = ln a · aˣ</b>. La dérivée est proportionnelle à la fonction, avec le coefficient ln <i>a</i>.`)
+  +bk('why',`aˣ = ${E('x ln a')} est une composée : l’exposant u(x) = x ln a a pour dérivée la constante ln a, et (${E('u')})′ = u′·${E('u')}. Donc (aˣ)′ = ln a · ${E('x ln a')} = ln a · aˣ. Pour <i>a</i> = e, ln e = 1 et on retrouve (eˣ)′ = eˣ : e est la base dont la dérivée se contente de recopier la fonction.`)
+  +bk('ex',`f(x) = 3ˣ : f′(x) = ln 3 · 3ˣ, donc f′(0) = ln 3 ≈ 1,099 : la tangente en (0 ; 1) est plus raide que celle de eˣ (pente 1). Pour g(x) = 5ˣ, g′(2) = ln 5 · 25 ≈ 40,24.`)
+  +bk('idea',`Le facteur ln <i>a</i> est le taux de croissance instantané. Une population multipliée par 1,03 chaque année suit 1,03${sup('t')} et croît à chaque instant au taux ln 1,03 ≈ 0,0296, un peu moins que 3 % : les intérêts gagnés en cours d’année produisent eux-mêmes des intérêts.`)},
  {h:'Dériver 2ˣ',p:'Soit <i>f(x) = 2ˣ</i>. Calcule <i>f′(2)</i>, arrondi au centième.',lab:'f′(2) =',ans:2.77,tol:.006,
   why:`f′(x) = ln 2 · 2ˣ, donc f′(2) = 4 ln 2 ≈ 4 × 0,6931 ≈ 2,77.`},
  {kind:'Méthode',h:'Dériver a^u(x) : passer à la forme e^(u ln a)',p:`<b>Quand</b> : la base est fixe mais l’exposant est une fonction, comme ${'3'+sup('x²')} ou ${'5'+sup('√x')}. La règle (aˣ)′ = ln a · aˣ ne suffit plus. <b>Pourquoi ça marche</b> : <b>a${sup('u(x)')} = ${E('u(x)·ln a')}</b> est une exponentielle de fonction, et (${E('v')})′ = v′·${E('v')}. <b>Comment</b> : réécris avec e, dérive l’exposant, puis reviens à la forme a${sup('u')} : <b>(a${sup('u')})′ = u′ · ln a · a${sup('u')}</b>.`,
@@ -81,6 +104,12 @@ COURS.push(
   ok:v=>Math.abs(v.x-.35)<1e-6,why:'La dérivée xˣ(ln x + 1) s’annule quand ln x = −1, soit x = 1/e ≈ 0,37. Sur la grille, 0,35 est la position la plus proche (pente ≈ −0,03).'},
  {kind:'Défi',h:'Dérivée de xˣ',p:'Calcule la dérivée de <i>xˣ</i> en <i>x = 2</i>, arrondie au centième.',lab:'f′(2) =',ans:6.77,tol:.006,
   why:'f′(x) = xˣ(ln x + 1), donc f′(2) = 4(ln 2 + 1) ≈ 4 × 1,6931 ≈ 6,77.'},
+ {kind:'Théorie',h:'L’équivalent ln(1 + h) ~ h',p:`<p>Pour calculer des limites comme (1 + 3/x)ˣ, on a besoin de savoir comment ln(1 + h) se comporte quand <i>h</i> est tout petit. La réponse tient en une ligne.</p>`
+  +bk('prop',`Quand h → 0 : <b>ln(1 + h)/h → 1</b>. On écrit <b>ln(1 + h) ~ h</b> et on lit « ln(1 + h) est équivalent à h ». De même <b>${E('h')} − 1 ~ h</b>.`)
+  +bk('why',`Par définition de la dérivée, (ln(1 + h) − ln 1)/h tend vers ln′(1) = 1/1 = 1. Comme ln 1 = 0, cela donne exactement ln(1 + h)/h → 1. Pour l’exponentielle, (${E('h')} − ${E('0')})/h → exp′(0) = ${E('0')} = 1.`)
+  +bk('ex',`ln(1,01) ≈ 0,00995 pour h = 0,01, et ln(1,001) ≈ 0,0009995 pour h = 0,001 : le rapport ln(1 + h)/h vaut 0,995 puis 0,9995, il se rapproche de 1.`)
+  +bk('idea',`Un équivalent remplace une fonction compliquée par une fonction simple <b>dans un produit ou un quotient</b> sans changer la limite : si f ~ g, alors f·u et g·u ont la même limite. C’est ce qui permet d’écrire x · ln(1 + 3/x) ~ x · 3/x = 3.`)
+  +bk('warn',`Interdit dans une somme ou une différence : ln(1 + h) − h n’est pas « équivalent à 0 », il vaut environ −h²/2. Les développements limités, plus loin dans le cours, règlent ce cas.`)},
  {kind:'Méthode',h:'Limite d’une puissance variable : la forme 1^∞',p:`<b>Quand</b> : on cherche la limite de u(x)${sup('v(x)')} avec u → 1 et v → ∞, comme (1 + 3/x)ˣ. On ne peut pas conclure « 1 puissance quelque chose = 1 » : la base n’est jamais exactement 1. <b>Pourquoi ça marche</b> : u${sup('v')} = ${E('v·ln u')} et exp est continue, il suffit donc de trouver la limite de l’exposant v·ln u. <b>Comment</b> : réécris avec e, puis utilise l’équivalent <b>ln(1 + h) ~ h</b> quand h → 0.`,
   demo:{enonce:'Calcule la limite de (1 + 3/x)ˣ quand x → +∞.',etapes:[
    {f:`(1 + 3/x)ˣ = ${E('x · ln(1 + 3/x)')}`,w:'Forme 1^∞ : on passe à l’exponentielle pour faire descendre l’exposant.'},
@@ -91,6 +120,13 @@ COURS.push(
   note:'C’est ainsi qu’apparaît le taux « continu » des banques : placer à r % en n versements par an donne (1 + r/n)ⁿ, qui tend vers eʳ.'},
  {h:'Une limite 1^∞',p:'Que vaut la limite de <i>(1 − 1/x)</i><sup>2<i>x</i></sup> quand <i>x</i> → +∞&nbsp;? Arrondis au centième.',lab:'limite =',ans:.14,tol:.006,
   why:'(1 − 1/x)^(2x) = e^(2x ln(1 − 1/x)) et ln(1 − 1/x) ~ −1/x, donc l’exposant tend vers −2. La limite vaut e^(−2) ≈ 0,135, soit 0,14 au centième.'},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir',p:`<p>Tout le chapitre repose sur une seule idée : ramener chaque puissance à l’exponentielle de base e, dont on connaît la dérivée et la réciproque ln.</p>`
+  +keep([`<b>Définitions</b> : aˣ = ${E('x ln a')} pour a &gt; 0 ; x${sup('α')} = ${E('α ln x')} pour x &gt; 0.`,
+   `<b>Règles</b> : a${sup('x+y')} = aˣa${sup('y')}, (aˣ)${sup('y')} = a${sup('xy')}, (ab)ˣ = aˣbˣ, ln(aˣ) = x ln a. Toutes viennent des propriétés de exp et ln.`,
+   `<b>Dérivées</b> : (aˣ)′ = ln a · aˣ ; (x${sup('α')})′ = α x${sup('α−1')} ; (a${sup('u')})′ = u′ · ln a · a${sup('u')} ; (xˣ)′ = xˣ(ln x + 1). Base fixe : facteur ln a. Exposant fixe : règle des puissances. Les deux varient : on repasse par e.`,
+   `<b>Résoudre</b> aˣ = b (b &gt; 0) : x = ln b / ln a. Résoudre x${sup('α')} = c : x = c${sup('1/α')}.`,
+   `<b>Forme 1^∞</b> : u${sup('v')} = ${E('v ln u')}, puis ln(1 + h) ~ h. En particulier (1 + a/x)ˣ → ${E('a')}.`,
+   `<b>Piège</b> : (5${sup('√x')})′ n’est pas √x · 5${sup('√x − 1')}. Avant de dériver, demande-toi qui varie, la base ou l’exposant.`])},
  {kind:'Problème',h:'Intérêts composés ou continus',
   p:'Tu places 1000 CHF à 3 % par an, intérêts composés chaque année : le capital vaut <b><i>C</i>(<i>t</i>) = 1000 · 1,03<sup><i>t</i></sup></b> après <i>t</i> années. La formule a un sens pour tout réel <i>t</i> ≥ 0 grâce à 1,03<sup><i>t</i></sup> = e<sup><i>t</i> ln 1,03</sup>. Une autre banque propose un taux « continu » de 3 % : <i>D</i>(<i>t</i>) = 1000 e<sup>0,03<i>t</i></sup>.',
   parts:[
@@ -116,22 +152,57 @@ COURS.push(
 
 /* ===================== 2. Fonctions hyperboliques ===================== */
 {subj:'an2', sem:'pri', id:'an2-hyperboliques', h:'Fonctions hyperboliques', p:'ch, sh et th : les cousines de cos et sin, construites avec eˣ.', steps:[
- {kind:'Théorie',h:'ch et sh',p:`On définit <b>ch x = ${F(E('x')+' + '+E('−x'),2)}</b> (partie paire de eˣ) et <b>sh x = ${F(E('x')+' − '+E('−x'),2)}</b> (partie impaire). Leur somme redonne eˣ. Pour <i>x</i> grand, les deux se collent à eˣ/2.`,
+ {kind:'Théorie',h:'Partie paire et partie impaire d’une fonction',p:`<p>Avant de définir ch et sh, une idée simple sur les fonctions. cos est paire, sin est impaire, et eˣ n’est ni l’un ni l’autre. Peut-on quand même découper eˣ en un morceau pair et un morceau impair ?</p>`
+  +bk('prop',`Toute fonction f définie sur ℝ s’écrit d’une seule façon f = g + u avec g paire et u impaire : <b>g(x) = ${F('f(x) + f(−x)',2)}</b> et <b>u(x) = ${F('f(x) − f(−x)',2)}</b>.`)
+  +bk('why',`g(−x) = (f(−x) + f(x))/2 = g(x) : g est paire. u(−x) = (f(−x) − f(x))/2 = −u(x) : u est impaire. Et g + u = f, car les f(−x) se simplifient. Unicité : si f = g₁ + u₁ aussi, alors g − g₁ = u₁ − u est à la fois paire et impaire, donc égale à son opposée, donc nulle.`)
+  +bk('ex',`Pour f(x) = (x + 1)² = x² + 2x + 1 : partie paire x² + 1, partie impaire 2x. Contrôle : ((x + 1)² + (−x + 1)²)/2 = (2x² + 2)/2 = x² + 1.`)
+  +bk('idea',`Appliquée à eˣ, cette découpe produit deux fonctions nouvelles, aussi importantes que cos et sin : ce sont ch et sh de l’étape suivante.`),
+  fig:(()=>{ const P=plane({x:[-3,3],y:[-2,6],h:220,lab:1}); P.fn(Math.exp,{c:'var(--muted)',w:2,dash:true}).fn(ch,{c:'var(--math)'}).fn(sh,{c:'var(--spark)'}).text(1.2,4.2,'eˣ',{c:'var(--muted)'}).text(-2.3,4,'paire',{c:'var(--math)',s:11}).text(-2.3,-1.7,'impaire',{c:'var(--spark)',s:11}); return P.svg(); })(),
+  note:'En pointillés eˣ, en bleu sa partie paire, en jaune sa partie impaire. Leur somme redonne exactement eˣ.'},
+ {kind:'Théorie',h:'ch et sh',p:`<p>Appliquons la découpe à eˣ. Sa partie paire et sa partie impaire reçoivent un nom.</p>`
+  +bk('def',`<b>ch x = ${F(E('x')+' + '+E('−x'),2)}</b> (cosinus hyperbolique) et <b>sh x = ${F(E('x')+' − '+E('−x'),2)}</b> (sinus hyperbolique), pour tout <i>x</i> réel. On note aussi cosh et sinh. Par construction, <b>ch x + sh x = eˣ</b> et ch x − sh x = e⁻ˣ.`)
+  +bk('idea',`Pour <i>x</i> grand, e⁻ˣ devient négligeable : ch x et sh x se collent tous deux à eˣ/2 (pointillés). Pour <i>x</i> très négatif, c’est eˣ qui disparaît : ch x ≈ e⁻ˣ/2 remonte, sh x ≈ −e⁻ˣ/2 plonge. Entre les deux, ch dessine un U posé sur le point (0 ; 1), et sh traverse l’origine en montant.`)
+  +bk('ex',`ch 1 = (e + 1/e)/2 = (2,718 + 0,368)/2 ≈ 1,543 et sh 1 = (2,718 − 0,368)/2 ≈ 1,175. Somme : 2,718 = e. En x = 3 : ch 3 ≈ 10,068 et e³/2 ≈ 10,043, déjà très proches.`)
+  +bk('warn',`ch et sh ne sont ni périodiques ni bornées, contrairement à cos et sin. Le nom vient d’une autre ressemblance, celle de l’étape suivante.`),
   params:[{id:'x',l:'x',min:-2,max:2,step:.25,v:1}],
   draw:v=>{ const P=plane({x:[-3,3],y:[-3.5,4.5],h:320,lab:1}); P.fn(x=>Math.exp(x)/2,{c:'var(--muted)',w:1.5,dash:true}).fn(ch,{c:'var(--math)'}).fn(sh,{c:'var(--spark)'})
     .dot(v.x,ch(v.x),{c:'var(--math)',l:'ch'}).dot(v.x,sh(v.x),{c:'var(--spark)',l:'sh',dy:16}); return P.svg(); },
   info:v=>`ch ${fmt(v.x)} ≈ ${fmt(ch(v.x),3)} · sh ${fmt(v.x)} ≈ ${fmt(sh(v.x),3)} · somme = e${sup(fmt(v.x))} ≈ ${fmt(Math.exp(v.x),3)}`,
   note:'ch est paire et vaut au moins 1 (minimum ch 0 = 1). sh est impaire, strictement croissante, et sh 0 = 0. La chaînette, forme d’un câble suspendu, est le graphe de ch.'},
- {kind:'Théorie',h:'ch² − sh² = 1',p:`Développe : (ch x)² − (sh x)² = ${F('(eˣ + e⁻ˣ)² − (eˣ − e⁻ˣ)²',4)} = ${F(4,4)} = 1. Le point (ch t ; sh t) parcourt donc l’<b>hyperbole</b> x² − y² = 1, comme (cos t ; sin t) parcourt le cercle x² + y² = 1. D’où le nom.`,
+ {kind:'Théorie',h:'ch² − sh² = 1',p:`<p>cos et sin vérifient cos² + sin² = 1, ce qui place le point (cos t ; sin t) sur le cercle unité. Quelle relation lie ch et sh ?</p>`
+  +bk('prop',`Pour tout <i>x</i> : <b>ch² x − sh² x = 1</b>.`)
+  +bk('why',`(ch x)² − (sh x)² = (ch x − sh x)(ch x + sh x) = e⁻ˣ · eˣ = 1. On peut aussi développer : (eˣ + e⁻ˣ)² − (eˣ − e⁻ˣ)² = (e²ˣ + 2 + e⁻²ˣ) − (e²ˣ − 2 + e⁻²ˣ) = 4, puis diviser par 4.`)
+  +bk('idea',`Le point (ch t ; sh t) vérifie x² − y² = 1 : il parcourt la branche droite de l’<b>hyperbole</b> équilatère, comme (cos t ; sin t) parcourt le cercle x² + y² = 1. C’est l’origine du nom « hyperbolique ». Quand <i>t</i> croît, le point monte le long de la branche ; les pointillés y = ±x sont les asymptotes de l’hyperbole.`)
+  +bk('ex',`Pour t = 2 : ch 2 ≈ 3,762 et sh 2 ≈ 3,627 ; 3,762² − 3,627² ≈ 14,154 − 13,154 = 1,000.`)
+  +bk('warn',`Le signe moins est la grande différence avec la trigonométrie : ch² + sh² ne vaut pas 1 (c’est ch 2x). En revanche ch x = √(1 + sh² x) sans hésitation sur le signe, puisque ch &gt; 0.`),
   params:[{id:'t',l:'t',min:-1.8,max:1.8,step:.2,v:.8}],
   draw:v=>{ const P=plane({x:[-1,5],y:[-3.5,3.5],lab:1}); P.seg(-1,-1,3.5,3.5,{c:'var(--muted)',w:1,dash:true}).seg(-1,1,3.5,-3.5,{c:'var(--muted)',w:1,dash:true})
     .curve(ch,sh,-2,2,{c:'var(--math)'}).circ(0,0,1,{c:'var(--muted)',w:1.5}).seg(ch(v.t),0,ch(v.t),sh(v.t),{c:'var(--spark)',w:2,dash:true}).arrow(0,0,ch(v.t),sh(v.t),{c:'var(--accent)',w:2.5}).dot(ch(v.t),sh(v.t),{l:'(ch t ; sh t)'}); return P.svg(); },
   info:v=>`ch² − sh² = ${fmt(ch(v.t)**2,3)} − ${fmt(sh(v.t)**2,3)} = ${fmt(ch(v.t)**2-sh(v.t)**2,3)}`},
  {h:'Valeurs en 0',p:'Que valent <i>ch 0</i> et <i>sh 0</i>&nbsp;?',opts:['ch 0 = 0 et sh 0 = 1','ch 0 = 1 et sh 0 = 1','ch 0 = 1 et sh 0 = 0','ch 0 = ½ et sh 0 = ½'],ans:2,
   why:'ch 0 = (1 + 1)/2 = 1 et sh 0 = (1 − 1)/2 = 0. On vérifie : 1² − 0² = 1.'},
- {kind:'Théorie',h:'Dérivées et tangente hyperbolique',p:`On dérive terme à terme : <b>(sh x)′ = ch x</b> et <b>(ch x)′ = sh x</b>, sans signe moins cette fois. On pose <b>th x = ${F('sh x','ch x')}</b>, et la règle du quotient donne <b>(th x)′ = ${F(1,'ch² x')} = 1 − th² x</b>.`,
+ {kind:'Théorie',h:'Parité, signe et croissance',p:`<p>Les graphes suggèrent que ch est paire et ne descend jamais sous 1, que sh est impaire et strictement croissante. Ces propriétés se démontrent en trois lignes avec les définitions.</p>`
+  +bk('prop',`<b>ch est paire</b>, <b>sh est impaire</b>. <b>ch x ≥ 1</b> pour tout <i>x</i>, avec égalité seulement en 0. <b>sh x a le signe de x</b>, et sh est strictement croissante, bijective de ℝ sur ℝ.`)
+  +bk('why',`Parité : remplacer <i>x</i> par −<i>x</i> échange eˣ et e⁻ˣ, ce qui ne change pas la somme et change le signe de la différence. Minoration : ch x − 1 = (eˣ − 2 + e⁻ˣ)/2 = (${E('x/2')} − ${E('−x/2')})²/2 ≥ 0, nul seulement si ${E('x/2')} = ${E('−x/2')}, c’est-à-dire x = 0. Croissance de sh : eˣ croît et −e⁻ˣ croît aussi, donc leur somme croît strictement ; les limites ±∞ en ±∞ donnent la bijectivité.`)
+  +bk('ex',`ch 0,5 − 1 ≈ 0,1276, et (${E('0,25')} − ${E('−0,25')})²/2 ≈ 0,1276 : la formule est juste. sh(−2) = −sh 2 ≈ −3,627.`)
+  +bk('idea',`Retiens l’image : près de 0, ch ressemble à la parabole 1 + x²/2 (même valeur, même tangente horizontale) et sh à la droite y = x. Loin de 0, les deux rejoignent eˣ/2.`),
+  fig:(()=>{ const P=plane({x:[-2.5,2.5],y:[-2,4],h:220,lab:1}); P.fn(x=>1+x*x/2,{c:'var(--muted)',w:1.5,dash:true}).seg(-2,-2,2,2,{c:'var(--muted)',w:1.5,dash:true}).fn(ch,{c:'var(--math)'}).fn(sh,{c:'var(--spark)'}).dot(0,1,{r:4,l:'(0 ; 1)'}); return P.svg(); })(),
+  note:'Pointillés : la parabole 1 + x²/2 et la droite y = x, qui épousent ch et sh près de 0.'},
+ {kind:'Théorie',h:'Dérivées et tangente hyperbolique',p:`<p>Dériver ch et sh est immédiat avec les exponentielles, et le résultat est plus simple qu’en trigonométrie : aucun signe moins n’apparaît.</p>`
+  +bk('prop',`<b>(sh x)′ = ch x</b> et <b>(ch x)′ = sh x</b>.`)
+  +bk('why',`(eˣ)′ = eˣ et (e⁻ˣ)′ = −e⁻ˣ. Donc (sh x)′ = (eˣ + e⁻ˣ)/2 = ch x, et (ch x)′ = (eˣ − e⁻ˣ)/2 = sh x. Comparé à (cos x)′ = −sin x, le signe moins a disparu. Conséquence : ch décroît pour <i>x</i> &lt; 0 (sh &lt; 0) et croît pour <i>x</i> &gt; 0, avec son minimum 1 en 0.`)
+  +bk('def',`La <b>tangente hyperbolique</b> est <b>th x = ${F('sh x','ch x')} = ${F('eˣ − e⁻ˣ','eˣ + e⁻ˣ')}</b>, définie sur tout ℝ puisque ch ne s’annule jamais.`)
+  +bk('prop',`<b>(th x)′ = ${F(1,'ch² x')} = 1 − th² x</b>. Règle du quotient : (sh′·ch − sh·ch′)/ch² = (ch² − sh²)/ch² = 1/ch² ; puis en divisant ch² − sh² = 1 par ch², on obtient 1 − th² = 1/ch².`)
+  +bk('ex',`th 0 = 0 et th′(0) = 1 : th part de l’origine avec la pente 1, comme sh. Mais th 2 ≈ 0,964 et th 3 ≈ 0,995 : la courbe s’aplatit vite, comme le montre la figure.`),
   fig:(()=>{ const P=plane({x:[-4,4],y:[-1.5,1.5],h:160,lab:1}); P.seg(-4,1,4,1,{c:'var(--muted)',w:1,dash:true}).seg(-4,-1,4,-1,{c:'var(--muted)',w:1,dash:true}).fn(Math.tanh).text(-3.8,1,'y = 1',{dy:-6,c:'var(--muted)',s:11}); return P.svg(); })(),
   note:'th est impaire, strictement croissante, à valeurs dans ]−1 ; 1[, avec deux asymptotes horizontales y = ±1.'},
+ {kind:'Théorie',h:'Pourquoi th reste entre −1 et 1',p:`<p>La figure précédente montre th coincée entre les droites y = −1 et y = 1. Pourquoi ? Et pourquoi sa dérivée 1 − th² devient-elle presque nulle pour <i>x</i> grand ?</p>`
+  +bk('prop',`Pour tout <i>x</i> : <b>−1 &lt; th x &lt; 1</b>. th est impaire, strictement croissante, et <b>th x → 1</b> quand x → +∞, th x → −1 quand x → −∞.`)
+  +bk('why',`|sh x| &lt; ch x, car ch² = 1 + sh² &gt; sh². Donc |th x| &lt; 1. Croissance : th′ = 1/ch² &gt; 0. Limite : en divisant haut et bas par eˣ, th x = ${F('1 − e⁻²ˣ','1 + e⁻²ˣ')}, et e⁻²ˣ → 0 quand x → +∞, d’où th x → 1. L’imparité donne la limite −1 en −∞.`)
+  +bk('ex',`th 1 = 1,175/1,543 ≈ 0,762 ; th 2 ≈ 0,964 ; th 3 ≈ 0,995. À partir de x = 3, th x vaut 1 à 0,5 % près.`)
+  +bk('idea',`th envoie ℝ tout entier sur l’intervalle ]−1 ; 1[ de façon lisse et croissante : c’est une fonction de <b>saturation</b>. La vitesse d’un corps freiné par l’air suit une th : elle tend vers une vitesse limite sans jamais la dépasser (problème de fin de chapitre).`),
+  fig:(()=>{ const P=plane({x:[-4,4],y:[-1.5,1.5],h:160,lab:1}); P.seg(-4,1,4,1,{c:'var(--muted)',w:1,dash:true}).seg(-4,-1,4,-1,{c:'var(--muted)',w:1,dash:true}).fn(Math.tanh).fn(x=>1-Math.tanh(x)**2,{c:'var(--spark)',w:1.5}).text(2.2,.4,'th′ = 1 − th²',{c:'var(--spark)',s:11}); return P.svg(); })(),
+  note:'En jaune, la dérivée 1 − th² x : elle vaut 1 en 0 et s’écrase vers 0 des deux côtés.'},
  {kind:'Méthode',h:'Calculer ch, sh, th en x = ln a',p:`<b>Quand</b> : l’argument est un logarithme, comme ch(ln 3) ou th(ln 2). <b>Pourquoi ça marche</b> : ${E('ln a')} = a et ${E('−ln a')} = 1/a, donc les exponentielles de la définition disparaissent. <b>Comment</b> : remplace ${E('x')} par a et ${E('−x')} par 1/a dans les définitions : <b>ch(ln a) = ${F('a + 1/a','2')}</b>, <b>sh(ln a) = ${F('a − 1/a','2')}</b>, puis th = sh/ch.`,
   demo:{enonce:'Calcule ch(ln 3), sh(ln 3) et th(ln 3).',etapes:[
    {f:`${E('ln 3')} = 3 et ${E('−ln 3')} = 1/3`,w:'exp et ln sont réciproques, et e^(−y) = 1/e^y.'},
@@ -163,7 +234,11 @@ COURS.push(
   note:'Une racine u ≤ 0 est à rejeter : eˣ est toujours strictement positif. Et ch x = a n’a pas de solution si a &lt; 1.'},
  {h:'Résoudre ch x = 5/3',p:'Quelle est la solution positive de <i>ch x = 5/3</i>&nbsp;? Arrondis au centième.',lab:'x =',ans:1.1,tol:.006,
   why:'Avec u = eˣ : u + 1/u = 10/3, soit 3u² − 10u + 3 = 0, donc u = 3 ou u = 1/3. La solution positive est x = ln 3 ≈ 1,10.'},
- {kind:'Théorie',h:'Les réciproques',p:`sh est une bijection de ℝ sur ℝ. Pour inverser, on résout sh y = x : en posant u = ${E('y')}, on obtient u² − 2xu − 1 = 0, dont la seule racine positive est u = x + √(x² + 1). Donc <b>argsh x = ln(x + √(x² + 1))</b>. De même, sur [1 ; +∞[, argch x = ln(x + √(x² − 1)), et sur ]−1 ; 1[, argth x = ½ ln${F('1 + x','1 − x')}.`,
+ {kind:'Théorie',h:'Les réciproques',p:`<p>sh est une bijection de ℝ sur ℝ : chaque réel <i>x</i> est atteint par un seul <i>y</i>. On peut donc définir la fonction réciproque et, chance des hyperboliques, l’écrire avec un logarithme.</p>`
+  +bk('def',`<b>argsh</b> (argument sinus hyperbolique) est la réciproque de sh : y = argsh x ⇔ x = sh y. De même <b>argch</b> est la réciproque de ch restreinte à [0 ; +∞[, définie sur [1 ; +∞[, et <b>argth</b> la réciproque de th, définie sur ]−1 ; 1[.`)
+  +bk('why',`Résolvons sh y = x. Avec u = ${E('y')} &gt; 0 : (u − 1/u)/2 = x, soit u² − 2xu − 1 = 0, de discriminant 4x² + 4 &gt; 0. Les racines sont x ± √(x² + 1) ; comme √(x² + 1) &gt; |x|, seule x + √(x² + 1) est positive. Donc <b>argsh x = ln(x + √(x² + 1))</b>. Le même calcul donne <b>argch x = ln(x + √(x² − 1))</b> pour x ≥ 1, et <b>argth x = ½ ln${F('1 + x','1 − x')}</b> pour |x| &lt; 1.`)
+  +bk('ex',`argsh 1 = ln(1 + √2) ≈ 0,881. Contrôle : sh(0,881) = (${E('0,881')} − ${E('−0,881')})/2 ≈ (2,413 − 0,414)/2 ≈ 1,00.`)
+  +bk('warn',`Pour argch, il faut restreindre ch à [0 ; +∞[ car ch est paire : ch y = 2 a deux solutions opposées, et argch 2 désigne la positive, ln(2 + √3) ≈ 1,317.`),
   fig:(()=>{ const P=plane({x:[-3,3],y:[-3,3],lab:1}); P.seg(-3,-3,3,3,{c:'var(--muted)',w:1,dash:true}).fn(sh,{c:'var(--spark)'}).fn(x=>Math.log(x+Math.sqrt(x*x+1)),{c:'var(--math)'}).text(1.5,2.6,'sh',{c:'var(--spark)'}).text(2.2,1.0,'argsh',{c:'var(--math)'}); return P.svg(); })(),
   note:'Les graphes de sh et argsh sont symétriques par rapport à la droite y = x, comme pour toute bijection et sa réciproque. Et (argsh x)′ = 1/√(x² + 1).'},
  {h:'Un argsh exact',p:'Calcule <i>argsh(4/3)</i>, arrondi au centième.',lab:'argsh(4/3) =',ans:1.1,tol:.006,
@@ -178,6 +253,14 @@ COURS.push(
   note:'Contrôle possible : dériver ln(x + √(x² − 1)) donne le même résultat, avec plus de calculs.'},
  {kind:'Défi',h:'Dérivée de argsh',p:'Quelle est la dérivée de <i>argsh x</i>&nbsp;?',opts:['1/√(1 − x²)','1/(1 + x²)','1/√(x² + 1)','1/√(x² − 1)'],ans:2,
   why:'Si y = argsh x, alors x = sh y et dx/dy = ch y = √(1 + sh² y) = √(1 + x²). Donc y′ = 1/√(x² + 1). Les autres sont les dérivées d’arcsin, arctan et argch.'},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir',p:`<p>Les fonctions hyperboliques se calculent toutes avec eˣ et e⁻ˣ : en cas de doute, reviens aux définitions.</p>`
+  +keep([`<b>Définitions</b> : ch x = (eˣ + e⁻ˣ)/2 (paire, ≥ 1), sh x = (eˣ − e⁻ˣ)/2 (impaire, croissante), th x = sh x/ch x (impaire, à valeurs dans ]−1 ; 1[). ch x + sh x = eˣ.`,
+   `<b>Relation fondamentale</b> : ch² x − sh² x = 1, d’où ch x = √(1 + sh² x). Identités : sh 2x = 2 sh x ch x, ch 2x = ch² x + sh² x.`,
+   `<b>Dérivées</b> : (sh)′ = ch, (ch)′ = sh, (th)′ = 1/ch² = 1 − th². Pas de signe moins.`,
+   `<b>En x = ln a</b> : eˣ = a et e⁻ˣ = 1/a, donc ch(ln a) = (a + 1/a)/2, sh(ln a) = (a − 1/a)/2.`,
+   `<b>Équation</b> ch x = a ou sh x = a : poser u = eˣ &gt; 0, multiplier par u, résoudre le trinôme, garder u &gt; 0, revenir à x = ln u.`,
+   `<b>Réciproques</b> : argsh x = ln(x + √(x² + 1)) sur ℝ, argch x = ln(x + √(x² − 1)) sur [1 ; +∞[, argth x = ½ ln((1 + x)/(1 − x)) sur ]−1 ; 1[. Dérivées : 1/√(x² + 1), 1/√(x² − 1), 1/(1 − x²).`,
+   `<b>Piège</b> : ch² + sh² ≠ 1, et une racine u ≤ 0 d’un trinôme en u = eˣ est toujours à rejeter.`])},
  {kind:'Problème',h:'Le câble entre deux poteaux',
   p:'Un câble homogène suspendu entre deux poteaux prend la forme d’une <b>chaînette</b> <i>y</i> = <i>a</i> ch(<i>x</i>/<i>a</i>). Ici <i>a</i> = 20 m et les poteaux sont en <i>x</i> = −30 m et <i>x</i> = 30 m. La longueur du câble entre les abscisses −<i>b</i> et <i>b</i> vaut 2<i>a</i> sh(<i>b</i>/<i>a</i>), une formule qui vient de 1 + sh² = ch².',
   fig:(()=>{ const P=plane({x:[-36,36],y:[-4,52],w:320,grid:false,axes:false}), f=x=>20*Math.cosh(x/20);
@@ -203,7 +286,17 @@ COURS.push(
 
 /* ===================== 3. Nombres complexes ===================== */
 {subj:'an2', sem:'pri', id:'an2-complexes', h:'Nombres complexes', p:'Calculer avec i, le module, le conjugué et l’inverse.', steps:[
- {kind:'Théorie',h:'z = a + bi',p:'On ajoute à ℝ un nombre <b>i</b> tel que <b>i² = −1</b>. Un complexe s’écrit de façon unique <i>z = a + bi</i> avec <i>a</i> = Re <i>z</i> et <i>b</i> = Im <i>z</i> réels. Son <b>conjugué</b> est <i>z̄ = a − bi</i>, son <b>module</b> <i>|z| = √(a² + b²)</i>.',
+ {kind:'Théorie',h:'Pourquoi inventer un nombre i',p:`<p>Dans ℝ, l’équation x² = −1 n’a pas de solution : un carré n’est jamais négatif. Pendant longtemps on s’en est contenté. Puis, au 16e siècle, des algébristes qui résolvaient des équations de degré 3 ont remarqué qu’en calculant « comme si » un nombre de carré −1 existait, ils obtenaient des solutions réelles justes. L’outil marchait : il fallait lui donner un statut.</p>`
+  +bk('def',`On introduit un nouveau nombre, noté <b>i</b>, avec une seule règle : <b>i² = −1</b>. L’ensemble ℂ des <b>nombres complexes</b> est formé des expressions a + bi avec <i>a</i>, <i>b</i> réels, qu’on additionne et multiplie avec les règles habituelles (commutativité, distributivité), en remplaçant i² par −1 dès qu’il apparaît.`)
+  +bk('idea',`Rien d’autre ne change : tout ce que tu sais faire avec des lettres reste valable. ℝ est inclus dans ℂ (ce sont les a + 0i). Le prix à payer est léger : on perd l’ordre (il n’y a pas de « i &lt; 2 ») mais on gagne la résolution de toutes les équations polynomiales.`)
+  +bk('ex',`(2 + i)(2 − i) = 4 − i² = 4 + 1 = 5 : un produit de deux non-réels peut être réel. Et (1 + i)² = 1 + 2i + i² = 2i : le carré de 1 + i est un imaginaire pur.`)
+  +bk('warn',`N’écris pas √(−1) : la racine carrée est réservée aux réels positifs, et dans ℂ il y a deux nombres de carré −1, i et −i, sans moyen de préférer l’un à l’autre.`)},
+ {kind:'Théorie',h:'z = a + bi',p:`<p>Un complexe est donné par deux réels. Donnons-leur un nom et une image.</p>`
+  +bk('def',`Tout complexe s’écrit <b>d’une seule façon</b> <i>z = a + bi</i> avec <i>a</i>, <i>b</i> réels : <i>a</i> est la <b>partie réelle</b> Re <i>z</i>, <i>b</i> la <b>partie imaginaire</b> Im <i>z</i> (un réel, sans le i). Si b = 0, <i>z</i> est réel ; si a = 0, <i>z</i> est <b>imaginaire pur</b>. Le <b>conjugué</b> est <b>z̄ = a − bi</b>, le <b>module</b> est <b>|z| = √(a² + b²)</b>.`)
+  +bk('idea',`On représente <i>z</i> par le point (ou le vecteur) de coordonnées (a ; b) : l’axe horizontal porte les réels, l’axe vertical les imaginaires purs. |z| est la longueur de la flèche (Pythagore), et z̄ est le symétrique de <i>z</i> par rapport à l’axe réel : on garde <i>a</i>, on change le signe de <i>b</i>.`)
+  +bk('why',`L’unicité de l’écriture vient de ceci : si a + bi = c + di avec b ≠ d, alors i = (c − a)/(b − d) serait un réel, dont le carré ne pourrait pas valoir −1. Donc b = d, puis a = c.`)
+  +bk('ex',`z = 3 + 2i : Re z = 3, Im z = 2, z̄ = 3 − 2i, |z| = √(9 + 4) = √13 ≈ 3,606. Le conjugué a le même module, √(9 + 4) encore.`)
+  +bk('warn',`Im(3 + 2i) vaut 2, pas 2i. Et |z| est un réel positif : on ne compare pas des complexes entre eux, mais on peut comparer leurs modules.`),
   params:[{id:'a',l:'Partie réelle a',min:-4,max:4,v:3},{id:'b',l:'Partie imaginaire b',min:-4,max:4,v:2}],
   draw:v=>{ const P=cpl(); P.seg(v.a,v.b,v.a,-v.b,{c:'var(--muted)',w:1.5,dash:true}).arrow(0,0,v.a,v.b).arrow(0,0,v.a,-v.b,{c:'var(--math)',w:2}).dot(v.a,v.b,{l:'z'}).dot(v.a,-v.b,{c:'var(--math)',l:'z̄',dy:16}); return P.svg(); },
   info:v=>`z = ${cz(v.a,v.b)} · z̄ = ${cz(v.a,-v.b)} · |z| = √${v.a*v.a+v.b*v.b} ≈ ${fmt(Math.hypot(v.a,v.b))}`,
@@ -220,10 +313,28 @@ COURS.push(
   why:'On développe : 2 − 2i + 3i − 3i² = 2 + i + 3 = 5 + i, car −3i² = +3.'},
  {h:'Puissances de i',p:'Calcule la partie imaginaire de <i>i²⁰²⁷ + (1 + i)²</i>.',lab:'Im =',ans:1,
   why:'2027 = 4 · 506 + 3, donc i²⁰²⁷ = i³ = −i. Et (1 + i)² = 1 + 2i − 1 = 2i. La somme vaut i, de partie imaginaire 1.'},
- {kind:'Théorie',h:'z·z̄ = |z|²',p:'Le produit d’un complexe par son conjugué est toujours un réel positif : <b>(a + bi)(a − bi) = a² + b² = |z|²</b>. Le module se comporte bien : <b>|zw| = |z|·|w|</b>, et la conjugaison passe aux opérations : <span style="text-decoration:overline">z + w</span> = z̄ + w̄, <span style="text-decoration:overline">zw</span> = z̄·w̄.',
+ {kind:'Théorie',h:'Le module est une distance',p:`<p>Le module mesure la longueur de la flèche de 0 à <i>z</i>. Il mesure aussi la distance entre deux points quelconques du plan, ce qui en fait l’outil géométrique de base des complexes.</p>`
+  +bk('prop',`Pour deux complexes <i>z</i> et <i>w</i>, <b>|z − w| est la distance</b> entre les points <i>z</i> et <i>w</i>. En particulier, l’ensemble des <i>z</i> tels que |z − w| = r est le <b>cercle</b> de centre <i>w</i> et de rayon <i>r</i>.`)
+  +bk('why',`Si z = a + bi et w = c + di, alors z − w = (a − c) + (b − d)i et |z − w| = √((a − c)² + (b − d)²) : c’est la formule de la distance entre les points (a ; b) et (c ; d).`)
+  +bk('prop',`<b>Inégalité triangulaire</b> : |z + w| ≤ |z| + |w|. La flèche de z + w (z et w mis bout à bout) est plus courte que le chemin qui passe par z puis par w : un côté d’un triangle est plus court que la somme des deux autres.`)
+  +bk('ex',`Distance entre 3 + 2i et 1 − i : |(3 + 2i) − (1 − i)| = |2 + 3i| = √13 ≈ 3,61. Et |(3 + 4i) + (3 − 4i)| = |6| = 6 &lt; 5 + 5 = 10.`)
+  +bk('warn',`Il n’existe pas de formule |z + w| = |z| + |w| : l’égalité n’a lieu que si <i>z</i> et <i>w</i> pointent dans la même direction. Pour les produits, en revanche, tout est simple (étape suivante).`),
+  fig:(()=>{ const P=cpl(5,2); P.circ(1,-1,Math.sqrt(13),{c:'var(--muted)',w:1,dash:true}).seg(1,-1,3,2,{c:'var(--spark)',w:2.5}).dot(3,2,{l:'3 + 2i'}).dot(1,-1,{c:'var(--math)',l:'1 − i',dy:16}).text(2.4,.2,'√13',{c:'var(--spark)',s:12}); return P.svg(); })(),
+  note:'Le cercle en pointillés est l’ensemble des z tels que |z − (1 − i)| = √13 : il passe par 3 + 2i.'},
+ {kind:'Théorie',h:'z·z̄ = |z|²',p:`<p>Multiplier un complexe par son conjugué fait disparaître i. C’est la clé de la division, et la raison pour laquelle le module se comporte si bien avec les produits.</p>`
+  +bk('prop',`<b>z·z̄ = |z|²</b>, un réel positif. Et <b>|zw| = |z|·|w|</b> : le module d’un produit est le produit des modules.`)
+  +bk('why',`(a + bi)(a − bi) = a² − (bi)² = a² − b²i² = a² + b² = |z|². Pour le produit : |zw|² = zw·${ov('zw')} = z z̄ · w w̄ = |z|²|w|², en utilisant que le conjugué d’un produit est le produit des conjugués (démontré deux étapes plus loin). On prend la racine : |zw| = |z||w|.`)
+  +bk('ex',`(3 + 4i)(3 − 4i) = 9 + 16 = 25 = 5². Et (2 + i)(1 + 3i) = 2 + 6i + i + 3i² = −1 + 7i, de module √50 ≈ 7,07, qui vaut bien √5 · √10 = √50.`)
+  +bk('idea',`Sur la figure, <i>z</i> et z̄ sont sur le même cercle centré en 0 : même module 5. Leur produit tombe sur l’axe réel, au point 25 = |z|².`),
   fig:(()=>{ const P=cpl(5,2); P.circ(0,0,Math.hypot(3,4),{c:'var(--muted)',w:1.5,dash:true}).arrow(0,0,3,4).arrow(0,0,3,-4,{c:'var(--math)'}).dot(3,4,{l:'3 + 4i'}).dot(3,-4,{c:'var(--math)',l:'3 − 4i',dy:16}).text(-4.6,4,'|z| = 5',{s:12}); return P.svg(); })(),
   note:'Piège : |z + w| n’est pas |z| + |w| en général. On a seulement l’inégalité triangulaire |z + w| ≤ |z| + |w|.'},
  {h:'Un module',p:'Calcule <i>|−5 + 12i|</i>.',lab:'|z| =',ans:13,why:'|−5 + 12i| = √(25 + 144) = √169 = 13.'},
+ {kind:'Théorie',h:'Le conjugué passe aux opérations',p:`<p>Conjuguer, c’est changer i en −i. Comme la règle i² = −1 vaut aussi pour −i, tout calcul fait avec i reste juste avec −i : c’est pourquoi la conjugaison est compatible avec toutes les opérations.</p>`
+  +bk('prop',`Pour tous <i>z</i>, <i>w</i> : <b>${ov('z + w')} = z̄ + w̄</b>, <b>${ov('zw')} = z̄·w̄</b>, ${ov('z/w')} = z̄/w̄, ${ov('zⁿ')} = (z̄)ⁿ, et ${ov('z̄')} = z. De plus <b>Re z = ${F('z + z̄',2)}</b> et <b>Im z = ${F('z − z̄','2i')}</b>.`)
+  +bk('why',`Pour le produit : avec z = a + bi et w = c + di, zw = (ac − bd) + (ad + bc)i, donc ${ov('zw')} = (ac − bd) − (ad + bc)i. Et z̄·w̄ = (a − bi)(c − di) = (ac − bd) − (ad + bc)i : c’est pareil. Pour la somme, on conjugue chaque partie. Enfin z + z̄ = 2a et z − z̄ = 2bi, d’où les formules de Re et Im.`)
+  +bk('ex',`z = 1 + 2i, w = 3 − i : zw = 3 − i + 6i − 2i² = 5 + 5i, et z̄·w̄ = (1 − 2i)(3 + i) = 3 + i − 6i − 2i² = 5 − 5i, qui est bien le conjugué de 5 + 5i.`)
+  +bk('idea',`Conséquence importante : si P est un polynôme à coefficients <b>réels</b>, ${ov('P(z)')} = P(z̄), car conjuguer chaque terme aₖzᵏ donne aₖ(z̄)ᵏ. Les racines non réelles d’un tel polynôme vont donc par paires conjuguées, comme 2 + 3i et 2 − 3i.`)
+  +bk('warn',`<i>z</i> est réel si et seulement si z = z̄, imaginaire pur si et seulement si z̄ = −z. Ces critères remplacent souvent un calcul de parties réelle et imaginaire.`)},
  {kind:'Méthode',h:'Un module sans développer',p:`<b>Quand</b> : on veut le module d’un produit, d’un quotient ou d’une puissance. <b>Pourquoi ça marche</b> : |zw|² = zw·<span style="text-decoration:overline">zw</span> = z z̄ · w w̄ = |z|²|w|², donc <b>|zw| = |z|·|w|</b>, et par suite <b>|z/w| = |z|/|w|</b> et <b>|zⁿ| = |z|ⁿ</b>. <b>Comment</b> : calcule le module de chaque morceau, puis combine. Et <b>|z − w|</b> est la <b>distance</b> entre les points z et w du plan.`,
   demo:{enonce:'Calcule |(3 + 4i)²/(1 − i)|.',etapes:[
    {f:'|3 + 4i| = √(9 + 16) = 5, donc |(3 + 4i)²| = 25',w:'|zⁿ| = |z|ⁿ : inutile de développer le carré.'},
@@ -294,6 +405,14 @@ COURS.push(
    conclusion:'Les deux nombres sont 1 + 2i et 1 − 2i.'}},
  {h:'Retrouver le trinôme',p:'De quelle équation <i>3 + i</i> et <i>3 − i</i> sont-ils les deux solutions&nbsp;?',opts:['t² + 6t + 10 = 0','t² − 6t + 8 = 0','t² − 6t + 10 = 0','t² − 3t + 1 = 0'],ans:2,
   why:'S = 6 et P = (3 + i)(3 − i) = 9 + 1 = 10, donc t² − 6t + 10 = 0.'},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir',p:`<p>Avec les complexes, on calcule comme avec des lettres, plus la règle i² = −1. Le conjugué et le module font le reste.</p>`
+  +keep([`<b>Écriture</b> : z = a + bi unique, a = Re z, b = Im z réels. a + bi = c + di ⇔ a = c et b = d : une équation complexe vaut deux équations réelles.`,
+   `<b>Puissances de i</b> : i, −1, −i, 1, puis ça recommence ; pour iⁿ, regarde le reste de n modulo 4.`,
+   `<b>Conjugué</b> z̄ = a − bi : ${ov('z + w')} = z̄ + w̄, ${ov('zw')} = z̄ w̄, Re z = (z + z̄)/2, Im z = (z − z̄)/2i. z réel ⇔ z = z̄.`,
+   `<b>Module</b> |z| = √(a² + b²) : z z̄ = |z|², |zw| = |z||w|, |z/w| = |z|/|w|, |zⁿ| = |z|ⁿ. |z − w| est la distance entre z et w. Pas de formule pour |z + w|, seulement |z + w| ≤ |z| + |w|.`,
+   `<b>Inverse et quotient</b> : 1/z = z̄/|z|², z/w = z w̄/|w|² : on multiplie haut et bas par le conjugué du dénominateur.`,
+   `<b>Racine carrée de Δ = a + bi</b> : poser δ = x + iy, puis x² − y² = a, 2xy = b et x² + y² = |Δ|. Choisir les signes avec celui de b.`,
+   `<b>Degré 2 dans ℂ</b> : z = (−b ± δ)/2a avec δ² = Δ ; coefficients réels et Δ &lt; 0 : δ = i√(−Δ), racines conjuguées. Somme −b/a, produit c/a.`])},
  {kind:'Problème',h:'Impédances d’un circuit',
   p:'En courant alternatif, un dipôle se décrit par une <b>impédance complexe</b> <i>Z</i> = <i>R</i> + <i>iX</i> (en ohms) : <i>R</i> est la résistance, <i>X</i> la réactance, et |<i>Z</i>| règle l’amplitude du courant. Deux dipôles ont pour impédances <i>Z</i>₁ = 3 + 4i et <i>Z</i>₂ = 6 − 8i. En série, <i>Z</i> = <i>Z</i>₁ + <i>Z</i>₂. En parallèle, 1/<i>Z</i> = 1/<i>Z</i>₁ + 1/<i>Z</i>₂, soit <i>Z</i> = <i>Z</i>₁<i>Z</i>₂/(<i>Z</i>₁ + <i>Z</i>₂).',
   parts:[
@@ -316,12 +435,23 @@ COURS.push(
 
 /* ===================== 4. Représentations ===================== */
 {subj:'an2', sem:'pri', id:'an2-representations', h:'Représentations des complexes', p:'Plan de Gauss, forme polaire, Euler, Moivre et matrices 2 × 2.', steps:[
- {kind:'Théorie',h:'Forme polaire',p:`Dans le <b>plan de Gauss</b>, <i>z</i> est repéré par sa distance <i>r = |z|</i> à l’origine et son angle θ = arg <i>z</i> avec l’axe réel. Alors <b>z = r(cos θ + i sin θ) = r·${E('iθ')}</b>. On repasse en cartésien avec a = r cos θ et b = r sin θ.`,
+ {kind:'Théorie',h:'Forme polaire',p:`<p>Un point du plan se repère par ses coordonnées (a ; b), mais aussi par sa distance à l’origine et la direction dans laquelle on le voit. Pour les complexes, cette seconde description rend les produits et les puissances presque évidents.</p>`
+  +bk('def',`Pour z ≠ 0, le <b>module</b> r = |z| est la distance à l’origine, et un <b>argument</b> θ = arg <i>z</i> est l’angle orienté entre l’axe réel et la flèche de <i>z</i>, en radians. La <b>forme trigonométrique</b> est <b>z = r(cos θ + i sin θ)</b>, qu’on écrit aussi <b>z = r·${E('iθ')}</b> (forme exponentielle, expliquée à l’étape suivante).`)
+  +bk('idea',`La figure montre le triangle rectangle : <b>a = r cos θ</b> et <b>b = r sin θ</b>. Le module dit « à quelle distance », l’argument dit « dans quelle direction ». Le nombre 0 n’a pas d’argument : toutes les directions se valent.`)
+  +bk('ex',`z = 1 + i : r = √2 et θ = π/4 (45°), car cos 45° = sin 45° = √2/2. Donc 1 + i = √2·${E('iπ/4')}. Inversement, 2${E('iπ/3')} = 2(cos 60° + i sin 60°) = 1 + i√3.`)
+  +bk('warn',`L’argument n’est défini qu’à 2π près : θ et θ + 2π désignent la même direction. On choisit souvent la valeur dans ]−π ; π], l’<b>argument principal</b>. Ainsi arg(−i) = −π/2 plutôt que 3π/2, même si les deux sont corrects.`),
   params:[{id:'r',l:'Module r',min:.5,max:4,step:.5,v:3},{id:'t',l:'Argument θ',min:0,max:345,step:15,v:45,u:'°'}],
   draw:v=>{ const a=v.r*Math.cos(rad(v.t)), b=v.r*Math.sin(rad(v.t)), P=cpl(); P.circ(0,0,v.r,{c:'var(--muted)',w:1,dash:true}).curve(t=>.8*Math.cos(t),t=>.8*Math.sin(t),0,rad(v.t),{c:'var(--spark)',w:2})
     .seg(a,0,a,b,{c:'var(--muted)',w:1.5,dash:true}).arrow(0,0,a,b).dot(a,b,{l:'z'}); return P.svg(); },
   info:v=>`z = ${fmt(v.r,1)}·e${sup('i·'+v.t+'°')} = ${cz(v.r*Math.cos(rad(v.t)),v.r*Math.sin(rad(v.t)))}`,
   note:'L’argument n’est défini qu’à 2π près : θ et θ + 360° donnent le même point. On choisit souvent θ dans ]−π ; π].'},
+ {kind:'Théorie',h:'Pourquoi écrire e^(iθ)',p:`<p>Écrire cos θ + i sin θ sous la forme ${E('iθ')} ressemble à un abus : qu’est-ce que l’exponentielle d’un imaginaire ? C’est une notation, mais elle est choisie parce qu’elle a toutes les propriétés d’une exponentielle.</p>`
+  +bk('def',`<b>Formule d’Euler</b> : pour θ réel, <b>${E('iθ')} = cos θ + i sin θ</b>. C’est un complexe de module 1 (car cos² θ + sin² θ = 1) : le point du cercle unité d’angle θ.`)
+  +bk('why',`La propriété fondamentale d’une exponentielle est ${E('a+b')} = ${E('a')}${E('b')}. Vérifions-la : (cos α + i sin α)(cos β + i sin β) = (cos α cos β − sin α sin β) + i(sin α cos β + cos α sin β) = cos(α + β) + i sin(α + β), par les formules d’addition. Donc <b>${E('iα')}·${E('iβ')} = ${E('i(α+β)')}</b>. Autre indice : f(θ) = cos θ + i sin θ vérifie f′(θ) = −sin θ + i cos θ = i·f(θ), exactement comme ${E('kθ')} vérifie (${E('kθ')})′ = k·${E('kθ')}, avec k = i.`)
+  +bk('ex',`${E('iπ/2')} = i, ${E('iπ')} = −1 (la célèbre identité ${E('iπ')} + 1 = 0), ${E('2iπ')} = 1, ${E('iπ/3')} = ½ + i√3/2. Et (${E('iπ/6')})³ = ${E('iπ/2')} = i.`)
+  +bk('idea',`Avec cette notation, les formules trigonométriques deviennent des règles d’exposants. Un produit de complexes se calcule comme un produit de puissances : on multiplie les modules et on ajoute les exposants, c’est-à-dire les angles.`),
+  fig:(()=>{ const P=cpl(1.4,1,{step:.5}); const a=Math.PI/3; P.circ(0,0,1,{c:'var(--muted)',w:1.5}).curve(t=>.4*Math.cos(t),t=>.4*Math.sin(t),0,a,{c:'var(--spark)',w:2}).seg(Math.cos(a),0,Math.cos(a),Math.sin(a),{c:'var(--muted)',w:1.5,dash:true}).seg(0,Math.sin(a),Math.cos(a),Math.sin(a),{c:'var(--muted)',w:1.5,dash:true}).arrow(0,0,Math.cos(a),Math.sin(a)).dot(Math.cos(a),Math.sin(a),{l:'e^(iπ/3)'}).text(.45,.15,'θ',{c:'var(--spark)'}).text(Math.cos(a),0,'cos θ',{dy:14,s:11}).text(0,Math.sin(a),'sin θ',{a:'end',dx:-4,dy:4,s:11}); return P.svg(); })(),
+  note:'Sur le cercle unité, e^(iθ) est le point d’angle θ : son abscisse est cos θ, son ordonnée sin θ.'},
  {kind:'Méthode',h:'De a + bi à la forme polaire',p:'<b>Quand</b> : pour multiplier, élever à une puissance ou extraire une racine, la forme polaire est bien plus commode. <b>Pourquoi ça marche</b> : a = r cos θ et b = r sin θ, donc <b>r = √(a² + b²)</b>, puis <b>cos θ = a/r</b> et <b>sin θ = b/r</b>. Il faut les <b>deux</b> : cos θ seul donne deux angles possibles, le signe de sin θ (donc de b) tranche. <b>Comment</b> : calcule r, écris cos θ et sin θ, repère le quadrant avec les signes de a et b, puis reconnais un angle connu.',
   demo:{enonce:'Écris z = −1 − i√3 sous forme polaire.',etapes:[
    {f:'r = √(1 + 3) = 2',w:'Module.'},
@@ -337,7 +467,12 @@ COURS.push(
   ok:v=>v.r===2&&v.t===150,why:'r = √(3 + 1) = 2. Puis cos θ = −√3/2 et sin θ = ½, donc θ = 150° = 5π/6. Ainsi −√3 + i = 2e^(5iπ/6).'},
  {h:'Un argument dans le 3e quadrant',p:'Quel est l’argument de <i>−2 − 2i</i>, en degrés, choisi dans ]−180° ; 180°]&nbsp;?',lab:'θ =',unit:'°',ans:-135,
   why:'r = 2√2, cos θ = sin θ = −√2/2 : 3e quadrant, donc θ = −135°. La calculatrice donne arctan(1) = 45°, qu’il faut corriger de −180°.'},
- {kind:'Théorie',h:'Euler et Moivre',p:`La <b>formule d’Euler</b> ${E('iθ')} = cos θ + i sin θ transforme les produits en sommes d’angles : <b>r${E('iα')}·s${E('iβ')} = rs·${E('i(α+β)')}</b>. Les modules se multiplient, les arguments s’additionnent. En particulier, <b>formule de Moivre</b> : (cos θ + i sin θ)ⁿ = cos nθ + i sin nθ.`,
+ {kind:'Théorie',h:'Euler et Moivre',p:`<p>Maintenant que ${E('iα')}${E('iβ')} = ${E('i(α+β)')}, le produit de deux complexes en forme polaire est immédiat.</p>`
+  +bk('prop',`<b>r${E('iα')}·s${E('iβ')} = rs·${E('i(α+β)')}</b> : les modules se multiplient, les arguments s’additionnent. Pour le quotient : r${E('iα')}/(s${E('iβ')}) = (r/s)·${E('i(α−β)')}.`)
+  +bk('thm',`<b>Formule de Moivre</b> : pour tout entier <i>n</i>, <b>(cos θ + i sin θ)ⁿ = cos nθ + i sin nθ</b>, c’est-à-dire (${E('iθ')})ⁿ = ${E('inθ')}. Plus généralement <b>(r${E('iθ')})ⁿ = rⁿ·${E('inθ')}</b>.`)
+  +bk('why',`On multiplie <i>n</i> fois ${E('iθ')} par lui-même : les arguments s’ajoutent <i>n</i> fois, θ + θ + … + θ = nθ, et les modules 1 se multiplient en 1. Pour <i>n</i> négatif, 1/${E('iθ')} = ${E('−iθ')}, car ${E('iθ')}·${E('−iθ')} = ${E('0')} = 1.`)
+  +bk('ex',`(1 + i)² : 1 + i = √2·${E('iπ/4')}, donc (1 + i)² = 2·${E('iπ/2')} = 2i. Directement : 1 + 2i + i² = 2i. Et i·i = ${E('iπ/2')}·${E('iπ/2')} = ${E('iπ')} = −1 : la règle i² = −1 se lit « deux quarts de tour font un demi-tour ».`)
+  +bk('idea',`La figure enchaîne z, z², z³… : chaque point s’obtient du précédent en tournant de θ et en multipliant la distance à l’origine par <i>r</i>. Pour r = 1, les puissances restent sur le cercle unité.`),
   params:[{id:'r',l:'Module r',min:.8,max:1.2,step:.1,v:1.1},{id:'t',l:'θ',min:15,max:90,step:15,v:30,u:'°'},{id:'n',l:'Puissance n',min:1,max:8,v:4}],
   draw:v=>{ const P=cpl(4.5,1); P.circ(0,0,1,{c:'var(--muted)',w:1.5,dash:true}); let px=1,py=0;
     for(let k=1;k<=v.n;k++){ const R=v.r**k, x=R*Math.cos(rad(k*v.t)), y=R*Math.sin(rad(k*v.t)); P.seg(px,py,x,y,{c:'var(--muted)',w:1.5}); P.dot(x,y,{r:k===v.n?7:4,c:k===v.n?'var(--accent)':'var(--spark)',l:k===1?'z':k===v.n?'zⁿ':''}); px=x; py=y; }
@@ -353,6 +488,14 @@ COURS.push(
   note:'C’est souvent la seule façon simple d’obtenir des valeurs exactes comme cos 15° : en forme algébrique, (1 + i)/(√3 + i) = ((√3 + 1) + i(√3 − 1))/4.'},
  {h:'Argument d’un produit',p:'Quel est l’argument de <i>(1 + i)(√3 + i)</i>, en degrés&nbsp;?',lab:'θ =',unit:'°',ans:75,
   why:'arg(1 + i) = 45° et arg(√3 + i) = 30°. Les arguments s’additionnent : 75°. Le module vaut √2 · 2 = 2√2.'},
+ {kind:'Théorie',h:'Multiplier par e^(iθ), c’est tourner',p:`<p>La règle « les arguments s’additionnent » a une traduction géométrique très concrète, qui fait des complexes l’outil naturel des rotations.</p>`
+  +bk('prop',`Multiplier un complexe <i>z</i> par ${E('iθ')} <b>fait tourner</b> le point <i>z</i> de l’angle θ autour de l’origine, sans changer sa distance. Multiplier par un réel r &gt; 0 <b>dilate</b> d’un facteur <i>r</i>. Multiplier par w = r${E('iθ')} fait les deux : c’est une <b>similitude</b> de rapport <i>r</i> et d’angle θ.`)
+  +bk('why',`Si z = ρ${E('iφ')}, alors ${E('iθ')}·z = ρ${E('i(φ+θ)')} : même module ρ, argument augmenté de θ. C’est exactement la définition d’une rotation de centre 0 et d’angle θ.`)
+  +bk('ex',`Multiplier par i = ${E('iπ/2')} est un quart de tour : i(2 + i) = 2i + i² = −1 + 2i, et le point (2 ; 1) est devenu (−1 ; 2), tourné de 90° dans le sens direct. Multiplier par −1 = ${E('iπ')} est un demi-tour. Multiplier par 1 + i = √2·${E('iπ/4')} tourne de 45° et agrandit d’un facteur √2.`)
+  +bk('idea',`Pour tourner un point <i>z</i> autour d’un centre <i>c</i> plutôt que de l’origine : z ↦ c + ${E('iθ')}(z − c). On se ramène au centre, on tourne, on revient. Le problème du bras articulé, en fin de chapitre, repose sur ce principe.`),
+  params:[{id:'t',l:'Angle θ',min:0,max:345,step:15,v:90,u:'°'}],
+  draw:v=>{ const a=rad(v.t), x=2*Math.cos(a)-Math.sin(a), y=2*Math.sin(a)+Math.cos(a), P=cpl(3,1); P.circ(0,0,Math.sqrt(5),{c:'var(--muted)',w:1,dash:true}).curve(t=>.8*Math.cos(t),t=>.8*Math.sin(t),Math.atan2(1,2),Math.atan2(1,2)+a,{c:'var(--spark)',w:2}).arrow(0,0,2,1,{c:'var(--math)'}).arrow(0,0,x,y).dot(2,1,{c:'var(--math)',r:4,l:'z = 2 + i'}).dot(x,y,{l:'e^(iθ)·z'}); return P.svg(); },
+  info:v=>{ const a=rad(v.t); return `${E('i·'+v.t+'°')}·(2 + i) = ${cz(2*Math.cos(a)-Math.sin(a),2*Math.sin(a)+Math.cos(a))} : même module √5 ≈ 2,236, argument augmenté de ${v.t}°`; }},
  {kind:'Méthode',h:'Une puissance avec Moivre',p:'<b>Quand</b> : on doit calculer zⁿ pour n grand. Développer serait très long. <b>Pourquoi ça marche</b> : <b>(r·e^(iθ))ⁿ = rⁿ·e^(inθ)</b> : on élève le module à la puissance n et on multiplie l’argument par n. <b>Comment</b> : mets z sous forme polaire, applique la formule, <b>ramène nθ dans ]−π ; π]</b> en retirant des multiples de 2π, puis repasse en a + bi.',
   demo:{enonce:'Calcule (1 − i)⁶.',etapes:[
    {f:'1 − i = √2·e^(−iπ/4)',w:'r = √2, cos θ = √2/2, sin θ = −√2/2 : 4e quadrant.'},
@@ -393,7 +536,11 @@ COURS.push(
   note:'Astuce de l’angle moitié : 1 + e^(iθ) = e^(iθ/2)(e^(−iθ/2) + e^(iθ/2)) = 2 cos(θ/2)·e^(iθ/2), donc |1 + e^(iθ)| = 2|cos(θ/2)|.'},
  {h:'Une somme d’exponentielles',p:'Calcule <i>|1 + e<sup>iπ/3</sup>|</i>, arrondi au millième.',lab:'module =',ans:1.732,tol:.0006,
   why:'|1 + cos θ + i sin θ|² = 2 + 2 cos θ = 2 + 1 = 3 pour θ = π/3, donc le module vaut √3 ≈ 1,732. L’angle moitié donne aussi 2 cos(π/6) = √3.'},
- {kind:'Théorie',h:'Des complexes en matrices',p:`On associe à <i>z = a + bi</i> la matrice <b>M(z) = ${mat([['a','−b'],['b','a']])}</b>. Alors M(z + w) = M(z) + M(w) et <b>M(zw) = M(z)·M(w)</b> : calculer avec ces matrices, c’est calculer avec les complexes. On a M(i) = ${mat([[0,'−1'],[1,0]])}, la rotation de 90°, et M(i)² = −I.`,
+ {kind:'Théorie',h:'Des complexes en matrices',p:`<p>Multiplier par z = a + bi transforme le plan (rotation suivie d’une dilatation). Toute transformation linéaire du plan a une matrice 2 × 2. Quelle est celle de la multiplication par <i>z</i> ?</p>`
+  +bk('def',`À z = a + bi on associe <b>M(z) = ${mat([['a','−b'],['b','a']])}</b>. Multiplier x + iy par <i>z</i> donne (ax − by) + i(bx + ay) : c’est exactement M(z) appliquée au vecteur (x ; y).`)
+  +bk('prop',`<b>M(z + w) = M(z) + M(w)</b> et <b>M(zw) = M(z)·M(w)</b> : calculer avec ces matrices, c’est calculer avec les complexes. De plus <b>det M(z) = a² + b² = |z|²</b>, et M(z̄) est la transposée de M(z).`)
+  +bk('why',`M(zw) et M(z)M(w) représentent la même transformation (multiplier par <i>w</i> puis par <i>z</i>, ou directement par <i>zw</i>), donc ce sont les mêmes matrices. On peut aussi vérifier à la main : M(i) = ${mat([[0,'−1'],[1,0]])} est la rotation de 90°, et M(i)² = ${mat([['−1',0],[0,'−1']])} = −I, traduction matricielle de i² = −1.`)
+  +bk('ex',`z = 1 + i : M(z) = ${mat([[1,'−1'],[1,1]])}, et M(z)² = ${mat([[0,'−2'],[2,0]])} = M(2i). On retrouve (1 + i)² = 2i, avec det M(z) = 2 = |1 + i|².`),
   fig:`<p>En polaire, M(r${E('iθ')}) = r·${mat([['cos θ','−sin θ'],['sin θ','cos θ']])} : une rotation d’angle θ suivie d’une homothétie de rapport r. Et det M(z) = a² + b² = |z|².</p>`,
   note:'M(z̄) est la transposée de M(z). Multiplier par z agit sur le plan exactement comme la matrice M(z) agit sur le vecteur (x ; y).'},
  {h:'La bonne matrice',p:'Quelle matrice représente <i>z = 3 − 2i</i>&nbsp;?',
@@ -401,6 +548,14 @@ COURS.push(
   why:'Avec a = 3 et b = −2, la forme [[a, −b], [b, a]] donne [[3, 2], [−2, 3]].'},
  {kind:'Défi',h:'Produit matriciel',p:`Soient <i>z = 1 + 2i</i> et <i>w = 3 − i</i>. Quel est le coefficient en haut à droite de M(z)·M(w)&nbsp;?`,lab:'coefficient =',ans:-5,
   why:'M(z)M(w) = M(zw) et zw = 3 − i + 6i − 2i² = 5 + 5i. La matrice est [[5, −5], [5, 5]] : le coefficient en haut à droite est −b = −5.'},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir',p:`<p>Forme algébrique pour additionner, forme polaire pour multiplier : savoir passer de l’une à l’autre est la compétence centrale du chapitre.</p>`
+  +keep([`<b>Forme polaire</b> : z = r(cos θ + i sin θ) = r${E('iθ')}, avec r = |z| = √(a² + b²), cos θ = a/r et sin θ = b/r (les deux, pour le quadrant). L’argument est défini à 2π près.`,
+   `<b>Euler</b> : ${E('iθ')} = cos θ + i sin θ, de module 1 ; ${E('iα')}${E('iβ')} = ${E('i(α+β)')}. Valeurs clés : ${E('iπ/2')} = i, ${E('iπ')} = −1, ${E('2iπ')} = 1.`,
+   `<b>Produit et quotient</b> : modules multipliés (divisés), arguments additionnés (soustraits). Multiplier par ${E('iθ')} = tourner de θ ; par i = quart de tour.`,
+   `<b>Moivre</b> : (r${E('iθ')})ⁿ = rⁿ${E('inθ')} ; développer (cos θ + i sin θ)ⁿ donne cos nθ et sin nθ. Ramène nθ dans ]−π ; π].`,
+   `<b>Formules d’Euler</b> : cos θ = (${E('iθ')} + ${E('−iθ')})/2, sin θ = (${E('iθ')} − ${E('−iθ')})/2i, pour linéariser cosⁿ θ et sinⁿ θ.`,
+   `<b>Module d’une somme</b> : mets en facteur l’exponentielle commune (module 1), passe en algébrique, utilise cos² + sin² = 1. |1 + ${E('iθ')}| = 2|cos(θ/2)|.`,
+   `<b>Matrices</b> : M(a + bi) = ${mat([['a','−b'],['b','a']])}, M(zw) = M(z)M(w), det M(z) = |z|², M(r${E('iθ')}) = r × rotation d’angle θ.`])},
  {kind:'Problème',h:'Une puissance dixième',
   p:'On veut calculer <b>(1 + i√3)¹⁰</b> sans développer dix fois. La forme polaire transforme la puissance en deux opérations simples : élever le module à la puissance 10 et multiplier l’argument par 10. On repasse ensuite en forme cartésienne.',
   parts:[
@@ -427,14 +582,30 @@ COURS.push(
 
 /* ===================== 5. Racines n-ièmes ===================== */
 {subj:'an2', sem:'pri', id:'an2-racines', h:'Racines de l’unité et racines n-ièmes', p:'Résoudre zⁿ = w : des polygones réguliers dans le plan complexe.', steps:[
- {kind:'Théorie',h:'Les racines n-ièmes de l’unité',p:`L’équation <b>zⁿ = 1</b> a exactement <i>n</i> solutions dans ℂ : <b>ω<sub>k</sub> = ${E('2ikπ/n')}</b>, pour k = 0, 1, …, n − 1. Elles ont toutes un module 1 et sont espacées de 360°/n : ce sont les sommets d’un <b>polygone régulier</b> inscrit dans le cercle unité, avec 1 comme sommet.`,
+ {kind:'Théorie',h:'Les racines n-ièmes de l’unité',p:`<p>Dans ℝ, x² = 1 a deux solutions et x³ = 1 une seule. Dans ℂ, l’équation zⁿ = 1 a toujours exactement <i>n</i> solutions, et elles dessinent une figure parfaite.</p>`
+  +bk('def',`Les <b>racines n-ièmes de l’unité</b> sont les solutions de <b>zⁿ = 1</b>. Ce sont les <i>n</i> nombres <b>ω<sub>k</sub> = ${E('2ikπ/n')}</b>, pour k = 0, 1, …, n − 1.`)
+  +bk('why',`Cherchons z = r${E('iθ')}. Alors zⁿ = rⁿ${E('inθ')} doit valoir 1 = 1·${E('i·0')}. Égalité des modules : rⁿ = 1, donc r = 1. Égalité des arguments à 2π près : nθ = 2kπ, donc θ = 2kπ/n avec <i>k</i> entier. Pour k = 0, …, n − 1 on obtient <i>n</i> directions différentes ; pour k = n on retombe sur θ = 2π, le même point que k = 0. Il y a donc exactement <i>n</i> solutions, pas une de plus.`)
+  +bk('ex',`n = 4 : les angles sont 0°, 90°, 180°, 270°, soit 1, i, −1, −i. On vérifie i⁴ = (i²)² = 1 et (−i)⁴ = i⁴ = 1. n = 2 : 1 et −1, comme dans ℝ.`)
+  +bk('idea',`Toutes ont un module 1 et sont espacées de 360°/n : ce sont les sommets d’un <b>polygone régulier</b> inscrit dans le cercle unité, avec 1 comme sommet. En notant ω = ${E('2iπ/n')} la racine d’angle minimal, les autres sont ses puissances ω⁰, ω¹, …, ω${sup('n−1')} : on tourne de 2π/n à chaque multiplication.`),
   params:[{id:'n',l:'n',min:2,max:12,v:5}],
   draw:v=>{ const P=cpl(1.5,1,{step:.5}), pts=[]; for(let k=0;k<v.n;k++) pts.push([Math.cos(2*Math.PI*k/v.n),Math.sin(2*Math.PI*k/v.n)]);
     P.circ(0,0,1,{c:'var(--muted)',w:1.5,dash:true}).poly(pts,{fill:'var(--accent)',fo:.15,c:'var(--accent)',w:2}); pts.forEach((p,k)=>P.dot(p[0],p[1],{r:5,l:k===0?'1':k===1?'ω':''})); return P.svg(); },
   info:v=>`${v.n} racines, angle entre deux voisines : ${fmt(360/v.n,1)}°. ω = e${sup('2iπ/'+v.n)} et ω${sup('k')} parcourt toutes les racines.`},
  {h:'Racines réelles',p:'Parmi les 6 solutions complexes de <i>z⁶ = 1</i>, combien sont réelles&nbsp;?',opts:['0','1','2','6'],ans:2,
   why:'Les racines sont aux angles 0°, 60°, 120°, 180°, 240°, 300°. Seules 0° et 180° tombent sur l’axe réel : z = 1 et z = −1.'},
- {kind:'Théorie',h:'Leur somme est nulle',p:`Pour <i>n</i> ≥ 2, avec ω = ${E('2iπ/n')} ≠ 1 : <b>1 + ω + ω² + … + ωⁿ⁻¹ = ${F('ωⁿ − 1','ω − 1')} = 0</b> (somme géométrique). Géométriquement : mises bout à bout, les <i>n</i> flèches de longueur 1 tournent chaque fois de 360°/n et referment un polygone. On revient à 0.`,
+ {kind:'Théorie',h:'Les racines cubiques de l’unité et le nombre j',p:`<p>Le cas n = 3 revient si souvent que sa racine principale a reçu un nom : j.</p>`
+  +bk('def',`<b>j = ${E('2iπ/3')} = −½ + i√3/2</b>. Les racines cubiques de l’unité sont 1, j et j² = ${E('4iπ/3')} = −½ − i√3/2.`)
+  +bk('prop',`<b>j³ = 1</b>, <b>j² = j̄ = 1/j</b>, et <b>1 + j + j² = 0</b>.`)
+  +bk('why',`j³ = ${E('2iπ')} = 1. Le conjugué de j a pour argument −2π/3, qui est la même direction que 4π/3 : c’est j². Et comme |j| = 1, j̄ = 1/j. Pour la somme : 1 + j + j² = 1 + (−½ + i√3/2) + (−½ − i√3/2) = 0. Autre vue : (j − 1)(1 + j + j²) = j³ − 1 = 0 et j ≠ 1.`)
+  +bk('ex',`j⁷ = j⁶·j = (j³)²·j = j. Et (1 + j)² = (−j²)² = j⁴ = j. Contrôle numérique : 1 + j = ½ + i√3/2 = ${E('iπ/3')}, dont le carré est ${E('2iπ/3')} = j.`)
+  +bk('idea',`1, j et j² sont les sommets d’un triangle équilatéral inscrit dans le cercle unité. Les trois règles ci-dessus suffisent à réduire n’importe quelle expression en j à la forme a + bj, comme le fera la méthode suivante.`),
+  fig:(()=>{ const P=cpl(1.5,1,{step:.5}), pts=[0,120,240].map(t=>[Math.cos(rad(t)),Math.sin(rad(t))]); P.circ(0,0,1,{c:'var(--muted)',w:1.5,dash:true}).poly(pts,{fill:'var(--accent)',fo:.15,c:'var(--accent)',w:2}); P.dot(1,0,{r:5,l:'1'}).dot(pts[1][0],pts[1][1],{r:5,l:'j',dx:-14}).dot(pts[2][0],pts[2][1],{r:5,l:'j² = j̄',dx:-30,dy:16}); return P.svg(); })()},
+ {kind:'Théorie',h:'Leur somme est nulle',p:`<p>Place les <i>n</i> racines sur le cercle et calcule leur centre de gravité : il tombe sur l’origine, par symétrie. Algébriquement, cela signifie que leur somme est nulle.</p>`
+  +bk('prop',`Pour <i>n</i> ≥ 2 et ω = ${E('2iπ/n')} : <b>1 + ω + ω² + … + ω${sup('n−1')} = 0</b>.`)
+  +bk('why',`C’est une somme géométrique de raison ω ≠ 1 : 1 + ω + … + ω${sup('n−1')} = ${F('ωⁿ − 1','ω − 1')}. Or ωⁿ = 1, donc le numérateur est nul. Il faut n ≥ 2 pour avoir ω ≠ 1 et pouvoir diviser.`)
+  +bk('idea',`Géométriquement : mets les <i>n</i> flèches 1, ω, ω², … bout à bout. Chacune a la longueur 1 et tourne de 360°/n par rapport à la précédente. Elles referment un polygone régulier et la dernière pointe revient au point de départ : le déplacement total est 0. La figure le montre pour chaque <i>n</i>.`)
+  +bk('ex',`n = 4 : 1 + i + (−1) + (−i) = 0. n = 3 : 1 + j + j² = 0, donc j + j² = −1, une égalité qu’on utilise sans arrêt. n = 6 : les racines sont ±1, ±j, ±j², et les paires opposées s’annulent deux à deux.`)
+  +bk('warn',`La somme des racines n-ièmes d’un autre nombre <i>w</i> est aussi nulle (ce sont les ω<sub>k</sub> multipliées par une racine fixe z₀). Mais la somme des <b>modules</b> ne l’est pas : elle vaut <i>n</i>.`),
   params:[{id:'n',l:'n',min:2,max:12,v:6}],
   draw:v=>{ const P=plane({x:[-1.6,2.6],y:[-.6,4],lab:1}); let x=0,y=0;
     for(let k=0;k<v.n;k++){ const a=2*Math.PI*k/v.n, nx=x+Math.cos(a), ny=y+Math.sin(a); P.arrow(x,y,nx,ny,{c:k%2?'var(--spark)':'var(--accent)',w:2.5,hs:9}); x=nx; y=ny; }
@@ -471,8 +642,20 @@ COURS.push(
   ok:v=>v.r===2&&[30,150,270].includes(v.t),why:'8i = 8e^(iπ/2). Donc r = 8^(1/3) = 2 et θ = 30° + k·120° : 30°, 150° ou 270°. Les trois racines sont √3 + i, −√3 + i et −2i.'},
  {h:'Racines carrées de i',p:'Quelles sont les deux racines carrées de <i>i</i>&nbsp;?',opts:['±i','±(1 + i)','±(1 − i)/√2','±(1 + i)/√2'],ans:3,
   why:'i = e^(iπ/2), donc z = ±e^(iπ/4) = ±(√2/2)(1 + i) = ±(1 + i)/√2. Vérification : ((1 + i)/√2)² = 2i/2 = i.'},
+ {kind:'Théorie',h:'Factoriser zⁿ − w grâce aux racines',p:`<p>Connaître les <i>n</i> racines de <i>w</i>, c’est aussi factoriser le polynôme zⁿ − w, qui n’a souvent aucune racine réelle évidente (par exemple z⁴ + 1).</p>`
+  +bk('prop',`Si z₀, z₁, …, z<sub>n−1</sub> sont les <i>n</i> racines n-ièmes de <i>w</i>, alors <b>zⁿ − w = (z − z₀)(z − z₁)…(z − z<sub>n−1</sub>)</b>. En particulier <b>zⁿ − 1 = (z − 1)(z − ω)…(z − ω${sup('n−1')})</b>.`)
+  +bk('why',`Chaque z<sub>k</sub> annule zⁿ − w, donc chaque facteur (z − z<sub>k</sub>) le divise. Les <i>n</i> facteurs sont distincts, et leur produit est un polynôme de degré <i>n</i> de coefficient dominant 1, comme zⁿ − w : les deux polynômes sont égaux.`)
+  +bk('ex',`z⁴ − 1 = (z − 1)(z + 1)(z − i)(z + i). En regroupant les deux facteurs conjugués, (z − i)(z + i) = z² + 1, on retrouve z⁴ − 1 = (z² − 1)(z² + 1). De même z³ + 8 = (z + 2)(z − 1 − i√3)(z − 1 + i√3) = (z + 2)(z² − 2z + 4), car (z − 1)² + 3 = z² − 2z + 4.`)
+  +bk('idea',`Regrouper chaque racine avec sa conjuguée donne des facteurs réels de degré 2 : c’est ainsi qu’on factorise sur ℝ un polynôme sans racine réelle. Le chapitre sur les polynômes développe cette idée.`)},
  {kind:'Défi',h:'Le carré de −16',p:'Les quatre racines quatrièmes de <i>−16</i> forment un carré. Quelle est la longueur de son côté, arrondie au centième&nbsp;?',lab:'côté =',ans:2.83,tol:.006,
   why:'−16 = 16e^(iπ). Les racines ont pour module 16^(1/4) = 2 et pour arguments 45°, 135°, 225°, 315°. Deux sommets voisins, comme √2 + i√2 et −√2 + i√2, sont à distance 2√2 ≈ 2,83.'},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir',p:`<p>Résoudre zⁿ = w, c’est égaler les modules et les arguments à 2π près : une racine du module, et <i>n</i> angles régulièrement espacés.</p>`
+  +keep([`<b>Racines n-ièmes de l’unité</b> : ω<sub>k</sub> = ${E('2ikπ/n')}, k = 0, …, n − 1 ; module 1, sommets d’un polygone régulier, avec 1 comme sommet. Toutes sont des puissances de ω = ${E('2iπ/n')}.`,
+   `<b>Le nombre j</b> = ${E('2iπ/3')} = −½ + i√3/2 : j³ = 1, j² = j̄ = 1/j, 1 + j + j² = 0.`,
+   `<b>Somme nulle</b> : 1 + ω + … + ω${sup('n−1')} = 0 pour n ≥ 2 (somme géométrique, ωⁿ = 1). Pour calculer : réduis les exposants modulo n, puis remplace les sommes grâce à la somme nulle.`,
+   `<b>Racines de w = ρ${E('iφ')}</b> : z<sub>k</sub> = ρ${sup('1/n')}·${E('i(φ + 2kπ)/n')}. Divise l’angle par n <b>et</b> ajoute les 2kπ/n : n solutions, sur le cercle de rayon ρ${sup('1/n')}.`,
+   `<b>Géométrie</b> : deux racines voisines sont à distance 2ρ${sup('1/n')} sin(π/n) ; racines carrées de w : ±√ρ·${E('iφ/2')}.`,
+   `<b>Factorisation</b> : zⁿ − w = ∏(z − z<sub>k</sub>) ; en regroupant les paires conjuguées, on obtient des facteurs réels de degré 2.`])},
  {kind:'Problème',h:'Les racines cubiques de −8',
   p:'On résout <b><i>z</i>³ = −8</b> dans ℂ. On sait déjà que −2 est une solution réelle. Les trois solutions forment un triangle équilatéral centré à l’origine, qu’on va décrire complètement.',
   fig:(()=>{ const P=cpl(2.6,1,{step:.5}), pts=[60,180,300].map(t=>[2*Math.cos(rad(t)),2*Math.sin(rad(t))]); P.circ(0,0,2,{c:'var(--muted)',w:1.5,dash:true}).poly(pts,{fill:'var(--accent)',fo:.15,c:'var(--accent)',w:2}); pts.forEach(p=>P.dot(p[0],p[1],{r:5})); return P.svg(); })(),
@@ -497,7 +680,17 @@ COURS.push(
 
 /* ===================== 6. Polynômes ===================== */
 {subj:'an2', sem:'pri', id:'an2-polynomes', h:'Polynômes réels et complexes', p:'Division euclidienne, racines, et factorisation sur ℂ et sur ℝ.', steps:[
- {kind:'Théorie',h:'Division euclidienne',p:'Pour deux polynômes <i>A</i> et <i>B ≠ 0</i>, il existe un unique couple (Q, R) tel que <b>A = B·Q + R</b> avec <b>deg R &lt; deg B</b>. On pose la division comme pour les entiers, en éliminant à chaque étape le terme de plus haut degré.',
+ {kind:'Théorie',h:'Polynômes, degré et coefficient dominant',p:`<p>Tu manipules des polynômes depuis longtemps : x² − 3x + 2, 2x³ + 1… Avant de les diviser et de les factoriser, fixons le vocabulaire, car tout le chapitre repose sur une seule grandeur : le <b>degré</b>.</p>`
+  +bk('def',`Un <b>polynôme</b> à coefficients dans 𝕂 (𝕂 = ℝ ou ℂ) est une expression <b>P = aₙxⁿ + … + a₁x + a₀</b>, où les a<sub>k</sub> sont des nombres de 𝕂. Si aₙ ≠ 0, <i>n</i> est le <b>degré</b> de P, noté deg P, et aₙ son <b>coefficient dominant</b>. P est <b>unitaire</b> si aₙ = 1. On note 𝕂[x] l’ensemble de ces polynômes.`)
+  +bk('prop',`<b>deg(PQ) = deg P + deg Q</b> et <b>deg(P + Q) ≤ max(deg P, deg Q)</b>.`)
+  +bk('why',`Le terme de plus haut degré de PQ est aₙxⁿ · b<sub>m</sub>x${sup('m')} = aₙb<sub>m</sub>x${sup('n+m')}, et aₙb<sub>m</sub> ≠ 0 car un produit de deux nombres non nuls n’est jamais nul. Pour une somme, les termes dominants peuvent se détruire : (x² + x) + (−x² + 1) = x + 1, de degré 1 seulement.`)
+  +bk('ex',`P = 2x³ − x + 5 : degré 3, coefficient dominant 2, terme constant 5. (x² + 1)(3x − 2) = 3x³ − 2x² + 3x − 2 : degré 2 + 1 = 3, coefficient dominant 1 · 3 = 3.`)
+  +bk('warn',`Une constante non nulle, comme 7, est de degré 0. Le polynôme nul n’a pas de degré au sens usuel : par convention, deg 0 = −∞, ce qui garde la formule du produit vraie.`)},
+ {kind:'Théorie',h:'Division euclidienne',p:`<p>Avec les entiers, 17 = 5 · 3 + 2 : on divise 17 par 5, le quotient est 3 et le reste 2 est plus petit que le diviseur. Les polynômes se divisent de la même façon, le <b>degré</b> jouant le rôle de la taille.</p>`
+  +bk('thm',`Pour deux polynômes <i>A</i> et <i>B ≠ 0</i>, il existe un <b>unique</b> couple (Q, R) tel que <b>A = B·Q + R</b> avec <b>deg R &lt; deg B</b>. Q est le <b>quotient</b>, R le <b>reste</b>. Si R = 0, on dit que B <b>divise</b> A.`)
+  +bk('why',`Existence : tant que deg A ≥ deg B, on retranche à A le monôme (terme dominant de A ÷ terme dominant de B) multiplié par B. Le terme de plus haut degré disparaît, le degré baisse strictement, donc on finit par passer sous deg B. Unicité : si BQ + R = BQ′ + R′, alors B(Q − Q′) = R′ − R. À droite le degré est &lt; deg B ; à gauche il serait ≥ deg B si Q ≠ Q′. Donc Q = Q′, puis R = R′.`)
+  +bk('idea',`Chaque étape tue le terme de plus haut degré du reste partiel, comme on « abaisse » les chiffres dans une division posée d’entiers. L’exemple ci-dessous le fait pas à pas.`)
+  +bk('warn',`Le quotient a pour degré deg A − deg B. Ses coefficients peuvent être des fractions même si ceux de A et B sont entiers : x² + 1 = (2x)·(x/2) + 1.`),
   fig:`<p>Exemple : <i>A = x³ − 2x² + 4</i> divisé par <i>B = x − 1</i>.</p><p>x³ ÷ x = <b>x²</b> : il reste A − x²(x − 1) = −x² + 4.<br>−x² ÷ x = <b>−x</b> : il reste −x² + 4 − (−x)(x − 1) = −x + 4.<br>−x ÷ x = <b>−1</b> : il reste −x + 4 − (−1)(x − 1) = <b>3</b>.</p><p>Donc x³ − 2x² + 4 = (x − 1)(x² − x − 1) + 3.</p>`,
   note:'Quand B = x − a, le reste est une constante, et il vaut A(a). Ici A(1) = 1 − 2 + 4 = 3. C’est le théorème du reste.'},
  {kind:'Méthode',h:'Poser une division euclidienne',p:'<b>Quand</b> : pour factoriser, simplifier une fraction rationnelle ou trouver un reste. <b>Pourquoi ça marche</b> : à chaque étape, on retranche un multiple de B qui tue le terme de plus haut degré du reste partiel. Le degré baisse strictement, donc on s’arrête dès que deg R &lt; deg B. <b>Comment</b> : ordonne A et B par puissances décroissantes, en écrivant les termes manquants avec un coefficient 0. Divise le terme dominant du reste par celui de B, multiplie B par ce monôme, soustrais, recommence.',
@@ -512,9 +705,19 @@ COURS.push(
   note:'Si le reste est nul, B divise A. Avec B = x − a, on peut aussi utiliser le théorème du reste : R = A(a).'},
  {h:'Diviser par x² + 1',p:'Quel est le reste de la division de <i>x³ + 2x² + 3x + 4</i> par <i>x² + 1</i>&nbsp;?',opts:['2','x + 2','2x + 2','3x + 4'],ans:2,
   why:'x³ ÷ x² = x : il reste 2x² + 2x + 4. Puis 2x² ÷ x² = 2 : il reste 2x + 2. Donc x³ + 2x² + 3x + 4 = (x² + 1)(x + 2) + 2x + 2.'},
+ {kind:'Théorie',h:'Le théorème du reste',p:`<p>Diviser par x − a est le cas le plus fréquent, car c’est lui qui sert à chercher les racines. Il y a un raccourci : on connaît le reste sans poser la division.</p>`
+  +bk('thm',`Le reste de la division de P par <b>x − a</b> est le nombre <b>P(a)</b> : P = (x − a)Q + P(a).`)
+  +bk('why',`x − a est de degré 1, donc le reste est de degré &lt; 1 : c’est une constante <i>r</i>. Dans l’égalité P(x) = (x − a)Q(x) + r, remplace x par a : le premier terme s’annule, et il reste P(a) = r.`)
+  +bk('ex',`P = x³ − 2x² + 4 et a = 1 : P(1) = 1 − 2 + 4 = 3, le reste trouvé plus haut en posant la division. Pour diviser par x + 2 = x − (−2), on évalue en −2 : P(−2) = −8 − 8 + 4 = −12. En effet x³ − 2x² + 4 = (x + 2)(x² − 4x + 8) − 12.`)
+  +bk('warn',`Le raccourci ne vaut que pour un diviseur de degré 1. Divisé par x² + 1, le reste est de degré ≤ 1, de la forme αx + β, pas un simple nombre : il faut alors poser la division. Et attention au signe : x + 2 se traite avec a = −2.`)},
  {h:'Le reste sans diviser',p:'Quel est le reste de la division de <i>x⁴ + 3x − 5</i> par <i>x − 2</i>&nbsp;?',lab:'reste =',ans:17,
   why:'Le reste de la division par x − 2 vaut P(2) = 16 + 6 − 5 = 17.'},
- {kind:'Théorie',h:'Racines et facteurs',p:'<i>a</i> est racine de <i>P</i> si et seulement si <b>(x − a) divise P</b>. Si (x − a)ᵐ divise P mais pas (x − a)ᵐ⁺¹, <i>a</i> est racine de <b>multiplicité m</b>. Fais varier <i>c</i> : le graphe de x³ − 3x + c coupe l’axe 3 fois, ou 1 fois, ou le touche en une racine double.',
+ {kind:'Théorie',h:'Racines et facteurs',p:`<p>Résoudre P(x) = 0 et factoriser P sont en fait le même problème. Le lien vient tout droit du théorème du reste.</p>`
+  +bk('def',`<i>a</i> est une <b>racine</b> de P si P(a) = 0. Si (x − a)ᵐ divise P mais pas (x − a)ᵐ⁺¹, <i>a</i> est racine de <b>multiplicité m</b> : simple si m = 1, double si m = 2, triple si m = 3.`)
+  +bk('thm',`<i>a</i> est racine de <i>P</i> si et seulement si <b>(x − a) divise P</b>.`)
+  +bk('why',`Le théorème du reste donne P = (x − a)Q + P(a). Le reste est nul, c’est-à-dire x − a divise P, exactement quand P(a) = 0.`)
+  +bk('ex',`x³ − 3x + 2 s’annule en 1, donc x − 1 le divise : x³ − 3x + 2 = (x − 1)(x² + x − 2) = (x − 1)²(x + 2). 1 est racine double, −2 racine simple, et 2 + 1 = 3 redonne le degré.`)
+  +bk('idea',`Sur le graphe, une racine simple est un point où la courbe <b>traverse</b> l’axe. Une racine double est un point où elle le <b>touche</b> sans changer de signe, car (x − a)² ≥ 0 : la courbe y est tangente à l’axe. Fais varier <i>c</i> : le graphe de x³ − 3x + c coupe l’axe 3 fois, ou 1 fois, ou le touche en une racine double pour c = ±2.`),
   params:[{id:'c',l:'c',min:-4,max:4,step:.5,v:1}],
   draw:v=>{ const P=plane({x:[-3,3],y:[-6,6],h:240,lab:1,step:1}); P.fn(x=>x**3-3*x+v.c,{n:300});
     let rs=[]; if(Math.abs(v.c)<2-1e-9){ const t=Math.acos(-v.c/2)/3; rs=[0,1,2].map(k=>2*Math.cos(t-2*Math.PI*k/3)); }
@@ -523,6 +726,11 @@ COURS.push(
     rs.forEach(x=>P.dot(x,0,{r:5})); return P.svg(); },
   info:v=>Math.abs(v.c)<2-1e-9?'3 racines réelles simples.':Math.abs(Math.abs(v.c)-2)<1e-9?`Une racine double (x = ${v.c>0?1:-1}) et une simple (x = ${v.c>0?-2:2}) : 2 + 1 = 3.`:'1 racine réelle et 2 racines complexes non réelles conjuguées.',
   note:'Dans tous les cas, en comptant les multiplicités et les racines complexes, il y a exactement 3 racines : le degré.'},
+ {kind:'Théorie',h:'Pas plus de racines que le degré',p:`<p>Une droite non horizontale coupe l’axe une fois, une parabole au plus deux fois. Ce n’est pas un hasard : le degré borne le nombre de racines.</p>`
+  +bk('thm',`Un polynôme <b>non nul</b> de degré <i>n</i> a <b>au plus n racines</b>, et même au plus <i>n</i> en comptant chacune avec sa multiplicité.`)
+  +bk('why',`Si a₁, …, a<sub>k</sub> sont des racines distinctes, on les sort une à une. P(a₁) = 0 donne P = (x − a₁)Q₁. Puis P(a₂) = (a₂ − a₁)Q₁(a₂) = 0 avec a₂ ≠ a₁, donc Q₁(a₂) = 0 et Q₁ = (x − a₂)Q₂. On arrive à P = (x − a₁)…(x − a<sub>k</sub>)Q avec Q ≠ 0, et le degré donne k ≤ n.`)
+  +bk('ex',`x³ − x = x(x − 1)(x + 1) a trois racines, 0, 1 et −1 : c’est le maximum pour le degré 3. x² + 1 n’en a aucune dans ℝ : « au plus » ne veut pas dire « exactement ».`)
+  +bk('prop',`<b>Conséquence</b> : si deux polynômes de degré ≤ n prennent les mêmes valeurs en n + 1 points, ils sont égaux : leur différence, de degré ≤ n, a n + 1 racines, donc elle est nulle. C’est ce qui justifie qu’on <b>identifie les coefficients</b> de deux écritures d’un même polynôme, comme dans la méthode suivante.`)},
  {kind:'Méthode',h:'Factoriser avec une racine évidente',p:'<b>Quand</b> : un polynôme de degré 3 ou plus, sans formule directe. <b>Pourquoi ça marche</b> : si P a des coefficients entiers et une racine entière a, alors a divise le terme constant (car P(a) = 0 donne a₀ = −a(…)). Et P(a) = 0 garantit que (x − a) divise P. <b>Comment</b> : teste P(±1), P(±2)… parmi les diviseurs du terme constant. Dès que P(a) = 0, divise P par x − a (ou identifie P = (x − a)(x² + bx + c)), puis factorise le quotient.',
   demo:{enonce:'Factorise P = x³ − 6x² + 11x − 6.',etapes:[
    {f:'Candidats : ±1, ±2, ±3, ±6. P(1) = 1 − 6 + 11 − 6 = 0',w:'Les racines entières divisent −6 ; on commence par le plus simple.'},
@@ -542,7 +750,12 @@ COURS.push(
    conclusion:'1 est racine triple : x⁴ − 2x³ + 2x − 1 = (x − 1)³(x + 1).'}},
  {h:'Multiplicité',p:'On a <i>x³ − 3x + 2 = (x − 1)²(x + 2)</i>. Quelle est la multiplicité de la racine 1&nbsp;?',opts:['1','2','3','0'],ans:1,
   why:'Le facteur (x − 1) apparaît au carré : 1 est racine double. On le voit aussi avec P(1) = 0 et P′(1) = 3·1² − 3 = 0, mais P″(1) = 6 ≠ 0.'},
- {kind:'Théorie',h:'Le théorème fondamental de l’algèbre',p:'Tout polynôme non constant à coefficients complexes a au moins une racine dans ℂ. Par récurrence, un polynôme de degré <i>n</i> se <b>factorise sur ℂ</b> en <b>P = a(x − z₁)(x − z₂)…(x − zₙ)</b>. Sur ℂ, les irréductibles sont donc les polynômes de degré 1.',
+ {kind:'Théorie',h:'Le théorème fondamental de l’algèbre',p:`<p>Sur ℝ, x² + 1 n’a aucune racine : un polynôme de degré <i>n</i> peut en avoir moins que <i>n</i>. Les nombres complexes comblent entièrement ce manque, et c’est l’une des grandes raisons de leur importance.</p>`
+  +bk('thm',`<b>Théorème de d’Alembert-Gauss.</b> Tout polynôme <b>non constant</b> à coefficients complexes (en particulier réels) a <b>au moins une racine dans ℂ</b>.`)
+  +bk('prop',`Tout P de degré n ≥ 1 se <b>factorise sur ℂ</b> en <b>P = a(x − z₁)(x − z₂)…(x − zₙ)</b>, où <i>a</i> est le coefficient dominant et les z<sub>k</sub> les racines, répétées selon leur multiplicité. P a donc exactement <i>n</i> racines complexes, multiplicités comptées.`)
+  +bk('why',`La preuve du théorème dépasse ce chapitre : elle montre, avec de l’analyse, que |P(z)| atteint un minimum, et que ce minimum ne peut être que 0. La factorisation, elle, se déduit par récurrence : une racine z₁ donne P = (x − z₁)Q avec deg Q = n − 1, puis Q a lui-même une racine tant qu’il n’est pas constant.`)
+  +bk('ex',`x² + 1 = (x − i)(x + i). x³ − 1 = (x − 1)(x − j)(x − j²) avec j = ${E('2iπ/3')}. 2x² − 2 = 2(x − 1)(x + 1) : n’oublie pas le coefficient dominant <i>a</i> = 2 devant.`)
+  +bk('warn',`Le théorème garantit que les racines <b>existent</b>, il ne dit pas comment les calculer. À partir du degré 5, il n’existe en général aucune formule avec des radicaux. Conséquence sur ℂ : les seuls polynômes impossibles à factoriser davantage (les <b>irréductibles</b>) sont ceux de degré 1.`),
   note:'Sur ℝ, c’est faux : x² + 1 n’a pas de racine réelle. Mais il se factorise sur ℂ en (x − i)(x + i).'},
  {kind:'Théorie',h:'Sur ℝ : les racines vont par paires',p:`Si P est à coefficients <b>réels</b> et P(z) = 0, alors P(z̄) = ${'<span style="text-decoration:overline">P(z)</span>'} = 0 : les racines non réelles viennent par <b>paires conjuguées</b>. Chaque paire donne un facteur réel <b>(x − z)(x − z̄) = x² − 2 Re(z)·x + |z|²</b>, de discriminant négatif. Les irréductibles sur ℝ sont les degrés 1 et les degrés 2 avec Δ &lt; 0.`,
   params:[{id:'p',l:'p',min:-6,max:6,v:0},{id:'q',l:'q',min:-4,max:10,v:1}],
@@ -582,6 +795,15 @@ COURS.push(
   note:'Pratique pour trouver la dernière racine : si un polynôme n’a pas de terme en x², la somme de ses racines est nulle.'},
  {h:'La troisième racine',p:'Le polynôme <i>x³ + px + q</i> (pas de terme en x²) a pour racines 1 et 2. Quelle est sa troisième racine&nbsp;?',lab:'x₃ =',ans:-3,
   why:'La somme des racines vaut −b/a = 0, donc x₃ = −(1 + 2) = −3. On trouve x³ − 7x + 6 = (x − 1)(x − 2)(x + 3).'},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir',p:`<p>Chercher les racines d’un polynôme et le factoriser, c’est le même travail : chaque racine <i>a</i> fournit un facteur x − a.</p>`
+  +keep([`<b>Degré</b> : deg(PQ) = deg P + deg Q. Le terme dominant décide de tout.`,
+   `<b>Division euclidienne</b> : A = BQ + R avec deg R &lt; deg B, couple unique. On élimine le terme dominant à chaque étape, en écrivant à 0 les termes manquants.`,
+   `<b>Théorème du reste</b> : le reste de P par x − a vaut P(a). Donc <i>a</i> racine ⇔ (x − a) divise P.`,
+   `<b>Multiplicité m</b> : P(a) = P′(a) = … = P⁽ᵐ⁻¹⁾(a) = 0 et P⁽ᵐ⁾(a) ≠ 0. Une racine double est un point où le graphe touche l’axe sans le traverser.`,
+   `<b>Nombre de racines</b> : au plus <i>n</i> pour un degré <i>n</i> ; sur ℂ, exactement <i>n</i> avec multiplicités (d’Alembert-Gauss) : P = a(x − z₁)…(x − zₙ).`,
+   `<b>Polynôme réel</b> : les racines non réelles vont par paires conjuguées, et (x − z)(x − z̄) = x² − 2 Re(z)x + |z|². Irréductibles sur ℝ : degré 1, et degré 2 avec Δ &lt; 0.`,
+   `<b>Outils de factorisation</b> : une racine entière divise le terme constant ; une différence de carrés, comme x⁴ + 4 = (x² + 2)² − (2x)².`,
+   `<b>Racines et coefficients</b> (degré 3) : somme −b/a, produits deux à deux c/a, produit −d/a.`])},
  {kind:'Problème',h:'Factoriser un polynôme de degré 3',
   p:'On veut factoriser complètement <b><i>P</i>(<i>x</i>) = <i>x</i>³ − 3<i>x</i>² + 4<i>x</i> − 2</b>, sur ℝ puis sur ℂ. Méthode : chercher une racine évidente parmi les petits entiers, diviser, puis étudier le trinôme restant.',
   parts:[
@@ -606,20 +828,39 @@ COURS.push(
 
 /* ===================== 7. Développements limités ===================== */
 {subj:'an2', sem:'pri', id:'an2-dl', h:'Développements limités', p:'Approcher une fonction par un polynôme et contrôler l’erreur.', steps:[
- {kind:'Théorie',h:'La formule de Taylor',p:`Si <i>f</i> est n fois dérivable en <i>a</i>, son <b>polynôme de Taylor</b> d’ordre n est <b>Pₙ(x) = f(a) + f′(a)(x − a) + ${F('f″(a)','2!')}(x − a)² + … + ${F('f⁽ⁿ⁾(a)','n!')}(x − a)ⁿ</b>. On a f(x) = Pₙ(x) + o((x − a)ⁿ) : c’est le <b>développement limité</b> (DL) à l’ordre n.`,
+ {kind:'Théorie',h:'Négligeable devant xⁿ : la notation o',p:`<p>Près de 0, sin x ressemble beaucoup à x : sin 0,1 ≈ 0,09983. Mais « ressembler » est vague. Pour approcher une fonction par un polynôme, il faut une façon précise de dire qu’une erreur est négligeable.</p>`
+  +bk('def',`On écrit <b>g(x) = o(xⁿ)</b> quand x → 0, et on lit « petit o de xⁿ », si <b>g(x)/xⁿ → 0</b> : g tend vers 0 plus vite que xⁿ. Un <b>développement limité</b> (DL) de <i>f</i> à l’ordre <i>n</i> en 0 est une écriture <b>f(x) = a₀ + a₁x + … + aₙxⁿ + o(xⁿ)</b>.`)
+  +bk('idea',`Le o(xⁿ) est un reste dont on ignore la valeur exacte : on sait seulement qu’il est tout petit devant xⁿ près de 0. Plus l’ordre <i>n</i> est grand, plus ce reste est petit, et plus le polynôme colle à la fonction.`)
+  +bk('ex',`x³ = o(x²), car x³/x² = x → 0. La dérivée donne le DL d’ordre 1 : f(x) = f(0) + f′(0)x + o(x), puisque (f(x) − f(0))/x − f′(0) → 0. Pour eˣ : eˣ = 1 + x + o(x). En x = 0,1 : e${sup('0,1')} ≈ 1,10517 et 1 + 0,1 = 1,1. L’erreur 0,00517 ne vaut qu’environ 5 % de x = 0,1.`)
+  +bk('warn',`o(xⁿ) ne désigne pas une fonction précise : o(x²) − o(x²) vaut o(x²), pas 0. Les règles utiles : xᵏ · o(xⁿ) = o(x${sup('n+k')}), et o(xⁿ) + o(x${sup('m')}) = o(xⁿ) si n ≤ m. Tout terme en x${sup('m')} avec m &gt; n est aussi un o(xⁿ) : on peut l’oublier.`)},
+ {kind:'Théorie',h:'La formule de Taylor',p:`<p>La tangente est la meilleure droite près de <i>a</i>. Pour faire mieux, on cherche le polynôme de degré <i>n</i> qui a, en <i>a</i>, la même valeur et les mêmes <i>n</i> premières dérivées que <i>f</i>.</p>`
+  +bk('thm',`<b>Taylor-Young.</b> Si <i>f</i> est n fois dérivable en <i>a</i>, son <b>polynôme de Taylor</b> d’ordre n est <b>Pₙ(x) = f(a) + f′(a)(x − a) + ${F('f″(a)','2!')}(x − a)² + … + ${F('f⁽ⁿ⁾(a)','n!')}(x − a)ⁿ</b>, et <b>f(x) = Pₙ(x) + o((x − a)ⁿ)</b> quand x → a : c’est le DL de <i>f</i> à l’ordre n en <i>a</i>.`)
+  +bk('why',`D’où viennent les factorielles : dérive k fois (x − a)ᵏ, tu obtiens k! = 1 · 2 · … · k (avec 0! = 1). Les autres puissances donnent 0 en x = a. Si P = Σ c<sub>k</sub>(x − a)ᵏ, alors P⁽ᵏ⁾(a) = c<sub>k</sub> · k!, et pour que ce soit f⁽ᵏ⁾(a), il faut c<sub>k</sub> = f⁽ᵏ⁾(a)/k!.`)
+  +bk('ex',`eˣ en 0 : toutes ses dérivées valent e⁰ = 1, donc Pₙ(x) = 1 + x + x²/2! + … + xⁿ/n!. En x = 1 : P₃(1) = 1 + 1 + 0,5 + 0,1667 ≈ 2,6667, contre e ≈ 2,7183. La figure montre Pₙ (trait fin) qui suit eˣ (trait épais gris) de plus en plus loin quand n grandit.`)
+  +bk('warn',`Le DL est un énoncé <b>local</b> : il décrit f quand x → a, pas loin de a. Pour chiffrer l’erreur en un point donné, il faudra le reste de Lagrange, plus bas.`),
   params:[{id:'n',l:'Ordre n',min:0,max:8,v:1}],
   draw:v=>{ const T=x=>{ let s=0,t=1; for(let k=0;k<=v.n;k++){ s+=t; t*=x/(k+1); } return s; }; const P=plane({x:[-4,3],y:[-2,8],h:300,lab:1});
     P.fn(Math.exp,{c:'var(--muted)',w:5,op:.6}).fn(T,{n:300}).dot(0,1,{r:4}); return P.svg(); },
   info:v=>{ const T=x=>{ let s=0,t=1; for(let k=0;k<=v.n;k++){ s+=t; t*=x/(k+1); } return s; }; return `P${['₀','₁','₂','₃','₄','₅','₆','₇','₈'][v.n]}(1) ≈ ${fmt(T(1),5)} contre e ≈ ${fmt(Math.E,5)} (écart ${sci(Math.E-T(1))})`; },
-  note:'Pour eˣ en 0, toutes les dérivées valent 1 : Pₙ(x) = 1 + x + x²/2! + … + xⁿ/n!. Plus n est grand, plus le polynôme colle loin de 0.'},
- {kind:'Théorie',h:'Les DL usuels en 0',p:'À connaître par cœur :',
-  fig:`<p>eˣ = 1 + x + ${F('x²','2')} + ${F('x³','6')} + … + ${F('xⁿ','n!')} + o(xⁿ)<br>sin x = x − ${F('x³','6')} + ${F('x⁵','120')} − … <br>cos x = 1 − ${F('x²','2')} + ${F('x⁴','24')} − … <br>ln(1 + x) = x − ${F('x²','2')} + ${F('x³','3')} − … + (−1)ⁿ⁺¹${F('xⁿ','n')} + o(xⁿ)<br>(1 + x)${sup('α')} = 1 + αx + ${F('α(α − 1)','2')}x² + … + o(xⁿ)</p>`,
+  note:'Pour a = 0, on parle aussi de formule de Mac-Laurin : Pₙ(x) = f(0) + f′(0)x + … + f⁽ⁿ⁾(0)xⁿ/n!.'},
+ {kind:'Théorie',h:'Les DL usuels en 0',p:`<p>Presque tous les DL se fabriquent à partir de quelques développements de base. Chacun sort de la formule de Taylor en 0 : il suffit de connaître les dérivées en 0. Ceux-ci sont à connaître par cœur.</p>`
+  +bk('prop',`eˣ = 1 + x + ${F('x²','2')} + ${F('x³','6')} + … + ${F('xⁿ','n!')} + o(xⁿ)<br>sin x = x − ${F('x³','6')} + ${F('x⁵','120')} − … <br>cos x = 1 − ${F('x²','2')} + ${F('x⁴','24')} − … <br>ln(1 + x) = x − ${F('x²','2')} + ${F('x³','3')} − … + (−1)ⁿ⁺¹${F('xⁿ','n')} + o(xⁿ)<br>(1 + x)${sup('α')} = 1 + αx + ${F('α(α − 1)','2')}x² + … + o(xⁿ)<br>${F(1,'1 − x')} = 1 + x + x² + … + xⁿ + o(xⁿ)`)
+  +bk('why',`sin : les dérivées sin, cos, −sin, −cos valent en 0 : 0, 1, 0, −1, puis le cycle recommence. D’où les coefficients 0, 1, 0, −1/3!, 0, 1/5!… Pour cos, le cycle part de 1. Pour ln(1 + x), la dérivée k-ième en 0 vaut (−1)${sup('k−1')}(k − 1)! ; divisée par k!, elle donne (−1)${sup('k−1')}/k : la factorielle se simplifie. Pour (1 + x)${sup('α')}, elle vaut α(α − 1)…(α − k + 1). Enfin 1/(1 − x) est le cas α = −1 avec x changé en −x.`)
+  +bk('ex',`α = −1/2 : ${F('α(α − 1)','2')} = ${F('(−1/2)(−3/2)','2')} = 3/8, donc 1/√(1 + x) = 1 − x/2 + 3x²/8 + o(x²). En x = 0,1 : 1 − 0,05 + 0,00375 = 0,95375, et la vraie valeur est 0,95346.`)
+  +bk('warn',`Tous ces DL sont <b>en 0</b>. ln x n’a pas de DL en 0, il n’y est même pas défini : c’est ln(1 + x) qu’on développe. Et ln(1 + x) a des dénominateurs 1, 2, 3, …, pas 1!, 2!, 3!.`),
   note:'sin est impaire : seules les puissances impaires apparaissent. cos est paire : seulement les paires. ln(1 + x) n’a pas de factorielles au dénominateur.'},
  {h:'DL de cos',p:'Quel est le DL de <i>cos x</i> à l’ordre 4 en 0&nbsp;?',
   opts:['1 − x² + x⁴','x − x³/6','1 + x²/2 + x⁴/24','1 − x²/2 + x⁴/24'],ans:3,
   why:'Les dérivées de cos en 0 valent 1, 0, −1, 0, 1. Donc cos x = 1 − x²/2! + x⁴/4! + o(x⁴) = 1 − x²/2 + x⁴/24 + o(x⁴).'},
  {h:'Un coefficient',p:'Quel est le coefficient de <i>x²</i> dans le DL de <i>√(1 + x)</i> en 0&nbsp;? (Une fraction comme 1/3 est acceptée.)',lab:'coefficient =',ans:-.125,tol:.0001,
   why:'√(1 + x) = (1 + x)^(1/2). Le coefficient de x² est α(α − 1)/2 = (½)(−½)/2 = −1/8. Donc √(1 + x) = 1 + x/2 − x²/8 + o(x²).'},
+ {kind:'Théorie',h:'Un seul DL possible : unicité et parité',p:`<p>Les méthodes qui suivent fabriquent des DL par des calculs, produits ou compositions, sans jamais dériver. Pourquoi le résultat est-il le bon ? Parce qu’à un ordre donné, il n’y a qu’un DL.</p>`
+  +bk('thm',`Si f(x) = a₀ + a₁x + … + aₙxⁿ + o(xⁿ) et aussi f(x) = b₀ + b₁x + … + bₙxⁿ + o(xⁿ), alors a<sub>k</sub> = b<sub>k</sub> pour tout k : le DL d’ordre n, quand il existe, est <b>unique</b>.`)
+  +bk('why',`Soustrais les deux écritures : (a₀ − b₀) + (a₁ − b₁)x + … + (aₙ − bₙ)xⁿ = o(xⁿ). Quand x → 0, la gauche tend vers a₀ − b₀ et la droite vers 0 : a₀ = b₀. Divise ensuite par x et recommence : a₁ = b₁, et ainsi de suite jusqu’à aₙ = bₙ.`)
+  +bk('prop',`Si <i>f</i> est <b>paire</b>, son DL en 0 ne contient que des puissances paires. Si <i>f</i> est <b>impaire</b>, que des puissances impaires.`)
+  +bk('why',`Si f est paire, f(−x) = f(x). Changer x en −x dans le DL change le signe des termes de degré impair. Par unicité, a<sub>k</sub> = −a<sub>k</sub> pour k impair, donc a<sub>k</sub> = 0.`)
+  +bk('ex',`cos est paire : son DL n’a ni x, ni x³. Ainsi cos x = 1 − x²/2 + x⁴/24 + o(x⁵), car le coefficient de x⁵ est nul. De même tan est impaire, donc son DL n’a que x, x³, x⁵…`)
+  +bk('idea',`En pratique, n’importe quelle méthode correcte, dériver, multiplier, composer, donne le même DL. Tu choisis la plus rapide, et la parité te dit d’avance quels coefficients sont nuls.`)},
  {kind:'Méthode',h:'Additionner et multiplier des DL',p:'<b>Quand</b> : la fonction est une somme ou un produit de fonctions usuelles, comme eˣ sin x. <b>Pourquoi ça marche</b> : les DL se manipulent comme des polynômes, et tout terme de degré &gt; n est absorbé par le o(xⁿ). <b>Comment</b> : écris chaque DL au même ordre n, multiplie comme des polynômes, mais <b>ne garde que les termes de degré ≤ n</b>. Inutile de calculer les autres.',
   demo:{enonce:'Trouve le DL de eˣ sin x à l’ordre 3 en 0.',etapes:[
    {f:'eˣ = 1 + x + x²/2 + o(x²) et sin x = x − x³/6 + o(x³)',w:'sin x commence en x : pour un produit d’ordre 3, eˣ à l’ordre 2 suffit.'},
@@ -659,7 +900,11 @@ COURS.push(
    conclusion:'√x = 2 + (x − 4)/4 − (x − 4)²/64 + o((x − 4)²).'}},
  {h:'Approcher √4,1',p:'Avec le DL <i>√(4 + h) ≈ 2 + h/4 − h²/64</i>, donne une valeur approchée de <i>√4,1</i> arrondie à 4 décimales.',lab:'√4,1 ≈',ans:2.0248,tol:.00006,
   why:'h = 0,1 : 2 + 0,025 − 0,01/64 ≈ 2,02484. La vraie valeur est 2,024846…'},
- {kind:'Théorie',h:'Le reste de Lagrange',p:`Le o(xⁿ) dit seulement que l’erreur devient petite. Pour la <b>chiffrer</b>, on utilise le <b>reste de Lagrange</b> : f(x) − Pₙ(x) = ${F('f⁽ⁿ⁺¹⁾(ξ)','(n + 1)!')}xⁿ⁺¹ pour un ξ entre 0 et x. Pour eˣ avec x &gt; 0 : <b>|Rₙ(x)| ≤ ${E('x')}·${F('xⁿ⁺¹','(n + 1)!')}</b>. Ici, en échelle logarithmique : erreur réelle (bleu) et majorant (jaune) selon n.`,
+ {kind:'Théorie',h:'Le reste de Lagrange',p:`<p>Le o(xⁿ) dit seulement que l’erreur devient petite quand x → 0. Si tu remplaces e par P₄(1), de combien te trompes-tu au plus ? Pour <b>chiffrer</b> l’erreur, il faut une autre forme du reste.</p>`
+  +bk('thm',`<b>Taylor-Lagrange.</b> Si <i>f</i> est n + 1 fois dérivable sur un intervalle contenant 0 et <i>x</i>, il existe un nombre <b>ξ entre 0 et x</b> tel que <b>f(x) − Pₙ(x) = ${F('f⁽ⁿ⁺¹⁾(ξ)','(n + 1)!')}xⁿ⁺¹</b>. Pour eˣ avec x &gt; 0, cela donne <b>|Rₙ(x)| ≤ ${E('x')}·${F('xⁿ⁺¹','(n + 1)!')}</b>.`)
+  +bk('idea',`Pour n = 0, c’est le théorème des accroissements finis : f(x) − f(0) = f′(ξ)x. Lagrange en est la version d’ordre n : le reste ressemble au terme suivant du DL, mais avec la dérivée prise en un point ξ inconnu (on lit « ksi »).`)
+  +bk('ex',`eˣ en x = 1 avec n = 4 : la dérivée 5e est eᵗ ≤ e &lt; 3 entre 0 et 1, donc |e − P₄(1)| ≤ 3/5! = 0,025. Vérification : P₄(1) = 1 + 1 + 0,5 + 0,16667 + 0,04167 ≈ 2,70833 et e ≈ 2,71828, soit une erreur de 0,00995, bien sous le majorant.`)
+  +bk('warn',`On ne connaît jamais ξ, qui dépend de x et de n. On ne calcule donc pas f⁽ⁿ⁺¹⁾(ξ) : on la <b>majore</b> sur tout l’intervalle entre 0 et x. Sur la figure, en échelle logarithmique, l’erreur réelle (bleu) reste toujours sous le majorant (jaune), quel que soit n.`),
   params:[{id:'x',l:'x',min:.25,max:2,step:.25,v:1},{id:'n',l:'Ordre n',min:1,max:10,v:3}],
   draw:v=>{ const err=n=>{ let s=0,t=1; for(let k=0;k<=n+40;k++){ if(k>n) s+=t; t*=v.x/(k+1); } return s; }; const fact=m=>{ let p=1; for(let k=2;k<=m;k++) p*=k; return p; };
     const P=plane({x:[0,11],y:[-12,1],h:260,grid:false,lx:1,ly:2}); for(let y=-12;y<=0;y+=2) P.seg(0,y,11,y,{c:'var(--line)',w:1});
@@ -690,6 +935,15 @@ COURS.push(
   why:'ln(1 + x) = x − x²/2 + o(x²), donc ln(1 + x) − x = −x²/2 + o(x²). Le quotient tend vers −1/2.'},
  {kind:'Défi',h:'Une limite par DL',p:'Que vaut la limite de <i>(eˣ − 1 − x)/x²</i> quand x → 0&nbsp;?',opts:['0','½','1','+∞'],ans:1,
   why:'eˣ = 1 + x + x²/2 + o(x²), donc eˣ − 1 − x = x²/2 + o(x²). Le quotient vaut ½ + o(1) et tend vers ½.'},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir',p:`<p>Un DL remplace une fonction par un polynôme près d’un point, avec un reste qu’on sait négliger (o) ou chiffrer (Lagrange).</p>`
+  +keep([`<b>Notation o</b> : g = o(xⁿ) si g(x)/xⁿ → 0. Tout terme de degré &gt; n est absorbé par le o(xⁿ).`,
+   `<b>Taylor-Young</b> : f(x) = f(a) + f′(a)(x − a) + … + f⁽ⁿ⁾(a)(x − a)ⁿ/n! + o((x − a)ⁿ).`,
+   `<b>DL usuels en 0</b> : eˣ, sin x, cos x, ln(1 + x), (1 + x)${sup('α')}, 1/(1 − x). Le DL est unique ; une fonction paire n’a que des puissances paires, une impaire que des impaires.`,
+   `<b>Somme, produit</b> : calcule comme avec des polynômes et tronque à l’ordre n ; si un facteur commence par xᵏ, l’autre suffit à l’ordre n − k.`,
+   `<b>Composée f(u)</b> : il faut u → 0 ; écris par exemple cos x = 1 + u avant d’utiliser ln(1 + u). <b>Quotient</b> : mets le dénominateur sous la forme c(1 + u) et utilise 1/(1 + u) = 1 − u + u² − …`,
+   `<b>DL en a ≠ 0</b> : pose x = a + h et développe en h → 0.`,
+   `<b>Lagrange</b> : f(x) − Pₙ(x) = f⁽ⁿ⁺¹⁾(ξ)xⁿ⁺¹/(n + 1)!, ξ entre 0 et x ; majore |f⁽ⁿ⁺¹⁾| par M, puis |erreur| ≤ M|x|ⁿ⁺¹/(n + 1)!.`,
+   `<b>Limites</b> : développe numérateur et dénominateur jusqu’au premier terme non nul ; il donne un équivalent.`])},
  {kind:'Problème',h:'Le pendule et sin x ≈ x',
   p:'Pour un pendule, l’équation exacte contient sin <i>θ</i>. Les physiciens la remplacent par <i>θ</i> pour les petites oscillations. Le DL sin <i>x</i> = <i>x</i> − <i>x</i>³/6 + … et le reste de Lagrange disent jusqu’où c’est raisonnable : pour <i>x</i> &gt; 0, on a <b>0 ≤ <i>x</i> − sin <i>x</i> ≤ <i>x</i>³/6</b>, et l’erreur relative (<i>x</i> − sin <i>x</i>)/<i>x</i> est au plus <i>x</i>²/6.',
   parts:[
@@ -713,7 +967,17 @@ COURS.push(
 
 /* ===================== 8. ED du 1er ordre ===================== */
 {subj:'an2', sem:'pri', id:'an2-ed1', h:'Équations différentielles du 1er ordre', p:'Linéaires, séparables, problèmes de Cauchy, refroidissement et circuit RC.', steps:[
- {kind:'Théorie',h:'L’équation homogène',p:`Une ED linéaire homogène du 1er ordre s’écrit <i>y′ + a(x)·y = 0</i>. Ses solutions sont <b>y = C·${E('−A(x)')}</b>, où A est une primitive de a et C une constante. Pour a constant, <i>y′ = ky</i> donne <b>y = C${E('kx')}</b>. La condition initiale y(0) = y₀ fixe C = y₀ : c’est un <b>problème de Cauchy</b>.`,
+ {kind:'Théorie',h:'Une équation dont l’inconnue est une fonction',p:`<p>Un café refroidit d’autant plus vite qu’il est chaud ; une population grandit d’autant plus vite qu’elle est nombreuse. Dans ces situations, on connaît une relation entre une grandeur y et sa dérivée y′, et on cherche la fonction y elle-même.</p>`
+  +bk('def',`Une <b>équation différentielle</b> (ED) relie une fonction inconnue y, sa variable x et ses dérivées. Elle est <b>du 1er ordre</b> si seule y′ apparaît. Une <b>solution</b> sur un intervalle I est une fonction dérivable sur I qui vérifie l’égalité en tout point de I. L’ED est <b>linéaire</b> si elle s’écrit <b>y′ + a(x)y = b(x)</b>, et <b>homogène</b> si de plus b = 0.`)
+  +bk('ex',`y = ${E('2x')} est solution de y′ = 2y : y′ = 2${E('2x')} = 2y. En revanche y = x² ne l’est pas : y′ = 2x, et en x = 2 on trouve 4 ≠ 2 · 4 = 8. Pour vérifier une solution, on dérive et on remplace : pas besoin de savoir résoudre.`)
+  +bk('idea',`Une ED a en général une <b>infinité</b> de solutions : 3${E('2x')} ou −${E('2x')} conviennent aussi. Il faut une information de plus, la valeur au départ, pour en choisir une seule.`)
+  +bk('warn',`y′ = y² ou y′ = sin y ne sont <b>pas linéaires</b> : y apparaît au carré ou à l’intérieur d’une fonction. Les méthodes des équations linéaires ne s’y appliquent pas ; pour certaines, on utilisera la séparation des variables.`)},
+ {kind:'Théorie',h:'L’équation homogène',p:`<p>Commençons par le cas le plus simple, y′ = ky : la vitesse de variation est proportionnelle à la grandeur elle-même, comme pour un capital placé à intérêts continus.</p>`
+  +bk('thm',`Sur un intervalle où <i>a</i> est continue, les solutions de <i>y′ + a(x)·y = 0</i> sont les fonctions <b>y = C·${E('−A(x)')}</b>, où A est une primitive de a et C ∈ ℝ. Pour a constant, <i>y′ = ky</i> donne <b>y = C${E('kx')}</b>.`)
+  +bk('why',`Multiplie y par ${E('A(x)')} et dérive : (y${E('A')})′ = (y′ + a·y)${E('A')} = 0. Une fonction de dérivée nulle sur un intervalle est constante : y${E('A')} = C, donc y = C${E('−A')}. Ce calcul prouve aussi qu’il n’y a <b>pas d’autre</b> solution.`)
+  +bk('ex',`y′ + 2xy = 0 : a(x) = 2x, A(x) = x², donc y = C${E('−x²')}. Contrôle : y′ = −2xC${E('−x²')} = −2xy.`)
+  +bk('def',`Imposer en plus y(x₀) = y₀ s’appelle un <b>problème de Cauchy</b>. Pour y′ = ky avec y(0) = y₀, on trouve C = y₀, donc y = y₀${E('kx')} : une seule solution.`)
+  +bk('idea',`La figure trace en chaque point un petit trait de pente k·y, celle que l’équation impose à une solution qui passe par là. Une solution est une courbe qui suit ces traits ; le curseur y₀ choisit laquelle.`),
   params:[{id:'k',l:'k',min:-1.5,max:1.5,step:.25,v:.5},{id:'y',l:'y₀',min:-3,max:3,step:.5,v:1}],
   draw:v=>{ const P=plane({x:[-4,4],y:[-4,4],lab:2});
     for(let x=-3.5;x<=3.5;x+=1) for(let y=-3.5;y<=3.5;y+=1){ const m=v.k*y, L=.3/Math.hypot(1,m); P.seg(x-L,y-L*m,x+L,y+L*m,{c:'var(--muted)',w:1.5}); }
@@ -722,6 +986,12 @@ COURS.push(
   note:'Une solution qui vaut 0 en un point est nulle partout : deux courbes solutions distinctes ne se croisent jamais (unicité de Cauchy-Lipschitz).'},
  {h:'Un problème de Cauchy',p:'Quelle est la solution de <i>y′ = −2y</i> avec <i>y(0) = 3</i>&nbsp;?',opts:['y = 3e^(2x)','y = −2e^(3x)','y = 3e^(−2x)','y = 3 − 2x'],ans:2,
   why:'Les solutions sont C·e^(−2x), et y(0) = C = 3. Vérification : y′ = −6e^(−2x) = −2y.'},
+ {kind:'Théorie',h:'Homogène plus particulière',p:`<p>Avec un second membre, comme y′ + y = 2, une exponentielle seule ne suffit plus. Heureusement, il suffit de trouver <b>une</b> solution pour les obtenir toutes.</p>`
+  +bk('thm',`Si y<sub>p</sub> est une solution de <i>y′ + a(x)y = b(x)</i>, alors les solutions sont exactement <b>y = y<sub>p</sub> + C${E('−A(x)')}</b>, C ∈ ℝ : une solution <b>particulière</b> plus la solution générale de l’équation <b>homogène</b>.`)
+  +bk('why',`Si y est une solution, la différence d = y − y<sub>p</sub> vérifie d′ + a·d = b − b = 0 : c’est une solution homogène, donc d = C${E('−A')}. Réciproquement, ajouter une solution homogène à y<sub>p</sub> ne change pas le second membre. C’est la <b>linéarité</b> qui permet ce découpage.`)
+  +bk('ex',`y′ + y = 2 : la constante y<sub>p</sub> = 2 convient, car 0 + 2 = 2. L’homogène y′ + y = 0 donne C${E('−x')}. Donc y = 2 + C${E('−x')}. Toutes les solutions tendent vers 2 : le terme homogène s’éteint.`)
+  +bk('idea',`Chaque solution s’obtient en décalant y<sub>p</sub> d’une solution homogène. Reste à trouver y<sub>p</sub> : la deviner quand le second membre est simple, ou faire varier la constante, comme dans la méthode suivante.`)
+  +bk('warn',`Ce découpage n’existe que pour une équation linéaire. Pour y′ = y², la somme de deux solutions n’est pas une solution.`)},
  {kind:'Méthode',h:'Inhomogène : variation de la constante',p:`<b>Quand</b> : une équation linéaire <i>y′ + a(x)y = b(x)</i> avec un second membre b ≠ 0, surtout si a n’est pas constant ou si b n’a pas une forme simple. Pour <i>y′ + a(x)y = b(x)</i>, la solution générale est <b>y = y<sub>h</sub> + y<sub>p</sub></b> : homogène plus <b>une</b> solution particulière (la différence de deux solutions vérifie l’équation homogène). <b>Comment</b> : pour trouver y<sub>p</sub>, on cherche y = C(x)${E('−A(x)')} : en reportant, les termes en C(x) s’annulent et il reste <b>C′(x) = b(x)${E('A(x)')}</b>, qu’on intègre.`,
   fig:`<p>Exemple : y′ + y = x. Ici A(x) = x, donc C′(x) = x${E('x')} et C(x) = (x − 1)${E('x')} (par parties). D’où y<sub>p</sub> = x − 1 et <b>y = C${E('−x')} + x − 1</b>.</p>`,
   demo:{enonce:'Résous y′ + y/x = 3x sur ]0 ; +∞[.',etapes:[
@@ -778,6 +1048,15 @@ COURS.push(
   ok:v=>Math.abs(20+70*Math.exp(-10*v.k)-50)<.5,why:'50 = 20 + 70e^(−10k) donne e^(−10k) = 3/7, donc k = ln(7/3)/10 ≈ 0,085 min⁻¹.'},
  {kind:'Défi',h:'Charge d’un condensateur',p:`Dans un circuit RC branché sur une tension E, <i>RC·u′ + u = E</i> avec u(0) = 0 donne <i>u(t) = E(1 − ${E('−t/RC')})</i>. Avec R = 10 kΩ et C = 100 µF, au bout de combien de secondes u atteint-elle 90 % de E&nbsp;? Arrondis au centième.`,unit:'s',ans:2.3,tol:.006,
   why:'τ = RC = 10⁴ × 10⁻⁴ = 1 s. 1 − e^(−t) = 0,9 donne e^(−t) = 0,1, soit t = ln 10 ≈ 2,30 s.'},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir',p:`<p>Pour une équation linéaire, la solution générale est toujours homogène plus particulière ; la condition initiale vient en dernier.</p>`
+  +keep([`<b>ED linéaire du 1er ordre</b> : y′ + a(x)y = b(x). Une solution se vérifie en dérivant et en remplaçant.`,
+   `<b>Homogène</b> : y = C${E('−A(x)')} avec A une primitive de a ; y′ = ky donne C${E('kx')}.`,
+   `<b>Structure</b> : y = y<sub>p</sub> + y<sub>h</sub>. Une seule solution particulière suffit.`,
+   `<b>Variation de la constante</b> : y = C(x)${E('−A(x)')} donne C′(x) = b(x)${E('A(x)')}, qu’on intègre.`,
+   `<b>Deviner y<sub>p</sub></b> (a constant) : même forme que b ; pour b = A${E('mx')} avec m = −a, essaie Bx${E('mx')}.`,
+   `<b>Problème de Cauchy</b> : écris la solution générale complète, puis seulement fixe C avec y(x₀) = y₀.`,
+   `<b>Séparation des variables</b> : y′ = g(x)h(y) donne ∫dy/h(y) = ∫g(x)dx ; les zéros de h donnent des solutions constantes.`,
+   `<b>Équilibre</b> : y′ = −k(y − L) donne y = L + (y₀ − L)${E('−kt')} ; l’écart est multiplié par ${E('−kΔt')} sur chaque durée Δt.`])},
  {kind:'Problème',h:'L’heure du décès',
   p:'Un médecin légiste trouve un corps dans une pièce à 20 °C. À 22 h, la température du corps est de 34 °C ; à 23 h, elle est de 30 °C. On admet la loi de Newton <i>T</i>′ = −<i>k</i>(<i>T</i> − 20), donc <i>T</i>(<i>t</i>) = 20 + (<i>T</i>₀ − 20)e<sup>−<i>kt</i></sup>, et qu’au moment du décès la température était de 37 °C.',
   parts:[
@@ -799,9 +1078,27 @@ COURS.push(
 
 /* ===================== 9. ED du 2e ordre ===================== */
 {subj:'an2', sem:'pri', id:'an2-ed2', h:'Équations différentielles du 2e ordre', p:'Coefficients constants, équation caractéristique et oscillateur amorti.', steps:[
- {kind:'Théorie',h:'L’équation caractéristique',p:`Pour <i>ay″ + by′ + cy = 0</i> (a ≠ 0), on essaie y = ${E('rx')} : il faut <b>ar² + br + c = 0</b>, l’équation caractéristique. Selon son discriminant Δ = b² − 4ac :`,
+ {kind:'Théorie',h:'Linéarité et deux constantes',p:`<p>Pour une masse accrochée à un ressort sans frottement, la loi de Newton donne m·y″ = −k·y : l’accélération ramène la masse vers l’équilibre. C’est une équation du <b>2e ordre</b>, car la dérivée seconde y″ y apparaît.</p>`
+  +bk('def',`Une ED <b>linéaire du 2e ordre à coefficients constants</b> s’écrit <b>ay″ + by′ + cy = f(x)</b>, avec a, b, c réels et a ≠ 0. Elle est <b>homogène</b> si f = 0.`)
+  +bk('prop',`<b>Superposition.</b> Si y₁ et y₂ sont solutions de l’équation homogène, toute combinaison <b>C₁y₁ + C₂y₂</b> l’est aussi.`)
+  +bk('why',`La dérivée d’une somme est la somme des dérivées : a(C₁y₁ + C₂y₂)″ + b(C₁y₁ + C₂y₂)′ + c(C₁y₁ + C₂y₂) = C₁(ay₁″ + by₁′ + cy₁) + C₂(ay₂″ + by₂′ + cy₂) = 0 + 0.`)
+  +bk('thm',`Si y₁ et y₂ sont deux solutions homogènes <b>non proportionnelles</b>, les solutions homogènes sont exactement les C₁y₁ + C₂y₂. Avec une solution particulière y<sub>p</sub>, la solution générale est <b>y = y<sub>p</sub> + C₁y₁ + C₂y₂</b>.`)
+  +bk('ex',`y″ + y = 0 : cos x et sin x sont solutions, car (cos x)″ = −cos x et (sin x)″ = −sin x. Donc y = C₁ cos x + C₂ sin x. Avec y(0) = 2 et y′(0) = 3, on trouve C₁ = 2 et C₂ = 3.`)
+  +bk('idea',`Deux constantes, parce qu’il faut deux informations pour fixer un mouvement : la position et la vitesse de départ. Reste à trouver y₁ et y₂ : c’est le rôle de l’équation caractéristique.`)},
+ {kind:'Théorie',h:'L’équation caractéristique',p:`<p>Au 1er ordre, y′ = ky avait pour solutions des exponentielles. Essayons la même idée au 2e ordre : cherchons des solutions de la forme y = ${E('rx')}, avec r à trouver.</p>`
+  +bk('def',`Pour <i>ay″ + by′ + cy = 0</i> (a ≠ 0), l’<b>équation caractéristique</b> est <b>ar² + br + c = 0</b>. On l’obtient en remplaçant y″ par r², y′ par r et y par 1.`)
+  +bk('why',`Avec y = ${E('rx')} : y′ = r${E('rx')} et y″ = r²${E('rx')}. L’équation devient (ar² + br + c)${E('rx')} = 0. Comme ${E('rx')} ne s’annule jamais, ${E('rx')} est solution exactement quand ar² + br + c = 0.`)
+  +bk('ex',`y″ − y′ − 6y = 0 : r² − r − 6 = (r − 3)(r + 2), racines 3 et −2. Les exponentielles ${E('3x')} et ${E('−2x')} ne sont pas proportionnelles, donc y = C₁${E('3x')} + C₂${E('−2x')}. Contrôle avec ${E('3x')} : 9 − 3 − 6 = 0.`)
+  +bk('idea',`Tout se joue sur le discriminant Δ = b² − 4ac. Si Δ &gt; 0, deux racines réelles donnent deux exponentielles, et c’est fini. Si Δ = 0, il manque une solution ; si Δ &lt; 0, les racines sont complexes. L’étape suivante règle ces deux cas ; le tableau résume les trois formes :`),
   fig:`<p><b>Δ &gt; 0</b>, deux racines réelles r₁, r₂ : y = C₁${E('r₁x')} + C₂${E('r₂x')}.<br><b>Δ = 0</b>, racine double r : y = (C₁ + C₂x)${E('rx')}.<br><b>Δ &lt; 0</b>, racines α ± iβ : y = ${E('αx')}(C₁ cos βx + C₂ sin βx).</p>`,
   note:'Deux constantes, donc deux conditions pour un problème de Cauchy : y(0) et y′(0).'},
+ {kind:'Théorie',h:'Racine double et racines complexes',p:`<p>Si Δ = 0, l’équation caractéristique n’a qu’une racine r, donc une seule exponentielle ${E('rx')} : il manque une deuxième solution. Si Δ &lt; 0, les racines sont complexes et ${E('rx')} n’est pas une fonction réelle. Voici comment on s’en sort.</p>`
+  +bk('prop',`<b>Δ = 0</b>, racine double r : <b>x${E('rx')}</b> est aussi solution, et <b>y = (C₁ + C₂x)${E('rx')}</b>.`)
+  +bk('why',`Racine double : r = −b/(2a), donc 2ar + b = 0. Avec y = x${E('rx')} : y′ = (1 + rx)${E('rx')} et y″ = (2r + r²x)${E('rx')}. Alors ay″ + by′ + cy = [x(ar² + br + c) + (2ar + b)]${E('rx')} = 0, car les deux parenthèses sont nulles.`)
+  +bk('prop',`<b>Δ &lt; 0</b>, racines α ± iβ avec β &gt; 0 : <b>y = ${E('αx')}(C₁ cos βx + C₂ sin βx)</b>.`)
+  +bk('why',`Par la formule d’Euler, ${E('(α + iβ)x')} = ${E('αx')}(cos βx + i sin βx) est une solution à valeurs complexes. Comme a, b, c sont réels, l’équation agit séparément sur la partie réelle et sur la partie imaginaire : ${E('αx')} cos βx et ${E('αx')} sin βx sont chacune solution.`)
+  +bk('ex',`y″ − 4y′ + 4y = 0 : (r − 2)² = 0, donc y = (C₁ + C₂x)${E('2x')}. y″ + 2y′ + 2y = 0 : Δ = 4 − 8 = −4, r = −1 ± i, donc y = ${E('−x')}(C₁ cos x + C₂ sin x).`)
+  +bk('idea',`Dans le cas complexe, α règle l’enveloppe : décroissance si α &lt; 0, croissance si α &gt; 0. β règle la pulsation des oscillations, de période 2π/β.`)},
  {kind:'Méthode',h:'Résoudre l’équation homogène',p:`<b>Quand</b> : ay″ + by′ + cy = 0 avec a, b, c constants. <b>Pourquoi ça marche</b> : (${E('rx')})′ = r${E('rx')} et (${E('rx')})″ = r²${E('rx')}, donc ${E('rx')} est solution exactement quand ar² + br + c = 0. Si r = α ± iβ, les parties réelle et imaginaire de ${E('(α + iβ)x')} = ${E('αx')}(cos βx + i sin βx) sont des solutions réelles. <b>Comment</b> : écris l’équation caractéristique (y″ → r², y′ → r, y → 1), calcule Δ, puis choisis la forme selon le signe de Δ.`,
   demo:{enonce:'Résous y″ + 2y′ + 5y = 0.',etapes:[
    {f:'r² + 2r + 5 = 0',w:'Équation caractéristique.'},
@@ -813,7 +1110,11 @@ COURS.push(
   why:'r² − 3r + 2 = (r − 1)(r − 2) = 0 donne r = 1 et r = 2. D’où y = C₁eˣ + C₂e^(2x).'},
  {h:'Une racine double',p:'Quelles sont les solutions de <i>y″ − 6y′ + 9y = 0</i>&nbsp;?',opts:['C₁e^(3x) + C₂e^(−3x)','C e^(3x)','(C₁ + C₂x)e^(3x)','e^(3x)(C₁ cos 3x + C₂ sin 3x)'],ans:2,
   why:'r² − 6r + 9 = (r − 3)² : Δ = 0 et r = 3 est racine double. Les solutions sont (C₁ + C₂x)e^(3x).'},
- {kind:'Théorie',h:'L’oscillateur amorti',p:`Une masse sur un ressort avec frottement obéit à <b>x″ + 2λx′ + ω₀²x = 0</b>. Équation caractéristique r² + 2λr + ω₀² = 0, Δ = 4(λ² − ω₀²). Ici ω₀ = 2, x(0) = 1 et x′(0) = 0 : fais varier l’amortissement λ et observe les trois régimes.`,
+ {kind:'Théorie',h:'L’oscillateur amorti',p:`<p>Une masse accrochée à un ressort, freinée par un frottement proportionnel à sa vitesse, est l’exemple type d’équation du 2e ordre. On l’écrit sous une forme qui fait apparaître deux nombres physiques.</p>`
+  +bk('def',`<b>x″ + 2λx′ + ω₀²x = 0</b>, où <b>ω₀</b> (« oméga zéro ») est la <b>pulsation propre</b>, celle du ressort sans frottement, et <b>λ ≥ 0</b> le coefficient d’<b>amortissement</b>.`)
+  +bk('why',`Équation caractéristique r² + 2λr + ω₀² = 0, de discriminant Δ = 4(λ² − ω₀²). Si <b>λ &lt; ω₀</b> : r = −λ ± iω₁ avec ω₁ = √(ω₀² − λ²), régime <b>pseudo-périodique</b>, x = ${E('−λt')}(C₁ cos ω₁t + C₂ sin ω₁t). Si <b>λ = ω₀</b> : racine double −λ, régime <b>critique</b>. Si <b>λ &gt; ω₀</b> : deux racines réelles négatives, régime <b>apériodique</b>.`)
+  +bk('ex',`ω₀ = 2 et λ = 0,5 : ω₁ = √(4 − 0,25) ≈ 1,936, d’où une pseudo-période 2π/ω₁ ≈ 3,245. λ = 2 : régime critique. λ = 3 : r = −3 ± √5, soit environ −0,764 et −5,236 ; c’est la racine −0,764, proche de 0, qui rend le retour lent.`)
+  +bk('idea',`Fais varier λ, avec ω₀ = 2, x(0) = 1 et x′(0) = 0. Sans frottement, l’oscillation ne s’arrête pas. Avec un peu de frottement, elle reste dans l’enveloppe ±${E('−λt')}. Au régime critique, la masse revient le plus vite possible sans dépasser l’équilibre. Au-delà, le frottement est si fort qu’elle revient lentement.`),
   params:[{id:'l',l:'Amortissement λ',min:0,max:4,step:.25,v:.5}],
   draw:v=>oscFig(v.l,2),
   info:v=>`λ = ${fmt(v.l)} : régime ${regime(v.l,2)}${v.l<2&&v.l>0?`, pseudo-pulsation √(ω₀² − λ²) ≈ ${fmt(Math.sqrt(4-v.l*v.l),3)}`:''}`,
@@ -868,6 +1169,15 @@ COURS.push(
    conclusion:'3 cos t + 4 sin t = 5 cos(t − φ) avec φ ≈ 53,1° : l’oscillation a une amplitude 5.'}},
  {h:'Amplitude et déphasage',p:'On écrit <i>cos t + √3 sin t = A cos(t − φ)</i>. Que vaut φ, en degrés&nbsp;?',lab:'φ =',unit:'°',ans:60,
   why:'A = √(1 + 3) = 2, cos φ = 1/2 et sin φ = √3/2, donc φ = 60°. Ainsi cos t + √3 sin t = 2 cos(t − 60°).'},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir',p:`<p>Au 2e ordre, tout passe par l’équation caractéristique : ses racines donnent la forme des solutions homogènes, et deux conditions fixent les deux constantes.</p>`
+  +keep([`<b>Structure</b> : ay″ + by′ + cy = f, solution y = y<sub>p</sub> + C₁y₁ + C₂y₂ (superposition, deux solutions non proportionnelles).`,
+   `<b>Équation caractéristique</b> : ar² + br + c = 0 (essai y = ${E('rx')}).`,
+   `<b>Δ &gt; 0</b> : C₁${E('r₁x')} + C₂${E('r₂x')}. <b>Δ = 0</b> : (C₁ + C₂x)${E('rx')}. <b>Δ &lt; 0</b>, r = α ± iβ : ${E('αx')}(C₁ cos βx + C₂ sin βx).`,
+   `<b>Second membre simple</b> : y<sub>p</sub> de la même forme que f (polynôme, B${E('mx')}, B cos ωx + D sin ωx).`,
+   `<b>Résonance</b> : si m (ou iω) est racine caractéristique, multiplie l’essai par x, par x² si la racine est double.`,
+   `<b>Conditions initiales</b> : solution générale complète d’abord, puis y(0) et y′(0) donnent un système en C₁, C₂.`,
+   `<b>Oscillateur</b> x″ + 2λx′ + ω₀²x = 0 : pseudo-périodique si λ &lt; ω₀ (pseudo-pulsation √(ω₀² − λ²)), critique si λ = ω₀, apériodique si λ &gt; ω₀.`,
+   `<b>Amplitude et phase</b> : B cos t + D sin t = A cos(t − φ) avec A = √(B² + D²), cos φ = B/A, sin φ = D/A.`])},
  {kind:'Problème',h:'Une masse sur un ressort amorti',
   p:'Une masse de 1 kg, accrochée à un ressort de raideur 10 N/m, subit un frottement visqueux de coefficient 2 N·s/m. Sa position vérifie <b><i>x</i>″ + 2<i>x</i>′ + 10<i>x</i> = 0</b>. On l’écarte de 0,1 m et on la lâche sans vitesse : <i>x</i>(0) = 0,1 et <i>x</i>′(0) = 0.',
   fig:(()=>{ const P=plane({x:[0,6],y:[-.08,.11],w:320,h:170,grid:false,lx:1}); const f=t=>Math.exp(-t)*(.1*Math.cos(3*t)+.1/3*Math.sin(3*t));

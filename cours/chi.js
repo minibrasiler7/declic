@@ -65,7 +65,21 @@ function titrDraw(V,weak){ const P=plane({x:[0,40],y:[0,14],h:230,grid:false,lx:
 COURS.push(
 /* ================= 1. ATOMES ================= */
 {subj:'chi', sem:'pri', id:'chi-atomes', h:'Atomes', p:'Orbitales, configuration électronique, tableau périodique et raies de l’hydrogène.', steps:[
- {kind:'Théorie',h:'Quatre nombres quantiques',p:`Chaque électron d’un atome est décrit par quatre nombres : <b>n</b> (couche, n ≥ 1), <b>ℓ</b> (sous-couche, 0 ≤ ℓ ≤ n − 1), <b>m<sub>ℓ</sub></b> (orbitale, −ℓ ≤ m<sub>ℓ</sub> ≤ ℓ) et <b>m<sub>s</sub></b> = ±½ (spin). ℓ = 0, 1, 2, 3 se notent s, p, d, f. Change <i>n</i> pour voir les orbitales disponibles.`,
+ {kind:'Théorie',h:'L’électron, une onde autour du noyau',p:`<p>Un atome, c’est un noyau minuscule, chargé positivement, et des électrons retenus autour de lui par l’attraction électrique. On aimerait dire « l’électron tourne sur une orbite », mais ce modèle échoue : un électron en orbite rayonnerait et tomberait sur le noyau en une fraction de seconde, et il ne produirait pas les raies de lumière bien séparées qu’on observe.</p>
+<div class="def"><p>Une <b>orbitale</b> est une région de l’espace où la probabilité de trouver l’électron est grande (on prend souvent 90 %). Elle est décrite par une fonction d’onde ψ ; |ψ|² donne la densité de probabilité de présence.</p></div>
+<div class="idea"><p>L’électron se comporte comme une onde stationnaire, un peu comme la corde d’une guitare : une corde fixée aux deux bouts ne peut vibrer qu’avec un nombre entier de ventres. De même, autour du noyau, seules certaines ondes « tiennent », et chacune a une énergie précise. Les énergies sont donc <b>quantifiées</b> : l’électron ne peut pas avoir n’importe quelle énergie.</p></div>
+<div class="ex"><p>Dans l’hydrogène, l’orbitale la plus basse (1s) est une sphère de rayon typique 0,053 nm ; son énergie vaut −13,6 eV. L’orbitale suivante (2s) est quatre fois plus large, 0,21 nm, et son énergie n’est plus que −3,4 eV. Entre les deux, rien : aucune énergie intermédiaire n’est permise.</p></div>
+<div class="warn"><p>Une orbitale n’est pas une trajectoire. Un électron 1s ne tourne pas sur un cercle de 0,053 nm : il a simplement de fortes chances de se trouver à cette distance du noyau.</p></div>`,
+  fig:(()=>{ const P=plane({x:[-5,5],y:[-3.2,3],h:180,grid:false,axes:false});
+    P.circ(0,0,2.6,{c:'var(--sci)',w:1.5,fill:'var(--sci)',fo:.12}).circ(0,0,0.65,{c:'var(--accent)',w:1.5,fill:'var(--accent)',fo:.35});
+    P.dot(0,0,{c:'var(--bad)',r:5}); P.text(0.9,0.4,'1s',{s:12,c:'var(--accent)'}).text(2.0,2.1,'2s',{s:12,c:'var(--sci)'});
+    P.text(0,-2.95,'zones où l’électron a 90 % de chances d’être',{a:'middle',s:11,c:'var(--muted)'}); return P.svg(); })()},
+ {kind:'Théorie',h:'Quatre nombres quantiques',p:`<p>Comment désigner chaque orbitale et chaque électron sans ambiguïté&nbsp;? La résolution de l’équation d’onde impose à chaque état trois entiers, et le spin en ajoute un quatrième.</p>
+<div class="def"><p>Chaque électron d’un atome est repéré par quatre <b>nombres quantiques</b> :</p><ul><li><b>n</b> = 1, 2, 3… la <b>couche</b> : il fixe l’énergie et la taille de l’orbitale ;</li><li><b>ℓ</b>, avec 0 ≤ ℓ ≤ n − 1, la <b>sous-couche</b> : il fixe la forme (ℓ = 0, 1, 2, 3 se lisent s, p, d, f) ;</li><li><b>m<sub>ℓ</sub></b>, avec −ℓ ≤ m<sub>ℓ</sub> ≤ ℓ, l’<b>orbitale</b> : son orientation dans l’espace ;</li><li><b>m<sub>s</sub></b> = +½ ou −½, le <b>spin</b>, noté ↑ ou ↓.</li></ul></div>
+<div class="idea"><p>Ces nombres s’emboîtent comme des poupées russes. La couche n contient n sous-couches (ℓ de 0 à n − 1), la sous-couche ℓ contient 2ℓ + 1 orbitales, et chaque orbitale accepte deux électrons de spins opposés. Au total, la couche n contient n² orbitales et au plus 2n² électrons.</p></div>
+<div class="ex"><p>n = 2 : ℓ vaut 0 (une orbitale 2s, m<sub>ℓ</sub> = 0) ou 1 (trois orbitales 2p, m<sub>ℓ</sub> = −1, 0, 1). Cela fait 4 orbitales et 8 électrons au maximum : exactement le nombre d’éléments de la deuxième période, du lithium au néon.</p></div>
+<div class="warn"><p>Les bornes sont strictes : ℓ = 2 exige n ≥ 3. Il n’existe donc ni sous-couche 2d ni sous-couche 3f.</p></div>
+<p>Change <i>n</i> pour voir les orbitales disponibles.</p>`,
   params:[{id:'n',l:'n',min:1,max:4,v:2}],
   draw:v=>{ const P=plane({x:[-5,5],y:[-0.5,4.3],h:200,grid:false,axes:false});
     for(let l=0;l<v.n;l++){ const m=2*l+1, y=3-l, x0=-m*0.55+0.6;
@@ -77,11 +91,25 @@ COURS.push(
  {h:'Un quadruplet interdit',p:'Lequel de ces quadruplets (<i>n</i>, ℓ, <i>m<sub>ℓ</sub></i>, <i>m<sub>s</sub></i>) est impossible&nbsp;?',
   opts:['(3, 2, −1, +½)','(2, 2, 0, −½)','(4, 0, 0, +½)','(2, 1, −1, −½)'],ans:1,
   why:'Pour n = 2, ℓ ne peut valoir que 0 ou 1 (ℓ ≤ n − 1). Une sous-couche 2d n’existe pas.'},
- {kind:'Théorie',h:'Remplir les orbitales',p:`<b>Aufbau</b> : on remplit les sous-couches par énergie croissante (règle de Klechkowski : 1s 2s 2p 3s 3p 4s 3d 4p…). <b>Hund</b> : dans une sous-couche, les électrons occupent d’abord chaque case seuls, avec des spins parallèles, avant de s’apparier. Fais varier <i>Z</i>.`,
+ {kind:'Théorie',h:'Remplir les orbitales',p:`<p>Un atome à Z électrons les range dans ses orbitales comme on remplit un immeuble en commençant par le bas : l’état fondamental est celui d’énergie minimale. Trois règles suffisent.</p>
+<div class="def"><p><b>Pauli</b> : au plus deux électrons par orbitale, de spins opposés. <b>Aufbau</b> : on remplit les sous-couches par énergie croissante, dans l’ordre 1s 2s 2p 3s 3p 4s 3d 4p (règle de Klechkowski : n + ℓ croissant, puis n croissant). <b>Hund</b> : dans une sous-couche, les électrons occupent d’abord chaque orbitale seuls, avec des spins parallèles, avant de s’apparier.</p></div>
+<div class="why"><p>L’ordre d’énergie vient de l’<b>écrantage</b> : dans un atome à plusieurs électrons, un électron 3d, qui reste loin du noyau, est masqué par les électrons internes et voit une charge réduite ; un électron 4s, dont l’onde pénètre près du noyau, est mieux retenu. Voilà pourquoi 4s se remplit avant 3d. La règle de Hund s’explique par la répulsion : deux électrons dans la même orbitale sont proches et se repoussent, alors que deux électrons de même spin dans des orbitales différentes se tiennent naturellement à distance.</p></div>
+<div class="ex"><p>Carbone, Z = 6 : 1s² 2s² 2p². Les deux électrons 2p vont dans deux cases différentes, spins parallèles : [↑][↑][ ], soit 2 électrons célibataires. Azote, Z = 7 : [↑][↑][↑], 3 célibataires. Oxygène, Z = 8 : le quatrième électron p doit s’apparier, [↑↓][↑][↑], il reste 2 célibataires.</p></div>
+<p>Fais varier <i>Z</i> et vérifie l’ordre de remplissage.</p>`,
   params:[{id:'z',l:'Z',min:1,max:36,v:6}],
   draw:v=>orbDraw(v.z),
   info:v=>`<b>${SYM[v.z]}</b> (Z = ${v.z}) : ${confStr(v.z)} · ${unpaired(v.z)} électron${unpaired(v.z)>1?'s':''} célibataire${unpaired(v.z)>1?'s':''}`,
   note:'<b>Exceptions :</b> le chrome (Z = 24) et le cuivre (Z = 29) prennent un électron 4s pour obtenir une sous-couche 3d à moitié ou entièrement remplie : 4s¹ 3d⁵ et 4s¹ 3d¹⁰.'},
+ {kind:'Théorie',h:'Cœur, valence et blocs du tableau',p:`<p>Pourquoi le sodium et le potassium se ressemblent-ils autant, alors qu’ils n’ont pas le même nombre d’électrons&nbsp;? Parce que la chimie ne voit que les électrons les plus externes.</p>
+<div class="def"><p>Les <b>électrons de valence</b> sont ceux de la couche de plus grand n (plus les électrons d en cours de remplissage pour les métaux de transition). Les autres forment le <b>cœur</b>, qu’on abrège par le gaz noble précédent entre crochets : [Ne] pour 1s² 2s² 2p⁶.</p></div>
+<div class="idea"><p>Le tableau périodique est la configuration électronique mise en tableau. La <b>période</b> (ligne) est la valeur de n de la couche externe ; la <b>colonne</b> compte les électrons de valence. Les deux premières colonnes remplissent une sous-couche s (bloc s), les six dernières une sous-couche p (bloc p), les dix du milieu une sous-couche d (bloc d). Deux éléments d’une même colonne ont la même configuration externe, donc des propriétés voisines.</p></div>
+<div class="ex"><p>Na : [Ne] 3s¹, K : [Ar] 4s¹. Tous deux ont un seul électron de valence sur une sous-couche s : colonne 1, et tous deux forment un ion +1. Cl : [Ne] 3s² 3p⁵ a 7 électrons de valence, colonne 17, et complète son octet en gagnant un électron : Cl⁻.</p></div>
+<div class="warn"><p>Le cœur n’est pas inerte en tout : il écrante le noyau. Mais il ne participe pas aux liaisons, et il faut une énergie énorme pour lui arracher un électron, ce qui se voit dans les énergies d’ionisation successives.</p></div>`,
+  fig:(()=>{ const P=plane({x:[-0.2,18.2],y:[-0.3,5],h:140,grid:false,axes:false});
+    for(let r=0;r<4;r++) for(let c=0;c<18;c++){ const per=r+1; if(per===1&&c>0&&c<17) continue; if((per===2||per===3)&&c>=2&&c<12) continue;
+      const blk=per===1?'s':c<2?'s':c<12?'d':'p'; P.rect(c,3.5-r,0.92,0.88,{fill:blk==='s'?'var(--accent)':blk==='d'?'var(--muted)':'var(--sci)',fo:.5,c:null}); }
+    P.text(1,4.55,'bloc s',{a:'middle',s:11,c:'var(--accent)'}).text(7,4.55,'bloc d',{a:'middle',s:11,c:'var(--muted)'}).text(15,4.55,'bloc p',{a:'middle',s:11,c:'var(--sci)'});
+    P.text(18.1,-0.1,'périodes 1 à 4',{a:'end',s:10,c:'var(--muted)'}); return P.svg(); })()},
  {kind:'Méthode',h:'Écrire une configuration électronique',p:`<b>Quand :</b> on te donne Z (ou un élément) et on te demande sa configuration, ses électrons de valence, ses électrons célibataires ou sa place dans le tableau. <b>Pourquoi ça marche :</b> les électrons occupent les sous-couches de plus basse énergie d’abord (Aufbau), au plus 2 par orbitale (Pauli), seuls dans les cases tant que c’est possible (Hund). <b>Comment :</b><ol><li>Écris Z électrons en suivant l’ordre 1s 2s 2p 3s 3p 4s 3d 4p ; capacités s : 2, p : 6, d : 10.</li><li>Vérifie que la somme des exposants vaut Z.</li><li>Abrège avec le gaz noble précédent entre crochets : [He], [Ne], [Ar].</li><li>Lis le tableau : la <b>période</b> est le plus grand n ; les <b>électrons de valence</b> sont ceux de la couche n la plus haute (plus les d en cours de remplissage pour les métaux de transition).</li><li>Pour les célibataires, dessine les cases de la dernière sous-couche et remplis-les une par une avant d’apparier.</li></ol>`,
   demo:{enonce:'Écris la configuration du phosphore P (Z = 15), puis donne sa période, ses électrons de valence et ses électrons célibataires.',
    etapes:[{f:'1s² 2s² 2p⁶ 3s² 3p³',w:'On suit l’ordre de remplissage : 2 + 2 + 6 + 2 = 12, il reste 3 électrons pour 3p.'},
@@ -107,13 +135,27 @@ COURS.push(
   note:'Piège classique : écrire Fe²⁺ = [Ar] 4s² 3d⁴. C’est faux, les électrons 4s partent toujours les premiers.'},
  {h:'L’ion cuivre(II)',p:'Le cuivre (Z = 29) forme l’ion Cu²⁺. Combien d’électrons célibataires possède cet ion&nbsp;?',lab:'électrons célibataires :',ans:1,
   why:'Cu = [Ar] 4s¹ 3d¹⁰ (exception). Cu²⁺ perd l’électron 4s puis un électron 3d : [Ar] 3d⁹, soit 4 cases pleines et 1 case avec un seul électron.'},
- {kind:'Théorie',h:'Tendances du tableau',p:`L’<b>énergie de première ionisation</b> (arracher un électron) augmente de gauche à droite sur une période, car la charge nucléaire effective grandit, et diminue quand on descend une colonne. Le <b>rayon atomique</b> suit la tendance inverse. L’<b>électronégativité</b> χ suit la même tendance que l’ionisation.`,
+ {kind:'Théorie',h:'La charge nucléaire effective',p:`<p>Un électron de valence ne ressent pas toute la charge +Z du noyau : les électrons situés entre lui et le noyau le repoussent, et masquent en partie l’attraction. C’est la clé de toutes les tendances du tableau.</p>
+<div class="def"><p>La <b>charge nucléaire effective</b> vue par un électron est <b>Z<sub>eff</sub> = Z − σ</b>, où σ est la constante d’<b>écrantage</b> : à peu près le nombre d’électrons plus proches du noyau que lui (un électron de cœur écrante presque entièrement, un électron de la même couche seulement un tiers environ).</p></div>
+<div class="why"><p>Le long d’une période, chaque élément ajoute un proton au noyau et un électron dans la <b>même couche</b>. Le proton compte pour +1 dans Z<sub>eff</sub>, le nouvel électron n’écrante qu’environ 0,35 : Z<sub>eff</sub> augmente donc de gauche à droite, les électrons externes sont plus attirés, l’atome se contracte et il est plus difficile de lui arracher un électron. En descendant une colonne, Z<sub>eff</sub> change peu, mais la couche externe a un n plus grand : elle est plus loin, donc moins liée.</p></div>
+<div class="ex"><p>Lithium, Z = 3 : l’électron 2s est écranté par deux électrons 1s (σ ≈ 1,7), Z<sub>eff</sub> ≈ 1,3. Fluor, Z = 9 : un électron 2p est écranté par 2 électrons 1s et 6 autres électrons de la couche 2 (σ ≈ 1,7 + 2,1 = 3,8), Z<sub>eff</sub> ≈ 5,2. Quatre fois plus de charge effective : le fluor est bien plus petit (rayon 0,06 nm contre 0,13 nm) et bien plus avide d’électrons.</p></div>`,
+  fig:(()=>{ const P=plane({x:[-5,5],y:[-3,3],h:170,grid:false,axes:false});
+    P.circ(0,0,2.5,{c:'var(--muted)',w:1.5,dash:true}); P.circ(0,0,1,{c:'var(--sci)',w:1.5,fill:'var(--sci)',fo:.25});
+    P.dot(0,0,{c:'var(--bad)',r:9}); P.text(0,0,'+Z',{a:'middle',dy:4,s:10,c:'var(--surface)'});
+    P.dot(0.7,0.7,{c:'var(--sci)',r:4}).dot(-0.7,-0.7,{c:'var(--sci)',r:4}); P.dot(2.5,0,{c:'var(--accent)',r:6});
+    P.text(2.7,0.3,'électron externe : voit Z − σ',{s:11}); P.text(-0.4,1.3,'cœur : écran σ',{a:'end',s:11,c:'var(--sci)'}); return P.svg(); })()},
+ {kind:'Théorie',h:'Tendances du tableau',p:`<p>Avec la charge effective en main, on peut lire le tableau périodique comme une carte des propriétés. Trois grandeurs reviennent partout.</p>
+<div class="def"><p>L’<b>énergie de première ionisation</b> E<sub>i</sub> est l’énergie minimale pour arracher un électron à l’atome gazeux : X → X⁺ + e⁻. Le <b>rayon atomique</b> est la taille du nuage externe. L’<b>électronégativité</b> χ (échelle de Pauling, sans unité, de 0,7 à 4,0) mesure la tendance d’un atome engagé dans une liaison à attirer les électrons de cette liaison.</p></div>
+<div class="prop"><p>Sur une période, de gauche à droite : E<sub>i</sub> et χ <b>augmentent</b>, le rayon <b>diminue</b>. Dans une colonne, de haut en bas : E<sub>i</sub> et χ <b>diminuent</b>, le rayon <b>augmente</b>.</p></div>
+<div class="why"><p>C’est Z<sub>eff</sub> qui parle : vers la droite, un électron externe plus attiré est plus proche du noyau (rayon plus petit) et plus difficile à arracher (E<sub>i</sub> plus grande) ; un atome qui retient fort ses propres électrons attire aussi ceux d’une liaison (χ plus grande). Vers le bas, la couche externe s’éloigne : tout s’inverse. Les gaz nobles, à couche complète, ont les E<sub>i</sub> les plus élevées de leur période.</p></div>
+<div class="ex"><p>Période 3 : Na 5,14 eV, Mg 7,65 eV, Al 5,99 eV, Si 8,15 eV, P 10,49 eV, S 10,36 eV, Cl 12,97 eV, Ar 15,76 eV. La montée est nette, avec deux petites chutes (Al, S) expliquées dans la note.</p></div>
+<p>Déplace <i>Z</i> sur la figure.</p>`,
   params:[{id:'z',l:'Z',min:1,max:18,v:3}],
   draw:v=>{ const P=plane({x:[0,19],y:[0,27],h:220,grid:false,lx:2,ly:5});
     for(let z=1;z<=18;z++) P.rect(z-0.4,0,0.8,IE[z],{fill:z===v.z?'var(--spark)':([2,10,18].includes(z)?'var(--sci)':'var(--ok)'),fo:z===v.z?.9:.5,c:null});
     P.text(18.8,25.5,'E (eV)',{a:'end',s:11,c:'var(--muted)'}); return P.svg(); },
   info:v=>`<b>${SYM[v.z]}</b> : ${confStr(v.z)} · E<sub>i</sub> = ${fmt(IE[v.z])} eV · χ = ${CHI[v.z]}`,
-  note:'Les petites chutes au bore (B) et à l’oxygène (O) viennent de la configuration : l’électron 2p du bore est plus haut en énergie, et le 4e électron 2p de l’oxygène s’apparie et subit une répulsion.'},
+  note:'Les petites chutes au bore et à l’aluminium (premier électron p, plus haut en énergie que les s) et à l’oxygène et au soufre (quatrième électron p, qui s’apparie et subit une répulsion) viennent de la configuration.'},
  {kind:'Méthode',h:'Comparer deux atomes avec les tendances',p:`<b>Quand :</b> on te demande de classer des atomes par rayon, énergie d’ionisation ou électronégativité. <b>Pourquoi :</b> descendre d’une période ajoute une couche, donc les électrons externes sont plus loin du noyau ; avancer vers la droite ajoute des protons dans la même couche, donc ils sont plus attirés. <b>Comment :</b><ol><li>Place chaque atome : période (plus grand n) et colonne.</li><li>Rayon : il <b>augmente vers le bas</b> et <b>vers la gauche</b>.</li><li>Énergie d’ionisation et électronégativité : l’inverse, elles augmentent <b>vers le haut</b> et <b>vers la droite</b>.</li><li>Si deux atomes diffèrent à la fois de période et de colonne dans des sens opposés, la tendance ne tranche pas toujours : consulte les valeurs.</li></ol>`,
   demo:{enonce:'Classe Mg, Ca et S par rayon atomique décroissant.',
    etapes:[{f:'Mg : période 3, colonne 2 · S : période 3, colonne 16 · Ca : période 4, colonne 2',w:'On situe d’abord chaque atome à partir de sa configuration : Mg [Ne] 3s², S [Ne] 3s² 3p⁴, Ca [Ar] 4s².'},
@@ -133,7 +175,21 @@ COURS.push(
   note:'Pour passer de kJ/mol à eV par atome, divise par 96,485 (1 eV par atome = 96,485 kJ/mol).'},
  {h:'Un saut après le premier',p:'Un élément de la 3e période a E₁ = 496, E₂ = 4562, E₃ = 6910 et E₄ = 9543 kJ/mol. Combien d’électrons de valence possède-t-il&nbsp;?',lab:'électrons de valence :',ans:1,
   why:'E₂/E₁ ≈ 9,2 alors que E₃/E₂ ≈ 1,5 et E₄/E₃ ≈ 1,4 : le saut est juste après le 1er électron. C’est le sodium, [Ne] 3s¹, qui forme Na⁺.'},
- {kind:'Théorie',h:'Les raies de l’hydrogène',p:`Les niveaux d’énergie de l’hydrogène sont <b>E<sub>n</sub> = −13,6 eV / n²</b>. Quand l’électron descend de n<sub>i</sub> à n<sub>f</sub>, il émet un photon d’énergie ΔE = E<sub>i</sub> − E<sub>f</sub> et de longueur d’onde <b>λ = hc / ΔE</b>, avec hc ≈ 1240 eV·nm.`,
+ {kind:'Théorie',h:'Niveaux d’énergie et photons',p:`<p>Quand on fait passer un courant dans de l’hydrogène, le gaz émet de la lumière, mais pas un arc-en-ciel continu : seulement quelques couleurs très précises, des <b>raies</b>. C’est la quantification rendue visible.</p>
+<div class="def"><p>Dans l’atome d’hydrogène, l’électron ne peut occuper que des <b>niveaux d’énergie</b> <b>E<sub>n</sub> = −13,6 eV / n²</b>, n = 1, 2, 3… Le niveau n = 1 est l’<b>état fondamental</b> ; E = 0 correspond à l’électron arraché, à l’infini et au repos. Un <b>photon</b> de longueur d’onde λ transporte l’énergie <b>E = hc/λ</b>, avec hc ≈ 1240 eV·nm.</p></div>
+<div class="why"><p>Les énergies sont négatives parce qu’un électron lié a moins d’énergie qu’un électron libre : il faut en fournir pour le détacher. Le facteur 1/n² sort du calcul de l’onde stationnaire (ou du modèle de Bohr) : plus n est grand, plus l’orbitale est large et moins l’électron est retenu. L’atome n’émet ou n’absorbe que lorsque l’électron saute d’un niveau à un autre, et le photon emporte exactement la différence : d’où des raies et non un continu.</p></div>
+<div class="ex"><p>Ioniser l’hydrogène depuis l’état fondamental demande 0 − (−13,6) = 13,6 eV, soit un photon de λ = 1240/13,6 ≈ 91 nm (ultraviolet lointain). Pour la transition 2 → 1, ΔE = 13,6 × (1 − 1/4) = 10,2 eV et λ = 1240/10,2 ≈ 122 nm : la raie Lyman α.</p></div>
+<div class="warn"><p>L’électronvolt n’est pas une unité SI mais il est commode : 1 eV = 1,602·10⁻¹⁹ J. La constante hc = 1240 eV·nm résume h = 6,63·10⁻³⁴ J·s et c = 3,00·10⁸ m/s en une seule valeur.</p></div>`,
+  fig:(()=>{ const P=plane({x:[0,10],y:[-14.5,1.5],h:200,grid:false,axes:false});
+    for(let n=1;n<=5;n++){ const E=-13.6/n/n; P.seg(2,E,8,E,{c:'var(--muted)',w:1.5}); P.text(1.8,E,`n=${n}`,{a:'end',dy:4,s:11}); P.text(8.2,E,`${fmt(E,2)} eV`,{dy:4,s:10,c:'var(--muted)'}); }
+    P.seg(2,0,8,0,{c:'var(--ink)',w:1,dash:true}); P.text(8.2,0,'E = 0 : ionisé',{dy:4,s:10});
+    P.arrow(4,-13.6,4,0,{c:'var(--spark)',w:3}); P.text(4.2,-7,'13,6 eV',{s:11,c:'var(--spark)'}); return P.svg(); })()},
+ {kind:'Théorie',h:'Les raies de l’hydrogène',p:`<p>Mettons les niveaux en mouvement. L’électron, excité par la décharge électrique sur un niveau n<sub>i</sub>, retombe sur un niveau n<sub>f</sub> plus bas et émet un photon.</p>
+<div class="prop"><p>Pour une émission de n<sub>i</sub> vers n<sub>f</sub> &lt; n<sub>i</sub> : <b>ΔE = E<sub>i</sub> − E<sub>f</sub> = 13,6 eV × (1/n<sub>f</sub>² − 1/n<sub>i</sub>²)</b> et <b>λ = hc/ΔE = 1240/ΔE</b> (λ en nm, ΔE en eV). Toutes les raies qui aboutissent sur le même n<sub>f</sub> forment une <b>série</b> : Lyman (n<sub>f</sub> = 1, ultraviolet), Balmer (n<sub>f</sub> = 2, visible), Paschen (n<sub>f</sub> = 3, infrarouge).</p></div>
+<div class="idea"><p>Sur la figure, les niveaux se resserrent vers le haut : E₁ = −13,6, E₂ = −3,4, E₃ = −1,51, E₄ = −0,85 eV. Un saut vers n = 1 traverse un grand écart (photon ultraviolet, très énergétique), un saut vers n = 2 un écart moyen (visible), vers n = 3 un petit écart (infrarouge). Dans une même série, plus n<sub>i</sub> est grand, plus ΔE se rapproche de la limite 13,6/n<sub>f</sub>² et plus les raies se tassent.</p></div>
+<div class="ex"><p>Transition 3 → 2 : ΔE = 13,6 × (1/4 − 1/9) = 13,6 × 0,1389 ≈ 1,89 eV, λ = 1240/1,89 ≈ 656 nm : la raie rouge Hα, la plus brillante du visible. Transition 3 → 1 : ΔE = 13,6 × (1 − 1/9) ≈ 12,09 eV, λ = 1240/12,09 ≈ 103 nm, ultraviolet (Lyman β).</p></div>
+<div class="warn"><p>Une absorption suit la même formule en sens inverse : l’atome ne peut absorber que les photons dont l’énergie correspond exactement à un écart entre niveaux. C’est ce qui crée les raies sombres du spectre solaire.</p></div>
+<p>Choisis n<sub>i</sub> et n<sub>f</sub> et lis λ.</p>`,
   params:[{id:'i',l:'nᵢ',min:2,max:6,v:3},{id:'f',l:'n_f',min:1,max:5,v:2}],
   draw:v=>{ const P=plane({x:[0,10],y:[-14.5,1.5],h:250,grid:false,axes:false});
     for(let n=1;n<=6;n++){ const E=-13.6/n/n; P.seg(2,E,9,E,{c:'var(--muted)',w:n===v.i||n===v.f?3:1.5}); P.text(1.8,E,`n=${n}`,{a:'end',dy:4,s:11}); }
@@ -164,6 +220,15 @@ COURS.push(
   why:'ΔE = 1240/1875 ≈ 0,661 eV, 1/n<sub>i</sub>² = 1/9 − 0,661/13,6 ≈ 0,0625, donc n<sub>i</sub>² = 16 et n<sub>i</sub> = 4.'},
  {h:'Ioniser depuis n = 3',p:'Quelle énergie faut-il pour arracher l’électron d’un atome d’hydrogène excité au niveau n = 3&nbsp;? Au centième d’eV.',lab:'E =',unit:'eV',ans:1.51,tol:.01,
   why:'E = 0 − E₃ = 13,6/9 ≈ 1,51 eV, neuf fois moins que depuis l’état fondamental.'},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir : atomes',p:`<div class="keep"><ul>
+<li>Un électron est une onde stationnaire autour du noyau : ses énergies sont <b>quantifiées</b>, une orbitale est une zone de probabilité, pas une trajectoire.</li>
+<li>Quatre nombres quantiques : n (couche), ℓ ≤ n − 1 (sous-couche s, p, d, f), m<sub>ℓ</sub> de −ℓ à ℓ (orbitale), m<sub>s</sub> = ±½ (spin). La couche n contient n² orbitales, 2n² électrons.</li>
+<li>Remplissage : Pauli (2 par orbitale, spins opposés), Aufbau (1s 2s 2p 3s 3p 4s 3d 4p), Hund (un électron par case avant d’apparier). Exceptions : Cr 4s¹ 3d⁵, Cu 4s¹ 3d¹⁰. Les cations perdent 4s avant 3d.</li>
+<li>Période = plus grand n ; électrons de valence = couche externe ; cœur abrégé par le gaz noble entre crochets.</li>
+<li>Z<sub>eff</sub> = Z − σ augmente vers la droite : rayon qui diminue, énergie d’ionisation et électronégativité qui augmentent ; l’inverse en descendant une colonne.</li>
+<li>Énergies d’ionisation successives : un grand saut après le k-ième électron signale k électrons de valence et l’ion X<sup>k+</sup>. 1 eV par atome = 96,485 kJ/mol.</li>
+<li>Hydrogène : E<sub>n</sub> = −13,6/n² eV ; ΔE = 13,6(1/n<sub>f</sub>² − 1/n<sub>i</sub>²) ; λ = 1240/ΔE nm. Lyman n<sub>f</sub> = 1 (UV), Balmer n<sub>f</sub> = 2 (visible), Paschen n<sub>f</sub> = 3 (IR). Ioniser depuis n coûte 13,6/n² eV.</li>
+</ul></div>`},
  {kind:'Problème',h:'L’élément mystère',
   p:'Un élément X de la <b>3e période</b> a pour énergies d’ionisation successives E₁ = 738, E₂ = 1451, E₃ = 7733 et E₄ = 10 543 kJ/mol. On veut l’identifier et prévoir l’ion qu’il forme. Donnée : 1 eV par atome correspond à 96,485 kJ/mol.',
   fig:(()=>{ const P=plane({x:[0,5],y:[0,12],h:180,grid:false,ly:2}), E=[0.738,1.451,7.733,10.543];
@@ -189,7 +254,20 @@ COURS.push(
 
 /* ================= 2. MOLÉCULES ================= */
 {subj:'chi', sem:'pri', id:'chi-molecules', h:'Molécules', p:'Liaisons, structures de Lewis, géométrie VSEPR et forces entre molécules.', steps:[
- {kind:'Théorie',h:'Du covalent à l’ionique',p:`L’<b>électronégativité</b> χ mesure la tendance d’un atome à attirer les électrons d’une liaison. Plus la différence Δχ est grande, plus le doublet est déplacé vers l’atome le plus électronégatif. Repères usuels : Δχ &lt; 0,4 covalente apolaire, 0,4 à 1,7 covalente polaire, au-delà plutôt ionique.`,
+ {kind:'Théorie',h:'Pourquoi les atomes se lient',p:`<p>Deux atomes d’hydrogène isolés forment spontanément H₂ en libérant de l’énergie. Pourquoi&nbsp;? Parce qu’à la bonne distance, chaque électron est attiré par <b>deux</b> noyaux au lieu d’un seul.</p>
+<div class="def"><p>Une <b>liaison covalente</b> est la mise en commun d’une paire d’électrons (un <b>doublet liant</b>) entre deux atomes. L’<b>énergie de liaison</b> est l’énergie qu’il faut fournir pour la rompre ; la <b>longueur de liaison</b> est la distance d’équilibre entre les noyaux.</p></div>
+<div class="why"><p>Quand les atomes se rapprochent, l’attraction des électrons par les deux noyaux fait baisser l’énergie ; trop près, les noyaux se repoussent et l’énergie remonte. Entre les deux, il existe un minimum : c’est la molécule stable. Les atomes partagent des électrons tant que cela remplit leur couche externe (règle de l’<b>octet</b>, 2 électrons pour H) : au-delà, les électrons supplémentaires devraient aller dans des orbitales plus hautes et ne stabilisent plus rien. C’est pourquoi l’hélium, à couche complète, ne forme pas He₂.</p></div>
+<div class="ex"><p>H₂ : énergie de liaison 436 kJ/mol, longueur 0,074 nm. Avec 2 électrons partagés, chaque H « voit » la configuration de l’hélium. Dans N₂, trois doublets sont partagés (triple liaison) : 945 kJ/mol et 0,110 nm. Plus une liaison est multiple, plus elle est courte et solide.</p></div>
+<div class="warn"><p>Une liaison ne se forme que si elle abaisse l’énergie. Former une liaison <b>libère</b> de l’énergie, la rompre en <b>coûte</b> : ne confonds jamais les deux sens.</p></div>`,
+  fig:(()=>{ const P=plane({x:[0.2,4],y:[-1.3,1.2],h:180,grid:false,axes:false}), E=r=>(1-Math.exp(-1.6*(r-1)))**2-1;
+    P.seg(0.2,0,4,0,{c:'var(--muted)',w:1,dash:true}); P.fn(E,{from:0.45,to:4}); P.dot(1,-1,{c:'var(--ok)',l:'liaison',dx:-48,dy:14});
+    P.text(3.9,0.1,'atomes séparés',{a:'end',s:11,c:'var(--muted)'}).text(0.3,1.05,'énergie',{s:11,c:'var(--muted)'}).text(3.9,-1.2,'distance r →',{a:'end',s:11,c:'var(--muted)'});
+    P.arrow(2.4,-1,2.4,-0.03,{c:'var(--spark)',w:2}); P.text(2.5,-0.5,'énergie de liaison',{s:11,c:'var(--spark)'}); return P.svg(); })()},
+ {kind:'Théorie',h:'Du covalent à l’ionique',p:`<p>Dans H₂, le doublet est partagé à égalité. Mais dans H–Cl, les deux atomes n’attirent pas les électrons avec la même force : le doublet penche vers le chlore. Il faut une grandeur pour mesurer ce déséquilibre.</p>
+<div class="def"><p>L’<b>électronégativité</b> χ d’un atome (échelle de Pauling, sans unité) mesure sa tendance à attirer vers lui les électrons d’une liaison. Elle croît vers la droite et vers le haut du tableau : F vaut 3,98, O 3,44, Cl 3,16, N 3,04, C 2,55, H 2,20, Na 0,93. La <b>différence Δχ</b> entre les deux atomes liés classe la liaison : Δχ &lt; 0,4 covalente <b>apolaire</b>, 0,4 à 1,7 covalente <b>polaire</b>, au-delà à caractère <b>ionique</b>.</p></div>
+<div class="idea"><p>Il n’y a pas trois sortes de liaisons mais une seule famille, avec un curseur. Au bout « apolaire », le doublet est au milieu ; au bout « ionique », il est passé presque entièrement sur l’atome le plus électronégatif, qui devient un anion face à un cation. Entre les deux, l’atome le plus électronégatif porte une charge partielle δ− et l’autre δ+ : la liaison est un petit <b>dipôle</b>.</p></div>
+<div class="ex"><p>C–H : Δχ = 2,55 − 2,20 = 0,35, apolaire ; c’est pourquoi les hydrocarbures sont peu polaires. O–H : Δχ = 3,44 − 2,20 = 1,24, nettement polaire, O porte δ−. Na–Cl : Δχ = 3,16 − 0,93 = 2,23, le chlorure de sodium est un solide ionique Na⁺Cl⁻.</p></div>
+<p>Fais glisser Δχ et observe la déformation du nuage.</p>`,
   params:[{id:'d',l:'Δχ',min:0,max:3.2,step:.1,v:.9}],
   draw:v=>{ const P=plane({x:[-5,5],y:[-2,2],h:130,grid:false,axes:false}), s=Math.min(v.d,3.2)/3.2*1.9;
     P.circ(s,0,2.6-s*0.4,{c:null,fill:'var(--accent)',fo:.18});
@@ -201,7 +279,11 @@ COURS.push(
   note:'La frontière à 1,7 est une convention : la liaison passe continûment du covalent pur à l’ionique.'},
  {h:'La plus polaire',p:'Avec χ(H) = 2,20, χ(C) = 2,55, χ(N) = 3,04, χ(Cl) = 3,16 et χ(F) = 3,98, quelle liaison est la plus polaire&nbsp;?',
   opts:['C–H','N–N','H–Cl','H–F'],ans:3,why:'Δχ(H–F) = 3,98 − 2,20 = 1,78, contre 0,96 pour H–Cl, 0,35 pour C–H et 0 pour N–N.'},
- {kind:'Théorie',h:'Le moment dipolaire',p:`Chaque liaison polaire porte un moment dipolaire <b>μ = q·d</b>, en debye (D). Le moment de la molécule est la <b>somme vectorielle</b> des moments de liaison. Pour deux liaisons identiques d’angle θ : <b>μ = 2μ<sub>liaison</sub>·cos(θ/2)</b>. Change l’angle (μ<sub>O–H</sub> ≈ 1,5 D).`,
+ {kind:'Théorie',h:'Le moment dipolaire',p:`<p>Comment chiffrer la polarité d’une liaison, puis d’une molécule entière&nbsp;? Par le moment dipolaire, qu’on mesure en plaçant la substance dans un champ électrique.</p>
+<div class="def"><p>Deux charges +q et −q séparées de la distance d forment un <b>dipôle</b> de <b>moment dipolaire μ = q·d</b>. C’est un vecteur, que les chimistes dessinent de δ+ vers δ− (flèche vers l’atome le plus électronégatif). L’unité pratique est le <b>debye</b> : 1 D = 3,336·10⁻³⁰ C·m. Le moment d’une molécule est la <b>somme vectorielle</b> des moments de ses liaisons.</p></div>
+<div class="why"><p>Un électron entier déplacé de 0,1 nm donnerait μ = 1,602·10⁻¹⁹ × 10⁻¹⁰ = 1,6·10⁻²⁹ C·m, soit 4,8 D. Les liaisons réelles ont des moments de 0,3 à 2 D : le transfert de charge n’est que partiel, δ de l’ordre de 0,1 à 0,4. Comme les moments sont des vecteurs, deux liaisons identiques opposées s’annulent exactement, et deux liaisons d’angle θ donnent, par la règle du parallélogramme, <b>μ = 2μ<sub>liaison</sub>·cos(θ/2)</b>.</p></div>
+<div class="ex"><p>Eau : μ<sub>O–H</sub> ≈ 1,5 D et θ = 104,5°. μ = 2 × 1,5 × cos(52,25°) = 3 × 0,612 ≈ 1,84 D, proche de la valeur mesurée 1,85 D. Si l’eau était linéaire (θ = 180°), cos 90° = 0 et μ serait nul : elle ne dissoudrait pas le sel.</p></div>
+<p>Change l’angle et regarde la résultante.</p>`,
   params:[{id:'t',l:'Angle θ',min:90,max:180,step:5,v:105,u:'°'}],
   draw:v=>{ const P=plane({x:[-3,3],y:[-2.6,1.6],h:220,grid:false,axes:false}), a=rad(v.t/2), hx=2*Math.sin(a), hy=-2*Math.cos(a), mu=3*Math.cos(a);
     P.seg(0,0,-hx,hy,{c:'var(--ink)',w:4}).seg(0,0,hx,hy,{c:'var(--ink)',w:4});
@@ -220,6 +302,11 @@ COURS.push(
    conclusion:'Chaque H porte environ +0,11 e : la liaison S–H est faiblement polaire, bien moins que O–H.'}},
  {h:'La charge partielle de HF',p:'Le fluorure d’hydrogène HF a un moment dipolaire de 1,82 D et une longueur de liaison de 0,917·10⁻¹⁰ m. Calcule la charge partielle δ portée par H, au centième (1 D = 3,336·10⁻³⁰ C·m, e = 1,602·10⁻¹⁹ C).',lab:'δ =',ans:.41,tol:.01,
   why:'Molécule diatomique : μ<sub>liaison</sub> = μ. q = 1,82 × 3,336·10⁻³⁰ / 0,917·10⁻¹⁰ ≈ 6,62·10⁻²⁰ C, δ = q/e ≈ 0,41.'},
+ {kind:'Théorie',h:'L’octet et la notation de Lewis',p:`<p>Pour prévoir la forme et la polarité d’une molécule, il faut d’abord savoir où sont ses électrons de valence. La notation de Lewis les dessine tous.</p>
+<div class="def"><p>Dans une <b>structure de Lewis</b>, on représente chaque atome par son symbole, chaque <b>doublet liant</b> par un trait entre deux atomes et chaque <b>doublet non liant</b> (ou libre) par un trait ou deux points sur l’atome qui le porte. Les atomes des périodes 2 et 3 cherchent à s’entourer de <b>8 électrons</b> (quatre doublets, liants ou non) : c’est la <b>règle de l’octet</b> ; l’hydrogène se contente de 2.</p></div>
+<div class="why"><p>Huit électrons, c’est une configuration ns² np⁶ complète, celle d’un gaz noble : toutes les orbitales de valence sont pleines, aucune place disponible pour une liaison de plus, et aucun électron facile à céder. Un atome y parvient en partageant autant de doublets qu’il lui manque d’électrons : O (6 électrons de valence) en partage 2, N (5) en partage 3, C (4) en partage 4.</p></div>
+<div class="ex"><p>Eau : 2 × 1 + 6 = 8 électrons, 4 doublets. Deux doublets lient O à chaque H, les deux autres restent libres sur O : H–O–H avec deux traits sur O. O a 2 + 2 × 2 = 8 électrons ✓, chaque H en a 2 ✓. Ammoniac NH₃ : 8 électrons, 3 liaisons N–H et 1 doublet libre sur N.</p></div>
+<div class="warn"><p>L’octet est une règle, pas une loi. Le bore de BF₃ se contente de 6 électrons ; le soufre de SF₆ en porte 12, grâce aux orbitales 3d disponibles à partir de la période 3. Et un électron célibataire peut subsister : NO a un nombre impair d’électrons.</p></div>`},
  {kind:'Méthode',h:'Dessiner une structure de Lewis pas à pas',p:`<b>Quand :</b> avant toute question de géométrie, de polarité ou de charges, il faut savoir où sont les doublets. <b>Pourquoi :</b> les atomes des périodes 2 et 3 tendent à s’entourer de 8 électrons (l’<b>octet</b>, 2 pour H) en partageant des doublets. <b>Comment :</b><ol><li><b>Compte</b> les électrons de valence de tous les atomes, ajoute un électron par charge négative, retire-en un par charge positive. Divise par 2 : nombre de doublets.</li><li><b>Squelette</b> : l’atome central est le moins électronégatif (jamais H). Relie-le aux autres par des liaisons simples.</li><li><b>Complète l’octet</b> des atomes périphériques avec des doublets libres (H n’en a pas).</li><li>Place les doublets restants sur l’atome central.</li><li>Si l’atome central n’a pas son octet, transforme un doublet libre d’un voisin en <b>liaison double</b> (ou triple).</li></ol>`,
   demo:{enonce:'Dessine la structure de Lewis du dioxyde de carbone CO₂.',
    etapes:[{f:'4 + 2 × 6 = 16 électrons → 8 doublets',w:'C apporte 4 électrons de valence, chaque O en apporte 6 ; la molécule est neutre.'},
@@ -242,7 +329,12 @@ COURS.push(
    conclusion:'Dans CO, C porte −1 et O porte +1. C’est inhabituel, mais c’est la seule structure où les deux atomes ont leur octet.'}},
  {h:'L’ion ammonium',p:'Dans l’ion NH₄⁺, l’azote est lié à quatre hydrogènes et ne porte aucun doublet libre. Quelle est la charge formelle de l’azote&nbsp;?',lab:'CF(N) =',ans:1,
   why:'CF(N) = 5 − 0 − 8/2 = +1. Chaque H a CF = 1 − 0 − 1 = 0 : la charge +1 de l’ion est portée par N.'},
- {kind:'Théorie',h:'Le modèle VSEPR',p:`Autour de l’atome central A, les domaines électroniques (liaisons X et doublets libres E) se repoussent et s’écartent au maximum. Le nombre total X + E fixe l’arrangement, les doublets libres déforment la forme visible. En bleu les atomes liés, en jaune les doublets libres.`,
+ {kind:'Théorie',h:'Le modèle VSEPR',p:`<p>Une structure de Lewis est plate ; la molécule, elle, vit en trois dimensions. Comment deviner sa forme sans la mesurer&nbsp;? Avec une idée simple : les électrons se fuient.</p>
+<div class="def"><p>Le modèle <b>VSEPR</b> (répulsion des paires électroniques de la couche de valence) considère autour de l’atome central A ses <b>domaines électroniques</b> : chaque atome lié compte pour un domaine X (qu’il soit lié par une liaison simple, double ou triple), chaque doublet libre pour un domaine E. On note la molécule <b>AX<sub>n</sub>E<sub>m</sub></b>.</p></div>
+<div class="prop"><p>Les n + m domaines se placent le plus loin possible les uns des autres : 2 domaines à 180° (linéaire), 3 à 120° (trigonal plan), 4 à 109,5° (tétraèdre), 5 en bipyramide trigonale, 6 en octaèdre. La <b>forme</b> de la molécule est celle des seuls atomes ; les doublets libres, invisibles, la déforment.</p></div>
+<div class="why"><p>Des doublets d’électrons portent la même charge et se repoussent : l’arrangement d’énergie minimale est celui qui maximise leurs distances, exactement comme des ballons noués ensemble. Un doublet libre n’est attiré que par un seul noyau : il s’étale davantage qu’un doublet liant, partagé entre deux noyaux, et pousse les liaisons voisines, ce qui <b>referme</b> leurs angles.</p></div>
+<div class="ex"><p>CH₄, NH₃ et H₂O ont toutes quatre domaines en tétraèdre. CH₄ (AX₄) est un tétraèdre parfait, 109,5°. NH₃ (AX₃E) est une pyramide, 107°. H₂O (AX₂E₂) est coudée, 104,5° : chaque doublet libre rogne environ 2,5°.</p></div>
+<p>En bleu les atomes liés, en jaune les doublets libres : règle X et E.</p>`,
   params:[{id:'x',l:'Liaisons X',min:2,max:6,v:4},{id:'e',l:'Doublets libres E',min:0,max:3,v:0}],
   draw:v=>vsepr(v.x,v.e),
   info:v=>{ const g=GEO[`${v.x}-${v.e}`]; return g?`AX<sub>${v.x}</sub>${v.e?`E<sub>${v.e}</sub>`:''} : <b>${g[0]}</b>, angles ${g[1]} · exemple : ${g[2]}`:'X + E &gt; 6 : hors du modèle usuel.'; },
@@ -270,8 +362,17 @@ COURS.push(
    conclusion:'CCl₄ est apolaire, CH₂Cl₂ est polaire (μ ≈ 1,6 D), malgré la même forme tétraédrique.'}},
  {h:'Polaire ou pas&nbsp;?',p:'Laquelle de ces molécules est <b>apolaire</b> alors que ses liaisons sont polaires&nbsp;?',opts:['H₂O','NH₃','CO₂','HCl'],ans:2,
   why:'CO₂ est linéaire : les deux moments C=O sont opposés et s’annulent. H₂O et NH₃ ne sont pas symétriques, et HCl n’a qu’une liaison.'},
+ {kind:'Théorie',h:'Les orbitales hybrides',p:`<p>Le carbone a pour configuration 2s² 2p² : deux électrons célibataires seulement, et des orbitales p à 90° l’une de l’autre. Pourtant il forme quatre liaisons identiques à 109,5° dans CH₄. Comment&nbsp;?</p>
+<div class="def"><p>L’<b>hybridation</b> est le mélange d’une orbitale s avec une, deux ou trois orbitales p du même atome pour donner autant d’orbitales <b>hybrides</b> équivalentes, pointant dans les directions prévues par VSEPR : <b>sp</b> (2 hybrides à 180°), <b>sp²</b> (3 hybrides à 120°, une p intacte), <b>sp³</b> (4 hybrides à 109,5°). Le nombre d’hybrides est égal au nombre de domaines X + E.</p></div>
+<div class="why"><p>Promouvoir un électron 2s vers 2p coûte de l’énergie, mais permet de former quatre liaisons au lieu de deux, et chaque liaison en rapporte bien plus (environ 410 kJ/mol pour C–H). Les hybrides, allongées dans une direction, recouvrent mieux les orbitales des voisins que les orbitales s ou p pures : les liaisons sont plus fortes. Une orbitale p laissée intacte, perpendiculaire au plan des hybrides sp², peut recouvrir latéralement une p voisine : c’est la <b>liaison π</b> d’une double liaison, qui s’ajoute à la liaison <b>σ</b> frontale.</p></div>
+<div class="ex"><p>Méthanal H₂CO : C a 3 domaines, donc sp², plan à 120° ; la p restante forme la liaison π de C=O. Éthyne HC≡CH : 2 domaines, sp, linéaire ; deux liaisons π. Méthane : 4 domaines, sp³.</p></div>
+<div class="warn"><p>L’hybridation ne crée pas la géométrie : c’est VSEPR qui la donne, l’hybridation est la description des orbitales qui la réalise.</p></div>`},
  {h:'Hybridation',p:`On associe au nombre de domaines de l’atome central une <b>hybridation</b> : 2 domaines → sp, 3 → sp², 4 → sp³. Une double liaison compte pour un seul domaine. Dans l’éthène H₂C=CH₂, quelle est l’hybridation de chaque carbone&nbsp;?`,
   opts:['sp','sp³','sp²','sp³d'],ans:2,why:'Chaque carbone a trois domaines (deux C–H et la double liaison C=C) : il est sp², plan, à 120°. L’orbitale p restante forme la liaison π.'},
+ {kind:'Théorie',h:'Les forces entre molécules',p:`<p>Pourquoi l’eau est-elle liquide à 20 °C alors que le méthane, de masse voisine, bout à −162 °C&nbsp;? Les liaisons covalentes ne sont pas en cause : elles restent intactes quand on bout. Ce qui diffère, ce sont les forces <b>entre</b> molécules.</p>
+<div class="def"><p>Trois forces intermoléculaires, par ordre de force croissante :</p><ul><li><b>London</b> (dispersion) : attraction entre dipôles instantanés, présente entre toutes les molécules, d’autant plus forte que le nuage électronique est gros et déformable ;</li><li><b>dipôle-dipôle</b> : entre molécules polaires, qui s’orientent δ+ face à δ− ;</li><li><b>liaison hydrogène</b> : un H lié à N, O ou F attiré par un doublet libre d’un N, O ou F d’une molécule voisine ; 10 à 40 kJ/mol, dix fois moins qu’une covalente mais bien plus que London.</li></ul></div>
+<div class="why"><p>Même dans une molécule apolaire, les électrons bougent : à chaque instant, le nuage est un peu décalé et forme un dipôle fugace, qui induit un dipôle dans la voisine. Plus il y a d’électrons et plus ils sont loin du noyau, plus ces fluctuations sont grandes : d’où London croissante avec la taille. La liaison hydrogène est si forte parce que H, minuscule et dépouillé de son électron par O, N ou F, laisse son noyau presque nu approcher très près du doublet voisin.</p></div>
+<div class="ex"><p>CH₄ (M = 16 g/mol) : London seulement, T<sub>éb</sub> = −162 °C. H₂O (M = 18 g/mol) : London + dipôle + jusqu’à quatre liaisons hydrogène par molécule, T<sub>éb</sub> = 100 °C. Dans la famille des alcanes, sans dipôle, la taille décide : méthane CH₄ −162 °C, hexane C₆H₁₄ +69 °C.</p></div>`},
  {kind:'Méthode',h:'Comparer des forces intermoléculaires',p:`<b>Quand :</b> on compare des températures d’ébullition ou de fusion, ou des solubilités. <b>Pourquoi :</b> bouillir, c’est séparer les molécules ; plus elles s’attirent, plus il faut chauffer. <b>Comment :</b> pour chaque molécule, liste les forces présentes.<ol><li><b>London</b> (dispersion) : toujours présentes, d’autant plus fortes que la molécule est grosse (beaucoup d’électrons, grande masse molaire).</li><li><b>Dipôle-dipôle</b> : seulement entre molécules polaires.</li><li><b>Liaison hydrogène</b> : H lié à N, O ou F, face au doublet libre d’un N, O ou F voisin. C’est la plus forte des trois.</li></ol>Compare d’abord la présence de liaisons hydrogène, puis, à taille voisine, la polarité ; entre molécules de même famille, la plus grosse l’emporte.`,
   demo:{enonce:'Classe F₂ (M = 38 g/mol), HCl (36,5 g/mol) et HF (20 g/mol) par température d’ébullition croissante.',
    etapes:[{f:'F₂ : apolaire → London seulement',w:'Deux atomes identiques : Δχ = 0.'},
@@ -284,6 +385,15 @@ COURS.push(
   why:'O est très électronégatif et petit : un H lié à O est attiré par un doublet libre d’une molécule voisine. Ces liaisons hydrogène sont bien plus fortes que les interactions de van der Waals de H₂S.'},
  {h:'Les alcanes',p:'Les alcanes sont apolaires. Lequel bout à la plus haute température&nbsp;?',opts:['Le méthane CH₄','L’éthane C₂H₆','Le propane C₃H₈','Le butane C₄H₁₀'],ans:3,
   why:'Sans dipôle ni liaison hydrogène, seules restent les forces de London, qui croissent avec la taille. Le butane, le plus gros, bout le plus haut (−0,5 °C contre −162 °C pour le méthane).'},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir : molécules',p:`<div class="keep"><ul>
+<li>Une liaison covalente est un doublet partagé qui abaisse l’énergie ; la former libère de l’énergie, la rompre en coûte.</li>
+<li>Électronégativité χ : Δχ &lt; 0,4 apolaire, 0,4 à 1,7 polaire (δ+/δ−), au-delà ionique.</li>
+<li>Moment dipolaire μ = q·d (1 D = 3,336·10⁻³⁰ C·m), somme vectorielle ; deux liaisons d’angle θ : μ = 2μ<sub>liaison</sub>cos(θ/2) ; charge partielle δ = μ/(e·d).</li>
+<li>Lewis : compter les électrons de valence (± charge), squelette, octet des périphériques, doublets restants sur le centre, liaisons multiples si besoin. Charge formelle CF = V − L − B/2.</li>
+<li>VSEPR : X atomes liés + E doublets libres ; 2 linéaire, 3 trigonal plan, 4 tétraèdre, 5 bipyramide, 6 octaèdre ; un doublet libre referme les angles. Hybridation sp, sp², sp³ pour 2, 3, 4 domaines.</li>
+<li>Molécule apolaire si les moments s’annulent par symétrie (AX₂, AX₃, AX₄, AX₂E₃, AX₄E₂ à voisins identiques), polaire sinon.</li>
+<li>Forces intermoléculaires : London (toujours, croît avec la taille) &lt; dipôle-dipôle &lt; liaison hydrogène (H sur N, O, F). Elles fixent les températures d’ébullition.</li>
+</ul></div>`},
  {kind:'Problème',h:'Une molécule inconnue',
   p:'Le trifluorure d’azote NF₃ sert à graver les puces électroniques. L’azote (5 électrons de valence) est l’atome central, lié à trois fluors (7 électrons de valence chacun). On veut sa structure de Lewis, sa géométrie et sa polarité. Données : χ(N) = 3,04, χ(F) = 3,98.',
   parts:[
@@ -306,7 +416,12 @@ COURS.push(
 
 /* ================= 3. QUANTITÉS ================= */
 {subj:'chi', sem:'pri', id:'chi-quantites', h:'Quantités de matière', p:'La mole, les masses molaires, les concentrations et les pressions partielles.', steps:[
- {kind:'Théorie',h:'La mole',p:`Une <b>mole</b> contient N<sub>A</sub> = 6,022·10²³ entités. La <b>masse molaire</b> M (g/mol) est la masse d’une mole : <b>m = n·M</b> et <b>N = n·N<sub>A</sub></b>. Avec la même quantité <i>n</i>, des substances différentes ont des masses différentes.`,
+ {kind:'Théorie',h:'La mole',p:`<p>Une goutte d’eau contient plus de molécules qu’il n’y a de secondes depuis le début de l’univers. Pour compter des atomes, il faut une unité à leur échelle : la mole, comme la douzaine pour les œufs, mais gigantesque.</p>
+<div class="def"><p>Une <b>mole</b> est un paquet de <b>N<sub>A</sub> = 6,022·10²³</b> entités (atomes, molécules, ions…) ; N<sub>A</sub> est la <b>constante d’Avogadro</b>. La <b>quantité de matière</b> n se mesure en moles. La <b>masse molaire</b> M (g/mol) est la masse d’une mole : <b>m = n·M</b> et <b>N = n·N<sub>A</sub></b>.</p></div>
+<div class="why"><p>Le nombre N<sub>A</sub> a été choisi pour que la masse molaire en grammes coïncide avec la masse atomique en unités u : un atome de carbone 12 pèse 12 u, une mole de carbone 12 pèse 12 g. Ainsi, les masses du tableau périodique sont directement des masses molaires. C’est pourquoi la mole est le pont entre le monde microscopique (atomes qu’on compte) et la balance (grammes qu’on pèse).</p></div>
+<div class="ex"><p>M(H₂O) = 2 × 1,0 + 16,0 = 18 g/mol. Un verre de 180 g d’eau contient n = 180/18 = 10 mol, soit N = 10 × 6,022·10²³ = 6,0·10²⁴ molécules. Une seule molécule pèse 18 / 6,022·10²³ = 3,0·10⁻²³ g.</p></div>
+<div class="warn"><p>Même quantité n ne veut pas dire même masse : 1 mol d’eau pèse 18 g, 1 mol de CO₂ 44 g, 1 mol de NaCl 58,5 g. La figure le montre : à n fixé, les colonnes n’ont pas la même hauteur.</p></div>
+<p>Fais varier <i>n</i>.</p>`,
   params:[{id:'n',l:'n (mol)',min:.5,max:5,step:.5,v:1}],
   draw:v=>{ const P=plane({x:[0,10],y:[0,300],h:200,grid:false,ly:50}), sub=[['H₂O',18],['CO₂',44],['NaCl',58.5]];
     sub.forEach(([s,M],i)=>{ const x=1.5+i*3, m=v.n*M; P.rect(x,0,1.6,Math.min(m,300),{fill:['var(--sci)','var(--muted)','var(--ok)'][i],fo:.6,c:null}).text(x+0.8,Math.min(m,280),fmt(m,1)+' g',{a:'middle',dy:-6,s:11}).text(x+0.8,0,s,{a:'middle',dy:-6,s:12}); });
@@ -341,6 +456,11 @@ COURS.push(
   why:'M(CO₂) = 12 + 2 × 16 = 44 g/mol, donc n = m/M = 11/44 = 0,25 mol.'},
  {h:'Compter les molécules',p:'Combien de molécules contiennent 4,4 g de CO₂ (M = 44 g/mol, N<sub>A</sub> = 6,022·10²³ mol⁻¹)&nbsp;? Donne le résultat en 10²² molécules, au centième.',lab:'N =',unit:'·10²² molécules',ans:6.02,tol:.01,
   why:'n = 4,4/44 = 0,10 mol, N = 0,10 × 6,022·10²³ = 6,02·10²² molécules.'},
+ {kind:'Théorie',h:'La concentration molaire',p:`<p>En solution, on ne pèse pas le soluté à chaque fois : on prélève un volume. Il faut donc savoir combien de moles contient chaque litre.</p>
+<div class="def"><p>La <b>concentration molaire</b> d’un soluté est <b>c = n/V</b>, en mol/L, où V est le volume de la <b>solution</b> (pas du solvant ajouté). La <b>concentration massique</b> t = m/V, en g/L, s’en déduit par <b>t = c·M</b>. Inversement, un volume V prélevé contient n = c·V moles.</p></div>
+<div class="idea"><p>La concentration est une densité de particules : si la solution est homogène, chaque millilitre contient la même quantité. Ajouter de l’eau répartit les mêmes moles dans un plus grand volume : la concentration baisse, la quantité n ne change pas. C’est tout le principe de la <b>dilution</b> : n₁ = c₁V₁ (prélevé) = n₂ = c₂V₂ (après ajout d’eau), d’où <b>c₁V₁ = c₂V₂</b>.</p></div>
+<div class="ex"><p>On dissout 5,85 g de NaCl (M = 58,5 g/mol) dans assez d’eau pour obtenir 250 mL. n = 5,85/58,5 = 0,100 mol, c = 0,100 / 0,250 = 0,400 mol/L, t = 0,400 × 58,5 = 23,4 g/L. Si l’on verse 50 mL de cette solution et qu’on complète à 200 mL, c₂ = 0,400 × 50/200 = 0,100 mol/L : diluée 4 fois.</p></div>
+<div class="warn"><p>V est en litres dans n = c·V : 50 mL = 0,050 L. Et « 250 mL de solution » n’est pas « 250 mL d’eau ajoutés » : le soluté occupe un peu de place, on complète jusqu’au trait de la fiole.</p></div>`},
  {kind:'Méthode',h:'Faire une dilution',p:`<b>Quand :</b> on prépare une solution moins concentrée à partir d’une solution mère, ou on cherche la concentration après ajout d’eau. <b>Pourquoi :</b> ajouter de l’eau ne crée ni ne détruit de soluté : la quantité prélevée n₁ = c₁V₁ se retrouve entière dans la fille, n₂ = c₂V₂. <b>Comment :</b><ol><li>Écris <b>c₁V₁ = c₂V₂</b> (1 : mère prélevée, 2 : solution finale).</li><li>Isole l’inconnue ; V₁ et V₂ peuvent rester en mL s’ils ont la même unité.</li><li>Contrôle : le <b>facteur de dilution</b> F = c₁/c₂ = V₂/V₁ est supérieur à 1.</li></ol>`,
   demo:{enonce:'Quel volume de solution mère à 2,0 mol/L faut-il prélever pour préparer 100 mL à 0,50 mol/L&nbsp;?',
    etapes:[{f:'c₁V₁ = c₂V₂ → V₁ = c₂V₂ / c₁',w:'La quantité de soluté prélevée est celle qu’on veut dans la fiole.'},
@@ -371,7 +491,21 @@ COURS.push(
    conclusion:'L’acide sulfurique concentré est à environ 18 mol/L. Formule compacte : c = 1000·ρ·w / M.'}},
  {h:'L’ammoniaque du commerce',p:'Une solution d’ammoniaque contient 25 % en masse de NH₃ (M = 17 g/mol) et a une masse volumique de 0,91 g/mL. Quelle est sa concentration molaire&nbsp;? Au dixième.',lab:'c =',unit:'mol/L',ans:13.4,tol:.05,
   why:'1 L pèse 910 g, dont 0,25 × 910 = 227,5 g de NH₃, soit 227,5/17 ≈ 13,4 mol : c ≈ 13,4 mol/L.'},
- {kind:'Théorie',h:'Loi de Dalton',p:`Dans un mélange de gaz parfaits, chaque gaz exerce sa <b>pression partielle</b> p<sub>i</sub> = n<sub>i</sub>RT/V, comme s’il était seul. La pression totale est la somme : <b>p = Σ p<sub>i</sub></b>, et <b>p<sub>i</sub> = x<sub>i</sub>·p</b> avec x<sub>i</sub> = n<sub>i</sub>/n la fraction molaire. Ici V = 50 L et T = 300 K.`,
+ {kind:'Théorie',h:'Le gaz parfait',p:`<p>Pour un gaz, on ne mesure ni masse ni volume de solution, mais une pression, un volume et une température. Comment en tirer le nombre de moles&nbsp;?</p>
+<div class="def"><p>Un <b>gaz parfait</b> est un gaz dont les molécules, ponctuelles, n’interagissent qu’en se choquant. Il obéit à <b>pV = nRT</b> : p en pascals, V en m³, T en kelvins (T = θ°C + 273,15), n en moles, avec <b>R = 8,314 J/(mol·K)</b>. Le <b>volume molaire</b> V<sub>m</sub> = V/n = RT/p est le même pour tous les gaz aux mêmes p et T.</p></div>
+<div class="why"><p>La pression, c’est le martèlement des molécules sur les parois. Deux fois plus de molécules (n × 2) dans le même volume : deux fois plus de chocs, p × 2. Même nombre dans un volume deux fois plus petit : les molécules frappent deux fois plus souvent, p × 2 (loi de Boyle, p ∝ 1/V). Chauffer augmente leur vitesse, donc la force et la fréquence des chocs : p ∝ T. Comme les molécules sont minuscules par rapport aux distances qui les séparent, leur nature ne compte pas : seul leur nombre importe. D’où une seule constante R pour tous les gaz.</p></div>
+<div class="ex"><p>À 0 °C et 101,3 kPa : V<sub>m</sub> = 8,314 × 273,15 / 101 300 = 0,02242 m³ = 22,4 L/mol. À 25 °C et 100 kPa : 8,314 × 298,15 / 100 000 = 0,02479 m³ = 24,8 L/mol. Une bouteille de 1,0 L d’air à 20 °C et 101,3 kPa contient n = 101 300 × 0,0010 / (8,314 × 293,15) = 0,042 mol.</p></div>
+<div class="warn"><p>Les unités font 90 % des erreurs : 1 L = 10⁻³ m³, 1 kPa = 1000 Pa, 1 bar = 10⁵ Pa, et jamais de °C dans pV = nRT.</p></div>`,
+  fig:(()=>{ const P=plane({x:[0,10],y:[0,6],h:170,grid:false,axes:false});
+    P.rect(1,1,8,4,{fill:'var(--muted)',fo:.1,c:'var(--ink)',w:2}); const pts=[[2,2],[3.5,4],[5,1.8],[6.5,3.6],[8,2.4],[4.2,2.9],[7.2,4.4]];
+    pts.forEach(([x,y],i)=>{ P.dot(x,y,{c:'var(--sci)',r:5}); const a=i*0.9; P.arrow(x,y,x+0.7*Math.cos(a),y+0.7*Math.sin(a),{c:'var(--sci)',w:1.5,hs:6}); });
+    P.arrow(8.5,3,9.4,3,{c:'var(--bad)',w:2.5}).arrow(1.5,3,0.6,3,{c:'var(--bad)',w:2.5}); P.text(5,5.5,'p = chocs des molécules sur les parois',{a:'middle',s:11,c:'var(--muted)'}); return P.svg(); })()},
+ {kind:'Théorie',h:'Loi de Dalton',p:`<p>L’air n’est pas un gaz mais un mélange : 78 % de N₂, 21 % de O₂, un peu d’argon et de CO₂. Que vaut la pression de chacun&nbsp;?</p>
+<div class="def"><p>Dans un mélange de gaz parfaits, la <b>pression partielle</b> p<sub>i</sub> d’un gaz est la pression qu’il exercerait s’il occupait seul tout le volume : <b>p<sub>i</sub> = n<sub>i</sub>RT/V</b>. La <b>fraction molaire</b> x<sub>i</sub> = n<sub>i</sub>/n<sub>total</sub> est sa part des moles (la somme des x<sub>i</sub> vaut 1).</p></div>
+<div class="prop"><p><b>Loi de Dalton</b> : la pression totale est la somme des pressions partielles, <b>p = Σ p<sub>i</sub></b>, et chaque gaz en prend sa part molaire : <b>p<sub>i</sub> = x<sub>i</sub>·p</b>.</p></div>
+<div class="why"><p>Dans un gaz parfait, les molécules s’ignorent : les chocs de N₂ sur la paroi ne dépendent pas de la présence de O₂. La pression totale compte tous les chocs, donc elle additionne les contributions. En divisant p<sub>i</sub> = n<sub>i</sub>RT/V par p = nRT/V, RT/V se simplifie : p<sub>i</sub>/p = n<sub>i</sub>/n = x<sub>i</sub>. La pression partielle est une « pression comptée en molécules ».</p></div>
+<div class="ex"><p>V = 10 L = 0,010 m³, T = 300 K, 0,30 mol de N₂ et 0,10 mol de O₂. p(N₂) = 0,30 × 8,314 × 300 / 0,010 = 74 826 Pa ≈ 74,8 kPa, p(O₂) ≈ 24,9 kPa, p ≈ 99,8 kPa. Avec les fractions : x(N₂) = 0,30/0,40 = 0,75, et 0,75 × 99,8 = 74,8 kPa ✓.</p></div>
+<p>Règle les quantités de N₂ et de O₂ (V = 50 L, T = 300 K).</p>`,
   params:[{id:'a',l:'n(N₂)',min:.5,max:4,step:.5,v:2,u:' mol'},{id:'b',l:'n(O₂)',min:.5,max:4,step:.5,v:1,u:' mol'}],
   draw:v=>{ const pa=v.a*R*300/0.05/1000, pb=v.b*R*300/0.05/1000, P=plane({x:[0,10],y:[0,420],h:220,grid:false,ly:100});
     P.rect(3,0,4,pa,{fill:'var(--sci)',fo:.6,c:null}).rect(3,pa,4,pb,{fill:'var(--bad)',fo:.5,c:null});
@@ -390,6 +524,15 @@ COURS.push(
   why:'p(O₂) = x(O₂)·p = 0,21 × 101,3 ≈ 21,3 kPa.'},
  {kind:'Défi',h:'Un mélange en bouteille',p:'Une bouteille de 50 L contient 2,0 mol de N₂ et 1,0 mol de O₂ à 300 K. Calcule la pression partielle de O₂ en kPa, arrondie à 0,1 kPa (R = 8,314 J/(mol·K)).',lab:'p(O₂) =',unit:'kPa',ans:49.9,tol:.1,
   why:'p(O₂) = nRT/V = 1,0 × 8,314 × 300 / 0,050 = 49 884 Pa ≈ 49,9 kPa. N₂ n’y change rien : il ajoute seulement sa propre pression partielle.'},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir : quantités de matière',p:`<div class="keep"><ul>
+<li>1 mol = 6,022·10²³ entités ; n = m/M = N/N<sub>A</sub>. La masse molaire M se lit dans le tableau (moyenne pondérée des isotopes) et s’additionne pour une formule, eau d’hydratation comprise.</li>
+<li>Toujours passer par les moles : masse → n → entités, masse → n → volume de gaz, masse → n → concentration.</li>
+<li>Concentration c = n/V (V en litres), concentration massique t = c·M ; dissolution : m = c·V·M.</li>
+<li>Dilution : la quantité de soluté se conserve, c₁V₁ = c₂V₂ ; facteur de dilution F = c₁/c₂ = V₂/V₁.</li>
+<li>Pourcentage massique : raisonner sur 1 L de solution, c = 1000·ρ·w/M.</li>
+<li>Gaz parfait : pV = nRT en unités SI (Pa, m³, K), R = 8,314 J/(mol·K) ; V<sub>m</sub> = 22,4 L à 0 °C et 101,3 kPa, 24,8 L à 25 °C et 100 kPa.</li>
+<li>Mélange de gaz : p<sub>i</sub> = n<sub>i</sub>RT/V = x<sub>i</sub>·p, avec x<sub>i</sub> = n<sub>i</sub>/n ; p = Σ p<sub>i</sub> (Dalton).</li>
+</ul></div>`},
  {kind:'Problème',h:'Une solution de sulfate de cuivre',
   p:'Au laboratoire, tu dois préparer <b>250 mL</b> d’une solution de sulfate de cuivre à <b>0,100 mol/L</b> à partir de cristaux bleus de CuSO₄·5H₂O (chaque unité contient 5 molécules d’eau). Tu dilueras ensuite cette solution mère. Masses molaires : Cu 63,5 ; S 32 ; O 16 ; H 1 g/mol. N<sub>A</sub> = 6,022·10²³ mol⁻¹.',
   parts:[
@@ -412,6 +555,18 @@ COURS.push(
 
 /* ================= 4. STŒCHIOMÉTRIE ================= */
 {subj:'chi', sem:'pri', id:'chi-stoechio', h:'Stœchiométrie', p:'Équilibrer une équation, trouver le réactif limitant et calculer un rendement.', steps:[
+ {kind:'Théorie',h:'Ce que dit une équation chimique',p:`<p>« Le méthane brûle dans l’air et donne du gaz carbonique et de l’eau. » Cette phrase ne dit ni combien d’oxygène il faut, ni combien d’eau on obtient. L’équation chimique, elle, le dit.</p>
+<div class="def"><p>Une <b>équation chimique</b> équilibrée, comme <b>CH₄ + 2 O₂ → CO₂ + 2 H₂O</b>, indique les réactifs (à gauche), les produits (à droite) et, par ses <b>coefficients stœchiométriques</b>, les proportions dans lesquelles ils réagissent : 1 molécule de CH₄ pour 2 de O₂, ou tout aussi bien 1 mole pour 2 moles.</p></div>
+<div class="why"><p>Une réaction ne fait que réarranger les atomes : les liaisons se cassent et se reforment autrement, mais aucun atome n’apparaît ni ne disparaît (<b>conservation des éléments</b>, Lavoisier). Chaque élément doit donc apparaître en nombre égal des deux côtés : ici 1 C, 4 H et 4 O. Comme les atomes se conservent, la masse aussi : 16 g + 64 g = 44 g + 36 g = 80 g. Et parce qu’une mole est un nombre fixe de molécules, la proportion vraie pour les molécules l’est pour les moles.</p></div>
+<div class="ex"><p>2 H₂ + O₂ → 2 H₂O se lit : 2 mol de H₂ (4,0 g) réagissent avec 1 mol de O₂ (32,0 g) pour donner 2 mol d’eau (36,0 g). Les masses ne sont pas dans le rapport 2 : 1 : 2, mais les moles oui. C’est toujours en moles qu’on raisonne.</p></div>
+<div class="warn"><p>On ajuste les <b>coefficients</b>, jamais les indices : écrire H₂O₂ pour équilibrer l’oxygène changerait l’eau en eau oxygénée, une autre substance.</p></div>`,
+  fig:(()=>{ const P=plane({x:[0,12],y:[0,4],h:120,grid:false,axes:false}); const mol=(x,y,at)=>at.forEach(([dx,dy,c,r])=>P.dot(x+dx,y+dy,{c,r}));
+    const C='var(--ink)',H='var(--muted)',O='var(--bad)';
+    mol(1.2,2,[[0,0,C,9],[-0.5,0.5,H,5],[0.5,0.5,H,5],[-0.5,-0.5,H,5],[0.5,-0.5,H,5]]); P.text(2.3,2,'+',{a:'middle',dy:5});
+    mol(3.3,2.6,[[-0.35,0,O,7],[0.35,0,O,7]]); mol(3.3,1.4,[[-0.35,0,O,7],[0.35,0,O,7]]); P.arrow(4.4,2,5.6,2,{c:'var(--ink)',w:2});
+    mol(6.8,2,[[0,0,C,9],[-0.75,0,O,7],[0.75,0,O,7]]); P.text(8.1,2,'+',{a:'middle',dy:5});
+    mol(9.4,2.6,[[0,0,O,7],[-0.5,-0.35,H,5],[0.5,-0.35,H,5]]); mol(9.4,1.3,[[0,0,O,7],[-0.5,-0.35,H,5],[0.5,-0.35,H,5]]);
+    P.text(6,0.4,'1 C, 4 H, 4 O de chaque côté',{a:'middle',s:11,c:'var(--muted)'}); return P.svg(); })()},
  {kind:'Méthode',h:'Équilibrer une équation',p:`<b>Quand :</b> avant tout calcul de quantités, l’équation doit être équilibrée. <b>Pourquoi :</b> une réaction réarrange les atomes sans en créer ni en détruire : chaque élément doit apparaître autant de fois de chaque côté. On ne change que les <b>coefficients</b>, jamais les indices des formules. <b>Comment :</b><ol><li>Commence par l’élément qui n’apparaît que dans une espèce de chaque côté (pour une combustion : C, puis H).</li><li>Garde pour la fin l’élément présent seul (O₂, H₂, Fe…) : son coefficient s’ajuste librement.</li><li>Un coefficient fractionnaire est permis en cours de route ; multiplie ensuite tout par le dénominateur pour avoir des entiers.</li><li>Recompte chaque élément des deux côtés.</li></ol>`,
   demo:{enonce:'Équilibre la combustion de l’éthane : C₂H₆ + O₂ → CO₂ + H₂O.',
    etapes:[{f:'C₂H₆ + O₂ → 2 CO₂ + H₂O',w:'2 C à gauche : il faut 2 CO₂.'},
@@ -432,7 +587,11 @@ COURS.push(
   why:'O : 2b = 3c, le plus petit choix est b = 3, c = 2. Fe : a = 2c = 4. Donc 4 Fe + 3 O₂ → 2 Fe₂O₃.'},
  {h:'La combustion de l’éthanol',p:'Équilibre C₂H₅OH + <i>b</i> O₂ → 2 CO₂ + 3 H₂O. Que vaut <i>b</i>&nbsp;?',lab:'b =',ans:3,
   why:'À droite : 2 × 2 + 3 = 7 atomes de O. L’éthanol en apporte déjà 1, il en faut 6 de O₂ : b = 3.'},
- {kind:'Théorie',h:'Avancement et réactif limitant',p:`L’<b>avancement</b> ξ (mol) suit la réaction : pour 2 H₂ + O₂ → 2 H₂O, on a n(H₂) = n₀(H₂) − 2ξ, n(O₂) = n₀(O₂) − ξ, n(H₂O) = 2ξ. La réaction s’arrête quand un réactif est épuisé : <b>ξ<sub>max</sub> = min(n₀(H₂)/2 ; n₀(O₂)/1)</b>. Ce réactif est le <b>réactif limitant</b>.`,
+ {kind:'Théorie',h:'Avancement et réactif limitant',p:`<p>On mélange 3 mol de H₂ et 2 mol de O₂. Tout ne peut pas réagir : les proportions ne sont pas celles de l’équation. Qui s’arrête le premier, et combien d’eau obtient-on&nbsp;? Il faut une variable qui suit la réaction.</p>
+<div class="def"><p>L’<b>avancement</b> ξ (xi, en mol) compte combien de fois « l’équation a eu lieu ». Pour 2 H₂ + O₂ → 2 H₂O, après un avancement ξ : n(H₂) = n₀(H₂) − 2ξ, n(O₂) = n₀(O₂) − ξ, n(H₂O) = 2ξ. Chaque espèce varie de son coefficient × ξ, en moins pour un réactif, en plus pour un produit. Le <b>réactif limitant</b> est celui qui s’épuise le premier ; il fixe <b>ξ<sub>max</sub> = min(n₀<sub>i</sub>/ν<sub>i</sub>)</b> sur les réactifs.</p></div>
+<div class="why"><p>Une quantité de matière ne peut pas devenir négative. Le réactif i atteint zéro quand ξ = n₀<sub>i</sub>/ν<sub>i</sub> ; la réaction s’arrête au premier zéro, donc au plus petit de ces rapports. L’autre réactif est <b>en excès</b> : il en reste. Diviser par le coefficient est indispensable, car un réactif dont il faut deux molécules par « tour » s’use deux fois plus vite.</p></div>
+<div class="ex"><p>3 mol de H₂ et 2 mol de O₂ : H₂ s’épuiserait à ξ = 3/2 = 1,5 mol, O₂ à ξ = 2/1 = 2 mol. ξ<sub>max</sub> = 1,5 mol, H₂ est limitant bien qu’on en ait plus de moles. Bilan final : H₂ 0, O₂ 2 − 1,5 = 0,5 mol, H₂O 2 × 1,5 = 3,0 mol.</p></div>
+<p>Fais varier les quantités initiales et observe qui limite.</p>`,
   params:[{id:'h',l:'n₀(H₂)',min:0,max:6,step:.5,v:3,u:' mol'},{id:'o',l:'n₀(O₂)',min:0,max:4,step:.5,v:2,u:' mol'}],
   draw:v=>{ const x=Math.min(v.h/2,v.o), P=plane({x:[0,10],y:[0,8],h:200,grid:false,ly:2});
     [['H₂',v.h,v.h-2*x],['O₂',v.o,v.o-x],['H₂O',0,2*x]].forEach(([s,a,b],i)=>{ const X=1+i*3;
@@ -460,7 +619,11 @@ COURS.push(
   why:'n(C₃H₈) = 0,50 mol, n(H₂O) = 0,50 × 4 = 2,0 mol, m = 2,0 × 18 = 36 g.'},
  {h:'Masse maximale',p:'Pour N₂ + 3 H₂ → 2 NH₃, on part de 28 g de N₂ et 9 g de H₂ (N : 14, H : 1 g/mol). Quelle masse maximale de NH₃ peut-on obtenir&nbsp;?',lab:'m =',unit:'g',ans:34,tol:.1,
   why:'n(N₂) = 28/28 = 1 mol, n(H₂) = 9/2 = 4,5 mol. ξ<sub>max</sub> = min(1 ; 4,5/3 = 1,5) = 1 mol, N₂ est limitant. n(NH₃) = 2 mol, soit 2 × 17 = 34 g.'},
- {kind:'Théorie',h:'Rendement et gaz',p:`Le <b>rendement</b> compare ce qu’on obtient à ce que la stœchiométrie permet : <b>η = n<sub>obtenu</sub> / n<sub>max</sub></b>. Pour un gaz formé, on passe de la quantité au volume avec <b>pV = nRT</b>. À 0 °C et 101,3 kPa, une mole de gaz parfait occupe 22,4 L ; à 25 °C et 100 kPa, environ 24,8 L.`,
+ {kind:'Théorie',h:'Rendement et gaz',p:`<p>La stœchiométrie prédit une masse maximale. Au laboratoire, on en recueille presque toujours moins. Et si le produit est un gaz, on mesure un volume plutôt qu’une masse.</p>
+<div class="def"><p>Le <b>rendement</b> compare ce qu’on obtient réellement à ce que l’équation permettait : <b>η = n<sub>obtenu</sub> / n<sub>max</sub> = m<sub>obtenue</sub> / m<sub>max</sub></b>, entre 0 et 1 (ou 0 et 100 %), où n<sub>max</sub> se calcule avec le <b>réactif limitant</b>.</p></div>
+<div class="why"><p>Trois raisons font chuter η : la réaction peut être <b>incomplète</b> (elle s’arrête à un équilibre), des <b>réactions parasites</b> consomment une partie des réactifs (combustion qui donne un peu de CO), et on <b>perd</b> du produit au filtrage, au transvasement, au séchage. En revanche, η ne peut jamais dépasser 100 % : si c’est le cas, le produit est impur ou mal séché.</p></div>
+<div class="ex"><p>On brûle 12 g de Mg (0,50 mol) dans un excès d’oxygène : 2 Mg + O₂ → 2 MgO. Maximum : 0,50 mol de MgO, soit 0,50 × 40 = 20 g. On en pèse 15 g : η = 15/20 = 0,75, soit 75 %, comme sur la figure.</p></div>
+<div class="blk" data-t="Gaz"><p>Pour un gaz formé, on passe des moles au volume par <b>pV = nRT</b> : V = nRT/p. À 0 °C et 101,3 kPa, une mole occupe 22,4 L ; à 25 °C et 100 kPa, 24,8 L. Ainsi 0,25 mol de CO₂ à 25 °C et 100 kPa occupent 0,25 × 24,8 ≈ 6,2 L.</p></div>`,
   fig:(()=>{ const P=plane({x:[0,10],y:[0,4],h:110,grid:false,axes:false}); P.rect(0.5,1,9,1.6,{fill:'var(--muted)',fo:.2,c:'var(--ink)',w:1.5}).rect(0.5,1,6.75,1.6,{fill:'var(--ok)',fo:.6,c:null}).text(5,1.8,'η = 75 %',{a:'middle',dy:5}).text(0.5,2.6,'quantité obtenue / quantité maximale',{dy:-8,s:11,c:'var(--muted)'}); return P.svg(); })(),
   note:'Le rendement se calcule toujours à partir du réactif limitant, jamais du réactif en excès.'},
  {kind:'Méthode',h:'Calculer un rendement',p:`<b>Quand :</b> on compare la quantité réellement obtenue à celle que l’équation permettait, ou on prévoit une masse réelle à partir d’un rendement connu. <b>Pourquoi :</b> réactions incomplètes, pertes au filtrage, réactions parasites : on obtient presque toujours moins que le maximum théorique. <b>Comment :</b><ol><li>Trouve le réactif limitant et ξ<sub>max</sub>.</li><li>Calcule la quantité (ou masse) maximale du produit : n<sub>max</sub>.</li><li><b>η = n<sub>obtenu</sub>/n<sub>max</sub> = m<sub>obtenue</sub>/m<sub>max</sub></b>, entre 0 et 100 %.</li><li>À l’inverse, m<sub>obtenue</sub> = η × m<sub>max</sub>.</li></ol>`,
@@ -475,6 +638,14 @@ COURS.push(
   why:'n(Mg) = 0,25 mol, donc 0,25 mol de MgO au maximum, soit 10 g. Avec η = 0,80 : m = 0,80 × 10 = 8,0 g.'},
  {kind:'Défi',h:'Le gaz de la calcination',p:'On chauffe 10 g de CaCO₃ (M = 100 g/mol) : CaCO₃ → CaO + CO₂. Quel volume de CO₂ obtient-on à 298 K et 100 kPa (R = 8,314 J/(mol·K))&nbsp;? Arrondis au centième de litre.',lab:'V =',unit:'L',ans:2.48,tol:.02,
   why:'n(CO₂) = n(CaCO₃) = 10/100 = 0,10 mol. V = nRT/p = 0,10 × 8,314 × 298 / 100 000 = 2,48·10⁻³ m³ ≈ 2,48 L.'},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir : stœchiométrie',p:`<div class="keep"><ul>
+<li>Une équation équilibrée conserve chaque élément (et la masse) ; ses coefficients sont des proportions en molécules comme en moles. On ajuste les coefficients, jamais les indices.</li>
+<li>Équilibrer : d’abord les éléments présents dans une seule espèce de chaque côté, l’élément seul (O₂) en dernier ; fractions permises puis multipliées.</li>
+<li>Avancement ξ : réactif n₀ − ν·ξ, produit ν·ξ. Réactif limitant : le plus petit n₀/ν, qui donne ξ<sub>max</sub>. Ce n’est pas forcément celui dont on a le moins de moles.</li>
+<li>Chaîne m₁ → n₁ → n₂ → m₂ : n₂ = n₁ × ν₂/ν₁, puis m₂ = n₂·M₂ ou V₂ = n₂RT/p pour un gaz.</li>
+<li>Rendement η = n<sub>obtenu</sub>/n<sub>max</sub>, toujours calculé depuis le réactif limitant, jamais supérieur à 100 %.</li>
+<li>Volume molaire : 22,4 L à 0 °C et 101,3 kPa, 24,8 L à 25 °C et 100 kPa ; sinon pV = nRT en unités SI.</li>
+</ul></div>`},
  {kind:'Problème',h:'Le coussin gonflable',
   p:'Un coussin gonflable de voiture se remplit d’azote en quelques millisecondes grâce à la décomposition de l’azoture de sodium : <b>2 NaN₃ → 2 Na + 3 N₂</b>. Le coussin doit contenir <b>60 L</b> de gaz à 298 K et 100 kPa. Le sodium formé, dangereux, est ensuite neutralisé par du nitrate de potassium : 10 Na + 2 KNO₃ → K₂O + 5 Na₂O + N₂. Données : R = 8,314 J/(mol·K), Na 23, N 14, K 39, O 16 g/mol.',
   parts:[
@@ -496,7 +667,19 @@ COURS.push(
 
 /* ================= 5. ÉQUILIBRES ================= */
 {subj:'chi', sem:'pri', id:'chi-equilibres', h:'Équilibres chimiques', p:'Quotient réactionnel, enthalpie libre, constante d’équilibre et principe de Le Chatelier.', steps:[
- {kind:'Théorie',h:'Le quotient réactionnel',p:`Pour <i>a</i>A + <i>b</i>B ⇌ <i>c</i>C + <i>d</i>D, le <b>quotient réactionnel</b> est <b>Q = (a<sub>C</sub><sup>c</sup>·a<sub>D</sub><sup>d</sup>) / (a<sub>A</sub><sup>a</sup>·a<sub>B</sub><sup>b</sup>)</b>, où a désigne l’activité : c/c° pour un soluté (c° = 1 mol/L), p/p° pour un gaz (p° = 1 bar), 1 pour un solide pur ou le solvant. À l’équilibre, Q prend une valeur fixe : la <b>constante d’équilibre K</b>.`,
+ {kind:'Théorie',h:'Une réaction qui s’arrête avant la fin',p:`<p>En stœchiométrie, on supposait qu’une réaction avance jusqu’à épuiser le réactif limitant. Ce n’est pas toujours vrai. Dans un ballon fermé, le tétraoxyde de diazote N₂O₄ (incolore) donne du dioxyde d’azote NO₂ (roux) ; la couleur se fonce, puis se fige alors qu’il reste beaucoup de N₂O₄. Pourquoi la réaction s’arrête-t-elle sans manquer de rien&nbsp;?</p>
+<div class="def"><p>Une réaction est <b>renversable</b> quand les produits peuvent aussi réagir entre eux pour redonner les réactifs. On l’écrit avec une double flèche : <b>N₂O₄ ⇌ 2 NO₂</b>. Le système atteint un <b>équilibre chimique</b> quand sa composition ne varie plus, alors que les deux réactions continuent.</p></div>
+<div class="idea"><p>Deux réactions se font concurrence. La réaction directe ralentit à mesure que N₂O₄ s’épuise ; la réaction inverse accélère à mesure que NO₂ s’accumule, car deux NO₂ se rencontrent plus souvent. Quand les deux vitesses deviennent égales, chaque seconde il se forme autant de NO₂ qu’il en disparaît : la composition ne bouge plus. L’équilibre est <b>dynamique</b>, pas un arrêt.</p></div>
+<div class="ex"><p>À 298 K, partant de 1,00 bar de N₂O₄, on mesure à l’équilibre p(N₂O₄) = 0,824 bar et p(NO₂) = 0,352 bar. Si l’on part plutôt de 2,00 bar de NO₂ pur dans le même ballon (le même nombre d’atomes), on aboutit au même mélange, par l’autre côté.</p></div>
+<div class="warn"><p>À l’équilibre, réactifs et produits n’ont pas des concentrations égales : ce sont les <b>vitesses</b> des deux réactions qui sont égales.</p></div>`,
+  fig:(()=>{ const P=plane({x:[0,6],y:[0,1.1],h:170,grid:false,lx:1}); const vd=t=>1-0.6*(1-Math.exp(-t)), vi=t=>0.4*(1-Math.exp(-t));
+    P.fn(vd,{from:0,to:6,c:'var(--sci)'}).fn(vi,{from:0,to:6,c:'var(--bad)'}).seg(3.5,0,3.5,1.05,{c:'var(--muted)',w:1,dash:true});
+    P.text(0.2,0.95,'vitesse directe',{s:11,c:'var(--sci)'}).text(0.6,0.12,'vitesse inverse',{s:11,c:'var(--bad)'}).text(3.6,0.75,'équilibre : vitesses égales',{s:11,c:'var(--muted)'}).text(5.9,0.05,'t',{a:'end',s:11,c:'var(--muted)'}); return P.svg(); })()},
+ {kind:'Théorie',h:'Le quotient réactionnel',p:`<p>Comment savoir, à partir d’une composition mesurée, si un mélange est à l’équilibre, et sinon dans quel sens il va évoluer&nbsp;? Il faut un nombre calculé à partir des concentrations qui prenne <b>toujours la même valeur</b> à l’équilibre, quel que soit le point de départ.</p>
+<div class="def"><p>Pour <i>a</i>A + <i>b</i>B ⇌ <i>c</i>C + <i>d</i>D, le <b>quotient réactionnel</b> est <b>Q = (a<sub>C</sub><sup>c</sup>·a<sub>D</sub><sup>d</sup>) / (a<sub>A</sub><sup>a</sup>·a<sub>B</sub><sup>b</sup>)</b>. L’<b>activité</b> a vaut c/c° pour un soluté (c° = 1 mol/L), p/p° pour un gaz (p° = 1 bar), 1 pour un solide pur ou le solvant. À l’équilibre, Q prend une valeur fixe à une température donnée : la <b>constante d’équilibre K</b>.</p></div>
+<div class="idea"><p>Les produits sont en haut : Q grandit quand la réaction avance. Diviser par c° ou p° rend Q sans unité. Un solide pur reste pur quelle que soit sa quantité : il ne déplace rien, son activité vaut 1. L’exposant compte chaque molécule : 2 HI, c’est HI + HI, donc deux facteurs [HI].</p></div>
+<div class="ex"><p>H₂ + I₂ ⇌ 2 HI, K = 50. Partant de 1,0 mol/L de H₂ et 0,50 mol/L de I₂, on trouve à l’équilibre 0,533, 0,033 et 0,934 mol/L : Q = 0,934² / (0,533 × 0,033) ≈ 50. Partant de 1,0 mol/L de HI pur, on trouve [H₂] = [I₂] = 0,110 et [HI] = 0,780 mol/L : Q = 0,780² / 0,110² ≈ 50. Deux compositions très différentes, un seul K.</p></div>
+<div class="warn"><p>Q &lt; K : il manque des produits, sens direct. Q &gt; K : il y en a trop, sens inverse. Q = K : équilibre.</p></div>`,
   fig:(()=>{ const P=plane({x:[0,10],y:[0,3],h:90,grid:false,axes:false}); P.text(5,1.5,'Q &lt; K → sens direct · Q = K → équilibre · Q &gt; K → sens inverse',{a:'middle',dy:5,s:11}); return P.svg(); })(),
   note:'K ne dépend que de la température. Les concentrations à l’équilibre, elles, dépendent des conditions initiales.'},
  {kind:'Méthode',h:'Écrire l’expression de K ou de Q',p:`<b>Quand :</b> au début de tout exercice d’équilibre. <b>Pourquoi :</b> chaque espèce intervient par son activité, élevée à la puissance de son coefficient ; les espèces dont l’activité vaut 1 disparaissent de l’expression. <b>Comment :</b><ol><li>Produits au numérateur, réactifs au dénominateur, en <b>produit</b> (jamais en somme).</li><li>Chaque terme est élevé à la puissance de son coefficient stœchiométrique.</li><li>Soluté : [X]/c° ; gaz : p(X)/p° ; <b>solide pur et solvant : 1</b>, on ne les écrit pas.</li></ol>`,
@@ -517,7 +700,12 @@ COURS.push(
  {h:'Le mélange roux',p:'Pour N₂O₄(g) ⇌ 2 NO₂(g), K = 0,15 (pressions en bar, p° = 1 bar). Un ballon contient p(N₂O₄) = 0,50 bar et p(NO₂) = 0,40 bar. Que se passe-t-il&nbsp;?',
   opts:['Q = 0,80 &gt; K : NO₂ se forme','Q = 0,32 &gt; K : NO₂ se recombine en N₂O₄','Q = 0,32 &gt; K : N₂O₄ se dissocie','Le mélange est à l’équilibre'],ans:1,
   why:'Q = p(NO₂)²/p(N₂O₄) = 0,16/0,50 = 0,32 &gt; 0,15 : il y a trop de produit, la réaction va dans le sens inverse, 2 NO₂ → N₂O₄.'},
- {kind:'Théorie',h:'ΔG = ΔG° + RT ln Q',p:`L’<b>enthalpie libre de réaction</b> ΔG dit dans quel sens la réaction évolue spontanément : ΔG &lt; 0 sens direct, ΔG &gt; 0 sens inverse, ΔG = 0 équilibre. Elle dépend de Q par <b>ΔG = ΔG° + RT ln Q</b>. À l’équilibre, ΔG = 0 et Q = K, d’où <b>K = exp(−ΔG°/RT)</b>. Ici ΔG° = −20 kJ/mol et T = 298 K.`,
+ {kind:'Théorie',h:'ΔG = ΔG° + RT ln Q',p:`<p>Comparer Q à K donne le sens d’évolution. Mais d’où vient la valeur de K, et peut-on la prévoir sans faire l’expérience&nbsp;? La thermodynamique répond avec une seule grandeur.</p>
+<div class="def"><p>L’<b>enthalpie libre de réaction</b> ΔG (en J/mol) mesure l’énergie « utilisable » que libère la réaction par mole d’avancement. Une réaction évolue spontanément dans le sens qui fait baisser l’enthalpie libre : <b>ΔG &lt; 0</b> sens direct, <b>ΔG &gt; 0</b> sens inverse, <b>ΔG = 0</b> équilibre. Elle dépend de la composition par <b>ΔG = ΔG° + RT ln Q</b>, où ΔG° (lire « delta G standard ») est sa valeur quand toutes les activités valent 1, donc Q = 1.</p></div>
+<div class="idea"><p>Le terme RT ln Q traduit la composition. Un mélange riche en réactifs a Q petit, ln Q très négatif : il pousse vers l’avant. À mesure que la réaction avance, Q grandit et ΔG remonte jusqu’à 0. Sur la figure, ΔG est une droite en log₁₀ Q : il gagne RT ln 10 ≈ 5,7 kJ/mol par puissance de 10.</p></div>
+<div class="why"><p>À l’équilibre, ΔG = 0 et Q = K : 0 = ΔG° + RT ln K, d’où <b>K = exp(−ΔG°/RT)</b>. Un ΔG° négatif donne K &gt; 1.</p></div>
+<div class="ex"><p>Ici ΔG° = −20 kJ/mol et T = 298 K, donc RT = 2,478 kJ/mol. ln K = 20 / 2,478 ≈ 8,07 : K ≈ 3,2·10³ (log₁₀ K ≈ 3,5). Pour Q = 10⁻² : ΔG = −20 + 2,478 × ln 0,01 ≈ −31,4 kJ/mol, la réaction avance.</p></div>
+<div class="warn"><p>Ne confonds pas ΔG° (un nombre fixe, qui donne K) et ΔG (qui change pendant la réaction). ΔG° &gt; 0 ne veut pas dire « impossible », seulement K &lt; 1.</p></div>`,
   params:[{id:'q',l:'log₁₀ Q',min:-6,max:8,step:.5,v:-2}],
   draw:v=>{ const g=x=>-20+R*298*Math.LN10/1000*x, P=plane({x:[-6.5,8.5],y:[-60,30],h:230,grid:false,lx:2,ly:20});
     P.fn(g,{from:-6.5,to:8.5}).dot(v.q,g(v.q),{c:g(v.q)<0?'var(--ok)':'var(--bad)'}).dot(3.506,0,{c:'var(--ink)',r:4,l:'K',dy:16});
@@ -538,7 +726,11 @@ COURS.push(
   info:v=>`ΔG = ${fmt(-20+R*298*Math.LN10/1000*v.q,1)} kJ/mol`,
   ok:v=>Math.abs(-20+R*298*Math.LN10/1000*v.q)<0.5,
   why:'ΔG = 0 quand ln Q = −ΔG°/RT = 20 000 / (8,314 × 298) ≈ 8,07, soit log₁₀ Q ≈ 3,5 : c’est log₁₀ K, K ≈ 3,2·10³.'},
- {kind:'Théorie',h:'Q tend vers K',p:`Pour A ⇌ B partant de [A]₀ = 1 mol/L et [B]₀ = 0, Q = [B]/[A] vaut 0 au départ puis augmente jusqu’à K. Plus K est grand, plus l’équilibre est déplacé vers B. Fais avancer le temps.`,
+ {kind:'Théorie',h:'Q tend vers K',p:`<p>Que fait Q au cours du temps&nbsp;? Prenons la réaction la plus simple, A ⇌ B en solution, partant de [A]₀ = 1 mol/L et [B]₀ = 0.</p>
+<div class="def"><p>Chaque sens a sa vitesse : <b>v<sub>d</sub> = k<sub>d</sub>[A]</b> pour A → B et <b>v<sub>i</sub> = k<sub>i</sub>[B]</b> pour B → A. L’équilibre est atteint quand v<sub>d</sub> = v<sub>i</sub>, soit k<sub>d</sub>[A] = k<sub>i</sub>[B], donc <b>Q = [B]/[A] = k<sub>d</sub>/k<sub>i</sub> = K</b>.</p></div>
+<div class="idea"><p>Au départ Q = 0 &lt; K : seule la réaction directe tourne. B s’accumule, la réaction inverse démarre, et Q monte sans jamais dépasser K : la montée ralentit à mesure que les deux vitesses se rapprochent. Plus K est grand, plus l’équilibre penche vers B. C’est le pont entre les deux visages de K : rapport de concentrations, et rapport de deux constantes de vitesse.</p></div>
+<div class="ex"><p>Ici k<sub>d</sub> + k<sub>i</sub> = 1 s⁻¹. Avec K = 2, l’équilibre est [B] = 2/3 ≈ 0,667 et [A] ≈ 0,333 mol/L. À t = 0,5 s, [B] = 0,667 × (1 − e<sup>−0,5</sup>) ≈ 0,262 mol/L et Q ≈ 0,262 / 0,738 ≈ 0,36. À t = 3 s, Q ≈ 1,73, déjà proche de 2.</p></div>
+<div class="warn"><p>L’approche est exponentielle : en théorie Q n’atteint jamais K, mais après 5 s l’écart à l’équilibre n’est plus que de 0,7 %. Fais avancer le temps et change K.</p></div>`,
   params:[{id:'K',l:'K',min:.5,max:4,step:.5,v:2},{id:'t',l:'t',min:0,max:5,step:.25,v:.5,u:' s'}],
   draw:v=>{ const be=v.K/(1+v.K), B=t=>be*(1-Math.exp(-t)), Q=t=>B(t)/(1-B(t)), P=plane({x:[0,5.2],y:[0,4.5],h:220,lab:1});
     P.seg(0,v.K,5.2,v.K,{c:'var(--spark)',w:2,dash:true}).text(5.1,v.K,'K',{a:'end',dy:-6,c:'var(--spark)'});
@@ -548,6 +740,13 @@ COURS.push(
   why:'K = exp(−ΔG°/RT) = exp(10 000 / (8,314 × 298)) = exp(4,036) ≈ 57.'},
  {h:'Dans quel sens&nbsp;?',p:'Pour cette même réaction (ΔG° = −10 kJ/mol, 298 K), le mélange a Q = 100. Calcule ΔG en kJ/mol, arrondi au centième.',lab:'ΔG =',unit:'kJ/mol',ans:1.41,tol:.02,
   why:'ΔG = −10 + 8,314 × 298 × ln 100 / 1000 = −10 + 11,41 = +1,41 kJ/mol &gt; 0 : Q &gt; K, la réaction évolue dans le sens inverse.'},
+ {kind:'Théorie',h:'Pourquoi un équilibre se déplace',p:`<p>Un équilibre installé ne bouge plus. Mais si l’on ajoute un réactif, comprime le mélange ou chauffe, la composition se remet à changer. Dans quel sens, et pourquoi&nbsp;?</p>
+<div class="thm"><p><b>Principe de Le Chatelier.</b> Un système à l’équilibre qu’on perturbe évolue dans le sens qui <b>s’oppose</b> à la perturbation, jusqu’à un nouvel équilibre.</p></div>
+<div class="why"><p>Ce n’est pas une loi de plus : c’est Q qui revient vers K. Il y a deux cas.</p>
+<ul><li>Ajouter une espèce ou comprimer change <b>Q</b> sans changer K. Ajouter un réactif fait baisser Q : sens direct, ce qui consomme l’ajout. Multiplier toutes les pressions par f multiplie Q par f<sup>Δn</sup>, où Δn est le nombre de moles de gaz produites moins consommées.</li>
+<li>Chauffer change <b>K</b> lui-même. La relation de van ’t Hoff, admise ici, donne ln(K₂/K₁) = (ΔH°/R)(1/T₁ − 1/T₂) : K augmente avec T si la réaction directe est endothermique (ΔH° &gt; 0).</li></ul></div>
+<div class="ex"><p>N₂O₄ ⇌ 2 NO₂, K = 0,15 à 298 K, équilibre à 0,824 et 0,352 bar. On divise le volume par 2 : les pressions doublent, Q = 0,704² / 1,648 = 0,30 = 2K. Q &gt; K : NO₂ se recombine, le nombre de molécules de gaz baisse et la pression monte moins que prévu. On chauffe à 318 K (ΔH° ≈ +57 kJ/mol) : K est multiplié par exp[(57 000/8,314)(1/298 − 1/318)] ≈ 4,3 et passe à 0,64, le mélange rougit.</p></div>
+<div class="warn"><p>Un catalyseur accélère les deux sens autant : il ne change ni Q ni K, et ne déplace rien. Ajouter un solide pur ne change pas Q non plus.</p></div>`},
  {kind:'Méthode',h:'Appliquer le principe de Le Chatelier',p:`<b>Quand :</b> on modifie un équilibre (ajout d’une espèce, pression, température, catalyseur) et on demande dans quel sens il se déplace. <b>Pourquoi :</b> la perturbation éloigne Q de K (ou change K si on chauffe) ; le système évolue pour ramener Q à K, ce qui revient à s’opposer à la perturbation. <b>Comment :</b><ol><li><b>Ajout</b> d’un réactif : Q diminue, sens direct. Ajout d’un produit : sens inverse. Un solide pur ne compte pas.</li><li><b>Compression</b> : compte les moles de gaz de chaque côté. Multiplier toutes les pressions par f multiplie Q par f<sup>Δn</sup>, avec Δn = n(gaz produits) − n(gaz réactifs). Le système va vers le côté qui a le moins de moles de gaz.</li><li><b>Chauffer</b> favorise le sens endothermique (ΔH &gt; 0) : K augmente si la réaction directe est endothermique, diminue si elle est exothermique.</li><li><b>Catalyseur</b> : aucun déplacement, l’équilibre est seulement atteint plus vite.</li></ol>`,
   demo:{enonce:'2 SO₂(g) + O₂(g) ⇌ 2 SO₃(g), ΔH &lt; 0. Que fait l’équilibre si on ajoute du O₂, si on divise le volume par 2, puis si on chauffe&nbsp;?',
    etapes:[{f:'ajout de O₂ → Q diminue → sens direct',w:'O₂ est au dénominateur de Q.'},
@@ -583,6 +782,15 @@ COURS.push(
   note:'Si la vérification donne plus de 5 %, l’approximation est refusée : il faut résoudre l’équation exacte.'},
  {h:'Un équilibre très peu avancé',p:'A ⇌ B + C en solution, K = 4,0·10⁻⁶. On part de [A]₀ = 0,25 mol/L. Quelle est [B] à l’équilibre&nbsp;? Donne-la en 10⁻³ mol/L, au dixième.',lab:'[B] =',unit:'·10⁻³ mol/L',ans:1,tol:.01,
   why:'x ≈ √(4,0·10⁻⁶ × 0,25) = √(1,0·10⁻⁶) = 1,0·10⁻³ mol/L. Vérification : x/c₀ = 0,4 % &lt; 5 %, l’approximation tient.'},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir : équilibres',p:`<div class="keep"><ul>
+<li>Une réaction renversable (⇌) atteint un équilibre dynamique : les vitesses directe et inverse sont égales, la composition ne varie plus.</li>
+<li>Q = produit des activités des produits / produit des activités des réactifs, chacune à la puissance de son coefficient. Soluté c/c°, gaz p/p°, solide pur et solvant 1.</li>
+<li>À l’équilibre Q = K, qui ne dépend que de T. Q &lt; K sens direct, Q &gt; K sens inverse.</li>
+<li>ΔG = ΔG° + RT ln Q ; ΔG &lt; 0 sens direct. K = exp(−ΔG°/RT), ΔG° = −RT ln K, avec ΔG° en J/mol et RT ≈ 2478 J/mol à 298 K.</li>
+<li>Le Chatelier : le système s’oppose à la perturbation. Ajout d’un réactif ou d’un produit, compression (Q × f<sup>Δn</sup>) : Q change. Chauffer : K change, en faveur du sens endothermique. Catalyseur : aucun effet sur l’équilibre.</li>
+<li>Tableau ICE : une inconnue x, les variations ±ν·x, puis K donne l’équation ; garder la racine qui laisse toutes les quantités positives.</li>
+<li>x petit : si K ≪ c₀, c₀ − x ≈ c₀, puis vérifier x/c₀ &lt; 5 %.</li>
+</ul></div>`},
  {kind:'Problème',h:'La synthèse de l’ammoniac',
   p:'L’ammoniac des engrais se fabrique par la réaction <b>N₂(g) + 3 H₂(g) ⇌ 2 NH₃(g)</b>, exothermique (ΔH° = −92 kJ/mol). À 298 K, ΔG° = −32,9 kJ/mol. Les activités des gaz sont p/p° avec p° = 1 bar. Donnée : R = 8,314 J/(mol·K).',
   parts:[
@@ -606,7 +814,18 @@ COURS.push(
 
 /* ================= 6. SOLUTIONS ================= */
 {subj:'chi', sem:'pri', id:'chi-solutions', h:'Solutions', p:'Solubilité, produit de solubilité et propriétés colligatives.', steps:[
- {kind:'Théorie',h:'Produit de solubilité',p:`Pour un sel peu soluble, AgCl(s) ⇌ Ag⁺ + Cl⁻, l’équilibre est décrit par <b>K<sub>s</sub> = [Ag⁺]·[Cl⁻]</b> = 1,8·10⁻¹⁰. Si le produit ionique Q = [Ag⁺][Cl⁻] dépasse K<sub>s</sub>, un précipité se forme. Déplace le point dans le plan des logarithmes.`,
+ {kind:'Théorie',h:'Dissoudre un sel : jusqu’où&nbsp;?',p:`<p>Verse du sel de cuisine dans un verre d’eau en remuant : il disparaît, puis à partir d’un moment les cristaux restent au fond. Avec du chlorure d’argent, presque rien ne se dissout. Qu’est-ce qui fixe cette limite&nbsp;?</p>
+<div class="def"><p>La <b>solubilité</b> <i>s</i> d’un solide est la quantité maximale qu’on peut en dissoudre dans un litre de solution, à une température donnée, en mol/L (ou en g/L : s × M). Une solution qui a atteint cette limite, en contact avec du solide non dissous, est <b>saturée</b>.</p></div>
+<div class="idea"><p>Pour dissoudre un cristal ionique, l’eau doit arracher les ions au réseau. Ses molécules polaires entourent chaque ion (l’extrémité O, négative, vers les cations ; les H vers les anions) : c’est l’<b>hydratation</b>, qui libère de l’énergie. Si elle compense l’énergie qui tient le réseau, le sel est soluble ; sinon, il l’est très peu.</p></div>
+<div class="why"><p>La solution saturée est un <b>équilibre dynamique</b>, comme au chapitre précédent : des ions quittent le cristal et d’autres s’y redéposent, au même rythme. Ajouter du solide ne change rien, car un solide pur a une activité 1.</p></div>
+<div class="ex"><p>À 25 °C, un litre d’eau dissout environ 360 g de NaCl, mais seulement 1,9 mg de AgCl (s = 1,34·10⁻⁵ mol/L, M = 143,4 g/mol) : près de 200 000 fois moins.</p></div>
+<div class="warn"><p>« Insoluble » veut dire « très peu soluble » : il passe toujours un peu d’ions en solution, et c’est ce peu que la suite permet de calculer.</p></div>`},
+ {kind:'Théorie',h:'Produit de solubilité',p:`<p>Pour un sel très peu soluble, la solubilité varie selon ce que contient déjà l’eau. Il faut la constante de l’équilibre de dissolution, qui, elle, ne bouge pas.</p>
+<div class="def"><p>Pour AgCl(s) ⇌ Ag⁺ + Cl⁻, la constante d’équilibre s’appelle le <b>produit de solubilité</b> : <b>K<sub>s</sub> = [Ag⁺]·[Cl⁻] = 1,8·10⁻¹⁰</b> à 25 °C (concentrations en mol/L divisées par c°). Le <b>produit ionique</b> Q = [Ag⁺][Cl⁻] se calcule pour n’importe quel mélange.</p></div>
+<div class="why"><p>Le solide n’apparaît pas dans K<sub>s</sub>, car son activité vaut 1. Si Q &lt; K<sub>s</sub>, la solution n’est pas saturée : le solide ajouté se dissout. Si Q &gt; K<sub>s</sub>, il y a trop d’ions : la réaction inverse l’emporte, un <b>précipité</b> se forme jusqu’à ce que Q retombe à K<sub>s</sub>.</p></div>
+<div class="idea"><p>En logarithmes, la frontière log[Ag⁺] + log[Cl⁻] = log K<sub>s</sub> ≈ −9,74 est une droite de pente −1. Au-dessus : précipité ; en dessous : solution limpide.</p></div>
+<div class="ex"><p>[Ag⁺] = 10⁻⁶ et [Cl⁻] = 10⁻⁵ mol/L : Q = 10⁻¹¹ &lt; 1,8·10⁻¹⁰, rien ne précipite. [Ag⁺] = 10⁻⁴ et [Cl⁻] = 10⁻⁵ : Q = 10⁻⁹ &gt; K<sub>s</sub>, AgCl précipite.</p></div>
+<div class="warn"><p>Les exposants suivent la formule : pour PbCl₂, K<sub>s</sub> = [Pb²⁺][Cl⁻]². On ne compare deux K<sub>s</sub> que pour des sels de même type (1 : 1 avec 1 : 1). Déplace le point.</p></div>`,
   params:[{id:'a',l:'log₁₀ [Ag⁺]',min:-7,max:-2,step:.25,v:-6},{id:'c',l:'log₁₀ [Cl⁻]',min:-7,max:-2,step:.25,v:-5}],
   draw:v=>{ const lk=Math.log10(1.8e-10), P=plane({x:[-7.5,-1.5],y:[-7.5,-1.5],h:260,lab:1});
     P.poly([[-7.5,lk+7.5],[-1.5,lk+1.5],[-1.5,-1.5],[-7.5,-1.5]],{fill:'var(--bad)',fo:.15,c:null});
@@ -656,7 +875,16 @@ COURS.push(
    conclusion:'Il précipite 0,574 g de AgCl et il ne reste que 3,0·10⁻⁸ mol/L de chlorure.'}},
  {h:'Ce qui reste en solution',p:'1,0 L de solution contient [Cl⁻] = 5,0·10⁻³ mol/L. On y ajoute 2,0·10⁻³ mol de Ag⁺ (volume inchangé). Quelle concentration de Ag⁺ reste-t-il après précipitation de AgCl (K<sub>s</sub> = 1,8·10⁻¹⁰)&nbsp;? Donne-la en 10⁻⁸ mol/L, au dixième.',lab:'[Ag⁺] =',unit:'·10⁻⁸ mol/L',ans:6,tol:.05,
   why:'Ag⁺ est en défaut et précipite presque entièrement : [Cl⁻] ≈ 5,0·10⁻³ − 2,0·10⁻³ = 3,0·10⁻³ mol/L, donc [Ag⁺] = 1,8·10⁻¹⁰ / 3,0·10⁻³ = 6,0·10⁻⁸ mol/L.'},
- {kind:'Théorie',h:'Propriétés colligatives',p:`Un soluté abaisse la température de fusion et élève celle d’ébullition du solvant, quelle que soit sa nature : seul compte le <b>nombre de particules</b>. <b>ΔT<sub>fus</sub> = i·K<sub>f</sub>·b</b> et <b>ΔT<sub>éb</sub> = i·K<sub>éb</sub>·b</b>, avec b la molalité (mol/kg de solvant) et i le facteur de van ’t Hoff (1 pour le glucose, 2 pour NaCl). Pour l’eau : K<sub>f</sub> = 1,86 et K<sub>éb</sub> = 0,512 K·kg/mol.`,
+ {kind:'Théorie',h:'Pourquoi un soluté retarde le gel',p:`<p>L’eau de mer gèle vers −2 °C, et le sel répandu sur une route fait fondre la glace. Le sel ne réchauffe rien : comment peut-il déplacer la température de fusion&nbsp;?</p>
+<div class="idea"><p>À 0 °C, glace et eau pure coexistent : chaque seconde, autant de molécules quittent la glace qu’il en rejoint. Dissous un soluté dans le liquide : à la surface de la glace, une partie des places voisines est occupée par des particules dissoutes, qui ne rejoignent pas le cristal. Moins de molécules d’eau s’y fixent, alors que la glace, restée pure, fond toujours au même rythme : elle fond. Pour retrouver l’équilibre, il faut ralentir la fonte, donc refroidir. Le même argument vaut pour l’évaporation : le soluté gêne le départ des molécules d’eau, la vapeur est moins abondante et il faut chauffer plus pour bouillir.</p></div>
+<div class="def"><p>Une propriété est <b>colligative</b> quand elle ne dépend que du <b>nombre</b> de particules dissoutes, pas de leur nature. La <b>loi de Raoult</b> en donne le principe : la pression de vapeur du solvant vaut <b>p = x<sub>solvant</sub>·p*</b>, où x<sub>solvant</sub> est sa fraction molaire et p* la pression de vapeur du solvant pur.</p></div>
+<div class="ex"><p>1 mol de glucose dans 1 kg d’eau (55,5 mol) : x<sub>eau</sub> = 55,5 / 56,5 ≈ 0,982. À 25 °C, p* = 3,17 kPa, donc p ≈ 0,982 × 3,17 ≈ 3,11 kPa, soit 1,8 % de moins.</p></div>
+<div class="warn"><p>On compte les <b>particules</b>, pas les unités de formule : 1 mol de NaCl libère 2 mol d’ions et agit deux fois plus que 1 mol de glucose.</p></div>`},
+ {kind:'Théorie',h:'Propriétés colligatives',p:`<p>L’idée précédente donne le sens de l’effet. Pour calculer de combien la température change, il faut une loi chiffrée et la bonne façon de compter le soluté.</p>
+<div class="def"><p>Pour une solution diluée : <b>ΔT<sub>fus</sub> = i·K<sub>f</sub>·b</b> (abaissement de la température de fusion) et <b>ΔT<sub>éb</sub> = i·K<sub>éb</sub>·b</b> (élévation de la température d’ébullition). La <b>molalité</b> b est la quantité de soluté par kilogramme de <b>solvant</b> (mol/kg). Le <b>facteur de van ’t Hoff</b> i est le nombre de particules libérées par unité dissoute : 1 pour le glucose, 2 pour NaCl, 3 pour CaCl₂. Pour l’eau : K<sub>f</sub> = 1,86 et K<sub>éb</sub> = 0,512 K·kg/mol.</p></div>
+<div class="why"><p>Aux faibles concentrations, l’abaissement de pression de vapeur est proportionnel à la fraction de particules dissoutes, elle-même proportionnelle à i·b. Les constantes K<sub>f</sub> et K<sub>éb</sub> ne dépendent que du solvant. On utilise la molalité plutôt que la concentration, car une masse de solvant ne varie pas avec la température.</p></div>
+<div class="ex"><p>Glucose à b = 1 mol/kg : ΔT<sub>fus</sub> = 1,86 K, l’eau gèle à −1,86 °C et bout à 100,51 °C. NaCl à la même molalité (i = 2) : gel à −3,72 °C, ébullition à 101,02 °C.</p></div>
+<div class="warn"><p>Ces lois supposent une solution diluée et idéale ; au-delà de 1 mol/kg environ, l’effet réel est un peu plus faible. Fais varier b et i.</p></div>`,
   params:[{id:'b',l:'molalité b',min:0,max:3,step:.25,v:1,u:' mol/kg'},{id:'i',l:'i',min:1,max:3,v:1}],
   draw:v=>{ const df=v.i*1.86*v.b, de=v.i*0.512*v.b, P=plane({x:[0,10],y:[0,18],h:200,grid:false,ly:4});
     P.rect(2,0,2,df,{fill:'var(--sci)',fo:.6,c:null}).rect(6,0,2,de,{fill:'var(--bad)',fo:.6,c:null});
@@ -675,6 +903,12 @@ COURS.push(
   why:'Al₂(SO₄)₃ → 2 Al³⁺ + 3 SO₄²⁻ : 2 + 3 = 5 particules par unité dissoute.'},
  {h:'Saler la route',p:'On dissout du NaCl dans l’eau à la molalité 1,0 mol/kg (i = 2, K<sub>f</sub> = 1,86 K·kg/mol). À quelle température l’eau gèle-t-elle&nbsp;? Au centième.',lab:'T =',unit:'°C',ans:-3.72,tol:.02,
   why:'ΔT = i·K<sub>f</sub>·b = 2 × 1,86 × 1,0 = 3,72 K. L’eau gèle à −3,72 °C.'},
+ {kind:'Théorie',h:'L’osmose',p:`<p>Une tranche de concombre dans de l’eau salée ramollit ; un globule rouge dans de l’eau pure gonfle et éclate. Dans les deux cas, de l’eau traverse une paroi. Qu’est-ce qui la pousse&nbsp;?</p>
+<div class="def"><p>Une <b>membrane semi-perméable</b> laisse passer les molécules de solvant mais pas les particules dissoutes. L’<b>osmose</b> est le passage du solvant à travers elle, du côté le moins concentré vers le côté le plus concentré. La <b>pression osmotique</b> Π est la surpression qu’il faut appliquer à la solution pour arrêter ce passage : <b>Π = i·c·R·T</b>, avec c en mol/m³ et Π en Pa.</p></div>
+<div class="idea"><p>C’est le même mécanisme que pour le gel : côté solution, une partie des molécules qui frappent la membrane sont des particules dissoutes qui ne passent pas. Le flux d’eau du côté pur vers la solution l’emporte donc sur le flux inverse. Une pression sur la solution pousse ses molécules d’eau plus fort et rétablit l’égalité.</p></div>
+<div class="why"><p>La formule a la forme du gaz parfait, p = (n/V)·RT : les particules dissoutes, très diluées, se comportent comme les molécules d’un gaz dans le volume de solvant.</p></div>
+<div class="ex"><p>Saccharose à 0,020 mol/L = 20 mol/m³ à 298 K : Π = 20 × 8,314 × 298 ≈ 49 600 Pa, soit 49,6 kPa. C’est la pression au pied d’une colonne d’eau de 49 600 / (1000 × 9,81) ≈ 5,1 m : une solution à peine sucrée peut faire monter l’eau de plusieurs mètres dans un tube.</p></div>
+<div class="warn"><p>Le solvant va vers la solution la plus <b>concentrée</b>, pas l’inverse. En appliquant une pression supérieure à Π, on inverse le flux : c’est l’osmose inverse, qui dessale l’eau de mer.</p></div>`},
  {kind:'Méthode',h:'Calculer une pression osmotique',p:`<b>Quand :</b> membranes, cellules, perfusions, dessalement. <b>Pourquoi :</b> les particules dissoutes se comportent comme un gaz parfait : Π = i·c·RT a la même forme que p = (n/V)RT. <b>Comment :</b><ol><li>Détermine i.</li><li>Convertis c en <b>mol/m³</b> : 1 mol/L = 1000 mol/m³.</li><li>Π = i·c·R·T, en Pa ; divise par 1000 pour des kPa, par 10⁵ pour des bar.</li></ol>`,
   demo:{enonce:'Quelle est la pression osmotique d’un sérum physiologique, NaCl à 0,15 mol/L, à 37 °C&nbsp;?',
    etapes:[{f:'i = 2 · T = 37 + 273 = 310 K',w:'NaCl libère Na⁺ et Cl⁻ ; la température doit être en kelvins.'},
@@ -685,6 +919,15 @@ COURS.push(
   why:'Π = cRT avec c = 0,10 mol/L = 100 mol/m³ : Π = 100 × 8,314 × 298 ≈ 247 800 Pa ≈ 248 kPa, soit près de 2,5 bar.'},
  {kind:'Défi',h:'Ébullioscopie',p:'On dissout 18 g de glucose (M = 180 g/mol) dans 500 g d’eau (K<sub>éb</sub> = 0,512 K·kg/mol). De combien la température d’ébullition augmente-t-elle&nbsp;? Au millième de kelvin.',lab:'ΔT =',unit:'K',ans:.102,tol:.001,
   why:'n = 18/180 = 0,10 mol, b = 0,10 / 0,500 kg = 0,20 mol/kg. ΔT = 1 × 0,512 × 0,20 ≈ 0,102 K.'},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir : solutions',p:`<div class="keep"><ul>
+<li>Solubilité s : quantité maximale dissoute par litre (mol/L, ou g/L = s × M). Une solution saturée est un équilibre dynamique avec le solide.</li>
+<li>Produit de solubilité : pour A<sub>x</sub>B<sub>y</sub>(s) ⇌ x A + y B, K<sub>s</sub> = [A]<sup>x</sup>[B]<sup>y</sup> = (x·s)<sup>x</sup>(y·s)<sup>y</sup> dans l’eau pure. Le solide n’apparaît pas.</li>
+<li>Q &gt; K<sub>s</sub> : précipité ; Q ≤ K<sub>s</sub> : solution limpide. Après un mélange, calculer d’abord les concentrations diluées dans le volume total.</li>
+<li>Ion commun : la solubilité baisse fortement (Le Chatelier) ; on approxime c + y·s ≈ c et on vérifie.</li>
+<li>Précipitation : l’ion en défaut précipite presque entièrement ; ce qui en reste vaut K<sub>s</sub> / [ion en excès].</li>
+<li>Propriétés colligatives : seul compte le nombre de particules. ΔT<sub>fus</sub> = i·K<sub>f</sub>·b, ΔT<sub>éb</sub> = i·K<sub>éb</sub>·b, b en mol par kg de solvant ; eau : K<sub>f</sub> = 1,86 et K<sub>éb</sub> = 0,512 K·kg/mol.</li>
+<li>Osmose : le solvant va vers la solution la plus concentrée ; Π = i·c·RT avec c en mol/m³ et T en K.</li>
+</ul></div>`},
  {kind:'Problème',h:'Saler les routes en hiver',
   p:'Les services de voirie répandent du sel pour empêcher la neige fondue de regeler. On veut que <b>1,0 kg d’eau</b> reste liquide jusqu’à <b>−5,0 °C</b>. On compare le chlorure de sodium NaCl (M = 58,5 g/mol, i = 2) et le chlorure de calcium CaCl₂ (M = 111 g/mol, i = 3). Donnée : K<sub>f</sub>(eau) = 1,86 K·kg/mol.',
   parts:[
@@ -707,7 +950,18 @@ COURS.push(
 
 /* ================= 7. ACIDES ET BASES ================= */
 {subj:'chi', sem:'pri', id:'chi-acides', h:'Acides et bases', p:'pH, pKa, acides forts et faibles, titrages et solutions tampons.', steps:[
- {kind:'Théorie',h:'L’échelle de pH',p:`Selon <b>Brønsted</b>, un acide cède un proton H⁺ et une base le capte : HA + H₂O ⇌ A⁻ + H₃O⁺, HA/A⁻ forme un <b>couple acide-base</b>. On définit <b>pH = −log₁₀[H₃O⁺]</b>. L’eau s’autoprotolyse : <b>K<sub>e</sub> = [H₃O⁺][OH⁻] = 10⁻¹⁴</b> à 25 °C.`,
+ {kind:'Théorie',h:'Acides et bases selon Brønsted',p:`<p>Le vinaigre, le jus de citron et l’acide chlorhydrique ont un goût aigre et attaquent le calcaire ; la soude et l’ammoniac sont glissants et neutralisent les acides. Qu’ont en commun toutes ces substances, au niveau des molécules&nbsp;?</p>
+<div class="def"><p>Selon <b>Brønsted</b>, un <b>acide</b> est une espèce qui peut céder un proton H⁺, une <b>base</b> une espèce qui peut en capter un. Un acide HA et la base A⁻ qu’il donne en perdant son proton forment un <b>couple acide-base</b>, noté HA/A⁻ ; A⁻ est la <b>base conjuguée</b> de HA.</p></div>
+<div class="idea"><p>Un proton nu n’existe pas en solution : il passe toujours d’une molécule à une autre. Une réaction acide-base est un <b>transfert de proton</b> entre deux couples. Dans l’eau, c’est l’eau qui sert de partenaire : avec un acide, elle capte le proton et devient l’ion <b>oxonium H₃O⁺</b> ; avec une base, elle le cède et devient l’ion <b>hydroxyde OH⁻</b>.</p></div>
+<div class="ex"><p>CH₃COOH + H₂O ⇌ CH₃COO⁻ + H₃O⁺ : l’acide acétique (couple CH₃COOH/CH₃COO⁻) donne son proton à l’eau (couple H₃O⁺/H₂O). NH₃ + H₂O ⇌ NH₄⁺ + OH⁻ : l’ammoniac (couple NH₄⁺/NH₃) arrache un proton à l’eau (couple H₂O/OH⁻).</p></div>
+<div class="why"><p>L’eau joue l’acide dans un cas, la base dans l’autre : elle est <b>amphotère</b>. Elle réagit même sur elle-même, 2 H₂O ⇌ H₃O⁺ + OH⁻ (autoprotolyse), très peu : il y a donc toujours un peu de H₃O⁺ et de OH⁻ dans l’eau.</p></div>
+<div class="warn"><p>Pour trouver la base conjuguée, on retire un H⁺ : la charge baisse de 1 (NH₄⁺ → NH₃, H₂O → OH⁻). On n’enlève pas un H, ni un OH.</p></div>`},
+ {kind:'Théorie',h:'L’échelle de pH',p:`<p>La concentration en H₃O⁺ va de 1 mol/L dans un acide concentré à 10⁻¹⁴ mol/L dans une base concentrée. Comparer 0,000 000 1 et 0,000 000 000 01 est malcommode : on utilise une échelle logarithmique.</p>
+<div class="def"><p>Le <b>pH</b> d’une solution aqueuse est <b>pH = −log₁₀[H₃O⁺]</b>, avec [H₃O⁺] en mol/L. Inversement, [H₃O⁺] = 10<sup>−pH</sup>. L’autoprotolyse de l’eau a pour constante le <b>produit ionique</b> <b>K<sub>e</sub> = [H₃O⁺][OH⁻] = 10⁻¹⁴</b> à 25 °C, valable dans toute solution aqueuse.</p></div>
+<div class="idea"><p>Le signe moins rend le pH positif ; le logarithme compte les puissances de 10. Un pH plus petit veut dire plus de H₃O⁺. Comme le produit [H₃O⁺][OH⁻] est fixé, quand l’un monte, l’autre descend.</p></div>
+<div class="why"><p>Dans l’eau pure, l’autoprotolyse forme autant de H₃O⁺ que de OH⁻ : [H₃O⁺]² = 10⁻¹⁴, [H₃O⁺] = 10⁻⁷ mol/L, pH = 7. Une solution est <b>neutre</b> si [H₃O⁺] = [OH⁻], <b>acide</b> si [H₃O⁺] &gt; [OH⁻] (pH &lt; 7), <b>basique</b> sinon.</p></div>
+<div class="ex"><p>À pH 3 : [H₃O⁺] = 10⁻³ mol/L et [OH⁻] = 10⁻¹⁴ / 10⁻³ = 10⁻¹¹ mol/L. Un jus à pH 3 contient 10 000 fois plus de H₃O⁺ qu’une eau à pH 7.</p></div>
+<div class="warn"><p>Une unité de pH, c’est un facteur 10. Et « neutre = pH 7 » ne vaut qu’à 25 °C : K<sub>e</sub> change avec la température. Déplace le curseur.</p></div>`,
   params:[{id:'p',l:'pH',min:0,max:14,step:.5,v:3}],
   draw:v=>{ const P=plane({x:[-0.5,14.5],y:[0,4],h:110,grid:false,axes:false});
     for(let k=0;k<14;k++) P.rect(k,1.2,1,1,{fill:k<7?'var(--bad)':'var(--sci)',fo:Math.abs(k+0.5-7)/7*.8+.08,c:null});
@@ -728,7 +982,18 @@ COURS.push(
   why:'[H₃O⁺] = c = 10⁻² mol/L, donc pH = −log(10⁻²) = 2.'},
  {h:'Base forte',p:'Quel est le pH d’une solution de potasse KOH à 0,0050 mol/L&nbsp;? Au centième.',lab:'pH =',ans:11.7,tol:.01,
   why:'[OH⁻] = 5,0·10⁻³ mol/L, donc pH = 14 + log(5,0·10⁻³) = 14 − 2,30 = 11,70.'},
- {kind:'Théorie',h:'Acide faible et pKa',p:`Un acide faible ne se dissocie que partiellement : <b>K<sub>a</sub> = [A⁻][H₃O⁺]/[HA]</b> et <b>pKa = −log K<sub>a</sub></b>. Si pH &lt; pKa, HA prédomine, sinon A⁻. Pour un acide faible peu dissocié : <b>pH ≈ ½(pKa − log c)</b>. La courbe montre les fractions de HA et de A⁻, le trait marque le pH de la solution.`,
+ {kind:'Théorie',h:'Acides forts, acides faibles',p:`<p>Une solution d’acide chlorhydrique et une solution d’acide acétique à la même concentration de 0,020 mol/L n’ont pas le même pH : 1,70 pour la première, 3,24 pour la seconde. Les deux sont des acides, mais l’un donne ses protons bien plus volontiers.</p>
+<div class="def"><p>Un <b>acide fort</b> réagit totalement avec l’eau : HCl + H₂O → Cl⁻ + H₃O⁺. Un <b>acide faible</b> ne réagit que partiellement et atteint un équilibre, de constante d’<b>acidité</b> <b>K<sub>a</sub> = [A⁻][H₃O⁺] / [HA]</b> (l’eau, solvant, n’y figure pas). On utilise <b>pKa = −log₁₀ K<sub>a</sub></b> : plus le pKa est petit, plus l’acide est fort. De même, une base forte (NaOH) libère totalement ses OH⁻, une base faible (NH₃) partiellement.</p></div>
+<div class="idea"><p>Céder un proton, c’est casser la liaison H–A. Si A⁻ est stable seul dans l’eau (grand ion bien hydraté comme Cl⁻, charge répartie comme dans CH₃COO⁻), la liaison se rompt facilement et K<sub>a</sub> est grand.</p></div>
+<div class="why"><p>Dans un couple, K<sub>a</sub>·K<sub>b</sub> = K<sub>e</sub> : multiplier les deux constantes fait apparaître [H₃O⁺][OH⁻]. Donc pKa + pK<sub>b</sub> = 14 : plus l’acide est fort, plus sa base conjuguée est faible.</p></div>
+<div class="ex"><p>Acide acétique, pKa = 4,76, à 0,020 mol/L : seulement 2,9 % des molécules sont dissociées, [H₃O⁺] ≈ 5,8·10⁻⁴ mol/L, pH ≈ 3,24. Pour l’acétate, pK<sub>b</sub> = 14 − 4,76 = 9,24.</p></div>
+<div class="warn"><p>Faible ne veut pas dire dilué : la force dépend de K<sub>a</sub>, la concentration est une autre affaire.</p></div>`},
+ {kind:'Théorie',h:'Acide faible et pKa',p:`<p>Dans une solution qui contient un couple HA/A⁻, qui domine, l’acide ou sa base&nbsp;? La réponse ne dépend que de l’écart entre le pH et le pKa.</p>
+<div class="prop"><p>En prenant le logarithme de K<sub>a</sub> = [A⁻][H₃O⁺]/[HA], on obtient <b>pH = pKa + log([A⁻]/[HA])</b>. Donc si pH &lt; pKa, <b>HA prédomine</b> ; si pH &gt; pKa, <b>A⁻ prédomine</b> ; à pH = pKa, il y en a autant.</p></div>
+<div class="idea"><p>Un pH bas veut dire beaucoup de H₃O⁺ : l’équilibre HA + H₂O ⇌ A⁻ + H₃O⁺ est repoussé vers HA. Chaque unité de pH au-dessus du pKa multiplie le rapport [A⁻]/[HA] par 10. Sur la figure, les deux courbes se croisent à pH = pKa.</p></div>
+<div class="why"><p>Pour un acide faible seul à la concentration c, la réaction avance de x = [H₃O⁺] et K<sub>a</sub> = x²/(c − x). Si l’acide est peu dissocié, c − x ≈ c, d’où x ≈ √(K<sub>a</sub>·c) et <b>pH ≈ ½(pKa − log c)</b>.</p></div>
+<div class="ex"><p>Couple acétique, pKa = 4,76, à pH 5,76 : [A⁻]/[HA] = 10, donc 91 % d’acétate. Acide de pKa 4,5 à c = 0,10 mol/L (réglage de départ) : pH ≈ ½(4,5 + 1) = 2,75, et le calcul exact donne 2,75, avec 1,8 % de dissociation.</p></div>
+<div class="warn"><p>La formule approchée n’est valable que si l’acide est peu dissocié (moins de 5 % environ) : pKa petit et c faible la mettent en défaut. Le trait marque le pH de la solution.</p></div>`,
   params:[{id:'k',l:'pKa',min:2,max:10,step:.5,v:4.5},{id:'c',l:'log₁₀ c',min:-4,max:-1,step:.5,v:-1}],
   draw:v=>{ const Ka=10**-v.k, c=10**v.c, h=solveH(h=>h-c*Ka/(Ka+h)-KW/h), pH=pHof(h), P=plane({x:[0,14],y:[0,1.2],w:320,h:180,grid:false,lx:2});
     P.fn(p=>1/(1+10**(p-v.k)),{c:'var(--bad)',from:0,to:14}).fn(p=>1/(1+10**(v.k-p)),{c:'var(--sci)',from:0,to:14});
@@ -755,7 +1020,12 @@ COURS.push(
    conclusion:'pH ≈ 11,1 : une solution d’ammoniac est nettement basique.'}},
  {h:'Une solution d’acétate',p:'Calcule le pH d’une solution d’acétate de sodium CH₃COONa à 0,10 mol/L (pKa(CH₃COOH/CH₃COO⁻) = 4,76). Au centième.',lab:'pH =',ans:8.88,tol:.01,
   why:'L’acétate est une base faible : pH ≈ 7 + ½(4,76 + log 0,10) = 7 + ½ × 3,76 = 8,88.'},
- {kind:'Théorie',h:'La courbe de titrage',p:`On verse de la soude à 0,10 mol/L dans 20 mL d’acide à 0,10 mol/L. À l’<b>équivalence</b> (V = 20 mL), les quantités d’acide et de base introduites sont égales. Acide fort : pH 7 à l’équivalence. Acide faible (acide acétique) : pH &gt; 7, et à la <b>demi-équivalence</b> pH = pKa.`,
+ {kind:'Théorie',h:'La courbe de titrage',p:`<p>Pour connaître la concentration d’un acide, on le fait réagir avec une base de concentration connue, versée peu à peu, et on suit le pH. La courbe obtenue dit où s’arrêter, et elle révèle aussi le pKa.</p>
+<div class="def"><p>Un <b>titrage</b> utilise une réaction totale et rapide, ici HA + OH⁻ → A⁻ + H₂O. L’<b>équivalence</b> est atteinte quand on a versé exactement la quantité de base qui consomme tout l’acide : n(OH⁻ versé) = n(acide initial). La <b>demi-équivalence</b> est le volume moitié.</p></div>
+<div class="idea"><p>On verse de la soude à 0,10 mol/L dans 20 mL d’acide à 0,10 mol/L ; l’équivalence est à 20 mL. Avant, chaque OH⁻ versé est aussitôt consommé et le pH bouge peu. Autour de l’équivalence, une goutte fait passer d’un léger excès d’acide à un léger excès de base : c’est le <b>saut de pH</b>. Après, la base en excès fixe le pH.</p></div>
+<div class="why"><p>Pour un acide faible, le mélange avant l’équivalence contient HA et A⁻ : pH = pKa + log(n(A⁻)/n(HA)). À la demi-équivalence, n(A⁻) = n(HA), donc <b>pH = pKa</b>. À l’équivalence, il ne reste que la base A⁻ : <b>pH &gt; 7</b>. Pour un acide fort, il ne reste que de l’eau salée : pH = 7.</p></div>
+<div class="ex"><p>Acide acétique (pKa = 4,76) : pH 2,88 au départ ; à 12 mL, n(A⁻)/n(HA) = 12/8 et pH = 4,76 + log 1,5 ≈ 4,94 ; à 10 mL, pH = 4,76 ; à 20 mL, pH ≈ 8,73 ; à 30 mL, pH ≈ 12,3.</p></div>
+<div class="warn"><p>L’équivalence n’est pas « le point où pH = 7 » : pour un acide faible, elle est en zone basique. Bascule entre acide fort et faible.</p></div>`,
   params:[{id:'V',l:'V(NaOH)',min:0,max:40,v:12,u:' mL'},{id:'w',l:'0 : acide fort · 1 : acide faible',min:0,max:1,v:1}],
   draw:v=>titrDraw(v.V,v.w===1),
   info:v=>`${v.w?'CH₃COOH':'HCl'} · V = ${v.V} mL · pH = <b>${fmt(titr(v.V,v.w===1),2)}</b>`,
@@ -781,6 +1051,11 @@ COURS.push(
    conclusion:'pH ≈ 8,7 à l’équivalence, repérée par la phénolphtaléine.'}},
  {h:'Titrer l’ammoniac',p:'On titre 20,0 mL d’ammoniac à 0,100 mol/L (pKa(NH₄⁺/NH₃) = 9,25) par de l’acide chlorhydrique à 0,100 mol/L. Quel est le pH à l’équivalence&nbsp;? Au centième.',lab:'pH =',ans:5.28,tol:.01,
   why:'À l’équivalence (20,0 mL), il reste 2,00·10⁻³ mol de NH₄⁺ dans 40,0 mL, soit 0,0500 mol/L. C’est un acide faible : pH ≈ ½(9,25 − log 0,0500) = ½(9,25 + 1,30) ≈ 5,28.'},
+ {kind:'Théorie',h:'Pourquoi un tampon résiste',p:`<p>Le sang, les cellules, beaucoup de réactions de laboratoire ne supportent qu’une variation de pH de quelques dixièmes. Pourtant on y ajoute sans cesse des acides et des bases. Comment garder un pH presque fixe&nbsp;?</p>
+<div class="def"><p>Une <b>solution tampon</b> contient un acide faible HA et sa base conjuguée A⁻ en quantités comparables. Son pH suit l’équation de <b>Henderson-Hasselbalch</b> : <b>pH = pKa + log(n(A⁻)/n(HA))</b>, et il varie peu quand on ajoute un peu d’acide fort, de base forte, ou d’eau.</p></div>
+<div class="why"><p>Le tampon contient de quoi neutraliser les deux attaques. Un H₃O⁺ ajouté est capté par A⁻ (A⁻ + H₃O⁺ → HA + H₂O), un OH⁻ ajouté par HA (HA + OH⁻ → A⁻ + H₂O). Ces réactions sont totales : l’ion ajouté disparaît, et seul le <b>rapport</b> n(A⁻)/n(HA) change un peu. Le pH dépend de ce rapport à travers un logarithme, qui écrase les variations. Diluer ne change pas le rapport, donc pas le pH.</p></div>
+<div class="ex"><p>Tampon acétique : 0,10 mol de CH₃COOH et 0,10 mol de CH₃COO⁻ dans 1 L, pH = 4,76. On ajoute 0,010 mol de NaOH : n(HA) = 0,09 et n(A⁻) = 0,11 mol, pH = 4,76 + log(0,11/0,09) ≈ 4,85. La même soude dans 1 L d’eau pure ferait passer le pH de 7 à 12.</p></div>
+<div class="warn"><p>Un tampon a des limites. Il est efficace entre pKa − 1 et pKa + 1, et seulement tant que l’ajout reste petit devant les quantités de HA et de A⁻ : au-delà, l’une des deux espèces est épuisée et le pH s’effondre. Pour viser un pH, on choisit un couple de pKa proche.</p></div>`},
  {kind:'Méthode',h:'pH d’un tampon, avant et après un ajout',p:`<b>Quand :</b> la solution contient à la fois un acide faible HA et sa base conjuguée A⁻ en quantités comparables, éventuellement après ajout d’un peu d’acide ou de base forte. <b>Pourquoi :</b> K<sub>a</sub> = [A⁻][H₃O⁺]/[HA] donne, en passant au logarithme, l’équation de <b>Henderson-Hasselbalch</b> : pH = pKa + log([A⁻]/[HA]). Un ajout ne change que le rapport, qui varie peu. <b>Comment :</b><ol><li>Fais le bilan de l’ajout : H⁺ fort + A⁻ → HA, ou OH⁻ fort + HA → A⁻ (réactions totales).</li><li>Calcule les nouvelles quantités de HA et de A⁻ (même volume : on peut garder les moles).</li><li>pH = pKa + log(n(A⁻)/n(HA)).</li><li>Pour fabriquer un tampon à un pH voulu : [A⁻]/[HA] = 10<sup>pH − pKa</sup>.</li></ol>`,
   demo:{enonce:'Un tampon contient 0,10 mol d’acide acétique et 0,10 mol d’acétate (pKa = 4,76). On y ajoute 0,010 mol de HCl. Quel est le nouveau pH&nbsp;?',
    etapes:[{f:'avant : pH = 4,76 + log(0,10/0,10) = 4,76',w:'Quantités égales : le pH vaut le pKa.'},
@@ -794,6 +1069,15 @@ COURS.push(
   why:'log([NH₃]/[NH₄⁺]) = pH − pKa = 0,30, donc le rapport vaut 10<sup>0,30</sup> ≈ 2,0.'},
  {h:'Un peu de soude dans le tampon',p:'Un tampon contient 0,10 mol d’acide acétique et 0,10 mol d’acétate (pKa = 4,76). On y ajoute 0,020 mol de NaOH. Quel est le nouveau pH&nbsp;? Au centième.',lab:'pH =',ans:4.94,tol:.01,
   why:'OH⁻ + CH₃COOH → CH₃COO⁻ + H₂O : n(HA) = 0,080 mol et n(A⁻) = 0,120 mol. pH = 4,76 + log(0,120/0,080) = 4,76 + 0,18 ≈ 4,94.'},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir : acides et bases',p:`<div class="keep"><ul>
+<li>Brønsted : un acide cède un proton H⁺, une base le capte ; HA/A⁻ est un couple. L’eau est amphotère : H₃O⁺/H₂O et H₂O/OH⁻.</li>
+<li>pH = −log[H₃O⁺], [H₃O⁺] = 10<sup>−pH</sup> ; K<sub>e</sub> = [H₃O⁺][OH⁻] = 10⁻¹⁴ à 25 °C, neutre à pH 7. Une unité de pH = un facteur 10.</li>
+<li>Acide fort : pH = −log c. Base forte : pH = 14 + log c.</li>
+<li>Acide faible : K<sub>a</sub> = [A⁻][H₃O⁺]/[HA], pKa = −log K<sub>a</sub>, pKa + pK<sub>b</sub> = 14. pH ≈ ½(pKa − log c), base faible pH ≈ 7 + ½(pKa + log c), à vérifier (moins de 5 % de dissociation).</li>
+<li>Prédominance : pH &lt; pKa, HA domine ; pH &gt; pKa, A⁻ domine.</li>
+<li>Titrage : à l’équivalence n(titrant) = n(titré) selon les coefficients ; demi-équivalence pH = pKa ; pH à l’équivalence fixé par l’espèce qui reste (7, &gt; 7 ou &lt; 7), d’où le choix de l’indicateur.</li>
+<li>Tampon : pH = pKa + log(n(A⁻)/n(HA)) ; un ajout modéré ne change que le rapport ; efficace entre pKa − 1 et pKa + 1.</li>
+</ul></div>`},
  {kind:'Problème',h:'Le titrage d’un vinaigre',
   p:'On veut mesurer l’acidité d’un vinaigre (acide acétique CH₃COOH, pKa = 4,76). On le dilue d’abord <b>10 fois</b>. On titre ensuite <b>10,0 mL</b> du vinaigre dilué par de la soude à <b>0,100 mol/L</b> : l’équivalence est atteinte pour <b>14,0 mL</b>. Réaction : CH₃COOH + OH⁻ → CH₃COO⁻ + H₂O. Donnée : M(CH₃COOH) = 60 g/mol.',
   parts:[
@@ -816,7 +1100,11 @@ COURS.push(
 
 /* ================= 8. CINÉTIQUE ================= */
 {subj:'chi', sem:'pri', id:'chi-cinetique', h:'Cinétique chimique', p:'Vitesse de réaction, lois de vitesse, demi-vie et loi d’Arrhenius.', steps:[
- {kind:'Théorie',h:'La vitesse de réaction',p:`Pour <i>a</i>A → produits, la <b>vitesse</b> est <b>v = −(1/a)·d[A]/dt</b>, en mol/(L·s). Graphiquement, c’est l’opposé de la pente de la tangente à la courbe [A](t), divisé par a. Elle diminue en général au fil de la réaction.`,
+ {kind:'Théorie',h:'La vitesse de réaction',p:`<p>Une explosion dure une milliseconde, la rouille met des mois, le diamant se transforme en graphite en des milliards d’années. La constante d’équilibre dit jusqu’où va une réaction, jamais en combien de temps. Pour comparer des rapidités, il faut une mesure.</p>
+<div class="def"><p>Pour <i>a</i>A → produits, la <b>vitesse de réaction</b> est <b>v = −(1/a)·d[A]/dt</b>, en mol/(L·s). La notation <b>d[A]/dt</b> (lire « d A sur d t ») est la dérivée de la concentration par rapport au temps : la limite du taux Δ[A]/Δt quand l’intervalle Δt devient très court.</p></div>
+<div class="idea"><p>Sur la courbe [A](t), d[A]/dt est la <b>pente de la tangente</b>. Elle est négative, car A disparaît : le signe moins rend v positive. On divise par le coefficient a pour que la vitesse soit la même quelle que soit l’espèce suivie. Au début, beaucoup de molécules réagissent : la pente est raide. Puis A se raréfie, les rencontres se font rares, la vitesse baisse.</p></div>
+<div class="ex"><p>Ici [A] = e<sup>−0,5t</sup> mol/L. À t = 1 s, [A] ≈ 0,607 mol/L et la tangente a une pente de −0,303 mol/(L·s) : v ≈ 0,303 mol/(L·s). La vitesse <b>moyenne</b> entre 0 et 2 s vaut (1 − 0,368)/2 ≈ 0,316 mol/(L·s), c’est la pente de la corde, pas de la tangente.</p></div>
+<div class="warn"><p>Ne confonds pas vitesse moyenne sur un intervalle et vitesse instantanée à un instant. Déplace t et regarde la tangente s’aplatir.</p></div>`,
   params:[{id:'t',l:'t',min:0,max:6,step:.5,v:1,u:' s'}],
   draw:v=>{ const A=t=>Math.exp(-0.5*t), m=-0.5*A(v.t), P=plane({x:[0,7],y:[0,1.15],h:200,grid:false,lx:1});
     P.fn(A,{from:0,to:7}).fn(x=>A(v.t)+m*(x-v.t),{c:'var(--spark)',w:2.5}).dot(v.t,A(v.t),{c:'var(--ink)'});
@@ -831,7 +1119,16 @@ COURS.push(
  {h:'Vitesses des espèces',p:'Pour 2 N₂O₅ → 4 NO₂ + O₂, O₂ se forme à 1,0·10⁻³ mol/(L·s). À quelle vitesse NO₂ se forme-t-il&nbsp;?',
   opts:['1,0·10⁻³ mol/(L·s)','2,0·10⁻³ mol/(L·s)','2,5·10⁻⁴ mol/(L·s)','4,0·10⁻³ mol/(L·s)'],ans:3,
   why:'v = d[O₂]/dt = (1/4)·d[NO₂]/dt, donc d[NO₂]/dt = 4 × 1,0·10⁻³ = 4,0·10⁻³ mol/(L·s).'},
- {kind:'Théorie',h:'Ordre 0, 1 et 2',p:`La loi de vitesse s’écrit <b>v = k[A]<sup>n</sup></b>, n est l’ordre. Formes intégrées : ordre 0, [A] = [A]₀ − kt ; ordre 1, [A] = [A]₀·e<sup>−kt</sup> ; ordre 2, 1/[A] = 1/[A]₀ + kt. La <b>demi-vie</b> t<sub>½</sub> est le temps pour que [A] soit divisé par 2. Ici [A]₀ = 1 mol/L.`,
+ {kind:'Théorie',h:'La loi de vitesse',p:`<p>La vitesse baisse quand les réactifs se raréfient. Mais de combien&nbsp;? Si l’on double une concentration, la vitesse double-t-elle, quadruple-t-elle, ou ne change-t-elle pas&nbsp;?</p>
+<div class="def"><p>Pour beaucoup de réactions, la vitesse suit une <b>loi de vitesse</b> <b>v = k[A]<sup>m</sup>[B]<sup>n</sup></b>. Les exposants m et n sont les <b>ordres partiels</b> par rapport à A et B, leur somme est l’<b>ordre global</b>. La <b>constante de vitesse</b> k ne dépend que de la température ; son unité dépend de l’ordre : s⁻¹ à l’ordre 1, L/(mol·s) à l’ordre 2.</p></div>
+<div class="idea"><p>Deux molécules doivent se rencontrer pour réagir. Le nombre de chocs entre A et B par seconde est proportionnel à [A] et à [B] : doubler [A] double les chocs. Si l’étape décisive est un choc entre deux A, elle varie comme [A]² : ordre 2.</p></div>
+<div class="ex"><p>2 NO + O₂ → 2 NO₂ suit v = k[NO]²[O₂] : ordre 2 en NO, 1 en O₂, 3 au total. Doubler [NO] multiplie v par 2² = 4 ; doubler [O₂] la multiplie par 2.</p></div>
+<div class="warn"><p>Les ordres se <b>mesurent</b>, ils ne se lisent pas sur l’équation. La décomposition 2 N₂O₅ → 4 NO₂ + O₂ est d’ordre 1, pas 2 : elle passe par une étape lente où une seule molécule N₂O₅ se casse. Les ordres égalent les coefficients seulement pour une réaction qui se fait en un seul choc.</p></div>`},
+ {kind:'Théorie',h:'Ordre 0, 1 et 2',p:`<p>La loi de vitesse dit comment v dépend de [A]. Mais ce qu’on veut souvent, c’est [A] à un instant donné, ou le temps qu’il faut pour en consommer la moitié. Il faut « intégrer » la loi.</p>
+<div class="def"><p>Pour A → produits avec <b>v = −d[A]/dt = k[A]<sup>n</sup></b>, les <b>lois intégrées</b> sont : ordre 0, <b>[A] = [A]₀ − kt</b> ; ordre 1, <b>[A] = [A]₀·e<sup>−kt</sup></b> ; ordre 2, <b>1/[A] = 1/[A]₀ + kt</b>. La <b>demi-vie</b> t<sub>½</sub> est le temps pour que [A] soit divisé par 2 : [A]₀/(2k), ln 2 / k et 1/(k[A]₀).</p></div>
+<div class="why"><p>Ordre 0 : la pente est constante, [A] baisse en ligne droite. Ordre 1 : la quantité qui disparaît par seconde est une <b>fraction fixe</b> k de ce qui reste ; c’est la définition d’une décroissance exponentielle, dont la dérivée k·[A]₀e<sup>−kt</sup> redonne bien k[A]. Chaque demi-vie a donc la même durée : e<sup>−kt</sup> = ½ donne t = ln 2/k, sans [A]₀. Ordre 2 : on vérifie en dérivant 1/[A] que sa pente vaut k ; la réaction ralentit beaucoup en fin de course.</p></div>
+<div class="ex"><p>Avec k = 0,3 et [A]₀ = 1 mol/L (réglage de départ) : ordre 0, t<sub>½</sub> = 1/0,6 ≈ 1,67 s ; ordre 1, t<sub>½</sub> = 0,693/0,3 ≈ 2,31 s ; ordre 2, t<sub>½</sub> = 1/0,3 ≈ 3,33 s. À l’ordre 1, après 1 s il reste e<sup>−0,3</sup> ≈ 74 %.</p></div>
+<div class="warn"><p>k n’a pas la même unité selon l’ordre : on ne compare pas les k de deux ordres différents. Change l’ordre et k.</p></div>`,
   params:[{id:'o',l:'ordre',min:0,max:2,v:1},{id:'k',l:'k',min:.1,max:1,step:.1,v:.3}],
   draw:v=>{ const A=[t=>Math.max(0,1-v.k*t),t=>Math.exp(-v.k*t),t=>1/(1+v.k*t)][v.o], th=[1/(2*v.k),Math.LN2/v.k,1/v.k][v.o], P=plane({x:[0,12],y:[0,1.15],h:200,grid:false,lx:2});
     P.seg(0,0.5,12,0.5,{c:'var(--muted)',w:1,dash:true}).fn(A,{from:0,to:12});
@@ -885,7 +1182,21 @@ COURS.push(
   why:'[A]₀ est multipliée par 3 et v₀ aussi : 3<sup>n</sup> = 3, donc n = 1.'},
  {h:'Trois demi-vies',p:'Pour une réaction d’ordre 1, quel pourcentage du réactif reste-t-il après trois demi-vies&nbsp;?',lab:'reste :',unit:'%',ans:12.5,tol:.05,
   why:'À chaque demi-vie la quantité est divisée par 2 : 100 → 50 → 25 → 12,5 %.'},
- {kind:'Théorie',h:'Loi d’Arrhenius',p:`La constante de vitesse croît avec la température : <b>k = A·e<sup>−E<sub>a</sub>/RT</sup></b>, où E<sub>a</sub> est l’<b>énergie d’activation</b>. Le graphe de ln k en fonction de 1/T est une droite de pente −E<sub>a</sub>/R. Ici A = 10¹³ s⁻¹.`,
+ {kind:'Théorie',h:'La barrière d’énergie',p:`<p>Dans l’air, le bois et le dioxygène se touchent sans cesse, et pourtant le bois ne brûle pas tout seul : il faut une allumette. Pourquoi tant de chocs restent-ils sans effet, et pourquoi chauffer change-t-il tout&nbsp;?</p>
+<div class="def"><p>Pour réagir, deux molécules doivent se choquer avec assez d’énergie pour casser des liaisons et passer par un arrangement instable, l’<b>état de transition</b>. L’énergie minimale nécessaire, par mole, est l’<b>énergie d’activation E<sub>a</sub></b> : c’est la hauteur de la barrière sur le profil d’énergie.</p></div>
+<div class="idea"><p>Les molécules n’ont pas toutes la même énergie : quelques-unes sont bien plus rapides que la moyenne. La fraction des chocs qui dépassent E<sub>a</sub> vaut à peu près <b>e<sup>−E<sub>a</sub>/RT</sup></b>. Elle est minuscule, mais elle croît très vite avec T : chauffer un peu peuple beaucoup la « queue » des molécules énergiques.</p></div>
+<div class="ex"><p>Pour E<sub>a</sub> = 50 kJ/mol à 300 K : e<sup>−50 000/(8,314 × 300)</sup> ≈ 2,0·10⁻⁹, deux chocs sur un milliard. À 310 K : 3,8·10⁻⁹. Dix degrés de plus, soit 3 % de température en plus, presque deux fois plus de chocs efficaces.</p></div>
+<div class="blk" data-t="Catalyseur"><p>Un <b>catalyseur</b> ouvre un autre chemin, de barrière plus basse, sans être consommé. Abaisser E<sub>a</sub> de 75 à 50 kJ/mol à 298 K multiplie la vitesse par e<sup>25 000/(8,314 × 298)</sup> ≈ 2,4·10⁴. Il abaisse la barrière dans les deux sens : il ne change pas l’équilibre.</p></div>
+<div class="warn"><p>E<sub>a</sub> n’a rien à voir avec ΔH : une réaction très exothermique peut avoir une barrière élevée, comme la combustion du bois.</p></div>`,
+  fig:(()=>{ const P=plane({x:[0,10],y:[0,6],h:170,grid:false,axes:false}); const E=x=>1.5+3.5*Math.exp(-((x-4.5)**2)/1.6)-0.8/(1+Math.exp(-(x-4.5)*1.5));
+    P.fn(E,{from:0.3,to:9.7}).seg(1,1.5,4.5,1.5,{c:'var(--muted)',w:1,dash:true}).arrow(2.2,1.5,2.2,E(4.5),{c:'var(--bad)',w:1.5}).text(2.4,3.3,'Eₐ',{c:'var(--bad)'});
+    P.text(0.4,1.1,'réactifs',{s:11,c:'var(--muted)'}).text(9.6,0.3,'produits',{a:'end',s:11,c:'var(--muted)'}).text(4.5,E(4.5)+0.25,'état de transition',{a:'middle',s:11,c:'var(--muted)'}); return P.svg(); })()},
+ {kind:'Théorie',h:'Loi d’Arrhenius',p:`<p>L’idée de barrière explique pourquoi la chaleur accélère les réactions. Pour prévoir de combien, il faut une loi qui relie k à la température.</p>
+<div class="thm"><p><b>Loi d’Arrhenius</b> : <b>k = A·e<sup>−E<sub>a</sub>/RT</sup></b>, avec T en kelvins, E<sub>a</sub> en J/mol et R = 8,314 J/(mol·K). Le <b>facteur préexponentiel</b> A (même unité que k) compte les chocs bien orientés ; l’exponentielle est la fraction de ceux qui franchissent la barrière.</p></div>
+<div class="why"><p>En prenant le logarithme : <b>ln k = ln A − (E<sub>a</sub>/R)·(1/T)</b>. Tracé en fonction de 1/T, ln k est une <b>droite</b> de pente −E<sub>a</sub>/R : c’est ainsi qu’on mesure E<sub>a</sub>. Avec deux températures, ln A disparaît dans la différence.</p></div>
+<div class="ex"><p>Ici A = 10¹³ s⁻¹. Pour E<sub>a</sub> = 50 kJ/mol à 300 K : k = 10¹³ × 1,97·10⁻⁹ ≈ 2,0·10⁴ s⁻¹. À 310 K, k est multipliée par exp[(50 000/8,314)(1/300 − 1/310)] ≈ 1,91.</p></div>
+<div class="idea"><p>Plus E<sub>a</sub> est grande, plus la droite est raide : la réaction est lente à froid, mais très sensible à la température. Monte E<sub>a</sub> et regarde le facteur affiché pour 10 K de plus grandir.</p></div>
+<div class="warn"><p>T en kelvins, toujours : avec des degrés Celsius, 1/T n’a aucun sens (1/0 à 0 °C).</p></div>`,
   params:[{id:'E',l:'Eₐ',min:20,max:120,step:10,v:50,u:' kJ/mol'},{id:'T',l:'T',min:280,max:380,step:10,v:300,u:' K'}],
   draw:v=>{ const lk=x=>Math.log(1e13)-v.E*1000/R*x/1000, P=plane({x:[2.5,3.7],y:[-25,32],h:220,grid:false,axes:false});
     P.fn(lk,{from:2.5,to:3.7}).dot(1000/v.T,lk(1000/v.T),{c:'var(--ink)'});
@@ -911,6 +1222,14 @@ COURS.push(
   why:'E<sub>a</sub> = 8,314 × ln 3 / (1/290 − 1/300) = 8,314 × 1,0986 / 1,149·10⁻⁴ ≈ 79 500 J/mol = 79,5 kJ/mol.'},
  {kind:'Défi',h:'Ordre 2',p:'Une réaction d’ordre 2 a k = 0,20 L/(mol·s) et [A]₀ = 0,50 mol/L. Que vaut [A] après 10 s&nbsp;?',lab:'[A] =',unit:'mol/L',ans:.25,tol:.002,
   why:'1/[A] = 1/0,50 + 0,20 × 10 = 2 + 2 = 4 L/mol, donc [A] = 0,25 mol/L. C’est exactement une demi-vie : t<sub>½</sub> = 1/(k[A]₀) = 10 s.'},
+ {kind:'Récapitulatif',h:'Ce qu’il faut retenir : cinétique',p:`<div class="keep"><ul>
+<li>Vitesse : v = −(1/a)·d[A]/dt = (1/c)·d[C]/dt, la même pour toutes les espèces ; vitesse d’une espèce = v × son coefficient. Instantanée : pente de la tangente.</li>
+<li>Loi de vitesse v = k[A]<sup>m</sup>[B]<sup>n</sup> : les ordres se mesurent, ils ne se lisent pas sur l’équation.</li>
+<li>Ordre 0 : [A] = [A]₀ − kt, t<sub>½</sub> = [A]₀/(2k). Ordre 1 : [A] = [A]₀e<sup>−kt</sup>, t = ln([A]₀/[A])/k, t<sub>½</sub> = ln 2/k indépendante de [A]₀. Ordre 2 : 1/[A] = 1/[A]₀ + kt, t<sub>½</sub> = 1/(k[A]₀).</li>
+<li>Trouver l’ordre : la grandeur [A], ln[A] ou 1/[A] qui varie linéairement avec t ; ou les vitesses initiales, n = ln(v₂/v₁)/ln([A]₂/[A]₁).</li>
+<li>Énergie d’activation : barrière à franchir ; fraction de chocs efficaces ≈ e<sup>−E<sub>a</sub>/RT</sup>. Un catalyseur abaisse E<sub>a</sub> sans déplacer l’équilibre.</li>
+<li>Arrhenius : k = A·e<sup>−E<sub>a</sub>/RT</sup> ; ln(k₂/k₁) = (E<sub>a</sub>/R)(1/T₁ − 1/T₂), T en K et E<sub>a</sub> en J/mol. Une durée varie comme 1/k.</li>
+</ul></div>`},
  {kind:'Problème',h:'La datation au carbone 14',
   p:'Un être vivant échange du carbone avec l’atmosphère : son carbone a une activité de <b>0,250 Bq par gramme</b>, due au ¹⁴C. À sa mort, les échanges cessent et le ¹⁴C se désintègre selon une cinétique d’ordre 1, de demi-vie <b>t<sub>½</sub> = 5730 ans</b>. Un os retrouvé dans une grotte a une activité de <b>0,080 Bq par gramme</b> de carbone. L’activité est proportionnelle au nombre de noyaux de ¹⁴C.',
   fig:(()=>{ const P=plane({x:[0,25],y:[0,1.1],w:320,h:180,grid:false,lx:5}); P.fn(t=>0.5**(t/5.73),{from:0,to:25});
