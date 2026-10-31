@@ -4,7 +4,7 @@ const x='<i>x</i>', f='<i>f</i>';
 const I=(a,b,g)=>`∫<sub>${a}</sub><sup>${b}</sup> ${g} d<i>x</i>`;
 EXAMS['gred-integrale']=[
  {n:'Sommes inférieures et supérieures', r:'Sommes inférieures et sommes supérieures', qs:[
-   {q:`Calcule la somme inférieure <i>s</i>₄ de ${f}(${x}) = ${x}² sur [0 ; 2] (4 morceaux égaux).`, lab:'s₄ =', ans:1.75, tol:1e-6, why:'h = 0,5 ; f croissante : hauteurs aux bords gauches 0 ; 0,5 ; 1 ; 1,5. s₄ = 0,5 · (0 + 0,25 + 1 + 2,25) = 1,75.'},
+   {q:`Calcule la somme inférieure <i>s</i>₄ de ${f}(${x}) = ${x}² sur [0 ; 2] (4 morceaux égaux).`, lab:'s₄ =', ans:1.75, tol:1e-6, why:'h = 0,5 ; f croissante : hauteurs prises aux bords gauches 0 ; 0,5 ; 1 ; 1,5, soit 0 ; 0,25 ; 1 ; 2,25. s₄ = 0,5 · (0 + 0,25 + 1 + 2,25) = 1,75.'},
    {q:`Calcule la somme supérieure <i>S</i>₃ de ${f}(${x}) = 2${x} sur [0 ; 3] (3 morceaux égaux).`, lab:'S₃ =', ans:12, tol:1e-6, why:'h = 1 ; f croissante : bords droits 1, 2, 3, hauteurs 2, 4, 6. S₃ = 1 · (2 + 4 + 6) = 12.'},
    {q:`Calcule la somme inférieure <i>s</i>₂ de ${f}(${x}) = 4 − ${x}² sur [0 ; 2] (2 morceaux égaux).`, lab:'s₂ =', ans:3, tol:1e-6, why:'h = 1 ; f est décroissante : le minimum de chaque morceau est au bord droit, 1 et 2, où f vaut 3 et 0. s₂ = 1 · (3 + 0) = 3.'},
    {q:`Calcule la somme supérieure <i>S</i>₂ de ${f}(${x}) = 4 − ${x}² sur [0 ; 2].`, lab:'S₂ =', ans:7, tol:1e-6, why:'f décroissante : maximum aux bords gauches 0 et 1, où f vaut 4 et 3. S₂ = 1 · (4 + 3) = 7.'},

@@ -46,7 +46,7 @@ EXAMS['gred-operations-homo']=[
  {n:'Décomposition symétrique + antisymétrique', r:'Décomposer une matrice en symétrique + antisymétrique', qs:[
    {q:'Soit A = ' + M([[3,5],[-1,2]]) + '. Dans A = S + K, quel est le coefficient de la 1re ligne, 2e colonne de S&nbsp;?', lab:'S₁₂ =', ans:2, why:'S₁₂ = (a₁₂ + a₂₁)/2 = (5 − 1)/2 = 2. Donc S = (3 2 ; 2 2) et K = (0 3 ; −3 0) ; on vérifie S + K = A.'},
    {q:'Soit A = ' + M([[1,0,4],[2,5,-3],[0,1,6]]) + '. Dans A = S + K, quel est le coefficient de la 2e ligne, 3e colonne de K&nbsp;?', lab:'K₂₃ =', ans:-2, why:'K₂₃ = (a₂₃ − a₃₂)/2 = (−3 − 1)/2 = −2. En entier K = (0 −1 2 ; 1 0 −2 ; −2 2 0).'},
-   {q:'Que vaut la diagonale de K = (A − ᵗA)/2 pour une matrice carrée A&nbsp;?', opts:['Celle de A','Elle est nulle','Le double de celle de A','Elle est quelconque'], ans:1, why:'Les cases diagonales ne bougent pas en transposant : (aᵢᵢ − aᵢᵢ)/2 = 0. Toute la diagonale de A passe dans S.'},
+   {q:'Que vaut la diagonale de K = (A − ᵗA)/2 pour une matrice carrée A&nbsp;?', opts:['Celle de A','Elle est nulle','Le double de celle de A','Elle est quelconque'], ans:1, why:'Les cases diagonales ne bougent pas en transposant : (aᵢᵢ − aᵢᵢ)/2 = 0. Toute la diagonale de A passe dans la partie symétrique S = (A + ᵗA)/2.'},
    {q:'Pourquoi l’écriture A = S + K (S symétrique, K antisymétrique) est-elle unique&nbsp;?', opts:['Parce que S et K ont la même taille que A','Parce que A est inversible','Parce que si S + K = S′ + K′, alors S − S′ = K′ − K est à la fois symétrique et antisymétrique, donc nulle','Parce que S = A dans tous les cas'], ans:2, why:'La seule matrice symétrique et antisymétrique est la matrice nulle, donc S = S′ et K = K′. Aucune hypothèse sur A n’est nécessaire.'},
  ]},
 ];
