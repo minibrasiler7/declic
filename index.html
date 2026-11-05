@@ -209,6 +209,12 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 /* Notation */
 .fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;font-size:.85em;line-height:1.15;margin:0 .1em}
 .fr>span:first-child{border-bottom:1.5px solid currentColor;padding:0 .2em}
+/* racines : la barre couvre ce qui est sous la racine (racines.js) */
+.rad{white-space:nowrap}
+.rad .rs{display:inline-block;transform:scaleY(1.12);transform-origin:bottom;margin-right:-.06em}
+.rad .rc{border-top:.085em solid currentColor;padding:.06em .1em 0 .06em}
+.rad:has(.rad)>.rs{transform:scaleY(1.32)}
+.rad:has(.rad)>.rc{padding-top:.24em}
 .mat{display:inline-grid;gap:2px 14px;vertical-align:middle;padding:2px 8px;border-left:2px solid currentColor;border-right:2px solid currentColor;border-radius:6px;font-family:var(--f-mono);font-size:.9em;text-align:center}
 .fig .info{font-size:16px;color:var(--ink);min-height:1.5em}
 .sliders{width:100%;display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
@@ -382,6 +388,7 @@ body.annot-on .card{outline:2px dashed color-mix(in srgb,var(--accent) 45%,trans
 <script src="cours/rel-restreinte.js"></script>
 <script src="cours/rel-generale.js"></script>
 <script src="app.js"></script>
+<script src="racines.js"></script>
 <script src="compte.js"></script>
 <script src="ink.js"></script>
 <script src="ardoise.js"></script>
