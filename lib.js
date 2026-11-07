@@ -20,8 +20,10 @@ function py(src){
 }
 
 /* Les cours complets. Les fichiers cours/*.js ajoutent des chapitres :
-   COURS.push({subj, sem, id, h, p, steps}). subj et sem (la partie du cours) doivent exister ici. */
+   COURS.push({subj, sem, id, h, p, steps, o?}). subj et sem (la partie du cours) doivent exister ici.
+   o (facultatif) fixe la place du chapitre dans sa matière, sinon c’est l’ordre de chargement. */
 const MATIERES=[
+  {id:'sec',h:'Maths au secondaire',c:'var(--math)',sems:{a9:{h:'9e année',s:'Divisibilité, nombres relatifs et rationnels, figures et constructions, isométries, aires, solides, fonctions et premières lettres'},a10:{h:'10e année',s:'Puissances, nombres réels, hasard, cercle, Pythagore, trigonométrie, volumes, polynômes, fonctions, équations, figures et isométries'},a11:{h:'11e année',s:'Racines, identités remarquables, équations du 2e degré, systèmes, angles et cercle, homothéties, Thalès, fonctions, probabilités, pyramides, cônes et sphères'}}},
   {id:'an1',h:'Analyse I',c:'var(--math)',sems:{aut:{h:'Calcul différentiel',s:'Nombres, suites, limites, continuité et dérivées'},pri:{h:'Applications et intégrales',s:'Étude de fonctions, arcs paramétrés, intégrale et ses applications'}}},
   {id:'an2',h:'Analyse II',c:'var(--math)',sems:{aut:{h:'Fonctions spéciales',s:'Angles, trigonométrie, logarithmes et exponentielles'},pri:{h:'Complexes et équations différentielles',s:'Fonctions hyperboliques, nombres complexes, polynômes, développements limités, équations différentielles'}}},
   {id:'al',h:'Algèbre linéaire',c:'var(--code)',sems:{all:{h:'Dans le plan',s:'Ensembles, logique, applications, matrices 2 × 2, réduction'},esp:{h:'En dimension 3',s:'Matrices 3 × 3, déterminants, systèmes et réduction'}}},

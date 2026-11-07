@@ -294,6 +294,10 @@ MATHS.forEach(c=>{
 });
 const COURSE_OF={}; MATHS.forEach(c=>COURSE_OF[c.lid]=c);
 const COURS_OF={};
+/* Range les chapitres de chaque matière selon o quand il est donné (plusieurs fichiers peuvent alimenter une même année) */
+{ const subs=[...new Set(COURS.map(c=>c.subj))];
+  const all=subs.flatMap(s=>COURS.filter(c=>c.subj===s).map((c,i)=>[c,c.o??i]).sort((a,b)=>a[1]-b[1]).map(x=>x[0]));
+  COURS.splice(0,COURS.length,...all); }
 COURS.forEach(ch=>{ const sj=MATIERES.find(s=>s.id===ch.subj); LESSONS[ch.id]={title:ch.h, domain:sj.h, steps:ch.steps}; COURS_OF[ch.id]={sj, sem:sj.sems[ch.sem], ch}; });
 const chapitres=sj=>Object.keys(sj.sems).flatMap(k=>COURS.filter(c=>c.subj===sj.id&&c.sem===k));
 const nbProblems=steps=>steps.filter(s=>s.parts).length;
