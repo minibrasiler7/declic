@@ -24,6 +24,16 @@ function tagsBalanced(html,where){ const st=[]; const re=/<\/?([a-zA-Z][a-zA-Z0-
 // Une question à réponse (étape simple ou partie de problème)
 function checkAnswer(q,w){
   let html='';
+  const nTxt=['txt','dictee','ordre'].filter(k=>q[k]!==undefined).length;
+  if(nTxt){ // langues : réponse écrite, dictée ou ordre des mots
+    if(nTxt>1||q.opts||'ans' in q) errs.push(`${w}: une seule forme de réponse (txt, dictee, ordre, opts ou ans)`);
+    const A=q.dictee!==undefined?[q.dictee]:q.ordre!==undefined?[Array.isArray(q.ordre)?q.ordre.join(' '):q.ordre,...(q.alt||[])]:[].concat(q.txt);
+    if(!A.length||A.some(a=>typeof a!=='string'||!a.trim())) errs.push(`${w}: réponse(s) attendue(s) vides ou mal formées`);
+    if(q.ordre!==undefined&&A[0].split(' ').length<3) errs.push(`${w}: ordre : au moins 3 mots`);
+    if(q.dictee!==undefined&&q.audio) errs.push(`${w}: dictee porte déjà son audio`);
+    if(!q.why) errs.push(`${w}: why manquant`);
+    return A.join(' ')+(q.audio?audioText(q.audio,w):'');
+  }
   if(q.opts){ if(!Array.isArray(q.opts)||q.opts.length<2) errs.push(`${w}: opts`);
     if(!Number.isInteger(q.ans)||q.ans<0||q.ans>=q.opts.length) errs.push(`${w}: ans doit être l’indice d’une option`);
     if(new Set(q.opts).size!==q.opts.length) errs.push(`${w}: options en double`); html+=q.opts.join(''); }
@@ -33,16 +43,29 @@ function checkAnswer(q,w){
   return html;
 }
 
-function checkSteps(id,stepsArr,{min=5,maths=false}={}){
+// Audio d'une langue : texte, ou dialogue [[qui, texte], …]
+function audioText(a,w){ if(typeof a==='string') return a; if(Array.isArray(a)&&a.length&&a.every(l=>Array.isArray(l)&&l.length===2&&typeof l[1]==='string')) return a.map(l=>l.join(' ')).join(' '); errs.push(`${w}: audio doit être un texte ou [[qui, texte], …]`); return ''; }
+const LANGKEYS=['txt','dictee','ordre','dire','oral','ecrire','audio','mots'];
+function checkSteps(id,stepsArr,{min=5,maths=false,lang=false}={}){
   const W=`[${id}]`;
   if(!Array.isArray(stepsArr)||stepsArr.length<min){ errs.push(`${W} au moins ${min} étapes`); return; }
-  let ex=0, inter=0, nprob=0, firstProb=-1, ndemo=0;
+  let ex=0, inter=0, nprob=0, firstProb=-1, ndemo=0; const lg={audio:0,dictee:0,oral:0,ecrire:0,mots:0};
   stepsArr.forEach((st,i)=>{ steps++; const w=`${W} étape ${i+1}`;
     try{
       if(st.render){ if(!maths) errs.push(`${w}: render() interdit, utiliser le format données`); return; }
       if(!st.h) errs.push(`${w}: h manquant`);
       let html=(st.h||'')+(st.p||'')+(st.note||'')+(st.fig||'')+(st.why||'')+(st.sol||'');
       if(st.fig!==undefined&&typeof st.fig!=='string') errs.push(`${w}: fig doit être une chaîne (utiliser une IIFE)`);
+      if(LANGKEYS.some(k=>st[k]!==undefined)){ // étapes de langue (docs/ANGLAIS.md)
+        if(!lang) errs.push(`${w}: champs de langue réservés aux matières de langue`);
+        if(st.audio!==undefined){ lg.audio++; html+=audioText(st.audio,w); }
+        if(st.dictee!==undefined) lg.dictee++;
+        if(st.mots!==undefined){ if(!Array.isArray(st.mots)||!st.mots.length||st.mots.some(m=>!Array.isArray(m)||m.length<2||m.length>3||m.some(x=>typeof x!=='string'||!x))) errs.push(`${w}: mots = [[anglais, français, exemple?], …]`); else { lg.mots+=st.mots.length; html+=st.mots.flat().join(' '); } }
+        if(st.dire!==undefined){ lg.oral++; const t=typeof st.dire==='string'?st.dire:st.dire?.t; if(typeof t!=='string'||!t) errs.push(`${w}: dire = texte, ou {t, cache}`); else html+=t; }
+        if(st.oral!==undefined){ lg.oral++; if(!st.oral||typeof st.oral.modele!=='string') errs.push(`${w}: oral = {modele, criteres}`); else html+=st.oral.modele+(st.oral.criteres||[]).map(c=>c.t||c).join(''); }
+        if(st.ecrire!==undefined){ lg.ecrire++; const e=st.ecrire; if(!e||typeof e.modele!=='string'||!Array.isArray(e.criteres)) errs.push(`${w}: ecrire = {min, modele, criteres:[…]}`); else { html+=e.modele+e.criteres.map(c=>c.t||c).join('');
+          e.criteres.forEach(c=>{ if(typeof c==='object'){ try{ new RegExp(c.re,'i'); }catch(x){ errs.push(`${w}: critère re invalide ${c.re}`); } if(!new RegExp(c.re,'i').test(e.modele)) errs.push(`${w}: le modèle ne remplit pas le critère « ${c.t} »`); } }); } }
+      }
       if(st.params){ inter++;
         if(typeof st.draw!=='function') errs.push(`${w}: draw manquant`);
         st.params.forEach(p=>{ if(p.id===undefined||p.l===undefined||p.min===undefined||p.max===undefined||p.v===undefined) errs.push(`${w}: param incomplet ${JSON.stringify(p)}`);
@@ -77,14 +100,17 @@ function checkSteps(id,stepsArr,{min=5,maths=false}={}){
       }
       if(st.ok&&st.opts) errs.push(`${w}: ok et opts ne se combinent pas`);
       // Une étape de théorie enseigne : au moins 70 mots de texte (docs/BRIEF.md, « Une théorie qui enseigne »)
-      if(!st.parts&&!st.demo&&!st.opts&&!('ans' in st)&&!st.ok){ const words=((st.p||'')+' '+(st.note||'')).replace(/<[^>]+>/g,' ').split(/\s+/).filter(x=>x.length>1).length;
+      if(!st.parts&&!st.demo&&!st.opts&&!('ans' in st)&&!st.ok&&!LANGKEYS.some(k=>st[k]!==undefined)){ const words=((st.p||'')+' '+(st.note||'')).replace(/<[^>]+>/g,' ').split(/\s+/).filter(x=>x.length>1).length;
         if(words<70) errs.push(`${w}: théorie trop courte (${words} mots) : développe (motivation, définition, idée, exemple)`); }
       if(bad(html)) errs.push(`${w}: texte contient NaN/undefined`);
       tagsBalanced(html,w);
     }catch(e){ errs.push(`${w}: exception ${e.message}`); }
   });
   if(!maths){ if(ex<3) errs.push(`${W} au moins 3 exercices (QCM, numérique ou curseurs avec ok)`);
-    if(inter<1) errs.push(`${W} au moins une figure à curseurs`); }
+    if(lang){ if(lg.audio<3) errs.push(`${W} au moins 3 étapes avec audio (écoute)`); if(lg.dictee<1) errs.push(`${W} au moins une dictée`);
+      if(lg.oral<2) errs.push(`${W} au moins 2 étapes d’oral (dire, oral)`); if(lg.ecrire<1) errs.push(`${W} au moins une écriture guidée (ecrire)`);
+      if(lg.mots<12) errs.push(`${W} au moins 12 mots de vocabulaire (mots), il y en a ${lg.mots}`); }
+    else if(inter<1) errs.push(`${W} au moins une figure à curseurs`); }
   if(ndemo<1) errs.push(`${W} au moins une étape Méthode avec exemple résolu (demo)`);
   if(nprob<2) errs.push(`${W} au moins 2 problèmes (étapes avec parts) à la fin du chapitre`);
   else if(stepsArr.slice(firstProb).some(s=>!s.parts)) errs.push(`${W} les problèmes doivent être les dernières étapes du chapitre`);
@@ -96,7 +122,7 @@ for(const ch of COURS){
   if(ids.has(ch.id)) errs.push(`${W} id en double`); ids.add(ch.id);
   const sj=SUBJ.find(s=>s.id===ch.subj); if(!sj) errs.push(`${W} subj inconnu ${ch.subj}`); else if(!sj.sems[ch.sem]) errs.push(`${W} sem inconnu ${ch.sem}`);
   if(!ch.h||!ch.p) errs.push(`${W} h et p requis`);
-  checkSteps(ch.id,ch.steps);
+  checkSteps(ch.id,ch.steps,{lang:!!sj?.lang});
 }
 for(const c of MATHS){ if(c.use) continue; if(ids.has(c.id)) errs.push(`[${c.id}] id en double`); ids.add(c.id); checkSteps(c.id,c.steps,{min:4,maths:true}); }
 

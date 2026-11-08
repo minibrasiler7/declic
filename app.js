@@ -4,7 +4,7 @@ const store = {
   get(){ try{ return JSON.parse(localStorage.getItem('declic')||'{}') }catch(e){ return {} } },
   set(v){ try{ localStorage.setItem('declic',JSON.stringify(v)) }catch(e){} }
 };
-const blankState=()=>({xp:0, streak:0, lastDay:null, done:{}, pos:{}, exams:{}, examRun:{}, ardoise:{}, notes:{}, last:null, updated:0});
+const blankState=()=>({xp:0, streak:0, lastDay:null, done:{}, pos:{}, exams:{}, examRun:{}, textes:{}, vocab:{}, ardoise:{}, notes:{}, last:null, updated:0});
 let S = Object.assign(blankState(), store.get());
 const dayStr=d=>d.toLocaleDateString('sv');               // AAAA-MM-JJ, heure locale
 const today=()=>dayStr(new Date()), yesterday=()=>dayStr(new Date(Date.now()-864e5));
@@ -23,7 +23,9 @@ function mergeState(r){
   m.pos=Object.assign({}, other.pos, latest.pos);
   m.ardoise=Object.assign({}, other.ardoise, latest.ardoise);
   m.notes=Object.assign({}, other.notes, latest.notes);
-  m.examRun=Object.assign({}, other.examRun, latest.examRun);   // examens en cours : la version la plus récente gagne
+  m.examRun=Object.assign({}, other.examRun, latest.examRun);
+  m.textes=Object.assign({}, other.textes, latest.textes);   // textes écrits en langue
+  m.vocab=Object.assign({}, other.vocab, latest.vocab);      // révision espacée du vocabulaire   // examens en cours : la version la plus récente gagne
   m.exams=Object.assign({}, other.exams, latest.exams);   // garde le meilleur score des deux côtés
   for(const k in r.exams) if(S.exams?.[k]) m.exams[k].best=Math.max(r.exams[k].best, S.exams[k].best);
   m.last=latest.last||other.last; m.updated=Math.max(S.updated, r.updated);
@@ -361,12 +363,16 @@ function renderSubject(id){
       <div class="bar" style="margin-top:12px"><span style="width:${fin/chs.length*100}%"></span></div>
       <div id="sems"></div>
     </div><div class="ill">${stepsThumb(chs[0].steps)}</div></section>`);
+  if(sj.lang){ // langue : révision espacée des mots des chapitres commencés
+    const d=Langue.dueCards(id), v=$(`<div class="vrev-cta"><div><b>Révision du vocabulaire</b><span>${d.n?`${d.n} mot${d.n>1?'s':''} à revoir aujourd’hui.`:'Rien à revoir aujourd’hui.'} Tu retrouves chaque mot juste avant de l’oublier : demain, puis dans 3 jours, 7 jours, 2 semaines…</span></div><button class="btn" type="button"${d.n?'':' disabled'}>Réviser</button></div>`);
+    v.querySelector('button').onclick=()=>Langue.review(id,()=>render()); page.querySelector('#sems').before(v);
+  }
   let n=0;
   Object.entries(sj.sems).forEach(([k,sem])=>{
     const list=COURS.filter(c=>c.subj===id&&c.sem===k); if(!list.length) return;
     const box=$(`<div class="sem"><h2>${sem.h}</h2><p class="sub">${sem.s}</p><ol class="lessons"></ol></div>`);
     list.forEach(c=>{ n++; const st=lessonState(c.id), np=nbProblems(c.steps);
-      const li=$(`<li class="${st.cls}"><span class="n">${st.cls==='fin'?'✓':n}</span><div><b>${c.h}</b><div class="s">${st.s?st.s+' · ':''}${c.steps.length-np} étapes${np?` + ${np} problèmes`:''} · ${c.p}</div></div><button class="btn">${st.label}</button></li>`);
+      const li=$(`<li class="${st.cls}"><span class="n">${st.cls==='fin'?'✓':n}</span><div><b>${c.h}</b><div class="s">${st.s?st.s+' · ':''}${c.steps.length-np} étapes${np?` + ${np} ${sj.lang?'missions':'problèmes'}`:''} · ${c.p}</div></div><button class="btn">${st.label}</button></li>`);
       li.querySelector('button').onclick=()=>openLesson(c.id);
       const nm=methodSteps(c.steps).length; if(nm){ const f=$(`<button class="linkish fm-link" type="button">Fiche méthodes (${nm})</button>`); f.onclick=()=>openMethods(c.id); li.querySelector('div').append(f); }
       li.querySelector('div').append(examLink(c.id));
@@ -473,7 +479,7 @@ function renderHome(){
 let L=null, idx=0, ctx=null, phase='idle';
 const foot=document.getElementById('foot'), fb=document.getElementById('fb'), act=document.getElementById('action');
 function openLesson(id,at){
-  X=null; L=LESSONS[id]; L.id=id; const p=S.pos[id];
+  X=null; L=LESSONS[id]; L.id=id; const p=S.pos[id]; Langue.setLang(COURS_OF[id]?.sj.lang);
   // far : étape la plus avancée déjà atteinte ; toutes les étapes d'avant se revoient en touchant la barre
   L.far=S.done[id]?L.steps.length-1:(p>0&&p<L.steps.length)?p:0;
   idx=at??L.far; if(S.done[id]&&at==null) idx=0;
@@ -493,11 +499,15 @@ function numInput(q,ctx,uid){
   ctx.mark=ok=>inp.classList.add(ok?'right':'wrong');
   return w;
 }
-function isRight(q,a){ return q.opts ? a===q.ans : (a!==null && Math.abs(a-q.ans)<=(q.tol??1e-9)); }
+function isRight(q,a){ if(Langue.isText(q)) return Langue.txtRight(q,a); return q.opts ? a===q.ans : (a!==null && Math.abs(a-q.ans)<=(q.tol??1e-9)); }
+/* Champ de réponse d'une question à texte : dictée et réponse écrite (champ), ordre des mots (étiquettes) */
+const textField=(q,ctx,uid)=>q.ordre!==undefined?Langue.tiles(q,ctx):Langue.textInput(q,ctx,uid);
 
 function buildStep(st,c,ctx){
   if(st.h) c.append($(`<h2>${st.h}</h2>`));
   if(st.p) c.append($(`<div class="ptext">${st.p}</div>`));
+  if(st.mots) c.append(Langue.motsBox(st.mots));
+  if(st.audio||st.dictee!==undefined){ const a=Langue.audioBox(st.audio||st.dictee,{hide:st.cache||st.dictee!==undefined}); c.append(a); ctx.reveal=()=>a.reveal(); }
   if(st.fig) c.append($(`<div class="fig">${st.fig}</div>`));
   if(st.params){
     const vals={}; st.params.forEach(p=>vals[p.id]=p.v);
@@ -514,7 +524,11 @@ function buildStep(st,c,ctx){
   }
   if(st.parts) buildProblem(st,c,ctx);
   else if(st.opts){ c.append(choices(st.opts,ctx,st.opts.every(o=>o.replace(/<[^>]+>/g,'').length<14))); ctx.check=()=>({ok:ctx.answer===st.ans,why:st.why}); }
+  else if(Langue.isText(st)){ c.append(textField(st,ctx,ctx.uid)); ctx.check=()=>{ const ok=isRight(st,ctx.answer); return {ok, why:Langue.why(st,ctx.answer,ok), near:Langue.near(st,ctx.answer)}; }; }
   else if('ans' in st){ const w=numInput(st,ctx,ctx.uid); c.append(w); ctx.check=()=>({ok:isRight(st,ctx.answer),why:st.why}); setTimeout(()=>w.querySelector('input').focus({preventScroll:true}),50); }
+  if(st.dire) c.append(Langue.direBox(st.dire));
+  if(st.oral) c.append(Langue.oralBox(st.oral));
+  if(st.ecrire) c.append(Langue.writeBox(st.ecrire, L.id+':'+L.steps.indexOf(st)));
   if(st.demo) c.append(demoBox(st.demo,false));
   if(st.note) c.append($(`<div class="note">${st.note}</div>`));
 }
@@ -547,29 +561,30 @@ function buildProblem(st,c,ctx){
   const items=st.parts.map((q,k)=>{
     const li=$(`<li class="part locked"><div class="q">${q.q}</div><div class="zone"></div><div class="hint" hidden><b>Indice.</b> ${q.hint}</div><div class="pwhy" hidden></div></li>`);
     box.append(li); return li; });
-  const solBox=$(`<details class="sol" hidden><summary>Solution rédigée</summary><div>${st.sol}</div></details>`); c.append(solBox);
+  const lg=!!COURS_OF[L.id]?.sj.lang, solBox=$(`<details class="sol" hidden><summary>${lg?'Corrigé':'Solution rédigée'}</summary><div>${st.sol}</div></details>`); c.append(solBox);
   ctx.part=-1;
   const activate=k=>{
     ctx.part=k; ctx.answer=null; ctx.tries=0; ctx.mark=null;
     const q=st.parts[k], li=items[k]; li.classList.remove('locked'); li.classList.add('active');
     const zone=li.querySelector('.zone');
     if(q.opts) zone.append(choices(q.opts,ctx,q.opts.every(o=>o.replace(/<[^>]+>/g,'').length<14)));
+    else if(Langue.isText(q)) zone.append(textField(q,ctx,ctx.uid+'-'+k));
     else { const w=numInput(q,ctx,ctx.uid+'-'+k); zone.append(w); setTimeout(()=>w.querySelector('input').focus({preventScroll:true}),50); }
     const hb=$(`<button class="hint-btn" type="button">Indice</button>`); hb.onclick=()=>{ li.querySelector('.hint').hidden=false; hb.remove(); ctx.hinted=true; };
     zone.append(hb);
     if(k>0) li.scrollIntoView({block:'nearest',behavior:'smooth'});
   };
-  ctx.check=()=>{ const q=st.parts[ctx.part], ok=isRight(q,ctx.answer); return {ok, why:q.why, more: ok&&ctx.part<st.parts.length-1}; };
+  ctx.check=()=>{ const q=st.parts[ctx.part], ok=isRight(q,ctx.answer), tx=Langue.isText(q); return {ok, why:tx?Langue.why(q,ctx.answer,ok):q.why, near:tx&&Langue.near(q,ctx.answer), more: ok&&ctx.part<st.parts.length-1}; };
   ctx.partDone=()=>{ const li=items[ctx.part], q=st.parts[ctx.part];
     li.classList.remove('active'); li.classList.add('done');
     li.querySelectorAll('button,input').forEach(e=>{ e.disabled=true; e.classList.remove('cible'); });
-    li.querySelector('.hint-btn')?.remove(); const pw=li.querySelector('.pwhy'); pw.innerHTML=q.why; pw.hidden=false; };
+    li.querySelector('.hint-btn')?.remove(); const pw=li.querySelector('.pwhy'); pw.innerHTML=Langue.isText(q)?Langue.why(q,null,true):q.why; pw.hidden=false; };
   ctx.advance=()=>{ ctx.partDone(); activate(ctx.part+1); };
   ctx.finishProblem=()=>{ ctx.partDone(); solBox.hidden=false; solBox.open=true; };
   activate(0);
 }
 
-const kindOf=st=>st.kind||(st.demo?'Méthode':st.parts?'Problème':st.ok?'Pratique':(st.opts||'ans' in st)?'Question':'Théorie');
+const kindOf=st=>st.kind||(st.demo?'Méthode':st.parts?'Problème':st.dictee!==undefined?'Dictée':st.dire||st.oral?'Oral':st.ecrire?'Écriture':st.mots?'Vocabulaire':st.audio&&st.opts?'Écoute':st.ok?'Pratique':(st.opts||'ans' in st||Langue.isText(st))?'Question':'Théorie');
 function segs(){
   const el=document.getElementById('segs');
   if(X){ el.innerHTML=X.items.map((_,i)=>`<span class="${i<X.res.length?(X.res[i]?'done':'miss'):i===X.i?'cur':''}"></span>`).join(''); return; }
@@ -607,14 +622,15 @@ async function onAction(){
     act.disabled=true; phase='checking';
     const r=await ctx.check(); ctx.tries++;
     ctx.mark&&ctx.mark(r.ok);
+    if(r.ok||ctx.tries>=2) ctx.reveal?.();
     const prob=!!L.steps[idx].parts;
     if(r.ok){
       if(!ctx.review) S.xp+=prob?(ctx.tries===1&&!ctx.hinted?15:8):(ctx.tries===1?10:5); bumpStreak(); save();
       const title=ctx.tries===1?'Bravo !':'C’est ça !';
       if(r.more){ phase='nextpart'; setFoot('ok', title, r.why, 'Question suivante'); }
-      else { if(prob) ctx.finishProblem(); phase='next'; setFoot('ok', title, prob?'Problème résolu. La solution rédigée est ouverte ci-dessus.':r.why, 'Continuer'); }
+      else { if(prob) ctx.finishProblem(); phase='next'; setFoot('ok', title, prob?(COURS_OF[L.id]?.sj.lang?'Mission accomplie. Le corrigé est ouvert ci-dessus.':'Problème résolu. La solution rédigée est ouverte ci-dessus.'):r.why, 'Continuer'); }
     }
-    else { phase='ask'; setFoot('bad','Pas tout à fait', ctx.tries>=2?r.why:(prob?'Essaie encore. L’indice peut t’aider, et l’ardoise sert à poser tes calculs.':'Essaie encore. Indice disponible au prochain essai.'), 'Vérifier', ctx.answer!==null); }
+    else { phase='ask'; setFoot('bad','Pas tout à fait', ctx.tries>=2?r.why:r.near?'Presque : il y a une petite faute d’orthographe. Relis ta réponse.':(prob?'Essaie encore. L’indice peut t’aider, et l’ardoise sert à poser tes calculs.':'Essaie encore. Indice disponible au prochain essai.'), 'Vérifier', ctx.answer!==null); }
     return;
   }
   if(phase==='nextpart'){ ctx.advance(); phase='ask'; setFoot('','','','Vérifier',false); return; }
@@ -654,7 +670,7 @@ async function startExam(id, fresh=false){
     if(document.getElementById('player').hidden) alert('Examen indisponible. Vérifie ta connexion puis réessaie.');
     else { phase='exam'; setFoot('bad','Examen indisponible','Vérifie ta connexion puis réessaie.','Passer l’examen'); }
     return; }
-  L=LESSONS[id]; L.id=id;
+  L=LESSONS[id]; L.id=id; Langue.setLang(COURS_OF[id]?.sj.lang);
   // Les questions d'une même notion ne se suivent pas : on mélange tout
   const all=ex.flatMap((g,k)=>g.qs.map(q=>({q,k})));
   // Un examen interrompu est gardé dans S.examRun[id] : ordre des questions (o) et résultats déjà donnés (res, 1 = juste)
@@ -671,8 +687,10 @@ function examQ(){
   card.append($(`<div class="kicker">Examen de compétence · ${X.i+1} / ${X.items.length} · ${g.n}</div>`));
   ctx={answer:null, tries:0, uid:'x'+X.i, ready:(r)=>{ if(phase==='ask') act.disabled=!r; }};
   card.append($(`<div class="ptext exam-q">${q.q}</div>`));
+  if(q.audio||q.dictee!==undefined){ const a=Langue.audioBox(q.audio||q.dictee,{hide:q.cache||q.dictee!==undefined}); card.append(a); ctx.reveal=()=>a.reveal(); }
   if(q.fig) card.append($(`<div class="fig">${q.fig}</div>`));
-  if(q.opts) card.append(choices(q.opts,ctx,q.opts.every(o=>o.replace(/<[^>]+>/g,'').length<14)));
+  if(Langue.isText(q)) card.append(textField(q,ctx,ctx.uid));
+  else if(q.opts) card.append(choices(q.opts,ctx,q.opts.every(o=>o.replace(/<[^>]+>/g,'').length<14)));
   else { const w=numInput(q,ctx,ctx.uid); card.append(w); setTimeout(()=>w.querySelector('input').focus({preventScroll:true}),50); }
   window.Ink?.attachCard(card, 'examen:'+X.id+':'+X.i);
   document.querySelector('.p-body').scrollTop=0;
@@ -681,14 +699,14 @@ function examQ(){
 function examAction(){
   if(phase==='ask'){
     const q=X.items[X.i].q, ok=isRight(q,ctx.answer);
-    ctx.mark&&ctx.mark(ok); X.res.push(ok);
+    ctx.mark&&ctx.mark(ok); ctx.reveal?.(); X.res.push(ok);
     const run=S.examRun[X.id]; if(run) run.res=X.res.map(Number);
     document.querySelectorAll('#card button, #card input').forEach(e=>e.disabled=true);
     if(!ok&&q.opts) document.querySelectorAll('#card .choice')[q.ans]?.classList.add('right');
     if(ok){ S.xp+=2; bumpStreak(); }
     save();   // garde aussi la réponse dans l'examen en cours
-    const v=q.ans, good=q.opts?'':`Réponse : <b>${q.show??(v===0||Math.abs(v)>=.01?fmt(v,4):v.toExponential(3).replace('.',','))}${q.unit?' '+q.unit:''}</b>. `;
-    phase='next'; segs(); setFoot(ok?'ok':'bad', ok?'Juste':'Pas juste', (ok?'':good)+q.why, X.i<X.items.length-1?'Question suivante':'Voir mon score');
+    const v=q.ans, good=q.opts||Langue.isText(q)?'':`Réponse : <b>${q.show??(v===0||Math.abs(v)>=.01?fmt(v,4):v.toExponential(3).replace('.',','))}${q.unit?' '+q.unit:''}</b>. `;
+    phase='next'; segs(); setFoot(ok?'ok':'bad', ok?'Juste':'Pas juste', Langue.isText(q)?Langue.why(q,ctx.answer,ok):(ok?'':good)+q.why, X.i<X.items.length-1?'Question suivante':'Voir mon score');
     return;
   }
   if(phase==='next'){ if(++X.i<X.items.length) examQ(); else examEnd(); return; }

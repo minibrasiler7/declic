@@ -215,6 +215,44 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .rad .rc{border-top:.085em solid currentColor;padding:.06em .1em 0 .06em}
 .rad:has(.rad)>.rs{transform:scaleY(1.32)}
 .rad:has(.rad)>.rc{padding-top:.24em}
+/* langues (langue.js) : audio, mots, réponses écrites, ordre des mots, oral, écriture, révision */
+.audio{display:grid;gap:10px;margin:14px 0}
+.au-btns{display:flex;gap:10px;flex-wrap:wrap}
+.au-btns .btn{padding:10px 18px;font-size:16px}
+.au-tr summary{cursor:pointer;color:var(--accent);font-weight:700}
+.au-tr p{margin:6px 0}
+.au-off,.lg-l{color:var(--muted);font-size:15px}
+.mots{display:grid;gap:8px;margin:12px 0}
+.mot{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:2px 14px;text-align:left;padding:10px 14px;border:2px solid var(--line);border-radius:14px;background:var(--surface);cursor:pointer}
+.mot:hover{border-color:var(--accent)}
+.m-en{font-weight:700}.m-fr{color:var(--muted)}
+.m-ex{grid-column:1/-1;font-style:italic;color:var(--muted);font-size:15px}
+.txtin{display:grid;gap:8px}
+.txtin label{font-weight:700}
+.txtin input,.txtin textarea,.ecrire textarea,.vr-in{font:500 19px var(--f-body);width:100%;padding:12px 14px;border-radius:14px;border:2px solid var(--line);background:var(--surface);color:var(--ink)}
+.txtin input:focus,.txtin textarea:focus,.ecrire textarea:focus,.vr-in:focus{border-color:var(--accent);outline:none}
+.txtin .right,.vr-in.right,.tiles.right .tl-ans{border-color:var(--ok);background:var(--ok-soft)}
+.txtin .wrong,.vr-in.wrong,.tiles.wrong .tl-ans{border-color:var(--bad);background:var(--bad-soft)}
+.tiles{display:grid;gap:12px}
+.tl-ans{min-height:58px;display:flex;flex-wrap:wrap;gap:8px;padding:8px;border:2px dashed var(--line);border-radius:14px}
+.tl-bank{display:flex;flex-wrap:wrap;gap:8px}
+.tile{padding:8px 14px;border-radius:12px;border:2px solid var(--line);background:var(--surface);font-weight:700;cursor:pointer;box-shadow:0 2px 0 var(--line)}
+.tl-ans .tile{border-color:var(--accent);background:var(--accent-soft)}
+.df .ok{color:var(--ok);font-weight:700}.df .ko{color:var(--bad);font-weight:700;text-decoration:underline wavy}
+.dire,.oral,.ecrire{display:grid;gap:10px;margin:12px 0}
+.dire-t{font-size:20px;font-weight:700}
+.btn.mic{justify-self:start}
+.dire-r p{margin:6px 0}
+.modele{border-left:4px solid var(--ok);background:var(--ok-soft);border-radius:0 14px 14px 0;padding:12px 16px;display:grid;gap:8px}
+.crit{list-style:none;padding:0;margin:4px 0 0;display:grid;gap:6px}
+.crit .ok{color:var(--ok)}.crit .ko{color:var(--bad)}
+.ec-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.ec-n{color:var(--muted);font-size:14px}
+.vrev-cta{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:18px 0 6px;padding:14px 18px;border-radius:16px;background:var(--accent-soft)}
+.vrev-cta span{display:block;color:var(--muted);font-size:15px}
+.vrev .vr-body{display:grid;gap:14px;margin-top:10px}
+.vr-n{color:var(--muted);font-size:14px}.vr-fr{font:700 24px var(--f-display)}
+.vr-a{font-size:20px}.vr-btns{gap:10px}
 .mat{display:inline-grid;gap:2px 14px;vertical-align:middle;padding:2px 8px;border-left:2px solid currentColor;border-right:2px solid currentColor;border-radius:6px;font-family:var(--f-mono);font-size:.9em;text-align:center}
 .fig .info{font-size:16px;color:var(--ink);min-height:1.5em}
 .sliders{width:100%;display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
@@ -400,6 +438,23 @@ body.annot-on .card{outline:2px dashed color-mix(in srgb,var(--accent) 45%,trans
 <script src="cours/sec11-algebre.js"></script>
 <script src="cours/sec11-geometrie.js"></script>
 <script src="cours/sec11-solides.js"></script>
+<script src="cours/en-a1-1.js"></script>
+<script src="cours/en-a1-2.js"></script>
+<script src="cours/en-a1-3.js"></script>
+<script src="cours/en-a1-4.js"></script>
+<script src="cours/en-a2-1.js"></script>
+<script src="cours/en-a2-2.js"></script>
+<script src="cours/en-a2-3.js"></script>
+<script src="cours/en-a2-4.js"></script>
+<script src="cours/en-b1-1.js"></script>
+<script src="cours/en-b1-2.js"></script>
+<script src="cours/en-b1-3.js"></script>
+<script src="cours/en-b1-4.js"></script>
+<script src="cours/en-b2-1.js"></script>
+<script src="cours/en-b2-2.js"></script>
+<script src="cours/en-b2-3.js"></script>
+<script src="cours/en-b2-4.js"></script>
+<script src="langue.js"></script>
 <script src="app.js"></script>
 <script src="racines.js"></script>
 <script src="compte.js"></script>
