@@ -1,0 +1,50 @@
+/* Déclic — examen de compétence : My things (anglais A1) */
+(()=>{
+// X('a {b|c} d') → ['a b d', 'a c d'] : toutes les variantes d’une réponse écrite
+const X=(...ss)=>ss.flatMap(s=>{ const m=s.match(/\{([^{}]*)\}/); return m?m[1].split('|').flatMap(o=>X(s.replace(m[0],()=>o))):[s]; });
+EXAMS['en-a1-things']=[
+ {n:'Objets du quotidien et couleurs', r:'Les objets du quotidien', qs:[
+   {q:'Écris en anglais, avec l’article : « un portefeuille ».', lab:'En anglais', txt:['a wallet'], why:'<i lang="en">a wallet</i>. À ne pas confondre avec <i lang="en">a purse</i>, plutôt un porte-monnaie.'},
+   {q:'Quelle phrase traduit correctement « Mes lunettes sont sur la table. »&nbsp;?', opts:['My glasses is on the table.','My glass are on the table.','My glasses are on the table.','My glasses are in the table.'], ans:2, why:'<i lang="en">glasses</i> (lunettes) est toujours au pluriel, donc <i lang="en">are</i> ; « sur » une surface = <i lang="en">on</i>. <i lang="en">a glass</i> = un verre.'},
+   {q:'Écris en anglais, avec l’article : « un parapluie jaune ».', lab:'En anglais', txt:['a yellow umbrella'], why:'La couleur se place avant le nom : <i lang="en">a yellow umbrella</i>. On écrit <i lang="en">a</i> et non <i lang="en">an</i>, car le mot qui suit, <i lang="en">yellow</i>, commence par une consonne.'},
+   {q:'Quelle phrase est correcte&nbsp;?', opts:['There are two cars reds.','There are two reds cars.','There are two car red.','There are two red cars.'], ans:3, why:'L’adjectif de couleur se place avant le nom et ne prend jamais de -s : <i lang="en">two red cars</i>.'},
+   {q:'Écoute. De quelle couleur est le téléphone de Ben&nbsp;?', audio:[['Ben','Is this my phone? It’s black.'],['Amy','No, that’s my phone. Your phone is grey. It’s in your bag!']], cache:true, opts:['Noir','Gris','Blanc','Bleu'], ans:1, why:'<i lang="en">Your phone is grey</i> : le téléphone de Ben est gris. Le noir est celui d’Amy.'},
+   {q:'Tu montres un objet à ton professeur. Écris la question : « Comment dit-on ça en anglais ? »', lab:'Ta question', txt:X('{What’s|What is} {this|that} in English?','How do you say {this|that} in English?'), why:'<i lang="en">What’s this in English?</i> (ou <i lang="en">How do you say this in English?</i>)'},
+ ]},
+ {n:'This, that, these, those', r:'Choisir entre this, that, these et those', qs:[
+   {q:'Tu présentes deux amis qui sont à côté de toi. Complète : <i lang="en">___ are my friends, Tom and Ali.</i>', lab:'Le mot', txt:['These'], why:'Près de toi et pluriel : <i lang="en">These are my friends.</i>'},
+   {q:'Tu montres une maison au bout de la rue. Quelle phrase choisis-tu&nbsp;?', opts:['This house is beautiful.','That house is beautiful.','Those house is beautiful.','These house is beautiful.'], ans:1, why:'Loin et singulier : <i lang="en">that</i>. <i lang="en">those/these</i> exigent un nom au pluriel.'},
+   {q:'Quelle phrase contient une erreur&nbsp;?', opts:['This book is interesting.','Those people are nice.','This books are expensive.','That bag is heavy.'], ans:2, why:'<i lang="en">books</i> est au pluriel : il faut <i lang="en">These books are expensive.</i>'},
+   {q:'Mets au singulier : <i lang="en">Those cars are new.</i>', lab:'Ta phrase', txt:X('That car{ is|’s} new.'), why:'<i lang="en">those → that</i>, <i lang="en">cars → car</i>, <i lang="en">are → is</i> : <i lang="en">That car is new.</i>'},
+   {q:'On te demande <i lang="en">What are those?</i> Ce sont des clés. Écris ta réponse en une phrase complète.', lab:'Ta réponse', txt:X('{They’re|They are} keys.','{They’re|They are} my keys.'), why:'Au pluriel, on répond avec <i lang="en">they</i> : <i lang="en">They’re keys.</i> (pas « It’s keys »).'},
+ ]},
+ {n:'There is et there are', r:'Il y a : there is, there are', qs:[
+   {q:'Complète avec un mot : <i lang="en">___ are three bedrooms in the flat.</i>', lab:'Le mot', txt:['There'], why:'« Il y a » + pluriel : <i lang="en">There are three bedrooms.</i>'},
+   {q:'Laquelle de ces phrases dit correctement « Il y a deux banques dans ma rue »&nbsp;?', opts:['There is two banks in my street.','There are two banks in my street.','It has two banks in my street.','They are two banks in my street.'], ans:1, why:'Deux banques : pluriel, donc <i lang="en">There are</i>. <i lang="en">It has</i> et <i lang="en">They are</i> ne veulent pas dire « il y a ».'},
+   {q:'Écris en anglais : « Il y a un supermarché près de chez moi. »', lab:'Ta phrase', txt:X('There{ is|’s} a supermarket near {my house|my home|my flat|my apartment|where I live}.','Near {my house|my home|my flat|my apartment}{,|} there{ is|’s} a supermarket.'), why:'<i lang="en">There’s a supermarket near my house.</i> Singulier : <i lang="en">there is</i>, contracté en <i lang="en">there’s</i>.'},
+   {q:'Comment dit-on « Il y a un problème. »&nbsp;?', opts:['It has a problem.','There is a problem.','It is a problem.','There are a problem.'], ans:1, why:'« Il y a » = <i lang="en">there is</i> devant un singulier : <i lang="en">There is a problem.</i> (<i lang="en">It is a problem</i> veut dire « C’est un problème ».)'},
+   {q:'Écoute et écris en chiffres le nombre d’étudiants.', audio:'In my English class, there are twelve students and there’s one teacher.', cache:true, lab:'Étudiants', txt:['12','twelve'], why:'<i lang="en">There are twelve students</i> : 12 étudiants, et un seul professeur.'},
+ ]},
+ {n:'Questions et négations avec there is / there are', r:'Questions et négations avec there is / there are', qs:[
+   {q:'Transforme en question : <i lang="en">There is a lift in the building.</i>', lab:'Ta question', txt:['Is there a lift in the building?'], why:'On inverse <i lang="en">there is</i> : <i lang="en">Is there a lift in the building?</i>'},
+   {q:'<i lang="en">Are there two bathrooms in the flat?</i> Non. Écris la réponse courte.', lab:'Ta réponse', txt:['No, there aren’t.'], why:'Question au pluriel, réponse courte négative : <i lang="en">No, there aren’t.</i>'},
+   {q:'Mets à la forme négative : <i lang="en">There is a car park.</i>', lab:'Ta phrase', txt:X('There isn’t a car park.','There{ is|’s} no car park.'), why:'<i lang="en">There isn’t a car park.</i> ou <i lang="en">There’s no car park.</i> (avec <i lang="en">no</i>, sans <i lang="en">a</i>)'},
+   {q:'<i lang="en">Is there a bank near here?</i> Oui. Quelle réponse courte est correcte&nbsp;?', opts:['Yes, there’s.','Yes, it is.','Yes, is there.','Yes, there is.'], ans:3, why:'On ne contracte pas en fin de réponse courte : <i lang="en">Yes, there is.</i>'},
+   {q:'Écris en anglais : « Il n’y a pas de chaises dans la cuisine. »', lab:'Ta phrase', txt:X('There {aren’t any|are no} chairs in the kitchen.','In the kitchen{,|} there {aren’t any|are no} chairs.'), why:'Pluriel négatif : <i lang="en">There aren’t any chairs</i> ou <i lang="en">There are no chairs in the kitchen.</i>'},
+ ]},
+ {n:'Prépositions de lieu', r:'Où est-ce ? Les prépositions de lieu', qs:[
+   {q:'Écris en anglais : « Mon téléphone est dans mon sac. »', lab:'Ta phrase', txt:X('My phone{ is|’s} in my bag.'), why:'« dans » = <i lang="en">in</i> : <i lang="en">My phone is in my bag.</i>'},
+   {q:'« Il y a une photo sur le mur. » Quelle préposition faut-il&nbsp;? <i lang="en">There’s a photo ___ the wall.</i>', opts:['in','at','on','under'], ans:2, why:'Contact avec une surface verticale : <i lang="en">on the wall</i>.'},
+   {q:'« Mon frère est sur la photo. » Quelle phrase est correcte&nbsp;?', opts:['My brother is on the photo.','My brother is in the photo.','My brother is at the photo.','My brother is over the photo.'], ans:1, why:'Une personne est « dans » l’image : <i lang="en">in the photo</i>. C’est un piège classique pour les francophones.'},
+   {q:'Complète : <i lang="en">The bank is ___ the post office.</i> (à côté de)', lab:'Les mots', txt:['next to','beside'], why:'« à côté de » = <i lang="en">next to</i>, sans <i lang="en">of</i>.'},
+   {q:'Écoute. Où est le chat&nbsp;?', audio:'Where’s the cat? Is it under the bed? No… Is it on the sofa? No… Oh, there it is! It’s behind the sofa.', cache:true, opts:['Sous le lit','Derrière le canapé','Sur le canapé','Devant la télévision'], ans:1, why:'<i lang="en">It’s behind the sofa</i> : derrière le canapé. Il n’est ni sous le lit, ni sur le canapé.'},
+   {q:'Remets dans l’ordre.', ordre:['The','bus','stop','is','in front of','the','station.'], why:'<i lang="en">The bus stop is in front of the station.</i> <i lang="en">in front of</i> = devant.'},
+ ]},
+ {n:'Écouter et prononcer', r:'Le son th, et this ou these', qs:[
+   {q:'Écoute. Qu’est-ce qui manque dans la chambre d’hôtel&nbsp;?', audio:[['Guest','Excuse me, is there a kettle in the room?'],['Receptionist','Yes, there is. It’s on the table, next to the TV.'],['Guest','And is there a fridge?'],['Receptionist','No, there isn’t, sorry. But there’s a fridge in the kitchen on the ground floor.']], cache:true, opts:['Une bouilloire','Une télévision','Un frigo','Une table'], ans:2, why:'<i lang="en">Is there a fridge? – No, there isn’t.</i> : il n’y a pas de frigo dans la chambre (il y en a un dans la cuisine du rez-de-chaussée). La bouilloire (<i lang="en">kettle</i>) est sur la table.'},
+   {q:'Dictée. Écoute et écris la phrase exacte.', dictee:'Those blue shoes are under the bed.', why:'<i lang="en">Those</i> (loin, pluriel), la couleur avant le nom, puis <i lang="en">under</i> = sous.'},
+   {q:'Dans quel mot le <b>th</b> se prononce-t-il avec la gorge qui vibre&nbsp;?', opts:['three','thanks','these','think'], ans:2, why:'Dans <i lang="en">this, that, these, those, there, the</i>, le th est vibrant. Dans <i lang="en">three, thanks, think</i>, il ne vibre pas.'},
+   {q:'Quelle différence entend-on entre <i lang="en">this</i> et <i lang="en">these</i>&nbsp;?', opts:['Aucune : ils se prononcent pareil.','Le i de this est court, celui de these est long.','Le th de these ne se prononce pas.','this a deux syllabes.'], ans:1, why:'<i lang="en">this</i> a un i court et ouvert, <i lang="en">these</i> un i long, « iii ». C’est ce qui fait entendre le singulier ou le pluriel.'},
+ ]},
+];
+})();

@@ -55,7 +55,7 @@ const Langue=(()=>{
     const box=$(`<div class="mots"></div>`);
     mots.forEach(([en,fr,ex])=>{
       const r=$(`<button type="button" class="mot"><span class="m-en" lang="en">${en}</span><span class="m-fr">${fr}</span>${ex?`<span class="m-ex" lang="en">${ex}</span>`:''}</button>`);
-      r.onclick=()=>say(ex?[[null,en.split(' / ')[0]],[null,ex]]:en.split(' / ')[0]);
+      r.onclick=()=>say(ex?[[null,variants(en)[0]],[null,ex]]:variants(en)[0]);
       box.append(r);
     });
     return box;
@@ -63,18 +63,52 @@ const Langue=(()=>{
 
   /* ---------- réponses écrites ---------- */
   const CONTR=[[/\bcan't\b/g,'can not'],[/\bcannot\b/g,'can not'],[/\bwon't\b/g,'will not'],[/\bshan't\b/g,'shall not'],[/n't\b/g,' not'],[/'m\b/g,' am'],[/'re\b/g,' are'],[/'ve\b/g,' have'],[/'ll\b/g,' will']];
-  function norm(s){
+  function norm(s,contr=true){
     s=String(s).replace(/<[^>]+>/g,'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[’‘`´]/g,"'");
-    CONTR.forEach(([r,t])=>s=s.replace(r,t));
-    return s.replace(/[^a-z0-9' ]+/g,' ').replace(/(^|\s)'|'(\s|$)/g,' ').replace(/\s+/g,' ').trim();
+    // Contraction en fin de phrase (« Yes, I'm. », « Yes, they're. ») : fautive en réponse courte, on ne la développe pas.
+    // « amn't » n'existe pas : il ne doit pas devenir « am not ».
+    s=s.replace(/(\d)[,’' ](\d{3})\b/g,'$1$2').replace(/(\d)[,’' ](\d{3})\b/g,'$1$2');   // 5,000 = 5 000 = 5000
+    s=s.replace(/(\d)\s*([ap])\.?\s*m\b\.?/g,'$1 $2m');   // 11pm = 11 p.m. = 11 pm
+    s=s.replace(/\bo\s*'?\s*clock\b/g,"o'clock").replace(/(\d)\s*[h.]\s*(\d\d)\b/g,'$1:$2');   // 10h35 = 10.35 = 10:35
+    s=s.replace(/\bamn't\b/g,'amn§t').replace(/'(m|re|ve|ll)([^a-z0-9]*)$/,'§$1$2');
+    if(contr) CONTR.forEach(([r,t])=>s=s.replace(r,t));
+    // Guillemets simples retirés, mais l'apostrophe du possessif pluriel (parents') reste
+    return s.replace(/[^a-z0-9'§ ]+/g,' ').replace(/(^|\s)'|([^s])'(\s|$)/g,'$1$2 ').replace(/§/g,"'").replace(/\s+/g,' ').trim();
   }
   const isText=q=>!!(q&&(q.txt!==undefined||q.dictee!==undefined||q.ordre!==undefined));
   const answers=q=>q.dictee!==undefined?[q.dictee]:q.ordre!==undefined?[Array.isArray(q.ordre)?q.ordre.join(' '):q.ordre,...(q.alt||[])]:[].concat(q.txt);
   const shown=q=>q.show??answers(q)[0];
-  const txtRight=(q,a)=>a!=null&&answers(q).some(x=>norm(x)===norm(a));
+  // 's et 'd sont ambigus (is/has, would/had) : après un pronom ou un mot interrogatif, on essaie les deux formes longues.
+  // Le possessif (Tom's car) n'est pas touché.
+  const SUBJ="(it|what|that|he|she|there|here|where|who|how|when|why)";
+  // Nombres en lettres = chiffres (jusqu'à 99) : « three » = « 3 », « twenty-five » = « 25 »
+  const NUM={zero:0,oh:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20,thirty:30,forty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90};
+  const digits=n=>n.replace(/\b(twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety) (one|two|three|four|five|six|seven|eight|nine)\b/g,(m,a,b)=>NUM[a]+NUM[b])
+    .replace(/\b(zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety)\b/g,m=>NUM[m]);
+  // Orthographe américaine ramenée à la britannique : -ize = -ise, color = colour…
+  const UK=f=>f.replace(/(\w{3,})iz(e|es|ed|ing|ation|ations)\b/g,'$1is$2').replace(/(\w{2,})yz(e|es|ed|ing)\b/g,'$1ys$2')
+    .replace(/\b(colo|favo|flavo|hono|humo|labo|neighbo|behavio|rumo)r(s|ed|ing|ite|ites|able|hood)?\b/g,'$1ur$2')
+    .replace(/\b(cent|theat|met|lit|fib)er(s)?\b/g,'$1re$2').replace(/\b(travel|cancel|label|model)(ed|ing|er|ers)\b/g,(m,a,b)=>a+'l'+b);
+  function forms(s){ const n=norm(s), out=new Set([n, norm(String(s).replace(/-/g,''))]);   // Wi-Fi = wifi, well-known = well known
+    [...out].forEach(f=>out.add(digits(f)));
+    [...out].forEach(f=>out.add(UK(f)));
+    // chaque 's ou 'd séparément : « If I'd known, I'd have come » = had … would
+    const each=(re,w)=>{ for(let k=0,grew=true;grew&&k<6&&out.size<300;k++){ grew=false;
+      for(const f of [...out]) for(const m of f.matchAll(re)){ const g=f.slice(0,m.index)+m[1]+w+f.slice(m.index+m[0].length); if(!out.has(g)){ out.add(g); grew=true; } } } };
+    const S2=new RegExp(`\\b${SUBJ}'s\\b`,'g'), D2=/\b(i|you|he|she|it|we|they)'d\b/g;
+    each(S2,' is'); each(S2,' has'); each(D2,' would'); each(D2,' had');
+    return out; }
+  // formel:true (registre soutenu) : les contractions ne sont pas acceptées
+  const txtRight=(q,a)=>{ if(a==null) return false; if(q.formel) return answers(q).some(x=>norm(x,false)===norm(a,false)); const A=forms(a); return answers(q).some(x=>[...forms(x)].some(f=>A.has(f))); };
   function lev(a,b){ const d=Array.from({length:a.length+1},(_,i)=>[i]); for(let j=1;j<=b.length;j++) d[0][j]=j;
     for(let i=1;i<=a.length;i++) for(let j=1;j<=b.length;j++) d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1)); return d[a.length][b.length]; }
-  const near=(q,a)=>a!=null&&!txtRight(q,a)&&answers(q).some(x=>{ const n=norm(x),m=norm(a); return n.length>=4&&lev(n,m)<=(n.length>14?2:1); });
+  // Contractions tapées sans apostrophe (fréquent sur téléphone) : signalées, pas acceptées
+  const NOAPOS=/\b(do|does|did|is|are|was|were|ca|wo|have|has|had|should|could|would|must|need)nt\b|\b(i)m\b|\b(you|they|we)re\b|\b(i|you|we|they)ve\b|\b(you|they)ll\b|\b(what|that|he|she|there|here|where|who)s\b/g;
+  const apos=a=>String(a).replace(NOAPOS,m=>m.replace(/(nt|m|re|ve|ll|s)$/,"'$1"));
+  // Presque juste : une faute de frappe, ou seulement des apostrophes oubliées (message dédié)
+  const near=(q,a)=>{ if(a==null||txtRight(q,a)) return false;
+    if(apos(a)!==String(a)&&txtRight(q,apos(a))) return 'Presque : il manque une ou plusieurs apostrophes (don’t, I’m, you’re…). Elles comptent à l’écrit.';
+    return answers(q).some(x=>{ const n=norm(x),m=norm(a); return n.length>=4&&lev(n,m)<=(n.length>14?2:1); }); };
 
   // Mots communs (plus longue sous-suite commune) : sert à la dictée et à l'oral
   function lcs(a,b){ const d=Array.from({length:a.length+1},()=>Array(b.length+1).fill(0));
@@ -208,18 +242,20 @@ const Langue=(()=>{
   /* ---------- vocabulaire à réviser (répétition espacée) ---------- */
   const GAP=[0,1,3,7,14,30,60];
   const addDays=(d,k)=>{ const x=new Date(d+'T12:00'); x.setDate(x.getDate()+k); return dayStr(x); };
-  const vKey=en=>'v:'+norm(en.split(' / ')[0]);
+  const vKey=en=>'v:'+norm(variants(en)[0]);
   // Les mots des chapitres commencés ou terminés de la matière
   function deck(subj){
     const out=[], seen=new Set();
-    COURS.filter(c=>c.subj===subj&&(S.done[c.id]||S.pos[c.id]>0)).forEach(c=>c.steps.forEach(st=>(st.mots||[]).forEach(m=>{ const k=vKey(m[0]); if(!seen.has(k)){ seen.add(k); out.push({k,en:m[0],fr:m[1],ex:m[2]}); } })));
+    COURS.filter(c=>c.subj===subj&&(S.done[c.id]||S.pos[c.id]>0)).forEach(c=>c.steps.forEach(st=>(st.mots||[]).forEach(m=>{ const k=vKey(m[0]); if(m[0].includes(', ')) return; // les listes (one, two, three) ne se révisent pas d'un bloc
+      if(!seen.has(k)){ seen.add(k); out.push({k,en:m[0],fr:m[1],ex:m[2]}); } })));
     return out;
   }
   function dueCards(subj){ const t=today(), V=S.vocab||{}, all=deck(subj);
     const due=all.filter(c=>V[c.k]&&V[c.k].d<=t).sort((a,b)=>V[a.k].d<V[b.k].d?-1:1), fresh=all.filter(c=>!V[c.k]);
     return {due, fresh, n:due.length+Math.min(fresh.length,10)}; }
   const vNorm=s=>norm(s.replace(/\([^)]*\)/g,' ')).replace(/^(to|a|an|the) /,'');
-  const vRight=(c,a)=>c.en.split(' / ').some(x=>vNorm(x)===vNorm(a||''));
+  const variants=en=>en.replace(/\([^)]*\)/g,' ').split(' / ');   // les parenthèses (facultatives) peuvent contenir un « / »
+  const vRight=(c,a)=>variants(c.en).some(x=>vNorm(x)===vNorm(a||''))||variants(c.en).some(x=>[...forms(x)].some(f=>forms(a||'').has(f)));
 
   function review(subj,onClose){
     const {due,fresh}=dueCards(subj), q=[...due,...fresh.slice(0,10)].slice(0,20), n0=q.length;
@@ -240,7 +276,7 @@ const Langue=(()=>{
         const ok=!give&&vRight(c,inp.value);
         inp.disabled=true; inp.classList.add(ok?'right':'wrong');
         A.hidden=false; A.innerHTML=`<b lang="en">${c.en}</b>${c.ex?`<div class="m-ex" lang="en">${c.ex}</div>`:''}`;
-        say(c.ex?[[null,c.en.split(' / ')[0]],[null,c.ex]]:c.en.split(' / ')[0]);
+        say(c.ex?[[null,variants(c.en)[0]],[null,c.ex]]:variants(c.en)[0]);
         if(first){ const v=V[c.k]||{b:0}; if(ok){ v.b=Math.min(v.b+1,GAP.length-1); good++; } else { v.b=0; again.add(c.k); q.push(c); } v.d=addDays(today(),ok?GAP[v.b]:1); V[c.k]=v; save(); }
         else if(!ok) { again.add(c.k); }
         bNo.remove(); bOk.textContent=i+1<q.length?'Suivant':'Voir le bilan'; bOk.onclick=()=>{ i++; card(); }; bOk.focus();

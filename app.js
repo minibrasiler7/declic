@@ -359,7 +359,7 @@ function renderSubject(id){
   const chs=chapitres(sj), fin=chs.filter(c=>S.done[c.id]).length;
   const page=$(`<section class="wrap cpage"><div>
       <button class="crumb" id="back">← Cours complets</button>
-      <h1>${sj.h}</h1><p class="lead">${chs.length} chapitres · ${fin} terminé${fin>1?'s':''}</p>
+      <h1>${sj.h}</h1><p class="lead">${chs.length} ${sj.lang?'unités':'chapitres'} · ${fin} terminé${sj.lang?'e':''}${fin>1?'s':''}</p>
       <div class="bar" style="margin-top:12px"><span style="width:${fin/chs.length*100}%"></span></div>
       <div id="sems"></div>
     </div><div class="ill">${stepsThumb(chs[0].steps)}</div></section>`);
@@ -630,7 +630,7 @@ async function onAction(){
       if(r.more){ phase='nextpart'; setFoot('ok', title, r.why, 'Question suivante'); }
       else { if(prob) ctx.finishProblem(); phase='next'; setFoot('ok', title, prob?(COURS_OF[L.id]?.sj.lang?'Mission accomplie. Le corrigé est ouvert ci-dessus.':'Problème résolu. La solution rédigée est ouverte ci-dessus.'):r.why, 'Continuer'); }
     }
-    else { phase='ask'; setFoot('bad','Pas tout à fait', ctx.tries>=2?r.why:r.near?'Presque : il y a une petite faute d’orthographe. Relis ta réponse.':(prob?'Essaie encore. L’indice peut t’aider, et l’ardoise sert à poser tes calculs.':'Essaie encore. Indice disponible au prochain essai.'), 'Vérifier', ctx.answer!==null); }
+    else { phase='ask'; setFoot('bad','Pas tout à fait', ctx.tries>=2?r.why:r.near?(typeof r.near==='string'?r.near:'Presque : une lettre seulement diffère de la réponse attendue. Relis chaque mot (orthographe, mais aussi than/then, worse/worst…).'):(prob?'Essaie encore. L’indice peut t’aider, et l’ardoise sert à poser tes calculs.':'Essaie encore. Indice disponible au prochain essai.'), 'Vérifier', ctx.answer!==null); }
     return;
   }
   if(phase==='nextpart'){ ctx.advance(); phase='ask'; setFoot('','','','Vérifier',false); return; }
