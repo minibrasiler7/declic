@@ -4,7 +4,7 @@ const store = {
   get(){ try{ return JSON.parse(localStorage.getItem('declic')||'{}') }catch(e){ return {} } },
   set(v){ try{ localStorage.setItem('declic',JSON.stringify(v)) }catch(e){} }
 };
-const blankState=()=>({xp:0, streak:0, lastDay:null, done:{}, pos:{}, exams:{}, ardoise:{}, notes:{}, last:null, updated:0});
+const blankState=()=>({xp:0, streak:0, lastDay:null, done:{}, pos:{}, exams:{}, examRun:{}, ardoise:{}, notes:{}, last:null, updated:0});
 let S = Object.assign(blankState(), store.get());
 const dayStr=d=>d.toLocaleDateString('sv');               // AAAA-MM-JJ, heure locale
 const today=()=>dayStr(new Date()), yesterday=()=>dayStr(new Date(Date.now()-864e5));
@@ -23,6 +23,7 @@ function mergeState(r){
   m.pos=Object.assign({}, other.pos, latest.pos);
   m.ardoise=Object.assign({}, other.ardoise, latest.ardoise);
   m.notes=Object.assign({}, other.notes, latest.notes);
+  m.examRun=Object.assign({}, other.examRun, latest.examRun);   // examens en cours : la version la plus récente gagne
   m.exams=Object.assign({}, other.exams, latest.exams);   // garde le meilleur score des deux côtés
   for(const k in r.exams) if(S.exams?.[k]) m.exams[k].best=Math.max(r.exams[k].best, S.exams[k].best);
   m.last=latest.last||other.last; m.updated=Math.max(S.updated, r.updated);
@@ -377,7 +378,12 @@ function renderSubject(id){
 }
 
 /* Lien « Examen de compétence » d'un chapitre, avec le meilleur score */
-function examLink(id){ const ex=S.exams[id], f=$(`<button class="linkish fm-link" type="button">Examen de compétence${ex?` · meilleur score ${ex.best} / ${ex.n}`:''}</button>`); f.onclick=()=>startExam(id); return f; }
+function examLink(id){
+  const ex=S.exams[id], run=S.examRun[id];
+  if(run){ // examen commencé et pas fini : on le reprend là où on s'est arrêté, ou on recommence
+    const f=$(`<div><button class="linkish fm-link" type="button">Reprendre l’examen · ${run.res.length} / ${run.o.length} questions faites</button><button class="linkish fm-link" type="button">Recommencer l’examen à zéro</button></div>`);
+    const [a,b]=f.querySelectorAll('button'); a.onclick=()=>startExam(id); b.onclick=()=>startExam(id,true); return f; }
+  const f=$(`<button class="linkish fm-link" type="button">Examen de compétence${ex?` · meilleur score ${ex.best} / ${ex.n}`:''}</button>`); f.onclick=()=>startExam(id); return f; }
 
 function renderMath(h){
   const sec=$(`<section class="wrap domain" id="maths">
@@ -627,7 +633,7 @@ function finish(){
   phase='end'; setFoot('', '', '', (COURSE_OF[L.id]||COURS_OF[L.id])?'Retour au cours':'Retour au catalogue');
   if(hasExam(L.id)){ // l'examen de compétence prend la suite du chapitre
     const ex=S.exams[L.id], b=$(`<div class="exam-cta"><div><b>Examen de compétence</b><span>Une trentaine d’exercices techniques sur tout le chapitre, un score et un bilan de ce qui est acquis.${ex?` Meilleur score : ${ex.best} / ${ex.n}.`:''}</span></div></div>`);
-    card.querySelector('.done-wrap').append(b); phase='exam'; setFoot('', '', '', 'Passer l’examen');
+    card.querySelector('.done-wrap').append(b); phase='exam'; setFoot('', '', '', S.examRun[L.id]?`Reprendre l’examen (${S.examRun[L.id].res.length} / ${S.examRun[L.id].o.length})`:'Passer l’examen');
     const r=$(`<button class="linkish" type="button">${(COURSE_OF[L.id]||COURS_OF[L.id])?'Plus tard, retour au cours':'Plus tard'}</button>`); r.onclick=closeLesson; b.append(r);
   }
 }
@@ -642,7 +648,7 @@ function loadExam(id){
     sc.onload=()=>EXAMS[id]?ok(EXAMS[id]):ko(); sc.onerror=()=>{ delete examFile[id]; sc.remove(); ko(); }; document.head.append(sc); });
 }
 const shuffle=a=>{ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
-async function startExam(id){
+async function startExam(id, fresh=false){
   if(!LESSONS[id]) return;
   let ex; try{ ex=await loadExam(id); }catch(e){
     if(document.getElementById('player').hidden) alert('Examen indisponible. Vérifie ta connexion puis réessaie.');
@@ -650,7 +656,12 @@ async function startExam(id){
     return; }
   L=LESSONS[id]; L.id=id;
   // Les questions d'une même notion ne se suivent pas : on mélange tout
-  X={id, notions:ex, items:shuffle(ex.flatMap((g,k)=>g.qs.map(q=>({q,k})))), i:0, res:[]};
+  const all=ex.flatMap((g,k)=>g.qs.map(q=>({q,k})));
+  // Un examen interrompu est gardé dans S.examRun[id] : ordre des questions (o) et résultats déjà donnés (res, 1 = juste)
+  let run=fresh?null:S.examRun[id];
+  if(run&&(run.o.length!==all.length||run.res.length>=all.length||run.o.some(j=>!all[j]))) run=null;   // examen modifié depuis
+  if(!run){ run={o:shuffle(all.map((_,j)=>j)), res:[]}; S.examRun[id]=run; save(); }
+  X={id, notions:ex, items:run.o.map(j=>all[j]), i:run.res.length, res:run.res.map(Boolean)};
   document.getElementById('player').hidden=false; document.body.style.overflow='hidden'; document.body.classList.add('in-lesson');
   window.Ardoise?.onLesson(id); back.hidden=true; examQ();
 }
@@ -671,9 +682,11 @@ function examAction(){
   if(phase==='ask'){
     const q=X.items[X.i].q, ok=isRight(q,ctx.answer);
     ctx.mark&&ctx.mark(ok); X.res.push(ok);
+    const run=S.examRun[X.id]; if(run) run.res=X.res.map(Number);
     document.querySelectorAll('#card button, #card input').forEach(e=>e.disabled=true);
     if(!ok&&q.opts) document.querySelectorAll('#card .choice')[q.ans]?.classList.add('right');
-    if(ok){ S.xp+=2; bumpStreak(); save(); }
+    if(ok){ S.xp+=2; bumpStreak(); }
+    save();   // garde aussi la réponse dans l'examen en cours
     const v=q.ans, good=q.opts?'':`Réponse : <b>${q.show??(v===0||Math.abs(v)>=.01?fmt(v,4):v.toExponential(3).replace('.',','))}${q.unit?' '+q.unit:''}</b>. `;
     phase='next'; segs(); setFoot(ok?'ok':'bad', ok?'Juste':'Pas juste', (ok?'':good)+q.why, X.i<X.items.length-1?'Question suivante':'Voir mon score');
     return;
@@ -686,7 +699,7 @@ function examEnd(){
   const n=X.items.length, sc=X.res.filter(Boolean).length, pc=Math.round(sc/n*100);
   const per=X.notions.map((g,k)=>{ const r=X.items.map((it,i)=>it.k===k?X.res[i]:null).filter(v=>v!==null); return {g, ok:r.filter(Boolean).length, n:r.length}; });
   const acq=per.filter(p=>p.ok/p.n>=.75), rev=per.filter(p=>p.ok/p.n<.75);
-  const prev=S.exams[X.id]; S.exams[X.id]={best:Math.max(sc,prev?.best||0), last:sc, n, day:today()}; save();
+  const prev=S.exams[X.id]; S.exams[X.id]={best:Math.max(sc,prev?.best||0), last:sc, n, day:today()}; delete S.examRun[X.id]; save();
   const level=pc>=90?['Maîtrisé','Tout le chapitre est en place.']:pc>=75?['Bien acquis','L’essentiel est solide.']:pc>=50?['En bonne voie','La base est là, quelques notions demandent encore de l’entraînement.']:['À retravailler','Reprends les notions ci-dessous puis repasse l’examen.'];
   const list=ps=>ps.map(p=>`<li><div class="row"><span>${p.g.n}</span><b>${p.ok} / ${p.n}</b></div><div class="bar"><span style="width:${p.ok/p.n*100}%"></span></div></li>`).join('');
   const names=ps=>ps.map(p=>/^.[a-zà-ÿ ]/.test(p.g.n)?p.g.n.charAt(0).toLowerCase()+p.g.n.slice(1):p.g.n).join(', ').replace(/, ([^,]*)$/,' et $1');
@@ -708,7 +721,7 @@ function examEnd(){
   box.querySelectorAll('ul.bad li').forEach((li,k)=>{ const g=rev[k].g, at=steps.findIndex(s=>s.h===g.r);
     if(at<0) return; const b=$(`<button class="linkish" type="button">Revoir « ${g.r.replace(/<[^>]+>/g,'')} »</button>`);
     const id=X.id; b.onclick=()=>openLesson(id,at); li.append(b); });
-  box.querySelector('#ex-again').onclick=()=>startExam(X.id);
+  box.querySelector('#ex-again').onclick=()=>startExam(X.id,true);
   card.append(box); window.Ink?.attachCard(card, 'examen:'+X.id+':fin');
   document.querySelector('.p-body').scrollTop=0;
   phase='end'; setFoot('', '', '', (COURSE_OF[X.id]||COURS_OF[X.id])?'Retour au cours':'Retour au catalogue');
