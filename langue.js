@@ -1,5 +1,5 @@
 /* Déclic — outils pour apprendre une langue (format : docs/ANGLAIS.md).
-   Audio par la synthèse vocale du navigateur, réponses écrites (txt), dictée, ordre des mots, oral (reconnaissance vocale),
+   Audio : fichiers audio/<id>.mp3 enregistrés d'avance avec une voix neuronale (tools/audio.js), sinon la synthèse vocale du navigateur ; réponses écrites (txt), dictée, ordre des mots, oral (reconnaissance vocale),
    écriture guidée comparée à un modèle, et révision espacée du vocabulaire (mots des étapes « mots »).
    Les fonctions s'appuient sur $, act, S, save, today… d'app.js : elles ne sont appelées qu'une fois tout chargé. */
 const Langue=(()=>{
@@ -20,21 +20,36 @@ const Langue=(()=>{
     return voices.filter(v=>v.lang.replace('_','-').startsWith(base)&&tier(v)<9)
       .sort((a,b)=>tier(a)+(a.lang.replace('_','-')===LANG?0:1)-tier(b)-(b.lang.replace('_','-')===LANG?0:1));
   }
-  const canSpeak=()=>!!SY;
-  // lines : texte, ou [[qui, texte], …] pour un dialogue (deux voix si possible)
-  function say(lines, rate=1){
-    if(!SY) return Promise.resolve();
-    SY.cancel(); if(!voices.length) loadV();
-    const L=typeof lines==='string'?[[null,lines]]:lines, V=pickVoices(), who=[...new Set(L.map(l=>l[0]))];
-    return new Promise(done=>{
-      L.forEach(([w,t],i)=>{
-        const u=new SpeechSynthesisUtterance(t.replace(/<[^>]+>/g,'')), k=Math.max(0,who.indexOf(w));
-        u.lang=LANG; const v=V[k%Math.max(1,V.length)]; if(v) u.voice=v;
-        u.rate=.95*rate; u.pitch=V.length>1?1:[1,.82,1.18][k%3];
-        if(i===L.length-1){ u.onend=()=>done(); u.onerror=()=>done(); }
-        SY.speak(u);
-      });
-    });
+  const canSpeak=()=>true;   // fichiers audio, ou à défaut la synthèse du navigateur
+
+  /* Fichiers enregistrés : une phrase = audio/<id>.mp3, id = empreinte de la voix et du texte.
+     Dans un dialogue, chaque personne a sa voix, dans l'ordre d'apparition (VOX) ; un texte seul prend la première. */
+  const VOX={'en-GB':['bf_emma','bm_george','bf_isabella','bm_fable']};
+  const clean=t=>String(t).replace(/<[^>]+>/g,'').replace(/&nbsp;/g,' ').replace(/\s+/g,' ').trim();
+  function hash(str){ let h1=0xdeadbeef, h2=0x41c6ce57;   // cyrb53
+    for(let i=0;i<str.length;i++){ const c=str.charCodeAt(i); h1=Math.imul(h1^c,2654435761); h2=Math.imul(h2^c,1597334677); }
+    h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909); h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);
+    return (4294967296*(2097151&h2)+(h1>>>0)).toString(36); }
+  const lineList=lines=>typeof lines==='string'?[[null,lines]]:lines;
+  // [{id, voice, text, k}] pour chaque phrase d'un audio (sert aussi à tools/audio.js)
+  function clips(lines,lang=LANG){ const L=lineList(lines), who=[...new Set(L.map(l=>l[0]))], V=VOX[lang]||VOX['en-GB'];
+    return L.map(([w,t])=>{ const k=Math.max(0,who.indexOf(w)), voice=V[k%V.length], text=clean(t); return {k, voice, text, id:hash(voice+'|'+text)}; }); }
+  const AU=typeof Audio!=='undefined'?new Audio():null; let token=0;
+  const playFile=(id,rate)=>new Promise((ok,ko)=>{ AU.onended=()=>ok(); AU.onerror=()=>ko();
+    AU.src=`audio/${id}.mp3`; AU.defaultPlaybackRate=AU.playbackRate=rate; AU.preservesPitch=true; AU.play().catch(ko); });
+  // Voix du navigateur, en secours quand le fichier manque (hors connexion, texte pas encore enregistré)
+  const ttsLine=(t,k,rate)=>new Promise(done=>{ if(!SY){ done(); return; } if(!voices.length) loadV();
+    const V=pickVoices(), u=new SpeechSynthesisUtterance(t); u.lang=LANG; const v=V[k%Math.max(1,V.length)]; if(v) u.voice=v;
+    u.rate=.95*rate; u.pitch=V.length>1?1:[1,.82,1.18][k%3]; u.onend=u.onerror=()=>done(); SY.speak(u); });
+  const pause=ms=>new Promise(r=>setTimeout(r,ms));
+  // lines : texte, ou [[qui, texte], …] pour un dialogue
+  async function say(lines, rate=1){
+    const my=++token; SY?.cancel(); AU?.pause();
+    for(const c of clips(lines)){
+      if(my!==token) return;
+      try{ if(!AU) throw 0; await playFile(c.id,rate); }catch(e){ if(my!==token) return; await ttsLine(c.text,c.k,rate); }
+      if(my!==token) return; await pause(220);
+    }
   }
   const scriptHtml=src=>typeof src==='string'?`<p lang="en">${src}</p>`:src.map(([w,t])=>`<p lang="en">${w?`<b>${w}:</b> `:''}${t}</p>`).join('');
 
@@ -45,7 +60,7 @@ const Langue=(()=>{
     if(!canSpeak()){ box.querySelector('.au-btns').replaceWith($(`<p class="au-off">L’audio n’est pas disponible dans ce navigateur : lis le texte.</p>`)); tr.open=true; hide=false; }
     if(hide) tr.hidden=true; else if(typeof src!=='string'||src.length<160) tr.open=true;
     box.querySelector('.au-play').onclick=()=>say(src,1);
-    box.querySelector('.au-slow').onclick=()=>say(src,.7);
+    box.querySelector('.au-slow').onclick=()=>say(src,.75);
     box.reveal=()=>{ tr.hidden=false; };
     return box;
   }
@@ -288,5 +303,5 @@ const Langue=(()=>{
     document.body.append(m); card();
   }
 
-  return {setLang:l=>{ LANG=l||'en-GB'; }, say, audioBox, motsBox, isText, answers, shown, txtRight, near, why, textInput, tiles, direBox, oralBox, writeBox, dueCards, review, norm};
+  return {clips, setLang:l=>{ LANG=l||'en-GB'; }, say, audioBox, motsBox, isText, answers, shown, txtRight, near, why, textInput, tiles, direBox, oralBox, writeBox, dueCards, review, norm};
 })();

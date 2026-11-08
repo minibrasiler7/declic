@@ -38,6 +38,9 @@ Ordre conseillé, à adapter au thème :
 
 Minimum vérifié : 3 étapes avec audio, 1 dictée, 2 étapes d’oral (`dire` ou `oral`), 1 écriture, 12 mots, 3 exercices, 1 Méthode, 2 missions à la fin.
 
+## Audio
+Tout texte lu (`audio`, `dictee`, `dire`, `oral.modele`, `mots`) est enregistré d’avance avec une voix neuronale britannique (Kokoro : Emma, George, Isabella, Fable) dans `audio/<id>.mp3`. Après avoir ajouté ou modifié un texte : `node tools/audio.js /tmp/m.json` puis `~/.cache/declic-tts/.venv/bin/python tools/tts.py /tmp/m.json` (installation en tête de `tools/tts.py`). Sans fichier, le site retombe sur la voix du navigateur. Écris les prix avec le symbole (£3.50) et les heures en chiffres (9.15) : l’outil les fait lire correctement.
+
 ## Les champs de langue
 - `audio` : un texte (`'Nice to meet you.'`) ou un dialogue `[['Anna','Hi!'],['Tom','Hello!']]` (deux voix). Lu par la synthèse vocale, avec « Plus lentement ». `cache:true` cache le texte jusqu’à la réponse.
 - `mots:[['to get up','se lever','I get up at seven.'], …]` : liste qu’on touche pour l’entendre. Variantes acceptées à la révision : `'a flat / an apartment'`. Mets l’article ou *to* comme en anglais : ils sont facultatifs à la révision.
