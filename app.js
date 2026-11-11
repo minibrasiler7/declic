@@ -1,36 +1,71 @@
 /* Déclic — moteur de leçons et interface */
 /* ---------- état : localStorage, synchronisé avec le compte par compte.js ---------- */
 const store = {
-  get(){ try{ return JSON.parse(localStorage.getItem('declic')||'{}') }catch(e){ return {} } },
-  set(v){ try{ localStorage.setItem('declic',JSON.stringify(v)) }catch(e){} }
+  raw:null,   // dernier texte lu ou écrit par cet onglet : sert à repérer ce qu'un autre onglet a enregistré entre-temps
+  read(){ try{ return localStorage.getItem('declic') }catch(e){ return null } },
+  get(){ this.raw=this.read(); try{ return JSON.parse(this.raw||'{}') }catch(e){ return {} } },
+  set(v){ const put=o=>{ const t=JSON.stringify(o); localStorage.setItem('declic',t); this.raw=t; };
+    try{ put(v) }catch(e){ try{ put({...v, notes:{}}) }catch(e2){} } }   // stockage plein : la progression passe avant les annotations au stylet
 };
-const blankState=()=>({xp:0, streak:0, lastDay:null, done:{}, pos:{}, exams:{}, examRun:{}, textes:{}, vocab:{}, ardoise:{}, notes:{}, last:null, updated:0});
-let S = Object.assign(blankState(), store.get());
+const blankState=()=>({xp:0, streak:0, lastDay:null, done:{}, pos:{}, part:{}, exams:{}, examRun:{}, textes:{}, vocab:{}, ardoise:{}, notes:{}, last:null, updated:0});
+const S = Object.assign(blankState(), store.get());
 const dayStr=d=>d.toLocaleDateString('sv');               // AAAA-MM-JJ, heure locale
 const today=()=>dayStr(new Date()), yesterday=()=>dayStr(new Date(Date.now()-864e5));
 function bumpStreak(){ const t=today(); if(S.lastDay===t) return; S.streak = S.lastDay===yesterday() ? S.streak+1 : 1; S.lastDay=t; }
 function liveStreak(){ return (S.lastDay===today()||S.lastDay===yesterday()) ? S.streak : 0; }
-function save(){ S.updated=Date.now(); store.set(S); renderStats(); window.Compte?.push(); }
+/* On reprend ce qu'un autre onglet a enregistré (à son signal, au retour sur l'onglet, et avant chaque écriture) :
+   un onglet resté ouvert n'efface jamais une progression plus récente */
+function absorb(){ const t=store.read(); if(t===null||t===store.raw) return false; let d; try{ d=JSON.parse(t) }catch(e){ return false } store.raw=t; return mergeState(d,{write:false}); }
+function save(){ S.updated=Date.now(); absorb(); store.set(S); renderStats(); window.Compte?.push(); }
 function renderStats(){ document.getElementById('xp').textContent=S.xp; document.getElementById('streak').textContent=liveStreak(); }
-/* Fusionne une progression distante (compte) avec la progression locale, sans rien perdre */
-function mergeState(r){
+/* Fusionne une autre progression (compte, autre onglet) avec celle de cet onglet, sans rien perdre.
+   Renvoie true si ce qui s'affiche (étapes, leçons finies, examens, XP) a changé. */
+const progSig=()=>JSON.stringify([S.xp, S.pos, S.part, Object.keys(S.done).sort(), S.exams, Object.entries(S.examRun).map(([k,v])=>k+v.res.length)]);
+function mergeState(r,{write=true}={}){
   r=Object.assign(blankState(), r||{});
-  const m=blankState();
+  const before=progSig(), m=blankState();
   m.done=Object.assign({}, r.done, S.done);
   m.xp=Math.max(S.xp, r.xp);
   const newer=(r.lastDay||'')>(S.lastDay||'') ? r : S; m.lastDay=newer.lastDay; m.streak=(r.lastDay===S.lastDay)?Math.max(r.streak,S.streak):newer.streak;
   const latest=r.updated>S.updated ? r : S, other=latest===r ? S : r;
-  m.pos=Object.assign({}, other.pos, latest.pos);
+  // étape atteinte dans chaque leçon : la plus avancée des deux gagne, on ne recule jamais
+  for(const k of new Set([...Object.keys(S.pos), ...Object.keys(r.pos)])){
+    if(m.done[k]) continue;
+    m.pos[k]=Math.max(S.pos[k]||0, r.pos[k]||0);
+    const pk=[S.part[k], r.part[k]].filter(v=>v&&v.i===m.pos[k]).map(v=>v.k);   // question atteinte dans le problème de cette étape
+    if(pk.length) m.part[k]={i:m.pos[k], k:Math.max(...pk)};
+  }
   m.ardoise=Object.assign({}, other.ardoise, latest.ardoise);
   m.notes=Object.assign({}, other.notes, latest.notes);
-  m.examRun=Object.assign({}, other.examRun, latest.examRun);
   m.textes=Object.assign({}, other.textes, latest.textes);   // textes écrits en langue
-  m.vocab=Object.assign({}, other.vocab, latest.vocab);      // révision espacée du vocabulaire   // examens en cours : la version la plus récente gagne
-  m.exams=Object.assign({}, other.exams, latest.exams);   // garde le meilleur score des deux côtés
-  for(const k in r.exams) if(S.exams?.[k]) m.exams[k].best=Math.max(r.exams[k].best, S.exams[k].best);
+  m.vocab=Object.assign({}, other.vocab, latest.vocab);      // révision espacée du vocabulaire
+  m.exams=Object.assign({}, other.exams, latest.exams);      // garde le meilleur score des deux côtés
+  for(const k in r.exams) if(S.exams[k]) m.exams[k]={...m.exams[k], best:Math.max(r.exams[k].best, S.exams[k].best)};
+  // examens en cours : à tirage égal le plus avancé gagne, sinon le plus récent ; un examen terminé depuis n'est plus « en cours »
+  m.examRun=Object.assign({}, other.examRun, latest.examRun);
+  for(const k in m.examRun){
+    const a=S.examRun[k], b=r.examRun[k];
+    if(a&&b&&a.o.join()===b.o.join()) m.examRun[k]=a.res.length>=b.res.length?a:b;
+    if((m.exams[k]?.t||0)>(m.examRun[k].t||0)) delete m.examRun[k];
+  }
   m.last=latest.last||other.last; m.updated=Math.max(S.updated, r.updated);
-  S=m; store.set(S); renderStats();
+  // S et ses tables gardent leur identité : le reste du code peut en tenir une référence
+  for(const k in m){ const v=m[k];
+    if(v&&typeof v==='object'&&S[k]&&typeof S[k]==='object'){ for(const j in S[k]) delete S[k][j]; Object.assign(S[k], v); } else S[k]=v; }
+  if(write) store.set(S);
+  renderStats();
+  return progSig()!==before;
 }
+/* Après une fusion : l'affichage suit, sans déranger une leçon ouverte */
+function refreshView(){
+  if(document.getElementById('player').hidden){ const y=scrollY; render(); scrollTo(0,y); return; }
+  if(!L||X||idx>=L.steps.length) return;
+  const far=S.done[L.id]?L.steps.length-1:Math.min(S.pos[L.id]||0, L.steps.length-1);
+  if(far>L.far){ L.far=far; segs(); }
+}
+addEventListener('storage',e=>{ if(e.key==='declic'&&absorb()) refreshView(); });
+const backHere=()=>{ if(!document.hidden&&absorb()) refreshView(); };
+document.addEventListener('visibilitychange',backHere); addEventListener('pageshow',backHere);
 
 const $ = (h)=>{ const t=document.createElement('template'); t.innerHTML=h.trim(); return t.content.firstElementChild; };
 
@@ -481,7 +516,7 @@ const foot=document.getElementById('foot'), fb=document.getElementById('fb'), ac
 function openLesson(id,at){
   X=null; L=LESSONS[id]; L.id=id; const p=S.pos[id]; Langue.setLang(COURS_OF[id]?.sj.lang);
   // far : étape la plus avancée déjà atteinte ; toutes les étapes d'avant se revoient en touchant la barre
-  L.far=S.done[id]?L.steps.length-1:(p>0&&p<L.steps.length)?p:0;
+  L.far=S.done[id]?L.steps.length-1:p>0?Math.min(p, L.steps.length-1):0;
   idx=at??L.far; if(S.done[id]&&at==null) idx=0;
   document.getElementById('player').hidden=false; document.body.style.overflow='hidden'; document.body.classList.add('in-lesson');
   showStep(); window.Ardoise?.onLesson(id);
@@ -579,9 +614,12 @@ function buildProblem(st,c,ctx){
     li.classList.remove('active'); li.classList.add('done');
     li.querySelectorAll('button,input').forEach(e=>{ e.disabled=true; e.classList.remove('cible'); });
     li.querySelector('.hint-btn')?.remove(); const pw=li.querySelector('.pwhy'); pw.innerHTML=Langue.isText(q)?Langue.why(q,null,true):q.why; pw.hidden=false; };
-  ctx.advance=()=>{ ctx.partDone(); activate(ctx.part+1); };
+  ctx.advance=()=>{ ctx.partDone(); activate(ctx.part+1); if(!ctx.review){ S.part[L.id]={i:idx,k:ctx.part}; save(); } };
   ctx.finishProblem=()=>{ ctx.partDone(); solBox.hidden=false; solBox.open=true; };
   activate(0);
+  // reprise : les questions déjà réussies de ce problème restent faites, avec leur correction
+  const at=!ctx.review&&S.part[L.id]?.i===idx?Math.min(S.part[L.id].k, st.parts.length-1):0;
+  while(ctx.part<at){ ctx.partDone(); activate(ctx.part+1); }
 }
 
 const kindOf=st=>st.kind||(st.demo?'Méthode':st.parts?'Problème':st.dictee!==undefined?'Dictée':st.dire||st.oral?'Oral':st.ecrire?'Écriture':st.mots?'Vocabulaire':st.audio&&st.opts?'Écoute':st.ok?'Pratique':(st.opts||'ans' in st||Langue.isText(st))?'Question':'Théorie');
@@ -612,7 +650,9 @@ function showStep(){
   window.Ink?.attachCard(card, L.id+':'+idx);
   document.querySelector('.p-body').scrollTop=0;
   if(idx>L.far) L.far=idx;
-  S.last=L.id; if(L.far>0&&!S.done[L.id]) S.pos[L.id]=L.far; save();
+  S.last=L.id; if(L.far>0&&!S.done[L.id]) S.pos[L.id]=Math.max(L.far, S.pos[L.id]||0);
+  if(S.part[L.id]&&(S.done[L.id]||S.part[L.id].i<L.far)) delete S.part[L.id];
+  save();
   if(ctx.check){ phase='ask'; setFoot('', '', '', 'Vérifier', ctx.answer!==null); }
   else { phase='next'; setFoot('', '', '', 'Continuer'); }
 }
@@ -628,7 +668,9 @@ async function onAction(){
       if(!ctx.review) S.xp+=prob?(ctx.tries===1&&!ctx.hinted?15:8):(ctx.tries===1?10:5); bumpStreak(); save();
       const title=ctx.tries===1?'Bravo !':'C’est ça !';
       if(r.more){ phase='nextpart'; setFoot('ok', title, r.why, 'Question suivante'); }
-      else { if(prob) ctx.finishProblem(); phase='next'; setFoot('ok', title, prob?(COURS_OF[L.id]?.sj.lang?'Mission accomplie. Le corrigé est ouvert ci-dessus.':'Problème résolu. La solution rédigée est ouverte ci-dessus.'):r.why, 'Continuer'); }
+      else { if(prob) ctx.finishProblem(); phase='next';
+        if(!ctx.review&&!S.done[L.id]&&idx<L.steps.length-1){ S.pos[L.id]=Math.max(idx+1, S.pos[L.id]||0); delete S.part[L.id]; save(); }   // étape réussie : acquise même si on quitte avant « Continuer »
+        setFoot('ok', title, prob?(COURS_OF[L.id]?.sj.lang?'Mission accomplie. Le corrigé est ouvert ci-dessus.':'Problème résolu. La solution rédigée est ouverte ci-dessus.'):r.why, 'Continuer'); }
     }
     else { phase='ask'; setFoot('bad','Pas tout à fait', ctx.tries>=2?r.why:r.near?(typeof r.near==='string'?r.near:'Presque : une lettre seulement diffère de la réponse attendue. Relis chaque mot (orthographe, mais aussi than/then, worse/worst…).'):(prob?'Essaie encore. L’indice peut t’aider, et l’ardoise sert à poser tes calculs.':'Essaie encore. Indice disponible au prochain essai.'), 'Vérifier', ctx.answer!==null); }
     return;
@@ -642,7 +684,7 @@ async function onAction(){
 }
 function finish(){
   idx=L.steps.length; L.far=L.steps.length-1; segs(); back.hidden=true;
-  const first=!S.done[L.id]; S.done[L.id]=true; delete S.pos[L.id]; if(first) S.xp+=20; bumpStreak(); save();
+  const first=!S.done[L.id]; S.done[L.id]=true; delete S.pos[L.id]; delete S.part[L.id]; if(first) S.xp+=20; bumpStreak(); save();
   const card=document.getElementById('card');
   card.innerHTML=`<div class="done-wrap"><svg width="120" height="120" viewBox="0 0 120 120"><circle cx="60" cy="60" r="54" fill="var(--spark-soft)"/><path d="m60 22 10.6 23.4 25.4 2.4-19.2 16.8 5.6 25L60 76.8 37.6 89.6l5.6-25L24 47.8l25.4-2.4Z" fill="var(--spark)"/></svg>
     <h2>Leçon terminée</h2><div class="big-xp">${S.xp} XP</div><p style="color:var(--muted)">${first?'+20 XP de bonus pour ta première fois.':'Révision faite.'} Série en cours : ${liveStreak()} jour${liveStreak()>1?'s':''}.</p></div>`;
@@ -676,7 +718,7 @@ async function startExam(id, fresh=false){
   // Un examen interrompu est gardé dans S.examRun[id] : ordre des questions (o) et résultats déjà donnés (res, 1 = juste)
   let run=fresh?null:S.examRun[id];
   if(run&&(run.o.length!==all.length||run.res.length>=all.length||run.o.some(j=>!all[j]))) run=null;   // examen modifié depuis
-  if(!run){ run={o:shuffle(all.map((_,j)=>j)), res:[]}; S.examRun[id]=run; save(); }
+  if(!run){ run={o:shuffle(all.map((_,j)=>j)), res:[], t:Date.now()}; S.examRun[id]=run; save(); }
   X={id, notions:ex, items:run.o.map(j=>all[j]), i:run.res.length, res:run.res.map(Boolean)};
   document.getElementById('player').hidden=false; document.body.style.overflow='hidden'; document.body.classList.add('in-lesson');
   window.Ardoise?.onLesson(id); back.hidden=true; examQ();
@@ -717,7 +759,7 @@ function examEnd(){
   const n=X.items.length, sc=X.res.filter(Boolean).length, pc=Math.round(sc/n*100);
   const per=X.notions.map((g,k)=>{ const r=X.items.map((it,i)=>it.k===k?X.res[i]:null).filter(v=>v!==null); return {g, ok:r.filter(Boolean).length, n:r.length}; });
   const acq=per.filter(p=>p.ok/p.n>=.75), rev=per.filter(p=>p.ok/p.n<.75);
-  const prev=S.exams[X.id]; S.exams[X.id]={best:Math.max(sc,prev?.best||0), last:sc, n, day:today()}; delete S.examRun[X.id]; save();
+  const prev=S.exams[X.id]; S.exams[X.id]={best:Math.max(sc,prev?.best||0), last:sc, n, day:today(), t:Date.now()}; delete S.examRun[X.id]; save();
   const level=pc>=90?['Maîtrisé','Tout le chapitre est en place.']:pc>=75?['Bien acquis','L’essentiel est solide.']:pc>=50?['En bonne voie','La base est là, quelques notions demandent encore de l’entraînement.']:['À retravailler','Reprends les notions ci-dessous puis repasse l’examen.'];
   const list=ps=>ps.map(p=>`<li><div class="row"><span>${p.g.n}</span><b>${p.ok} / ${p.n}</b></div><div class="bar"><span style="width:${p.ok/p.n*100}%"></span></div></li>`).join('');
   const names=ps=>ps.map(p=>/^.[a-zà-ÿ ]/.test(p.g.n)?p.g.n.charAt(0).toLowerCase()+p.g.n.slice(1):p.g.n).join(', ').replace(/, ([^,]*)$/,' et $1');
@@ -748,3 +790,4 @@ act.onclick=onAction;
 document.getElementById('quit').onclick=closeLesson;
 document.getElementById('home-btn').onclick=()=>{ document.getElementById('player').hidden=true; document.body.style.overflow=''; document.body.classList.remove('in-lesson'); window.Ardoise?.onLesson(null); go('home'); };
 renderStats(); render();
+try{ navigator.storage?.persist?.()?.catch?.(()=>{}); }catch(e){}   // demande au navigateur de ne pas vider la progression quand la place manque

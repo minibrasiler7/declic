@@ -48,3 +48,5 @@ Commit, push : GitHub Pages republie le site en une ou deux minutes.
 
 ## Ce qui est synchronisé
 L'objet de progression complet : leçons terminées, étape en cours de chaque leçon, XP, série de jours, contenu des ardoises. À la connexion, la progression locale et celle du compte sont fusionnées : rien n'est perdu.
+
+Un onglet ou un appareil resté ouvert ne peut pas faire reculer la progression : avant chaque écriture, le site regarde si le compte a été modifié ailleurs (colonne `updated_at`) et fusionne d'abord. Il refait cette vérification à chaque retour sur l'onglet. Dans une leçon, c'est toujours l'étape la plus avancée qui est gardée.

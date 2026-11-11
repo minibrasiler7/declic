@@ -22,30 +22,57 @@ window.Compte = (()=>{
     const w=document.getElementById('save-where'); if(w) w.textContent=user?'Ta progression est enregistrée sur ton compte.':'Ta progression est enregistrée dans ce navigateur. Crée un compte pour la retrouver partout.';
   }
 
+  /* Synchronisation. lastRemote = date de la ligne du compte telle qu'on l'a lue ou écrite en dernier :
+     si elle a changé, un autre appareil a écrit entre-temps, et on fusionne avant d'écrire pour ne rien écraser. */
+  let lastRemote=null, busy=false, again=false, lastCheck=0;
+  const row=()=>sb.from('progression');
   async function pull(){
-    const {data,error}=await sb.from('progression').select('data').eq('user_id',user.id).maybeSingle();
+    const {data,error}=await row().select('data,updated_at').eq('user_id',user.id).maybeSingle();
     if(error) throw error;
-    mergeState(data?.data); await pushNow(); if(typeof render==='function'&&document.getElementById('player').hidden) render();
+    lastRemote=data?.updated_at||null;
+    if(data?.data&&mergeState(data.data)) refreshView();
+  }
+  async function changedElsewhere(){
+    const {data,error}=await row().select('updated_at').eq('user_id',user.id).maybeSingle();
+    if(error) throw error;
+    return (data?.updated_at||null)!==lastRemote;
   }
   async function pushNow(){
-    if(!sb||!user) return; clearTimeout(timer);
-    const {error}=await sb.from('progression').upsert({user_id:user.id, data:S, updated_at:new Date().toISOString()});
-    status=error?'Erreur de synchronisation : '+error.message:'Synchronisé à '+new Date().toLocaleTimeString('fr-CH',{hour:'2-digit',minute:'2-digit'});
+    if(!sb||!user) return; clearTimeout(timer); timer=null;
+    if(busy){ again=true; return; }
+    busy=true;
+    try{
+      if(await changedElsewhere()) await pull();
+      const {data,error}=await row().upsert({user_id:user.id, data:S, updated_at:new Date().toISOString()}).select('updated_at').maybeSingle();
+      if(!error&&data?.updated_at) lastRemote=data.updated_at;
+      status=error?'Erreur de synchronisation : '+error.message:'Synchronisé à '+new Date().toLocaleTimeString('fr-CH',{hour:'2-digit',minute:'2-digit'});
+    }catch(e){ status='Erreur de synchronisation : '+(e.message||'connexion impossible'); }
+    finally{ busy=false; if(again){ again=false; push(); } }
   }
-  function push(){ if(!sb||!user) return; clearTimeout(timer); timer=setTimeout(pushNow,1500); }
+  function push(){ if(!sb||!user) return; clearTimeout(timer); timer=setTimeout(pushNow,800); }
+  /* Retour sur l'onglet ou l'app (souvent restés ouverts sur un iPad) : on reprend ce qu'un autre appareil a fait depuis */
+  async function refresh(){
+    if(!sb||!user||busy||Date.now()-lastCheck<3000) return; lastCheck=Date.now();
+    try{ if(await changedElsewhere()){ await pull(); push(); } }catch(e){}
+  }
 
   async function init(){
     if(!on){ paintButton(); return; }
     try{ await loadLib(); }catch(e){ paintButton(); return; }
     sb=window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey);
     const {data}=await sb.auth.getSession(); user=data.session?.user||null; paintButton();
-    if(user) pull().catch(()=>{});
+    const first=()=>pull().then(pushNow).catch(()=>{});
+    if(user) first();
     sb.auth.onAuthStateChange((ev,session)=>{
       const was=user?.id; user=session?.user||null; paintButton();
-      if(user&&user.id!==was) pull().catch(()=>{});
+      if(user&&user.id!==was){ lastRemote=null; first(); }
       if(ev==='PASSWORD_RECOVERY') openModal('reset');
     });
-    addEventListener('beforeunload',()=>{ if(timer) pushNow(); });
+    // iOS ne prévient pas toujours à la fermeture : on envoie ce qui attend dès que la page passe à l'arrière-plan
+    const flush=()=>{ if(timer) pushNow(); };
+    document.addEventListener('visibilitychange',()=>{ if(document.hidden) flush(); else refresh(); });
+    addEventListener('pagehide',flush); addEventListener('pageshow',e=>{ if(e.persisted) refresh(); });
+    addEventListener('focus',refresh); addEventListener('online',()=>{ refresh(); push(); });
   }
 
   /* Fenêtre de compte : connexion, inscription, mot de passe oublié, profil */
